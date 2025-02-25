@@ -21,11 +21,11 @@ export const sessionTable = pgTable('session', {
   }).notNull(),
 });
 
-export const userRelations = relations(userTable, ({ many }) => ({
-  sessions: many(sessionTable ),
+const userRelations = relations(userTable, ({ many }) => ({
+  sessions: many(sessionTable),
 }));
 
-export const sessionRelations = relations(sessionTable, ({ one }) => ({
+const sessionRelations = relations(sessionTable, ({ one }) => ({
   user: one(userTable, {
     fields: [sessionTable.userId],
     references: [userTable.id],
