@@ -7,6 +7,7 @@
     "@hono/zod-validator": "^0.4.3",
     "@lucia-auth/adapter-drizzle": "^1.1.0",
     "drizzle-orm": "^0.39.3",
+    "drizzle-zod": "^0.7.0",
     "hono": "^4.7.2",
     "lucia": "^3.2.2",
     "pg": "^8.13.3",
