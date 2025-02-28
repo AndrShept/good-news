@@ -2,9 +2,11 @@ import { z } from 'zod';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
-import { sessionTable, userTable } from './schema/auth';
-import { commentTable } from './schema/comments';
-import { postTable } from './schema/posts';
+import { sessionTable, userTable } from './schema/auth-schema';
+import * as posts from './schema/posts-schema';
+import * as auth from './schema/auth-schema';
+import * as comments from './schema/comments-schema';
+import * as upvotes from './schema/upvotes-schema';
 
 const EnvSchema = z.object({
   DATABASE_URL: z.string().url(),
@@ -18,10 +20,10 @@ const queryClient = postgres(processEnv.DATABASE_URL);
 export const db = drizzle({
   client: queryClient,
   schema: {
-    auth: userTable,
-    session: sessionTable,
-    comment: commentTable,
-    post: postTable,
+    ...posts,
+    ...auth,
+    ...comments,
+    ...upvotes,
   },
 });
 

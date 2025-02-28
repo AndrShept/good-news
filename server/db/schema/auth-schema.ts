@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
-import { postTable } from './posts';
-import { commentTable } from './comments';
+import { postTable } from './posts-schema';
+import { commentTable } from './comments-schema';
 
 export const userTable = pgTable('user', {
   id: text().primaryKey(),
@@ -15,7 +15,7 @@ export const userTable = pgTable('user', {
     .defaultNow(),
   updatedAt: timestamp('updated_at'),
 });
-const userRelations = relations(userTable, ({ many }) => ({
+export const userRelations = relations(userTable, ({ many }) => ({
   sessions: many(sessionTable),
   posts: many(postTable),
   comments: many(commentTable),
@@ -35,7 +35,7 @@ export const sessionTable = pgTable('session', {
   }).notNull(),
 });
 
-const sessionRelations = relations(sessionTable, ({ one }) => ({
+export const sessionRelations = relations(sessionTable, ({ one }) => ({
   user: one(userTable, {
     fields: [sessionTable.userId],
     references: [userTable.id],

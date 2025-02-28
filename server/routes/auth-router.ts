@@ -4,7 +4,7 @@ import { zValidator } from '@hono/zod-validator';
 import { loginSchema, type SuccessResponse } from '../../shared/types';
 import { generateId, type User } from 'lucia';
 import { db } from '../db/db';
-import { userTable } from '../db/schema/auth';
+import { userTable } from '../db/schema/auth-schema';
 import { lucia } from '../lucia';
 import { HTTPException } from 'hono/http-exception';
 import postgres from 'postgres';
@@ -48,7 +48,7 @@ authRouter.post('/sighup', zValidator('form', loginSchema), async (c) => {
 
 authRouter.post('/login', zValidator('form', loginSchema), async (c) => {
   const { password, username } = c.req.valid('form');
-  const existingUser = await db.query.auth.findFirst({
+  const existingUser = await db.query.userTable.findFirst({
     where: eq(userTable.username, username),
   });
   if (!existingUser) {

@@ -3,17 +3,18 @@ import { HTTPException } from 'hono/http-exception';
 import type { ErrorResponse } from '../shared/types';
 import { cors } from 'hono/cors';
 import type { Context } from './context';
-import { authRouter } from './routes/auth';
+import { authRouter } from './routes/auth-router';
 import { sessionHandler } from './middleware/sessionHandler';
-import { postRouter } from './routes/posts';
+import { postRouter } from './routes/posts-router';
+import { logger } from 'hono/logger';
 
-const app = new Hono<Context>().basePath('api');
+const app = new Hono<Context>().basePath('/api');
 app.use('*', cors(), sessionHandler);
-
+app.use(logger())
 
 //APP ROUTES
 app.route('/auth', authRouter);
-app.route('/', postRouter);
+app.route('/post', postRouter);
 
 
 app.onError((err, c) => {

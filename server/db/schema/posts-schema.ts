@@ -1,9 +1,10 @@
 import { relations } from 'drizzle-orm';
 import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
-import { userTable } from './auth';
-import { commentTable } from './comments';
+import { userTable } from './auth-schema';
+import { commentTable } from './comments-schema';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
+import { postUpvotesTable } from './upvotes-schema';
 
 export const postTable = pgTable('post', {
   id: serial().primaryKey(),
@@ -23,22 +24,12 @@ export const postTable = pgTable('post', {
   updatedAt: timestamp('updated_at'),
 });
 
-const postRelations = relations(postTable, ({ one, many }) => ({
+export const postRelations = relations(postTable, ({ one, many }) => ({
   author: one(userTable, {
     fields: [postTable.authorId],
     references: [userTable.id],
   }),
   comments: many(commentTable),
+  upvotes: many(postUpvotesTable),
 }));
 
-export const insertPostSchema = createInsertSchema(postTable, {
-  title: z.string().min(3),
-  url: z
-    .string()
-    .trim()
-    .url({ message: 'URL must be a valid URL' })
-    .optional()
-    .or(z.literal('')),
-  content: z.string().optional(),
-
-})
