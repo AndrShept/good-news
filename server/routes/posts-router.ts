@@ -12,6 +12,9 @@ import {
 } from '../../shared/types';
 import { db } from '../db/db';
 import { and, asc, countDistinct, desc, eq, sql } from 'drizzle-orm';
+import { z } from 'zod';
+import { postUpvotesTable } from '../db/schema/upvotes-schema';
+import { HTTPException } from 'hono/http-exception';
 
 export const postRouter = new Hono<Context>();
 
@@ -49,8 +52,6 @@ postRouter.get(
   async (c) => {
     const { limit, order, page, sortBy, author, site } = c.req.valid('query');
     const user = c.get('user');
-    console.log('user', user);
-
     const offset = (page - 1) * limit;
     const sortByColumn =
       sortBy === 'points' ? postTable.points : postTable.createdAt;
@@ -82,24 +83,84 @@ postRouter.get(
         },
         upvotes: true,
       },
-      extras: user
-        ? {
-            isUpvoted: sql<boolean>`EXISTS (
+      extras: {
+        isUpvoted: user
+          ? sql<boolean>`EXISTS (
           SELECT 1 FROM post_upvotes 
           WHERE post_upvotes.post_id = ${postTable.id} 
           AND post_upvotes.user_id = ${user?.id}
-        )`.as('is_upvoted'),
-          }
-        : {},
+        )`.as('is_upvoted')
+          : sql<boolean>`FALSE`.as('is_upvoted'),
+      },
     });
 
     return c.json<PaginatedResponse<Post[]>>({
       success: true,
-      message: 'get posts',
+      message: 'Posts fetched',
       data: posts,
       pagination: {
         page,
         totalPages: Math.ceil(count.count / limit),
+      },
+    });
+  }
+);
+
+postRouter.post(
+  '/:id/upvote',
+  loggedIn,
+  zValidator('param', z.object({ id: z.number({ coerce: true }) })),
+  async (c) => {
+    const { id } = c.req.valid('param');
+    const userId = c.get('user')?.id ?? '';
+
+    const post = await db.query.postTable.findFirst({
+      where: eq(postTable.id, id),
+    });
+    if (!post) {
+      throw new HTTPException(404, {
+        message: 'Post not found',
+      });
+    }
+    const data = {
+      message: '',
+      point: 0,
+    };
+
+    await db.transaction(async (tx) => {
+      const existUpvote = await tx.query.postUpvotesTable.findFirst({
+        where: and(
+          eq(postUpvotesTable.postId, id),
+          eq(postUpvotesTable.userId, userId)
+        ),
+      });
+      if (existUpvote) {
+        await tx
+          .delete(postUpvotesTable)
+          .where(
+            and(
+              eq(postUpvotesTable.postId, id),
+              eq(postUpvotesTable.userId, userId)
+            )
+          );
+        data.message = 'You delete upvoted  post';
+        data.point = 0;
+      } else {
+        await tx.insert(postUpvotesTable).values({
+          postId: id,
+          userId,
+        });
+        data.message = 'You upvoted post';
+        data.point = 1;
+      }
+    });
+
+    return c.json<SuccessResponse<{ count: number; isUpvoted: boolean }>>({
+      success: true,
+      message: data.message,
+      data: {
+        count: data.point,
+        isUpvoted: data.point === 1,
       },
     });
   }
