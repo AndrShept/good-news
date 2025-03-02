@@ -1,9 +1,10 @@
 import { relations } from 'drizzle-orm';
 import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
-import { userTable } from './auth-schema';
-import { commentTable } from './comments-schema';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
+
+import { userTable } from './auth-schema';
+import { commentTable } from './comments-schema';
 import { postUpvotesTable } from './upvotes-schema';
 
 export const postTable = pgTable('post', {

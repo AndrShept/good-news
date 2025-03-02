@@ -1,5 +1,5 @@
 {
-  "id": "5ee112ee-74e4-437c-9a52-5949fd6be732",
+  "id": "7fb36723-907a-4599-a7fc-aa76a516b36a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -144,12 +144,6 @@
           "notNull": true,
           "default": 0
         },
-        "parent_comment_id": {
-          "name": "parent_comment_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "author_id": {
           "name": "author_id",
           "type": "text",
@@ -225,7 +219,7 @@
           "name": "content",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "title": {
           "name": "title",

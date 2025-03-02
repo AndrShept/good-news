@@ -1,14 +1,15 @@
-import { Hono } from 'hono';
-import type { Context } from '../context';
 import { zValidator } from '@hono/zod-validator';
-import { loginSchema, type SuccessResponse } from '../../shared/types';
-import { generateId, type User } from 'lucia';
+import { and, eq } from 'drizzle-orm';
+import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
+import { type User, generateId } from 'lucia';
+import postgres from 'postgres';
+
+import { type SuccessResponse, loginSchema } from '../../shared/types';
+import type { Context } from '../context';
 import { db } from '../db/db';
 import { userTable } from '../db/schema/auth-schema';
 import { lucia } from '../lucia';
-import { HTTPException } from 'hono/http-exception';
-import postgres from 'postgres';
-import { and, eq } from 'drizzle-orm';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const authRouter = new Hono<Context>();
@@ -33,7 +34,7 @@ authRouter.post('/sighup', zValidator('form', loginSchema), async (c) => {
         success: true,
         message: 'User created',
       },
-      201
+      201,
     );
   } catch (error) {
     if (error instanceof postgres.PostgresError && error.code === '23505') {
@@ -58,7 +59,7 @@ authRouter.post('/login', zValidator('form', loginSchema), async (c) => {
   }
   const validPassword = await Bun.password.verify(
     password,
-    existingUser.password_hash
+    existingUser.password_hash,
   );
   if (!validPassword) {
     throw new HTTPException(401, {
@@ -75,7 +76,7 @@ authRouter.post('/login', zValidator('form', loginSchema), async (c) => {
       message: 'Logged in',
       data: existingUser,
     },
-    200
+    200,
   );
 });
 

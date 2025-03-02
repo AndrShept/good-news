@@ -1,4 +1,5 @@
 import type { Context, Next } from 'hono';
+
 import { lucia } from '../lucia';
 
 export const sessionHandler = async (c: Context, next: Next) => {

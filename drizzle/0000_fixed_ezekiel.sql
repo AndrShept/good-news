@@ -20,7 +20,6 @@ CREATE TABLE "comment" (
 	"depth" integer DEFAULT 0 NOT NULL,
 	"points" integer DEFAULT 0 NOT NULL,
 	"comment_count" integer DEFAULT 0 NOT NULL,
-	"parent_comment_id" text,
 	"author_id" text NOT NULL,
 	"post_id" integer NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -29,7 +28,7 @@ CREATE TABLE "comment" (
 --> statement-breakpoint
 CREATE TABLE "post" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"content" text NOT NULL,
+	"content" text,
 	"title" text NOT NULL,
 	"url" text,
 	"points" integer DEFAULT 0 NOT NULL,

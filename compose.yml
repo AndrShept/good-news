@@ -24,7 +24,7 @@ services:
     networks:
       - betternews-network
     ports:
-      - "5432:5432"
+      - '5432:5432'
 
 networks:
   betternews-network:

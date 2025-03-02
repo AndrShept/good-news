@@ -1,21 +1,21 @@
 import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
-import type { ErrorResponse } from '../shared/types';
 import { cors } from 'hono/cors';
-import type { Context } from './context';
-import { authRouter } from './routes/auth-router';
-import { sessionHandler } from './middleware/sessionHandler';
-import { postRouter } from './routes/posts-router';
+import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 
+import type { ErrorResponse } from '../shared/types';
+import type { Context } from './context';
+import { sessionHandler } from './middleware/sessionHandler';
+import { authRouter } from './routes/auth-router';
+import { postRouter } from './routes/post-router';
+
 const app = new Hono<Context>().basePath('/api');
+app.use(logger());
 app.use('*', cors(), sessionHandler);
-app.use(logger())
 
 //APP ROUTES
 app.route('/auth', authRouter);
 app.route('/post', postRouter);
-
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
@@ -30,7 +30,7 @@ app.onError((err, c) => {
               ? err.cause.form === true
               : false,
         },
-        err.status
+        err.status,
       );
     return errResponse;
   }
@@ -41,10 +41,12 @@ app.onError((err, c) => {
       error:
         process.env.NODE_ENV === 'production'
           ? 'Interal Server Error'
-          : err.stack ?? err.message,
+          : (err.stack ?? err.message),
     },
-    500
+    500,
   );
 });
+
+export type AppType = typeof app;
 
 export default app;

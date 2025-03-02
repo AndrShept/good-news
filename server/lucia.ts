@@ -1,4 +1,5 @@
 import { Lucia } from 'lucia';
+
 import { adapter } from './db/db';
 
 export const lucia = new Lucia(adapter, {

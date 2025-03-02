@@ -1,11 +1,12 @@
-import { z } from 'zod';
+import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
+import { z } from 'zod';
+
 import { sessionTable, userTable } from './schema/auth-schema';
-import * as posts from './schema/posts-schema';
 import * as auth from './schema/auth-schema';
 import * as comments from './schema/comments-schema';
+import * as posts from './schema/posts-schema';
 import * as upvotes from './schema/upvotes-schema';
 
 const EnvSchema = z.object({
@@ -30,5 +31,5 @@ export const db = drizzle({
 export const adapter = new DrizzlePostgreSQLAdapter(
   db,
   sessionTable,
-  userTable
+  userTable,
 );

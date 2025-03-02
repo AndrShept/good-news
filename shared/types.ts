@@ -1,9 +1,10 @@
-import { z } from 'zod';
-import { postTable } from '../server/db/schema/posts-schema';
 import type { InferSelectModel } from 'drizzle-orm';
-import type { commentTable } from '../server/db/schema/comments-schema';
 import { createInsertSchema } from 'drizzle-zod';
+import { z } from 'zod';
+
 import type { userTable } from '../server/db/schema/auth-schema';
+import { commentTable } from '../server/db/schema/comments-schema';
+import { postTable } from '../server/db/schema/posts-schema';
 
 export type SuccessResponse<T = undefined> = {
   success: true;
@@ -26,12 +27,7 @@ export const loginSchema = z.object({
 
 export const createPostSchema = createInsertSchema(postTable, {
   title: z.string().min(3),
-  url: z
-    .string()
-    .trim()
-    .url({ message: 'URL must be a valid URL' })
-    .optional()
-    .or(z.literal('')),
+  url: z.string().trim().url({ message: 'URL must be a valid URL' }).optional().or(z.literal('')),
   content: z.string().min(3).optional().or(z.literal('')),
 })
   .pick({
@@ -43,6 +39,14 @@ export const createPostSchema = createInsertSchema(postTable, {
     message: 'Either URL or Content must be provided',
     path: ['url', 'content'],
   });
+
+const insertCommentSchema = createInsertSchema(commentTable, {
+  content: z.string().min(1).trim(),
+});
+
+export const createCommentSchema = insertCommentSchema.pick({
+  content: true,
+});
 
 export const sortBySchema = z.enum(['points', 'recent']);
 export const orderSchema = z.enum(['asc', 'desc']);
@@ -69,7 +73,7 @@ export const paginationSchema = z.object({
 export type User = InferSelectModel<typeof userTable>;
 export type Post = InferSelectModel<typeof postTable> & {
   comments?: Comments[];
-  author?: Omit<User , 'password_hash'>;
+  author?: Omit<User, 'password_hash'>;
   isUpvoted?: boolean;
 };
 export type Comments = InferSelectModel<typeof commentTable> & {

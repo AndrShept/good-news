@@ -1,6 +1,6 @@
 {
-  "id": "7345a10a-9f37-44ed-91bd-d7913e1b794c",
-  "prevId": "7fb36723-907a-4599-a7fc-aa76a516b36a",
+  "id": "b85c5686-617c-4959-b2d5-513fbb243f05",
+  "prevId": "7345a10a-9f37-44ed-91bd-d7913e1b794c",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -143,12 +143,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": 0
-        },
-        "parent_comment_id": {
-          "name": "parent_comment_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
         },
         "author_id": {
           "name": "author_id",
