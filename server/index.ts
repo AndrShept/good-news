@@ -8,6 +8,7 @@ import type { Context } from './context';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
 import { postRouter } from './routes/post-router';
+import { commentRouter } from './routes/comment-router';
 
 const app = new Hono<Context>().basePath('/api');
 app.use(logger());
@@ -16,6 +17,7 @@ app.use('*', cors(), sessionHandler);
 //APP ROUTES
 app.route('/auth', authRouter);
 app.route('/post', postRouter);
+app.route('/comment', commentRouter);
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {

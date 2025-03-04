@@ -1,8 +1,8 @@
-import type { InferSelectModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-import type { userTable } from '../server/db/schema/auth-schema';
+import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 
@@ -69,7 +69,6 @@ export const paginationSchema = z.object({
   author: z.optional(z.string()),
   site: z.string().optional(),
 });
-
 export type User = InferSelectModel<typeof userTable>;
 export type Post = InferSelectModel<typeof postTable> & {
   comments?: Comments[];
@@ -77,7 +76,7 @@ export type Post = InferSelectModel<typeof postTable> & {
   isUpvoted?: boolean;
 };
 export type Comments = InferSelectModel<typeof commentTable> & {
-  comments?: Comments[];
+  childComments?: Comments[];
   author?: User;
   isUpvoted?: boolean;
 };

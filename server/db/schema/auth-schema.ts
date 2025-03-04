@@ -3,6 +3,7 @@ import { integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 import { commentTable } from './comments-schema';
 import { postTable } from './posts-schema';
+import { commentUpvotesTable, postUpvotesTable } from './upvotes-schema';
 
 export const userTable = pgTable('user', {
   id: text().primaryKey(),
@@ -20,6 +21,8 @@ export const userRelations = relations(userTable, ({ many }) => ({
   sessions: many(sessionTable),
   posts: many(postTable),
   comments: many(commentTable),
+  postUpvotes: many(postUpvotesTable),
+  commentUpvotes: many(commentUpvotesTable),
 }));
 
 export const sessionTable = pgTable('session', {
