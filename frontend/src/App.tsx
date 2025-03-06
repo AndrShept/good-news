@@ -10,7 +10,7 @@ function App() {
       <main className="flex flex-1 p-4">
         <Outlet />
       </main>
-      <Footer />
+      <Footer  />
     </section>
   );
 }

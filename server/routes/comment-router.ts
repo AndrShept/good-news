@@ -12,9 +12,9 @@ import { postTable } from '../db/schema/posts-schema';
 import { commentUpvotesTable } from '../db/schema/upvotes-schema';
 import { loggedIn } from '../middleware/loggedIn';
 
-export const commentRouter = new Hono<Context>();
+export const commentRouter = new Hono<Context>()
 
-commentRouter.post(
+.post(
   '/:id',
   loggedIn,
   zValidator('param', z.object({ id: z.number({ coerce: true }) })),
@@ -72,9 +72,9 @@ commentRouter.post(
       data: comment,
     });
   },
-);
+)
 
-commentRouter.post('/:id/upvote', loggedIn, zValidator('param', z.object({ id: z.number({ coerce: true }) })), async (c) => {
+.post('/:id/upvote', loggedIn, zValidator('param', z.object({ id: z.number({ coerce: true }) })), async (c) => {
   const { id } = c.req.valid('param');
   const userId = c.get('user')?.id ?? '';
 
@@ -134,9 +134,9 @@ commentRouter.post('/:id/upvote', loggedIn, zValidator('param', z.object({ id: z
       isUpvoted: data.point === 1,
     },
   });
-});
+})
 
-commentRouter.get(
+.get(
   '/:id/comments',
   zValidator('param', z.object({ id: z.number({ coerce: true }) })),
   zValidator('query', paginationSchema),

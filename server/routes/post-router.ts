@@ -20,9 +20,9 @@ import { postTable } from '../db/schema/posts-schema';
 import { postUpvotesTable } from '../db/schema/upvotes-schema';
 import { loggedIn } from '../middleware/loggedIn';
 
-export const postRouter = new Hono<Context>();
+export const postRouter = new Hono<Context>()
 
-postRouter.post('/', loggedIn, zValidator('form', createPostSchema), async (c) => {
+.post('/', loggedIn, zValidator('form', createPostSchema), async (c) => {
   const { title, content, url } = c.req.valid('form');
   const userId = c.get('user')?.id;
   const [post] = await db
@@ -50,9 +50,9 @@ postRouter.post('/', loggedIn, zValidator('form', createPostSchema), async (c) =
     },
     201,
   );
-});
+})
 
-postRouter.get(
+.get(
   '/',
 
   zValidator('query', paginationSchema),
@@ -107,9 +107,9 @@ postRouter.get(
       },
     });
   },
-);
+)
 
-postRouter.post(
+.post(
   '/:id/upvote',
   loggedIn,
   zValidator(
@@ -169,9 +169,9 @@ postRouter.post(
       },
     });
   },
-);
+)
 
-postRouter.post(
+.post(
   '/:id/comment',
   loggedIn,
   zValidator('param', z.object({ id: z.number({ coerce: true }) })),
@@ -217,9 +217,9 @@ postRouter.post(
       data,
     });
   },
-);
+)
 
-postRouter.get(
+.get(
   '/:id/comment',
   zValidator('param', z.object({ id: z.number({ coerce: true }) })),
   zValidator(
@@ -272,9 +272,9 @@ postRouter.get(
       },
     });
   },
-);
+)
 
-postRouter.get('/:id', zValidator('param', z.object({ id: z.number({ coerce: true }) })), async (c) => {
+.get('/:id', zValidator('param', z.object({ id: z.number({ coerce: true }) })), async (c) => {
   const { id } = c.req.valid('param');
   const user = c.get('user');
 

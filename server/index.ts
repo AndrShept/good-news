@@ -10,14 +10,12 @@ import { authRouter } from './routes/auth-router';
 import { postRouter } from './routes/post-router';
 import { commentRouter } from './routes/comment-router';
 
-const app = new Hono<Context>().basePath('/api');
+const app = new Hono<Context>();
 app.use(logger());
 app.use('*', cors(), sessionHandler);
 
 //APP ROUTES
-app.route('/auth', authRouter);
-app.route('/post', postRouter);
-app.route('/comment', commentRouter);
+const routes =  app.basePath('/api').route('/auth', authRouter).route('/post', postRouter).route('/comment', commentRouter);
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
@@ -49,6 +47,6 @@ app.onError((err, c) => {
   );
 });
 
-export type AppType = typeof app;
+export type ApiRoutes = typeof routes
 
 export default app;
