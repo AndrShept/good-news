@@ -12,8 +12,8 @@ export type SuccessResponse<T = undefined> = {
   data?: T;
 };
 export type ErrorResponse = {
-  success: boolean;
-  error: string;
+  success: false;
+  message: string;
   isFormError?: boolean;
 };
 export const loginSchema = z.object({
@@ -21,7 +21,7 @@ export const loginSchema = z.object({
     .string()
     .min(3)
     .max(31)
-    .regex(/^[a-zA-Z0-9_]+$/),
+    .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
   password: z.string().min(3).max(255),
 });
 

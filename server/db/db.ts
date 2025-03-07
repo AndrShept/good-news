@@ -17,7 +17,6 @@ const EnvSchema = z.object({
 const processEnv = EnvSchema.parse(process.env);
 
 const queryClient = postgres(processEnv.DATABASE_URL);
-
 export const db = drizzle({
   client: queryClient,
   schema: {

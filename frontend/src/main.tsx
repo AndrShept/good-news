@@ -14,7 +14,9 @@ import { SignUp } from './components/pages/SignUp.tsx';
 import { ThemeProvider } from './components/providerts/theme-provider.tsx';
 import './index.css';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions:{}
+});
 
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
