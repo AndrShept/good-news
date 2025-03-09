@@ -7,14 +7,14 @@
     "skipLibCheck": true,
 
     "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/shared/*": [
-        "../shared/*"
-      ]
-    },
+    // "paths": {
+    //   "@/*": [
+    //     "./src/*"
+    //   ],
+    //   "@/shared/*": [
+    //     "../shared/*"
+    //   ]
+    // },
 
     /* Bundler mode */
     "moduleResolution": "bundler",

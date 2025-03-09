@@ -23,6 +23,7 @@ export const loginSchema = z.object({
     .max(31)
     .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
   password: z.string().min(3).max(255),
+
 });
 
 export const createPostSchema = createInsertSchema(postTable, {
@@ -34,6 +35,7 @@ export const createPostSchema = createInsertSchema(postTable, {
     title: true,
     url: true,
     content: true,
+    
   })
   .refine((data) => data.url || data.content, {
     message: 'Either URL or Content must be provided',

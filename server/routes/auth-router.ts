@@ -1,3 +1,4 @@
+import type { User as UserType } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -89,12 +90,13 @@ export const authRouter = new Hono<Context>()
   })
 
   .get('/user', loggedIn, async (c) => {
-    const user = c.get('user');
-    return c.json<SuccessResponse<{ username: string }>>({
+    const userId = c.get('user')?.id;
+    const user = await db.query.userTable.findFirst({
+      where: eq(userTable.id, userId!),
+    });
+    return c.json<SuccessResponse<UserType>>({
       success: true,
       message: 'User fetched',
-      data: {
-        username: user?.username ?? '',
-      },
+      data: user,
     });
   });
