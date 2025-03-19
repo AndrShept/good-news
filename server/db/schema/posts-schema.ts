@@ -19,10 +19,13 @@ export const postTable = pgTable('post', {
     .references(() => userTable.id),
   createdAt: timestamp('created_at', {
     withTimezone: true,
+     mode: 'string'
   })
     .notNull()
     .defaultNow(),
-  updatedAt: timestamp('updated_at'),
+  updatedAt: timestamp('updated_at', {
+    mode: 'string'
+  }),
 });
 
 export const postRelations = relations(postTable, ({ one, many }) => ({

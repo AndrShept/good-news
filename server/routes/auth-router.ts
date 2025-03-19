@@ -12,12 +12,17 @@ import { db } from '../db/db';
 import { userTable } from '../db/schema/auth-schema';
 import { lucia } from '../lucia';
 import { loggedIn } from '../middleware/loggedIn';
+import { AvatarGenerator } from 'random-avatar-generator';
 
 export const authRouter = new Hono<Context>()
   .post('/sighup', zValidator('form', loginSchema), async (c) => {
     const { password, username } = c.req.valid('form');
     const passwordHash = await Bun.password.hash(password);
     const userId = generateId(15);
+    const generator = new AvatarGenerator();
+    const randomAvatarUrl = generator
+      .generateRandomAvatar()
+      .replace('Circle', 'Transparent');
 
     const existUsername = await db.query.userTable.findFirst({
       where: eq(userTable.username, username),
@@ -33,6 +38,7 @@ export const authRouter = new Hono<Context>()
       username,
       password_hash: passwordHash,
       id: userId,
+      image: randomAvatarUrl
     });
 
     const session = await lucia.createSession(userId, { username });
@@ -93,6 +99,9 @@ export const authRouter = new Hono<Context>()
     const userId = c.get('user')?.id;
     const user = await db.query.userTable.findFirst({
       where: eq(userTable.id, userId!),
+      with: {
+        
+      }
     });
     return c.json<SuccessResponse<UserType>>({
       success: true,

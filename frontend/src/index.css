@@ -55,7 +55,7 @@
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.985 0 0);
   --primary-foreground: oklch(0.205 0 0);
-  --secondary: #171717;
+  --secondary: #1c1c1c;
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: #c8c9ca;
@@ -128,6 +128,7 @@
   --color-color-3: var(----color-3);
   --color-color-2: var(----color-2);
   --color-color-1: var(----color-1);
+ 
 
   @keyframes aurora-border {
     0%, 100% {

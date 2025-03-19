@@ -1,0 +1,1 @@
+ALTER TABLE "post" ALTER COLUMN "created_at" SET DATA TYPE timestamp;

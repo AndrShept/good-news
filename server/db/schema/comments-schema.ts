@@ -23,10 +23,13 @@ export const commentTable = pgTable('comment', {
     }),
   createdAt: timestamp('created_at', {
     withTimezone: true,
+       mode : 'string'
   })
     .notNull()
     .defaultNow(),
-  updatedAt: timestamp('updated_at'),
+  updatedAt: timestamp('updated_at', {
+       mode : 'string'
+  }),
 });
 
 export const commentRelation = relations(commentTable, ({ one, many }) => ({
@@ -42,10 +45,10 @@ export const commentRelation = relations(commentTable, ({ one, many }) => ({
   parentComment: one(commentTable, {
     fields: [commentTable.parentCommentId],
     references: [commentTable.id],
-    relationName: "childComments",
+    relationName: 'childComments',
   }),
   childComments: many(commentTable, {
-    relationName: "childComments",
+    relationName: 'childComments',
   }),
-  commentUpvotes: many(commentUpvotesTable, { relationName: "commentUpvotes" }),
+  commentUpvotes: many(commentUpvotesTable, { relationName: 'commentUpvotes' }),
 }));

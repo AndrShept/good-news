@@ -23,23 +23,31 @@ export const loginSchema = z.object({
     .max(31)
     .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
   password: z.string().min(3).max(255),
-
 });
 
 export const createPostSchema = createInsertSchema(postTable, {
   title: z.string().min(3),
-  url: z.string().trim().url({ message: 'URL must be a valid URL' }).optional().or(z.literal('')),
   content: z.string().min(3).optional().or(z.literal('')),
+  url: z.string().trim().url({ message: 'URL must be a valid URL' }).optional().or(z.literal('')),
 })
   .pick({
     title: true,
-    url: true,
     content: true,
-    
+    url: true,
   })
-  .refine((data) => data.url || data.content, {
-    message: 'Either URL or Content must be provided',
-    path: ['url', 'content'],
+  .superRefine((data, ctx) => {
+    if (!data.url && !data.content) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Either URL or Content must be provided',
+        path: ['url'],
+      });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Either URL or Content must be provided',
+        path: ['content'],
+      });
+    }
   });
 
 const insertCommentSchema = createInsertSchema(commentTable, {
@@ -52,6 +60,7 @@ export const createCommentSchema = insertCommentSchema.pick({
 
 export const sortBySchema = z.enum(['points', 'recent']);
 export const orderSchema = z.enum(['asc', 'desc']);
+
 
 export const paginationSchema = z.object({
   limit: z
@@ -73,7 +82,6 @@ export const paginationSchema = z.object({
 });
 export type User = InferSelectModel<typeof userTable>;
 export type Post = InferSelectModel<typeof postTable> & {
-  comments?: Comments[];
   author?: Omit<User, 'password_hash'>;
   isUpvoted?: boolean;
 };

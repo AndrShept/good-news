@@ -1,4 +1,3 @@
-import { getUserQueryOptions, signUp } from '@/api/api';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,6 +7,7 @@ import { Link, useNavigate } from 'react-router';
 import { z } from 'zod';
 
 import { Input } from '../ui/input';
+import { getUserQueryOptions, signUp } from '@/api/auth-api';
 
 const loginSchema = z
   .object({
@@ -57,7 +57,7 @@ export const SignUp = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-[320px] flex-col gap-4 md:w-[380px]">
-        <h1 className="text-primary scroll-m-20 border-b pb-2 text-center text-3xl font-semibold tracking-tight">Signup</h1>
+        <h1 className="text-primary scroll-m-20 border-b pb-2 text-center text-3xl font-semibold tracking-tight">Sign Up</h1>
         <p className="mb-4"> Enter your details to create an account</p>
         <FormField
           control={form.control}
@@ -105,7 +105,7 @@ export const SignUp = () => {
         <Button className="mt-4" disabled={isLoading} variant={'outline'} type="submit">
           Sign Up 🔥
         </Button>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 mx-auto">
           <p className="text-muted-foreground"> Already have an account? </p>
           <Link className="text-blue-500 hover:underline" to={'/auth/sign-in'}>
             login

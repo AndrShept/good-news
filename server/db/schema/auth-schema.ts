@@ -10,12 +10,16 @@ export const userTable = pgTable('user', {
   username: text().notNull().unique(),
   password_hash: text('password_hash').notNull(),
   age: integer('age'),
+  image: text().notNull(),
   createdAt: timestamp('created_at', {
     withTimezone: true,
+    mode: 'string',
   })
     .notNull()
     .defaultNow(),
-  updatedAt: timestamp('updated_at'),
+  updatedAt: timestamp('updated_at', {
+    mode: 'string',
+  }),
 });
 export const userRelations = relations(userTable, ({ many }) => ({
   sessions: many(sessionTable),
@@ -35,7 +39,6 @@ export const sessionTable = pgTable('session', {
     }),
   expiresAt: timestamp('expires_at', {
     withTimezone: true,
-    mode: 'date',
   }).notNull(),
 });
 

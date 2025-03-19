@@ -1,5 +1,5 @@
-import { getUserQueryOptions, signIn, signUp } from '@/api/api';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { getUserQueryOptions, signIn } from '@/api/auth-api';
+import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
@@ -37,7 +37,6 @@ export const SignIn = () => {
       password,
       username,
     });
-    console.log(res);
     if (!res.success) {
       form.setError('root', {
         message: res.message,
@@ -87,7 +86,7 @@ export const SignIn = () => {
         <Button disabled={isLoading} variant={'outline'} type="submit">
           Sign in ✨
         </Button>
-        <div className="flex items-center gap-1">
+        <div className="mx-auto flex items-center gap-1">
           <p className="text-muted-foreground"> Already have an account? </p>
           <Link className="text-blue-500 hover:underline" to={'/auth/sign-up'}>
             register
