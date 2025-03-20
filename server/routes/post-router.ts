@@ -117,7 +117,7 @@ export const postRouter = new Hono<Context>()
     async (c) => {
       const { id } = c.req.valid('param');
       const userId = c.get('user')?.id ?? '';
-
+        // throw new Error('PIDSDA')
       const post = await db.query.postTable.findFirst({
         where: eq(postTable.id, id),
       });

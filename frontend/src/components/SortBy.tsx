@@ -1,16 +1,19 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { orderSchema, paginationSchema, sortBySchema } from '@/shared/types';
+import { paginationSchema, sortBySchema } from '@/shared/types';
 import qs from 'query-string';
-import React, { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 
-export const SortBy = () => {
-  const defaultOrderValue = paginationSchema.shape.order._def.defaultValue();
-  const defaultSortByValue = paginationSchema.shape.sortBy._def.defaultValue();
-  const sortByVariant = sortBySchema.Values;
-  const [order, setOrder] = useState<z.infer<typeof orderSchema> | string>(defaultOrderValue);
-  const [sortBy, setSortBy] = useState<z.infer<typeof sortBySchema> | string>(defaultSortByValue);
+interface Props {
+  order: string;
+  sortBy: string;
+  sortByVariant: typeof sortBySchema.Values;
+  setOrder: Dispatch<SetStateAction<string>>;
+  setSortBy: Dispatch<SetStateAction<string>>;
+}
+
+export const SortBy = ({ order, setOrder, setSortBy, sortBy, sortByVariant }: Props) => {
   const navigate = useNavigate();
   const query = qs.stringifyUrl(
     {
@@ -23,8 +26,7 @@ export const SortBy = () => {
     { skipEmptyString: true },
   );
   useEffect(() => {
-    console.log(order);
-
+    console.log('render')
     navigate(query);
   }, [order, sortBy]);
   return (

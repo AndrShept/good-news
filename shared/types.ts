@@ -5,6 +5,8 @@ import { z } from 'zod';
 import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import { postTable } from '../server/db/schema/posts-schema';
+import type { InferResponseType } from 'hono';
+import type { client } from '../frontend/src/api/api';
 
 export type SuccessResponse<T = undefined> = {
   success: true;
@@ -68,7 +70,7 @@ export const paginationSchema = z.object({
       coerce: true,
     })
     .optional()
-    .default(10),
+    .default(8),
   page: z
     .number({
       coerce: true,
@@ -80,6 +82,7 @@ export const paginationSchema = z.object({
   author: z.optional(z.string()),
   site: z.string().optional(),
 });
+export type IPaginationSchema = z.infer<typeof paginationSchema>
 export type User = InferSelectModel<typeof userTable>;
 export type Post = InferSelectModel<typeof postTable> & {
   author?: Omit<User, 'password_hash'>;
@@ -98,3 +101,5 @@ export type PaginatedResponse<T> = {
   };
   data: T;
 } & Omit<SuccessResponse, 'data'>;
+
+export type GetPostsData = InferResponseType<typeof client.post.$get>

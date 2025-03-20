@@ -39,6 +39,7 @@ app.onError((err, c) => {
       503, // 503 Service Unavailable
     );
   }
+  console.error(err)
 
   return c.json<ErrorResponse>(
     {
