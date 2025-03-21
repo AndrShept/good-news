@@ -34,7 +34,7 @@ export const getPostsQueryOptions = (query?: z.infer<typeof paginationSchema>) =
   });
 
 export const upvotePost = async (postId: string) => {
-  await new Promise((r) => setTimeout(r, 2000));
+  // await new Promise((r) => setTimeout(r, 2000));
   const res = await client.post[':id'].upvote.$post({
     param: {
       id: postId,

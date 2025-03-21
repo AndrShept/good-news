@@ -11,7 +11,6 @@ import { Spinner } from '../Spinner';
 import SvgSpinnersBarsRotateFade from '../SvgSpinnersBarsRotateFade';
 import { PostCard } from '../post/PostCard';
 import { PostCreateFrom } from '../post/PostCreateFrom';
-import { Button } from '../ui/button';
 
 export const HomePage = () => {
   const [searchParams] = useSearchParams();
