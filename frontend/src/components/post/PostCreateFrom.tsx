@@ -14,23 +14,6 @@ export const PostCreateFrom = () => {
   const queryKey = getPostsQueryOptions().queryKey;
   const createPostMutation = useMutation({
     mutationFn: createPost,
-
-    // onMutate: async (newData) => {
-    //   console.log(newData);
-    //   await queryClient.cancelQueries({ queryKey });
-
-    //   const prevData = queryClient.getQueryData(queryKey);
-
-    //   queryClient.setQueryData(queryKey, (old) => [...old, {data: {
-    //     ...newData
-    //   }}]);
-
-    //   return prevData;
-    // },
-    // onError: (err, newTodo, context) => {
-    //   queryClient.setQueryData(queryKey, context);
-    // },
-
     onSettled: async () => {
       return await queryClient.invalidateQueries({ queryKey });
     },

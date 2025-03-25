@@ -1,5 +1,5 @@
-import { getPostsQueryOptions, upvotePost } from '@/api/post-api';
-import { GetPostsData } from '@/shared/types';
+import { getPostQueryOptions, getPostsQueryOptions, upvotePost } from '@/api/post-api';
+import { GetPostsData, PaginatedResponse, Post, SuccessResponse } from '@/shared/types';
 import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const useUpvotePost = () => {
@@ -9,9 +9,29 @@ export const useUpvotePost = () => {
   return useMutation({
     mutationFn: upvotePost,
     async onMutate(id) {
-      await queryClient.cancelQueries({ queryKey: [...queryKey, id] });
+      await queryClient.cancelQueries({ queryKey: ['post', id] });
+      await queryClient.cancelQueries({ queryKey: [...queryKey] });
+
+      queryClient.setQueriesData<SuccessResponse<Post>>(
+        {
+          queryKey: [...getPostQueryOptions(id).queryKey],
+        },
+        (oldData) => {
+          if (!oldData) return;
+          if (!oldData.data) return;
+
+          return {
+            ...oldData,
+            data: {
+              ...oldData.data,
+              isUpvoted: !oldData.data.isUpvoted,
+              points: oldData.data.isUpvoted ? oldData.data.points - 1 : oldData.data.points + 1,
+            },
+          };
+        },
+      );
       let prevData;
-      queryClient.setQueriesData<InfiniteData<GetPostsData>>({ queryKey }, (oldData) => {
+      queryClient.setQueriesData<InfiniteData<PaginatedResponse<Post[]>>>({ queryKey }, (oldData) => {
         if (!oldData) return;
         prevData = oldData;
         return {
@@ -44,8 +64,10 @@ export const useUpvotePost = () => {
         },
       );
     },
-    onSettled() {
+
+    onSettled(data, error, variables, context) {
       queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries(getPostQueryOptions(variables));
     },
   });
 };

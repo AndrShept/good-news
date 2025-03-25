@@ -2,6 +2,7 @@ import { useUpvotePost } from '@/api/hooks/useUpvotePost';
 import { cn, getFormatDateTime } from '@/lib/utils';
 import { Post } from '@/shared/types';
 import { MessageSquareDotIcon } from 'lucide-react';
+import { useNavigate } from 'react-router';
 
 import { UpvoteIcon } from '../UpvoteIcon';
 import { UserAvatar } from '../UserAvatar';
@@ -13,6 +14,7 @@ interface Props {
 
 export const PostCard = ({ post }: Props) => {
   const { mutate } = useUpvotePost();
+  const navigate = useNavigate();
 
   return (
     <li className="hover:border-primary/70 hover:bg-secondary/50 flex flex-col gap-2 border p-3">
@@ -26,7 +28,14 @@ export const PostCard = ({ post }: Props) => {
       <section className="mt-auto flex items-center gap-1">
         <UpvoteIcon isUpvoted={post.isUpvoted} points={post.points} onUpvote={() => mutate(post.id.toString())} />
         <div className="flex items-center gap-1">
-          <Button className="group size-7" variant={'ghost'} size={'icon'}>
+          <Button
+            onClick={() => {
+              navigate(`/${post.id}`);
+            }}
+            className="group size-7"
+            variant={'ghost'}
+            size={'icon'}
+          >
             <MessageSquareDotIcon className={cn('text-muted-foreground/40 group-hover:text-muted-foreground', {})} />
           </Button>
           <p className="text-muted-foreground/40 text-xs">{post.commentCount}</p>

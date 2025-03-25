@@ -16,6 +16,7 @@ export const NavBar = () => {
       <ul className="text-muted-foreground flex flex-col">
         {navLinks.map((item) => (
           <NavLink
+          key={item.id}
             className={({ isActive }) =>
               buttonVariants({
                 variant: isActive ? 'secondary' : 'ghost',
