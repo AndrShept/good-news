@@ -6,6 +6,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const getFormatDateTime = (time: string) => {
+export const getFormatDateTime = (time: string | undefined) => {
+  if (!time) return;
   return format(time, 'dd.MM.yyyy HH:mm:ss');
 };

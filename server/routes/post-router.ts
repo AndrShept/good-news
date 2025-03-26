@@ -250,6 +250,7 @@ export const postRouter = new Hono<Context>()
       const comments = await db.query.commentTable.findMany({
         where: and(eq(commentTable.postId, id), isNull(commentTable.parentCommentId)),
         offset,
+        limit,
         orderBy: sortOrder,
         with: {
           author: true,

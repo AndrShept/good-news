@@ -1,27 +1,26 @@
+import { useCreatePostComment } from '@/api/hooks/useCreatePostComment';
 import { getPostCommentsQueryOptions, getPostQueryOptions } from '@/api/post-api';
 import { paginationSchema } from '@/shared/types';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { SendHorizonalIcon } from 'lucide-react';
+import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import React from 'react';
 import { useParams } from 'react-router';
 
-import { ContentInput } from '../ContentInput';
+import { CreateCommentForm } from '../CreateCommentForm';
 import { Spinner } from '../Spinner';
+import { CommentCard } from '../comment/CommentCard';
 import { PostCard } from '../post/PostCard';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
 
 export const PostPage = () => {
   const { postId } = useParams();
-  const postQuery = useQuery(getPostQueryOptions(postId ?? ''));
+  const postQuery = useSuspenseQuery(getPostQueryOptions(postId ?? ''));
   const query = paginationSchema.parse(paginationSchema);
-  const postCommentsQuery = useInfiniteQuery(
+  const postCommentsQuery = useSuspenseInfiniteQuery(
     getPostCommentsQueryOptions({
       postId: postId ?? '',
       query,
     }),
   );
-  console.log(postCommentsQuery.data);
+  const { mutate, isPending } = useCreatePostComment();
 
   if (postQuery.isLoading)
     return (
@@ -33,7 +32,8 @@ export const PostPage = () => {
   return (
     <section className="flex flex-col gap-4">
       {postQuery.data.data && <PostCard post={postQuery.data.data} />}
-      <ContentInput />
+      <CreateCommentForm isButtonDisable={isPending} onCreate={mutate} id={postQuery.data.data?.id.toString() ?? ''} />
+      <ul className='flex flex-col gap-2'>{postCommentsQuery.data.pages.map((page) => page.data.map((comment) => <CommentCard key={comment.id} comment={comment} />))}</ul>
     </section>
   );
 };

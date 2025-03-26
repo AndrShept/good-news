@@ -58,10 +58,10 @@ export const createPost = async (form: z.infer<typeof createPostSchema>) => {
   return data;
 };
 
-export const createPostComment = async ({ postId, form }: { postId: string; form: z.infer<typeof createCommentSchema> }) => {
+export const createPostComment = async ({ id, form }: { id: string; form: z.infer<typeof createCommentSchema> }) => {
   const res = await client.post[':id'].comment.$post({
     param: {
-      id: postId,
+      id,
     },
     form,
   });
@@ -85,6 +85,20 @@ export const upvotePost = async (postId: string) => {
   }
   const data = await res.json();
   throw new Error(data.message);
+};
+export const upvoteComment = async (commentId: string) => {
+  // await new Promise((r) => setTimeout(r, 2000));
+  // throw new Error('TOTOTO')
+  const res = await client.comment[':id'].upvote.$post({
+    param: {
+      id: commentId,
+    },
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message);
+  }
+  return data;
 };
 
 export const getPostsQueryOptions = (query?: z.infer<typeof paginationSchema>) =>
@@ -110,7 +124,7 @@ export const getPostQueryOptions = (postId: string) =>
 
 export const getPostCommentsQueryOptions = ({ postId, query }: { postId: string; query: z.infer<typeof paginationSchema> }) =>
   infiniteQueryOptions({
-    queryKey: ['comments'],
+    queryKey: ['comments', postId, query.order, query.sortBy],
     queryFn: ({ pageParam }) =>
       getPostComments({
         postId,
