@@ -254,7 +254,7 @@ export const postRouter = new Hono<Context>()
         orderBy: sortOrder,
         with: {
           author: true,
-          childComments: includeChildren ? true : undefined,
+          
         },
 
         extras: {

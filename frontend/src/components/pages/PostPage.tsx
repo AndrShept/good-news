@@ -6,6 +6,7 @@ import React from 'react';
 import { useParams } from 'react-router';
 
 import { CreateCommentForm } from '../CreateCommentForm';
+import { InfinityScrollComponent } from '../InfinityScrollComponent';
 import { Spinner } from '../Spinner';
 import { CommentCard } from '../comment/CommentCard';
 import { PostCard } from '../post/PostCard';
@@ -33,7 +34,15 @@ export const PostPage = () => {
     <section className="flex flex-col gap-4">
       {postQuery.data.data && <PostCard post={postQuery.data.data} />}
       <CreateCommentForm isButtonDisable={isPending} onCreate={mutate} id={postQuery.data.data?.id.toString() ?? ''} />
-      <ul className='flex flex-col gap-2'>{postCommentsQuery.data.pages.map((page) => page.data.map((comment) => <CommentCard key={comment.id} comment={comment} />))}</ul>
+      <InfinityScrollComponent
+        fetchNextPage={postCommentsQuery.fetchNextPage}
+        hasNextPage={postCommentsQuery.hasNextPage}
+        isFetchingNextPage={postCommentsQuery.isFetchingNextPage}
+      >
+        <ul className="flex flex-col gap-2">
+          {postCommentsQuery.data.pages.map((page) => page.data.map((comment) => <CommentCard key={comment.id} comment={comment} />))}
+        </ul>
+      </InfinityScrollComponent>
     </section>
   );
 };
