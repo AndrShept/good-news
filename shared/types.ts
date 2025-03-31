@@ -78,7 +78,7 @@ export const paginationSchema = z.object({
     .optional()
     .default(1),
   sortBy: sortBySchema.optional().default('recent'),
-  order: orderSchema.optional().default('desc'),
+  order: orderSchema.optional().default('asc'),
   author: z.optional(z.string()),
   site: z.string().optional(),
 });

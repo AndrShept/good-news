@@ -1,71 +1,28 @@
-import { Comments, Post, SuccessResponse } from '@/shared/types';
-import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Comments, SuccessResponse, createCommentSchema } from '@/shared/types';
+import {  useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import { z } from 'zod';
 
-import { createPostComment, getPostQueryOptions } from '../post-api';
 
-export const useCreatePostComment = () => {
+export const useCreateComment = ({
+  queryKey,
+  mutationFn,
+}: {
+  queryKey: string[][];
+  mutationFn: ({ id, form }: { id: string; form: z.infer<typeof createCommentSchema> }) => Promise<SuccessResponse<Comments>>;
+}) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createPostComment,
+    mutationFn,
 
-    async onMutate({ form, id }) {
-      let prevCommentsData;
-      let prevPostData;
-      await queryClient.cancelQueries({
-        queryKey: ['comments', id],
-      });
-
-      queryClient.setQueriesData<SuccessResponse<Post>>(
-        {
-          queryKey: getPostQueryOptions(id).queryKey,
-        },
-        (oldData) => {
-          prevPostData = oldData;
-          if (!oldData || !oldData.data) return;
-          return { ...oldData, data: { ...oldData.data, commentCount: oldData.data.commentCount + 1 } };
-        },
-      );
-      queryClient.setQueriesData<InfiniteData<SuccessResponse<Comments[]>>>(
-        {
-          queryKey: ['comments', id],
-        },
-        (oldData) => {
-          if (!oldData) return;
-          prevCommentsData = oldData;
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => {
-              return {
-                ...page,
-                data: [form as Comments, ...page.data!],
-              };
-            }),
-          };
-        },
-      );
-      return { prevCommentsData, prevPostData };
+    onError() {
+      toast.error('Something went wrong');
     },
-    onError(error, { id }, context) {
-      queryClient.setQueriesData(
-        {
-          queryKey: ['comments', id],
-        },
-        () => context?.prevCommentsData,
-      );
-      queryClient.setQueriesData<SuccessResponse<Post>>(
-        {
-          queryKey: getPostQueryOptions(id).queryKey,
-        },
-        () => context?.prevPostData,
-      );
-    },
-    onSettled(data, error, { id }, context) {
-      queryClient.invalidateQueries({
-        queryKey: ['comments', id],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: getPostQueryOptions(id).queryKey,
+    onSettled() {
+      queryKey.map((key) => {
+        queryClient.invalidateQueries({
+          queryKey: key,
+        });
       });
     },
   });

@@ -7,6 +7,7 @@ import { BrowserRouter } from 'react-router';
 import { AppRoutes } from './components/AppRoutes.tsx';
 import { ThemeProvider } from './components/providerts/theme-provider.tsx';
 import './index.css';
+import { Toaster } from 'react-hot-toast';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <AppRoutes />
       </BrowserRouter>
+      <Toaster />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </ThemeProvider>,

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { createCommentSchema } from '@/shared/types';
 import { SendHorizonalIcon } from 'lucide-react';
-import React, { ComponentProps, useState } from 'react';
+import React, { ComponentProps, Dispatch, SetStateAction, useState } from 'react';
 import { z } from 'zod';
 
 import { Button } from './ui/button';
@@ -11,9 +11,10 @@ interface Props extends ComponentProps<'div'> {
   id: string;
   onCreate: ({ form, id }: { id: string; form: z.infer<typeof createCommentSchema> }) => void;
   isButtonDisable: boolean;
+  onHide?: () => void;
 }
 
-export const CreateCommentForm = ({ id, onCreate, isButtonDisable, className, ...props }: Props) => {
+export const CreateCommentForm = ({ id, onCreate, isButtonDisable, onHide, className, ...props }: Props) => {
   const [content, setContent] = useState('');
 
   const handleSubmit = () => {
@@ -22,6 +23,7 @@ export const CreateCommentForm = ({ id, onCreate, isButtonDisable, className, ..
 
     onCreate({ id, form });
     setContent('');
+    onHide?.();
   };
   return (
     <div className={cn('relative flex items-center gap-1', className)}>

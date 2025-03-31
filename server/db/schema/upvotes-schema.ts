@@ -7,7 +7,9 @@ import { postTable } from './posts-schema';
 
 export const postUpvotesTable = pgTable('post_upvotes', {
   id: serial('id').primaryKey(),
-  postId: integer('post_id').notNull(),
+  postId: integer('post_id')
+    .notNull()
+    .references(() => postTable.id, { onDelete: 'cascade' }),
   userId: text('user_id').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
@@ -27,7 +29,9 @@ export const postUpvoteRelations = relations(postUpvotesTable, ({ one }) => ({
 
 export const commentUpvotesTable = pgTable('comment_upvotes', {
   id: serial('id').primaryKey(),
-  commentId: integer('comment_id').notNull(),
+  commentId: integer('comment_id')
+    .notNull()
+    .references(() => commentTable.id, { onDelete: 'cascade' }),
   userId: text('user_id').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });

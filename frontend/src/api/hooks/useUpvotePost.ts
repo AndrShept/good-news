@@ -59,7 +59,6 @@ export const useUpvotePost = () => {
           queryKey,
         },
         () => {
-          console.log(context?.prevData);
           return context?.prevData;
         },
       );

@@ -157,6 +157,7 @@ export const commentRouter = new Hono<Context>()
         where: and(eq(commentTable.parentCommentId, id)),
         offset,
         orderBy: sortOrder,
+        limit,
         with: {
           author: true,
         },

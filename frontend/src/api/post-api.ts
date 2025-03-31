@@ -124,7 +124,7 @@ export const getPostQueryOptions = (postId: string) =>
 
 export const getPostCommentsQueryOptions = ({ postId, query }: { postId: string; query: z.infer<typeof paginationSchema> }) =>
   infiniteQueryOptions({
-    queryKey: ['comments', postId, query.order, query.sortBy],
+    queryKey: ['post', 'comments', postId, query.order, query.sortBy],
     queryFn: ({ pageParam }) =>
       getPostComments({
         postId,

@@ -1,3 +1,4 @@
+import { useAuth } from '@/api/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { HeartIcon } from 'lucide-react';
 import React from 'react';
@@ -6,14 +7,16 @@ import { Button } from './ui/button';
 
 interface Props {
   points: number;
-  isUpvoted: boolean | undefined ;
+  isUpvoted: boolean | undefined;
   onUpvote: () => void;
 }
 
 export const UpvoteIcon = ({ isUpvoted, onUpvote, points }: Props) => {
+  const user = useAuth();
   return (
     <div className="flex items-center gap-1">
       <Button
+        disabled={!user}
         onClick={() => {
           onUpvote();
         }}

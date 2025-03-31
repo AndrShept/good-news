@@ -1,30 +1,20 @@
-import { getPostCommentsQueryOptions, getPostQueryOptions, getPostsQueryOptions, upvoteComment, upvotePost } from '@/api/post-api';
-import { Comments, GetPostsData, PaginatedResponse, Post, SuccessResponse, paginationSchema } from '@/shared/types';
+import { upvoteComment } from '@/api/post-api';
+import { Comments, SuccessResponse } from '@/shared/types';
 import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 
-export const useUpvoteComment = ({ parentId }: { parentId: number }) => {
+export const useUpvoteComment = ({ queryKey }: { queryKey: string[] }) => {
   const queryClient = useQueryClient();
-  const query = paginationSchema.parse(paginationSchema);
-  console.log();
+
   return useMutation({
     mutationFn: upvoteComment,
     async onMutate(id) {
-      await queryClient.cancelQueries({
-        queryKey: getPostCommentsQueryOptions({
-          postId: parentId.toString(),
-          query,
-        }).queryKey,
-      });
-
       let prevData;
       queryClient.setQueriesData<InfiniteData<SuccessResponse<Comments[]>>>(
         {
-          queryKey: getPostCommentsQueryOptions({
-            postId: parentId.toString(),
-            query,
-          }).queryKey,
+          queryKey,
         },
         (oldData) => {
+          console.log(oldData);
           if (!oldData) return;
           prevData = oldData;
           return {
@@ -53,10 +43,7 @@ export const useUpvoteComment = ({ parentId }: { parentId: number }) => {
     onError: (err, newPost, context) => {
       queryClient.setQueriesData<InfiniteData<SuccessResponse<Comments[]>>>(
         {
-          queryKey: getPostCommentsQueryOptions({
-            postId: parentId.toString(),
-            query,
-          }).queryKey,
+          queryKey,
         },
         () => {
           return context?.prevData;
@@ -64,6 +51,10 @@ export const useUpvoteComment = ({ parentId }: { parentId: number }) => {
       );
     },
 
-
+    onSuccess(data, variables) {
+      queryClient.invalidateQueries({
+        queryKey,
+      });
+    },
   });
 };

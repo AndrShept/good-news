@@ -1,5 +1,4 @@
-import { useCreatePostComment } from '@/api/hooks/useCreatePostComment';
-import { getPostCommentsQueryOptions, getPostQueryOptions } from '@/api/post-api';
+import { createPostComment, getPostCommentsQueryOptions, getPostQueryOptions } from '@/api/post-api';
 import { paginationSchema } from '@/shared/types';
 import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import React from 'react';
@@ -10,6 +9,7 @@ import { InfinityScrollComponent } from '../InfinityScrollComponent';
 import { Spinner } from '../Spinner';
 import { CommentCard } from '../comment/CommentCard';
 import { PostCard } from '../post/PostCard';
+import { useCreateComment } from '@/api/hooks/useCreatePostComment';
 
 export const PostPage = () => {
   const { postId } = useParams();
@@ -21,7 +21,13 @@ export const PostPage = () => {
       query,
     }),
   );
-  const { mutate, isPending } = useCreatePostComment();
+  const { mutate, isPending } = useCreateComment({
+    queryKey: [
+      ['post','comments', postId as string],
+      ['post', postId as string],
+    ],
+    mutationFn: createPostComment,
+  });
 
   if (postQuery.isLoading)
     return (
