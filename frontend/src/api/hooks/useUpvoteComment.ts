@@ -1,6 +1,7 @@
 import { upvoteComment } from '@/api/post-api';
 import { Comments, SuccessResponse } from '@/shared/types';
 import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 
 export const useUpvoteComment = ({ queryKey }: { queryKey: string[] }) => {
   const queryClient = useQueryClient();
@@ -41,13 +42,13 @@ export const useUpvoteComment = ({ queryKey }: { queryKey: string[] }) => {
       return { prevData };
     },
     onError: (err, newPost, context) => {
+      toast.error('Something went wrong');
       queryClient.setQueriesData<InfiniteData<SuccessResponse<Comments[]>>>(
         {
           queryKey,
         },
-        () => {
-          return context?.prevData;
-        },
+
+        context?.prevData,
       );
     },
 

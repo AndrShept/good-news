@@ -1,3 +1,4 @@
+import { useAuth } from '@/api/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { createCommentSchema } from '@/shared/types';
 import { SendHorizonalIcon } from 'lucide-react';
@@ -16,6 +17,7 @@ interface Props extends ComponentProps<'div'> {
 
 export const CreateCommentForm = ({ id, onCreate, isButtonDisable, onHide, className, ...props }: Props) => {
   const [content, setContent] = useState('');
+  const user = useAuth();
 
   const handleSubmit = () => {
     if (!content.trim().length) return;
@@ -27,7 +29,7 @@ export const CreateCommentForm = ({ id, onCreate, isButtonDisable, onHide, class
   };
   return (
     <div className={cn('relative flex items-center gap-1', className)}>
-      <Input value={content} onChange={(e) => setContent(e.target.value)} placeholder="add comment..." />
+      <Input disabled={!user} value={content} onChange={(e) => setContent(e.target.value)} placeholder="add comment..." />
       <Button onClick={handleSubmit} disabled={!content.length || isButtonDisable} variant={'ghost'} size={'icon'}>
         <SendHorizonalIcon className="text-muted-foreground" />
       </Button>

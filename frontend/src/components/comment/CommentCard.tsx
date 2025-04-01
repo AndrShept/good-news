@@ -4,6 +4,7 @@ import { useUpvoteComment } from '@/api/hooks/useUpvoteComment';
 import { getFormatDateTime } from '@/lib/utils';
 import { Comments, paginationSchema } from '@/shared/types';
 import { useInfiniteQuery, useSuspenseInfiniteQuery } from '@tanstack/react-query';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import React, { useState } from 'react';
 
 import { CommentIcon } from '../CommentIcon';
@@ -71,8 +72,14 @@ export const CommentCard = ({ comment }: Props) => {
           )}
 
           {!isReplyShow && !!comment.commentCount && (
-            <Button onClick={() => setIsReplyShow((prev) => !prev)} className="w-fit" variant={'link'}>
-              reply {comment.commentCount}
+            <Button onClick={() => setIsReplyShow((prev) => !prev)} className="text-muted-foreground w-fit" variant={'link'}>
+              <ChevronDown />
+              Reply {comment.commentCount}
+            </Button>
+          )}
+          {isReplyShow && !comment.parentCommentId && (
+            <Button onClick={() => setIsReplyShow(false)} className="w-fit text-green-500" variant={'link'}>
+              <ChevronUp /> Hide
             </Button>
           )}
         </div>
@@ -86,16 +93,11 @@ export const CommentCard = ({ comment }: Props) => {
             hasNextPage={replys.hasNextPage}
             isFetchingNextPage={replys.isFetchingNextPage}
           >
-            <section className='w-full' >
-              {replys.data?.pages.map((page) => page.data.map((comment) => <CommentCard comment={comment} />))}
+            <section className="w-full">
+              {replys.data?.pages.map((page) => page.data.map((comment) => <CommentCard key={comment.id} comment={comment} />))}
             </section>
           </InfinityScrollComponent>
         </div>
-      )}
-      {isReplyShow && !comment.parentCommentId && (
-        <Button onClick={() => setIsReplyShow(false)} className="w-fit" variant={'link'}>
-          hide
-        </Button>
       )}
     </li>
   );

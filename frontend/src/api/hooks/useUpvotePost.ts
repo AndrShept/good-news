@@ -1,6 +1,7 @@
 import { getPostQueryOptions, getPostsQueryOptions, upvotePost } from '@/api/post-api';
 import { GetPostsData, PaginatedResponse, Post, SuccessResponse } from '@/shared/types';
 import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 
 export const useUpvotePost = () => {
   const queryClient = useQueryClient();
@@ -54,17 +55,17 @@ export const useUpvotePost = () => {
       return { prevData };
     },
     onError: (err, newPost, context) => {
+      toast.error('Something went wrong');
       queryClient.setQueriesData<InfiniteData<GetPostsData>>(
         {
           queryKey,
         },
-        () => {
-          return context?.prevData;
-        },
+
+        context?.prevData,
       );
     },
 
-    onSettled(data, error, variables, context) {
+    onSuccess(data, variables, context) {
       queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries(getPostQueryOptions(variables));
     },

@@ -9,7 +9,7 @@ export const useCreateComment = ({
   mutationFn,
 }: {
   queryKey: string[][];
-  mutationFn: ({ id, form }: { id: string; form: z.infer<typeof createCommentSchema> }) => Promise<SuccessResponse<Comments>>;
+  mutationFn: (data: { id: string; form: z.infer<typeof createCommentSchema> }) => Promise<SuccessResponse<Comments>>;
 }) => {
   const queryClient = useQueryClient();
   return useMutation({

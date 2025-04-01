@@ -1,15 +1,16 @@
 import tailwindcss from '@tailwindcss/vite';
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig } from 'vite';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [TanStackRouterVite({ target: 'react', autoCodeSplitting: true }), react(), tailwindcss()],
   resolve: {
     alias: {
-      "@/shared": path.resolve(__dirname, "../shared"),
-      "@": path.resolve(__dirname, "./src"),
+      '@/shared': path.resolve(__dirname, '../shared'),
+      '@': path.resolve(__dirname, './src'),
     },
   },
   server: {

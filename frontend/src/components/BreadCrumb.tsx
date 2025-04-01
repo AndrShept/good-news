@@ -16,15 +16,10 @@ export const BreadCrumb = () => {
   return (
     <Breadcrumb className="mb-2 border-b pb-2">
       <ul className="flex items-center">
-        {arr.map((item) => (
-          <BreadcrumbList className="hover:text-primary hover:underline sm:gap-1">
+        {arr.map((item, idx) => (
+          <BreadcrumbList key={idx} className="hover:text-primary hover:underline sm:gap-1">
             <BreadcrumbItem className="capitalize">
-              <Link
-  
-                to={item ? `${item}` : '/'}
-              >
-                {item ? `${item}` : 'home'}
-              </Link>
+              <Link to={item ? `${item}` : '/'}>{item ? `${item}` : 'home'}</Link>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="" />
           </BreadcrumbList>

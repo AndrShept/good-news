@@ -17,7 +17,6 @@ import { TopPage } from './pages/TopPage';
 
 export const AppRoutes = () => {
   const { data: user, isLoading } = useQuery(getUserQueryOptions());
-  console.log(user);
   if (isLoading)
     return (
       <div className="flex h-screen">
