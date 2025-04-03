@@ -6,8 +6,10 @@ export const Route = createFileRoute('/auth')({
 
 function RouteComponent() {
   return (
-    <div className='bg-red-400 h-screen'>
-      <Outlet />
-    </div>
+    <section className="flex h-screen flex-col">
+      <div className="m-auto">
+        <Outlet />
+      </div>
+    </section>
   );
 }

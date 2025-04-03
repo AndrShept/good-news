@@ -1,18 +1,21 @@
-import { createPostComment, getPostCommentsQueryOptions, getPostQueryOptions } from '@/api/post-api';
-import { paginationSchema } from '@/shared/types';
-import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
-import React from 'react';
-import { useParams } from 'react-router';
-
-import { CreateCommentForm } from '../CreateCommentForm';
-import { InfinityScrollComponent } from '../InfinityScrollComponent';
-import { Spinner } from '../Spinner';
-import { CommentCard } from '../comment/CommentCard';
-import { PostCard } from '../post/PostCard';
 import { useCreateComment } from '@/api/hooks/useCreatePostComment';
+import { createPostComment, getPostCommentsQueryOptions, getPostQueryOptions } from '@/api/post-api';
+import { CreateCommentForm } from '@/components/CreateCommentForm';
+import { InfinityScrollComponent } from '@/components/InfinityScrollComponent';
+import { Spinner } from '@/components/Spinner';
+import { CommentCard } from '@/components/comment/CommentCard';
+import { PostCard } from '@/components/post/PostCard';
+import { paginationSchema } from '@/shared/types';
+import { useQuery, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
+import React from 'react';
 
-export const PostPage = () => {
-  const { postId } = useParams();
+export const Route = createFileRoute('/(home)/post/$postId')({
+  component: PostPage,
+});
+
+export function PostPage() {
+  const { postId } = Route.useParams();
   const postQuery = useSuspenseQuery(getPostQueryOptions(postId ?? ''));
   const query = paginationSchema.parse(paginationSchema);
   const postCommentsQuery = useSuspenseInfiniteQuery(
@@ -23,19 +26,12 @@ export const PostPage = () => {
   );
   const { mutate, isPending } = useCreateComment({
     queryKey: [
-      ['post','comments', postId as string],
+      ['post', 'comments', postId as string],
       ['post', postId as string],
     ],
     mutationFn: createPostComment,
   });
 
-  if (postQuery.isLoading)
-    return (
-      <div className="flex size-full">
-        <Spinner />
-      </div>
-    );
-  if (!postQuery.data) return;
   return (
     <section className="flex flex-col gap-4">
       {postQuery.data.data && <PostCard post={postQuery.data.data} />}
@@ -51,4 +47,4 @@ export const PostPage = () => {
       </InfinityScrollComponent>
     </section>
   );
-};
+}

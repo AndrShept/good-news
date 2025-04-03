@@ -1,31 +1,29 @@
+import { Link } from '@tanstack/react-router';
 import React from 'react';
-import { NavLink } from 'react-router';
 
 import { buttonVariants } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 
 export const NavBar = () => {
-  const navLinks = [
-    { id: 1, name: 'news', url: '/news' },
-    { id: 2, name: 'top', url: '/top' },
-    { id: 3, name: 'submit', url: '/submit' },
-  
-  ];
+  const navLinks = [{ id: 1, name: 'about', url: '/about' }];
   return (
     <ScrollArea className="h-full pr-2">
       <ul className="text-muted-foreground flex flex-col">
         {navLinks.map((item) => (
-          <NavLink
-          key={item.id}
-            className={({ isActive }) =>
-              buttonVariants({
-                variant: isActive ? 'secondary' : 'ghost',
-              })
-            }
+          <Link
+            className={buttonVariants({
+              variant: 'ghost',
+            })}
+            key={item.id}
             to={item.url}
+            activeProps={{
+              className: buttonVariants({
+                variant: 'secondary',
+              }),
+            }}
           >
             <p className="mr-auto">{item.name}</p>
-          </NavLink>
+          </Link>
         ))}
       </ul>
     </ScrollArea>

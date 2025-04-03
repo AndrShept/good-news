@@ -1,8 +1,8 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { paginationSchema, sortBySchema } from '@/shared/types';
+import { useNavigate } from '@tanstack/react-router';
 import qs from 'query-string';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
 import { z } from 'zod';
 
 interface Props {
@@ -25,10 +25,7 @@ export const SortBy = ({ order, setOrder, setSortBy, sortBy, sortByVariant }: Pr
     },
     { skipEmptyString: true },
   );
-  useEffect(() => {
-    console.log('render')
-    navigate(query);
-  }, [order, sortBy]);
+
   return (
     <div className="flex gap-2">
       <Select defaultValue={order} onValueChange={(e) => setOrder(e)}>

@@ -1,14 +1,16 @@
 import { getUserQueryOptions, signIn } from '@/api/auth-api';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router';
 import { z } from 'zod';
 
-import { Input } from '../ui/input';
-
+export const Route = createFileRoute('/auth/sign-in')({
+  component: SignIn,
+});
 const loginSchema = z.object({
   username: z
     .string()
@@ -17,8 +19,7 @@ const loginSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
   password: z.string().min(3).max(255),
 });
-
-export const SignIn = () => {
+function SignIn() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -44,7 +45,7 @@ export const SignIn = () => {
     }
     if (res.success) {
       await queryClient.invalidateQueries({ queryKey: getUserQueryOptions().queryKey });
-      navigate('/');
+      navigate({ to: '/' });
     }
   };
   return (
@@ -95,4 +96,4 @@ export const SignIn = () => {
       </form>
     </Form>
   );
-};
+}

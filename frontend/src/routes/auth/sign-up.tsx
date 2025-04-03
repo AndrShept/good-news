@@ -1,14 +1,16 @@
+import { getUserQueryOptions, signUp } from '@/api/auth-api';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router';
 import { z } from 'zod';
 
-import { Input } from '../ui/input';
-import { getUserQueryOptions, signUp } from '@/api/auth-api';
-
+export const Route = createFileRoute('/auth/sign-up')({
+  component: SignUp,
+});
 const loginSchema = z
   .object({
     username: z
@@ -23,8 +25,7 @@ const loginSchema = z
     message: 'Passwords must match!',
     path: ['confirmPassword'],
   });
-
-export const SignUp = () => {
+function SignUp() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -51,7 +52,7 @@ export const SignUp = () => {
       await queryClient.invalidateQueries({
         queryKey: getUserQueryOptions().queryKey,
       });
-      navigate('/');
+      navigate({ to: '/' });
     }
   };
   return (
@@ -105,7 +106,7 @@ export const SignUp = () => {
         <Button className="mt-4" disabled={isLoading} variant={'outline'} type="submit">
           Sign Up 🔥
         </Button>
-        <div className="flex items-center gap-1 mx-auto">
+        <div className="mx-auto flex items-center gap-1">
           <p className="text-muted-foreground"> Already have an account? </p>
           <Link className="text-blue-500 hover:underline" to={'/auth/sign-in'}>
             login
@@ -114,4 +115,4 @@ export const SignUp = () => {
       </form>
     </Form>
   );
-};
+}

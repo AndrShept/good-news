@@ -1,22 +1,20 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { Toaster } from 'react-hot-toast';
 
-import { AppRoutes } from './components/AppRoutes.tsx';
+import { ErrorLoadingData } from './components/ErrorLoadingData.tsx';
+import { NotFound } from './components/NotFound.tsx';
+import { Spinner } from './components/Spinner.tsx';
 import { ThemeProvider } from './components/providerts/theme-provider.tsx';
 import './index.css';
-import { Toaster } from 'react-hot-toast';
-import { RouterProvider, createRouter } from '@tanstack/react-router'
-
-// Import the generated route tree
-import { routeTree } from './routeTree.gen'
+import { routeTree } from './routeTree.gen';
 
 declare module '@tanstack/react-router' {
   interface Register {
-    router: typeof router
+    router: typeof router;
   }
 }
 
@@ -28,13 +26,27 @@ const queryClient = new QueryClient({
   },
 });
 
-const router = createRouter({ routeTree })
+const router = createRouter({
+  routeTree,
+  defaultPreload: 'intent',
+  defaultPreloadStaleTime: 0,
+  defaultNotFoundComponent: NotFound,
+  context: { queryClient },
+  defaultPendingComponent: () => {
+    return (
+      <div className="flex h-screen">
+        <Spinner size={'sm'} />
+      </div>
+    );
+  },
+  defaultErrorComponent: ({ error, reset }) => <ErrorLoadingData error={error} reset={reset} />,
+});
 
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
   <ThemeProvider defaultTheme="dark">
     <QueryClientProvider client={queryClient}>
-    <RouterProvider router={router} />
+      <RouterProvider router={router} />
       <Toaster />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

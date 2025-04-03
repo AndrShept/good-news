@@ -3,14 +3,15 @@ import { useAuth } from '@/api/hooks/useAuth';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useQueryClient } from '@tanstack/react-query';
 import { MenuIcon } from 'lucide-react';
-import { Link } from 'react-router';
 
 import { NavBar } from './NavBar';
 import { UserAvatar } from './UserAvatar';
 import { Button } from './ui/button';
+import { Link } from '@tanstack/react-router';
 
 export const Header = () => {
   const user = useAuth();
+  console.log(user)
   const queryClient = useQueryClient();
   return (
     <header className="bg-background/50 sticky top-0 z-50 flex h-14  border-b p-3 backdrop-blur-sm">

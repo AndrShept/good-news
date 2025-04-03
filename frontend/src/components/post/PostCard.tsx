@@ -1,8 +1,7 @@
 import { useUpvotePost } from '@/api/hooks/useUpvotePost';
-import {  getFormatDateTime } from '@/lib/utils';
+import { getFormatDateTime } from '@/lib/utils';
 import { Post } from '@/shared/types';
-
-import { useNavigate } from 'react-router';
+import { useNavigate } from '@tanstack/react-router';
 
 import { CommentIcon } from '../CommentIcon';
 import { UpvoteIcon } from '../UpvoteIcon';
@@ -27,7 +26,15 @@ export const PostCard = ({ post }: Props) => {
       <p className="text-muted-foreground line-clamp-4 text-[15px]">{post.content}</p>
       <section className="mt-auto flex items-center gap-1">
         <UpvoteIcon isUpvoted={post.isUpvoted} points={post.points} onUpvote={() => mutate(post.id.toString())} />
-        <CommentIcon commentCount={post.commentCount} onClick={() => navigate(`/${post.id}`)} />
+        <CommentIcon
+          commentCount={post.commentCount}
+          onClick={() => {
+            navigate({
+              to: '/post/$postId',
+              params: { postId: post.id.toString() },
+            });
+          }}
+        />
       </section>
     </li>
   );

@@ -1,21 +1,23 @@
 import { getPostsQueryOptions } from '@/api/post-api';
+import { InfinityScrollComponent } from '@/components/InfinityScrollComponent';
+import { PostCard } from '@/components/post/PostCard';
+import { PostCreateFrom } from '@/components/post/PostCreateFrom';
+import { SortBy } from '@/components/SortBy';
+import { Spinner } from '@/components/Spinner';
 import { orderSchema, paginationSchema, sortBySchema } from '@/shared/types';
-import {  useSuspenseInfiniteQuery } from '@tanstack/react-query';
+import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
-import { useSearchParams } from 'react-router';
 import { z } from 'zod';
 
-import { InfinityScrollComponent } from '../InfinityScrollComponent';
-import { SortBy } from '../SortBy';
-import { Spinner } from '../Spinner';
-import SvgSpinnersBarsRotateFade from '../SvgSpinnersBarsRotateFade';
-import { PostCard } from '../post/PostCard';
-import { PostCreateFrom } from '../post/PostCreateFrom';
 
-export const HomePage = () => {
-  const [searchParams] = useSearchParams();
-  const query = Object.fromEntries(searchParams);
-  const parsedQuery = paginationSchema.parse(query);
+
+export const Route = createFileRoute('/(home)/')({
+  component: HomePage,
+});
+
+function HomePage() {
+  const parsedQuery = paginationSchema.parse(paginationSchema);
 
   const {
     data: posts,
@@ -26,7 +28,6 @@ export const HomePage = () => {
   } = useSuspenseInfiniteQuery({
     ...getPostsQueryOptions(parsedQuery),
     queryKey: ['posts', parsedQuery.order, parsedQuery.sortBy],
-    
   });
 
   const defaultOrderValue = parsedQuery.order || paginationSchema.shape.order._def.defaultValue();
@@ -37,7 +38,7 @@ export const HomePage = () => {
 
   if (isLoading) return <Spinner />;
   return (
-    <div className="mx-auto w-full flex flex-col space-y-4">
+    <div className="mx-auto flex w-full flex-col space-y-4">
       <PostCreateFrom />
       <SortBy order={order} sortBy={sortBy} setOrder={setOrder} setSortBy={setSortBy} sortByVariant={sortByVariant} />
       <InfinityScrollComponent isFetchingNextPage={isFetchingNextPage} hasNextPage={hasNextPage} fetchNextPage={fetchNextPage}>
@@ -47,4 +48,4 @@ export const HomePage = () => {
       </InfinityScrollComponent>
     </div>
   );
-};
+}
