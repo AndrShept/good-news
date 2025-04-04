@@ -65,6 +65,7 @@ export const CommentCard = ({ comment }: Props) => {
             <CreateCommentForm
               isButtonDisable={createCommentReplys.isPending}
               id={comment.id.toString()}
+              isUserAvatar={true}
               onCreate={createCommentReplys.mutate}
               className="mb-5 mt-2"
               onHide={() => setIsCommentFormShow(false)}

@@ -1,12 +1,12 @@
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
+import type { InferResponseType } from 'hono';
 import { z } from 'zod';
 
+import type { client } from '../frontend/src/api/api';
 import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import { postTable } from '../server/db/schema/posts-schema';
-import type { InferResponseType } from 'hono';
-import type { client } from '../frontend/src/api/api';
 
 export type SuccessResponse<T = undefined> = {
   success: true;
@@ -62,7 +62,8 @@ export const createCommentSchema = insertCommentSchema.pick({
 
 export const sortBySchema = z.enum(['points', 'recent']);
 export const orderSchema = z.enum(['asc', 'desc']);
-
+export type SortBy = z.infer<typeof sortBySchema>;
+export type Order = z.infer<typeof orderSchema>;
 
 export const paginationSchema = z.object({
   limit: z
@@ -82,7 +83,7 @@ export const paginationSchema = z.object({
   author: z.optional(z.string()),
   site: z.string().optional(),
 });
-export type IPaginationSchema = z.infer<typeof paginationSchema>
+export type IPaginationSchema = z.infer<typeof paginationSchema>;
 export type User = InferSelectModel<typeof userTable>;
 export type Post = InferSelectModel<typeof postTable> & {
   author?: Omit<User, 'password_hash'>;
@@ -102,4 +103,4 @@ export type PaginatedResponse<T> = {
   data: T;
 } & Omit<SuccessResponse, 'data'>;
 
-export type GetPostsData = InferResponseType<typeof client.post.$get>
+export type GetPostsData = InferResponseType<typeof client.post.$get>;

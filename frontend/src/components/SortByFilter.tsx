@@ -1,34 +1,27 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { paginationSchema, sortBySchema } from '@/shared/types';
+import { Order, SortBy, sortBySchema } from '@/shared/types';
 import { useNavigate } from '@tanstack/react-router';
-import qs from 'query-string';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { z } from 'zod';
 
 interface Props {
   order: string;
   sortBy: string;
   sortByVariant: typeof sortBySchema.Values;
-  setOrder: Dispatch<SetStateAction<string>>;
-  setSortBy: Dispatch<SetStateAction<string>>;
 }
 
-export const SortBy = ({ order, setOrder, setSortBy, sortBy, sortByVariant }: Props) => {
+export const SortByFilter = ({ order, sortBy, sortByVariant }: Props) => {
   const navigate = useNavigate();
-  const query = qs.stringifyUrl(
-    {
-      url: '',
-      query: {
-        order,
-        sortBy,
-      },
-    },
-    { skipEmptyString: true },
-  );
 
   return (
     <div className="flex gap-2">
-      <Select defaultValue={order} onValueChange={(e) => setOrder(e)}>
+      <Select
+        defaultValue={order}
+        onValueChange={(order: Order) => {
+          navigate({
+            to: '/',
+            search: (prev) => ({ ...prev, order }),
+          });
+        }}
+      >
         <SelectTrigger className="">
           <SelectValue placeholder={order} />
         </SelectTrigger>
@@ -37,7 +30,15 @@ export const SortBy = ({ order, setOrder, setSortBy, sortBy, sortByVariant }: Pr
           <SelectItem value="desc">desc</SelectItem>
         </SelectContent>
       </Select>
-      <Select defaultValue={sortBy} onValueChange={(e) => setSortBy(e)}>
+      <Select
+        defaultValue={sortBy}
+        onValueChange={(sortBy: SortBy) => {
+          navigate({
+            to: '/',
+            search: (prev) => ({ ...prev, sortBy }),
+          });
+        }}
+      >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder={sortBy} />
         </SelectTrigger>

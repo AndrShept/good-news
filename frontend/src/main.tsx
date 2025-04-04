@@ -30,8 +30,8 @@ const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 0,
-  defaultNotFoundComponent: NotFound,
   context: { queryClient },
+  defaultNotFoundComponent: NotFound,
   defaultPendingComponent: () => {
     return (
       <div className="flex h-screen">
