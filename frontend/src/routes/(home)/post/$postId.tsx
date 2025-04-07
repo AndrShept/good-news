@@ -2,26 +2,32 @@ import { useCreateComment } from '@/api/hooks/useCreatePostComment';
 import { createPostComment, getPostCommentsQueryOptions, getPostQueryOptions } from '@/api/post-api';
 import { CreateCommentForm } from '@/components/CreateCommentForm';
 import { InfinityScrollComponent } from '@/components/InfinityScrollComponent';
+import { SortByFilter } from '@/components/SortByFilter';
 import { Spinner } from '@/components/Spinner';
 import { CommentCard } from '@/components/comment/CommentCard';
 import { PostCard } from '@/components/post/PostCard';
 import { paginationSchema } from '@/shared/types';
 import { useQuery, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { zodValidator } from '@tanstack/zod-adapter';
 import React from 'react';
+
+import { SearchSchema } from '..';
 
 export const Route = createFileRoute('/(home)/post/$postId')({
   component: PostPage,
+  validateSearch: zodValidator(SearchSchema),
 });
 
 export function PostPage() {
   const { postId } = Route.useParams();
+  const { order, sortBy } = Route.useSearch();
   const postQuery = useSuspenseQuery(getPostQueryOptions(postId ?? ''));
   const query = paginationSchema.parse(paginationSchema);
   const postCommentsQuery = useSuspenseInfiniteQuery(
     getPostCommentsQueryOptions({
       postId: postId ?? '',
-      query,
+      query: { ...query, order, sortBy },
     }),
   );
   const { mutate, isPending } = useCreateComment({
@@ -36,6 +42,7 @@ export function PostPage() {
     <section className="flex flex-col gap-4">
       {postQuery.data.data && <PostCard post={postQuery.data.data} />}
       <CreateCommentForm isButtonDisable={isPending} onCreate={mutate} id={postQuery.data.data?.id.toString() ?? ''} />
+      <SortByFilter order={order} sortBy={sortBy} />
       <InfinityScrollComponent
         fetchNextPage={postCommentsQuery.fetchNextPage}
         hasNextPage={postCommentsQuery.hasNextPage}

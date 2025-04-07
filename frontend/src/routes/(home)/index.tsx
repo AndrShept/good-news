@@ -11,15 +11,17 @@ import { fallback, zodValidator } from '@tanstack/zod-adapter';
 import { useState } from 'react';
 import { z } from 'zod';
 
+
 export const SearchSchema = z.object({
-  sortBy: fallback(sortBySchema, 'points').default('recent'),
-  order: fallback(orderSchema, 'desc').default('desc'),
+  sortBy: fallback(sortBySchema, 'recent').default('recent'),
+  order: fallback(orderSchema, 'asc').default('asc'),
 });
 
 export const Route = createFileRoute('/(home)/')({
   component: HomePage,
   validateSearch: zodValidator(SearchSchema),
 });
+
 
 function HomePage() {
   const parsedQuery = paginationSchema.parse(paginationSchema);
@@ -34,18 +36,18 @@ function HomePage() {
     ...getPostsQueryOptions({ ...parsedQuery, order, sortBy }),
     queryKey: ['posts', order, sortBy],
   });
-  const sortByVariant = sortBySchema.Values;
 
   if (isLoading) return <Spinner />;
   return (
     <div className="mx-auto flex w-full flex-col space-y-4">
       <PostCreateFrom />
-      <SortByFilter order={order} sortBy={sortBy} sortByVariant={sortByVariant} />
+      <SortByFilter order={order} sortBy={sortBy} />
       <InfinityScrollComponent isFetchingNextPage={isFetchingNextPage} hasNextPage={hasNextPage} fetchNextPage={fetchNextPage}>
         <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
           {posts?.pages.map((page) => page.data.map((post) => <PostCard key={post.id} post={post} />))}
         </ul>
       </InfinityScrollComponent>
+      
     </div>
   );
 }

@@ -1,16 +1,20 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { User } from '@/shared/types.ts';
+import { QueryClient, QueryClientProvider, useSuspenseQuery } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 
+import { useAuth } from './api/hooks/useAuth.ts';
+import { App } from './components/App.tsx';
 import { ErrorLoadingData } from './components/ErrorLoadingData.tsx';
 import { NotFound } from './components/NotFound.tsx';
 import { Spinner } from './components/Spinner.tsx';
+import { AuthProvider } from './components/providerts/AuthProvider.tsx';
 import { ThemeProvider } from './components/providerts/theme-provider.tsx';
 import './index.css';
-import { routeTree } from './routeTree.gen';
+import { routeTree } from './routeTree.gen.ts';
 
 declare module '@tanstack/react-router' {
   interface Register {
@@ -26,11 +30,12 @@ const queryClient = new QueryClient({
   },
 });
 
-const router = createRouter({
+export const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 0,
-  context: { queryClient },
+  context: { auth: undefined },
+
   defaultNotFoundComponent: NotFound,
   defaultPendingComponent: () => {
     return (
@@ -46,7 +51,9 @@ createRoot(document.getElementById('root')!).render(
   // <StrictMode>
   <ThemeProvider defaultTheme="dark">
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
       <Toaster />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

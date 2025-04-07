@@ -1,0 +1,9 @@
+import { useAuth } from '@/api/hooks/useAuth';
+import { router } from '@/main';
+import { RouterProvider } from '@tanstack/react-router';
+import React from 'react';
+
+export const App = () => {
+  const auth = useAuth();
+  return <RouterProvider router={router} context={{ auth }} />;
+};
