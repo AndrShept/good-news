@@ -19,12 +19,12 @@ export const postTable = pgTable('post', {
     .references(() => userTable.id),
   createdAt: timestamp('created_at', {
     withTimezone: true,
-     mode: 'string'
+    mode: 'string',
   })
     .notNull()
     .defaultNow(),
   updatedAt: timestamp('updated_at', {
-    mode: 'string'
+    mode: 'string',
   }),
 });
 

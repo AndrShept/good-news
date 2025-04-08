@@ -11,7 +11,7 @@ import { z } from 'zod';
 export const Route = createFileRoute('/auth/sign-in')({
   component: SignIn,
   beforeLoad: ({ context }) => {
-    if(context.auth) throw redirect({to: '/auth/sign-up'})
+    if (context.auth) throw redirect({ to: '/auth/sign-up' });
   },
 });
 const loginSchema = z.object({

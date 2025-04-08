@@ -48,7 +48,7 @@ export const signIn = async (data: { password: string; username: string }) => {
 export const LogOut = async () => {
   const res = await client.auth.logout.$get();
   if (res.redirected) {
-    window.location.href = res.url; 
+    window.location.href = res.url;
   }
 };
 export const getUser = async () => {

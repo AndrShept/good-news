@@ -1,6 +1,5 @@
 import { getUserQueryOptions } from '@/api/auth-api';
 import { useQuery } from '@tanstack/react-query';
-
 import React, { ReactNode } from 'react';
 
 import { Spinner } from '../Spinner';

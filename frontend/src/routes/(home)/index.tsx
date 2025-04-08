@@ -11,7 +11,6 @@ import { fallback, zodValidator } from '@tanstack/zod-adapter';
 import { useState } from 'react';
 import { z } from 'zod';
 
-
 export const SearchSchema = z.object({
   sortBy: fallback(sortBySchema, 'recent').default('recent'),
   order: fallback(orderSchema, 'asc').default('asc'),
@@ -21,7 +20,6 @@ export const Route = createFileRoute('/(home)/')({
   component: HomePage,
   validateSearch: zodValidator(SearchSchema),
 });
-
 
 function HomePage() {
   const parsedQuery = paginationSchema.parse(paginationSchema);
@@ -47,7 +45,6 @@ function HomePage() {
           {posts?.pages.map((page) => page.data.map((post) => <PostCard key={post.id} post={post} />))}
         </ul>
       </InfinityScrollComponent>
-      
     </div>
   );
 }

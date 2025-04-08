@@ -9,6 +9,7 @@ import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
 import { postRouter } from './routes/post-router';
+import { serveStatic } from 'hono/bun';
 
 const app = new Hono<Context>();
 app.use(logger());
@@ -23,7 +24,7 @@ app.onError((err, c) => {
       {
         success: false,
         message: err.message,
-        isFormError: err.cause && typeof err.cause === 'object' && 'form' in err.cause ? err.cause.form === true : false,
+        isFormError: err instanceof HTTPException && 'cause' in err ? true : false,
       },
       err.status,
     );
@@ -39,7 +40,6 @@ app.onError((err, c) => {
       503, // 503 Service Unavailable
     );
   }
-  console.error(err)
 
   return c.json<ErrorResponse>(
     {
@@ -50,6 +50,21 @@ app.onError((err, c) => {
   );
 });
 
+
+
+// app.use('/assets/*', serveStatic({ root: './frontend/dist' }))
+// app.use('/*.(js|css|png|jpg|svg|ico)', serveStatic({ root: './frontend/dist' }))
+
+// app.get('*', serveStatic({ path: './frontend/dist/index.html' }))
+
+app.get("*", serveStatic({ root: "./frontend/dist" }));
+app.get("*", serveStatic({ path: "./frontend/dist/index.html" }));
+
 export type ApiRoutes = typeof routes;
 
-export default app;
+export default {
+  port: process.env['PORT'] || 3000,
+  hostname: "0.0.0.0",
+  fetch: app.fetch
+}
+console.log("Server Running on port", process.env["PORT"] || 3000);

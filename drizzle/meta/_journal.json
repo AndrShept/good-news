@@ -50,6 +50,13 @@
       "when": 1741771708744,
       "tag": "0006_sparkling_arachne",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1744101135345,
+      "tag": "0007_tranquil_mindworm",
+      "breakpoints": true
     }
   ]
 }

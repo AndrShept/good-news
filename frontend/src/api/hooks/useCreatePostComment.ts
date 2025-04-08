@@ -1,8 +1,7 @@
 import { Comments, SuccessResponse, createCommentSchema } from '@/shared/types';
-import {  useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
-
 
 export const useCreateComment = ({
   queryKey,

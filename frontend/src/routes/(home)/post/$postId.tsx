@@ -17,6 +17,7 @@ import { SearchSchema } from '..';
 export const Route = createFileRoute('/(home)/post/$postId')({
   component: PostPage,
   validateSearch: zodValidator(SearchSchema),
+
 });
 
 export function PostPage() {

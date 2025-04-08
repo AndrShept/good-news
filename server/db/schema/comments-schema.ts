@@ -23,12 +23,12 @@ export const commentTable = pgTable('comment', {
     }),
   createdAt: timestamp('created_at', {
     withTimezone: true,
-       mode : 'string'
+    mode: 'string',
   })
     .notNull()
     .defaultNow(),
   updatedAt: timestamp('updated_at', {
-       mode : 'string'
+    mode: 'string',
   }),
 });
 

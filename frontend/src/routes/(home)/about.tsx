@@ -11,10 +11,10 @@ export const Route = createFileRoute('/(home)/about')({
 
 function About() {
   const { sortBy, order } = Route.useSearch();
+
   return (
     <div>
       Hello "/about"!
-      zxczxcsdfdsfgd
       <SortByFilter order={order} sortBy={sortBy} />
     </div>
   );

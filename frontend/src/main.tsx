@@ -1,12 +1,10 @@
-import { User } from '@/shared/types.ts';
-import { QueryClient, QueryClientProvider, useSuspenseQuery } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { RouterProvider, createRouter } from '@tanstack/react-router';
+import { createRouter } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 
-import { useAuth } from './api/hooks/useAuth.ts';
 import { App } from './components/App.tsx';
 import { ErrorLoadingData } from './components/ErrorLoadingData.tsx';
 import { NotFound } from './components/NotFound.tsx';
@@ -34,8 +32,8 @@ export const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 0,
-  context: { auth: undefined },
-
+  context: { queryClient, auth: undefined },
+  scrollRestoration: true,
   defaultNotFoundComponent: NotFound,
   defaultPendingComponent: () => {
     return (

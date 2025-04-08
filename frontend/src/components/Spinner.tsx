@@ -1,6 +1,6 @@
 import { VariantProps, cva } from 'class-variance-authority';
-import SvgSpinnersBarsRotateFade from './SvgSpinnersBarsRotateFade';
 
+import SvgSpinnersBarsRotateFade from './SvgSpinnersBarsRotateFade';
 
 const spinnerVariants = cva('', {
   variants: {

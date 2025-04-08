@@ -1,11 +1,10 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -128,25 +127,26 @@
   --color-color-3: var(----color-3);
   --color-color-2: var(----color-2);
   --color-color-1: var(----color-1);
- 
 
   @keyframes aurora-border {
-    0%, 100% {
-      borderRadius: 37% 29% 27% 27% / 28% 25% 41% 37%;
+    0%,
+    100% {
+      borderradius: 37% 29% 27% 27% / 28% 25% 41% 37%;
     }
     25% {
-      borderRadius: 47% 29% 39% 49% / 61% 19% 66% 26%;
+      borderradius: 47% 29% 39% 49% / 61% 19% 66% 26%;
     }
     50% {
-      borderRadius: 57% 23% 47% 72% / 63% 17% 66% 33%;
+      borderradius: 57% 23% 47% 72% / 63% 17% 66% 33%;
     }
     75% {
-      borderRadius: 28% 49% 29% 100% / 93% 20% 64% 25%;
+      borderradius: 28% 49% 29% 100% / 93% 20% 64% 25%;
     }
   }
 
   @keyframes aurora-1 {
-    0%, 100% {
+    0%,
+    100% {
       top: 0;
       right: 0;
     }
@@ -161,7 +161,8 @@
   }
 
   @keyframes aurora-2 {
-    0%, 100% {
+    0%,
+    100% {
       top: 0;
       left: 0;
     }
@@ -176,7 +177,8 @@
   }
 
   @keyframes aurora-3 {
-    0%, 100% {
+    0%,
+    100% {
       bottom: 0;
       left: 0;
     }
@@ -191,7 +193,8 @@
   }
 
   @keyframes aurora-4 {
-    0%, 100% {
+    0%,
+    100% {
       bottom: 0;
       right: 0;
     }

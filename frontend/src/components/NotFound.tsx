@@ -1,7 +1,7 @@
+import { Link } from '@tanstack/react-router';
 import { HomeIcon } from 'lucide-react';
 
 import { buttonVariants } from './ui/button';
-import { Link } from '@tanstack/react-router';
 
 export const NotFound = () => {
   return (

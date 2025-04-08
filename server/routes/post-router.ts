@@ -254,8 +254,6 @@ export const postRouter = new Hono<Context>()
         orderBy: sortOrder,
         with: {
           author: true,
-   
-          
         },
 
         extras: {

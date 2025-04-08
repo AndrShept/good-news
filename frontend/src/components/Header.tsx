@@ -2,20 +2,20 @@ import { LogOut } from '@/api/auth-api';
 import { useAuth } from '@/api/hooks/useAuth';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useQueryClient } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 import { MenuIcon } from 'lucide-react';
 
 import { NavBar } from './NavBar';
 import { UserAvatar } from './UserAvatar';
 import { Button } from './ui/button';
-import { Link } from '@tanstack/react-router';
 
 export const Header = () => {
   const user = useAuth();
-  console.log(user)
+  console.log(user);
   const queryClient = useQueryClient();
   return (
-    <header className="bg-background/50 sticky top-0 z-50 flex h-14  border-b p-3 backdrop-blur-sm">
-      <div className=' flex max-w-7xl w-full mx-auto items-center justify-between'>
+    <header className="bg-background/50 sticky top-0 z-50 flex h-14 border-b p-3 backdrop-blur-sm">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between">
         <Link to={'/'}>🎇</Link>
 
         <section className="flex items-center gap-2">
