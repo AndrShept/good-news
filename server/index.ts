@@ -19,6 +19,7 @@ app.use('*', cors(), sessionHandler);
 const routes = app.basePath('/api').route('/auth', authRouter).route('/post', postRouter).route('/comment', commentRouter);
 
 app.onError((err, c) => {
+  
   if (err instanceof HTTPException) {
     return c.json<ErrorResponse>(
       {

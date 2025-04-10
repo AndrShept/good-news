@@ -47,7 +47,7 @@ function SignIn() {
       });
     }
     if (res.success) {
-      await queryClient.invalidateQueries({ queryKey: getUserQueryOptions().queryKey });
+      await queryClient.invalidateQueries();
       navigate({ to: '/' });
     }
   };
