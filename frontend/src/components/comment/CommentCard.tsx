@@ -14,7 +14,8 @@ import { Spinner } from '../Spinner';
 import { UpvoteIcon } from '../UpvoteIcon';
 import { UserAvatar } from '../UserAvatar';
 import { Button } from '../ui/button';
-
+import * as m from "motion/react-m"
+import { childrenVariants } from '@/lib/animation';
 interface Props {
   comment: Comments;
 }
@@ -45,8 +46,10 @@ export const CommentCard = ({ comment }: Props) => {
     ],
     mutationFn: createCommentReplies,
   });
+
+
   return (
-    <li className="flex flex-col gap-2 rounded">
+    <m.li variants={childrenVariants}  className="flex flex-col gap-2 rounded">
       <section className="hover:bg-secondary/30 flex gap-2 p-3">
         <div>
           <UserAvatar url={comment.author?.image} />
@@ -100,6 +103,6 @@ export const CommentCard = ({ comment }: Props) => {
           </InfinityScrollComponent>
         </div>
       )}
-    </li>
+    </m.li>
   );
 };

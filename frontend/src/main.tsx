@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRouter } from '@tanstack/react-router';
+import { LazyMotion, domAnimation } from 'motion/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
@@ -50,7 +51,9 @@ createRoot(document.getElementById('root')!).render(
   <ThemeProvider defaultTheme="dark">
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <App />
+        <LazyMotion features={domAnimation}>
+          <App />
+        </LazyMotion>
       </AuthProvider>
       <Toaster />
       <ReactQueryDevtools initialIsOpen={false} />

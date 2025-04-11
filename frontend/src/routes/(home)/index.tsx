@@ -4,10 +4,12 @@ import { SortByFilter } from '@/components/SortByFilter';
 import { Spinner } from '@/components/Spinner';
 import { PostCard } from '@/components/post/PostCard';
 import { PostCreateFrom } from '@/components/post/PostCreateFrom';
+import { childrenVariants, parentVariants } from '@/lib/animation';
 import { orderSchema, paginationSchema, sortBySchema } from '@/shared/types';
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { fallback, zodValidator } from '@tanstack/zod-adapter';
+import * as m from 'motion/react-m';
 import { useState } from 'react';
 import { z } from 'zod';
 
@@ -41,9 +43,15 @@ function HomePage() {
       <PostCreateFrom />
       <SortByFilter order={order} sortBy={sortBy} />
       <InfinityScrollComponent isFetchingNextPage={isFetchingNextPage} hasNextPage={hasNextPage} fetchNextPage={fetchNextPage}>
-        <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {posts?.pages.map((page) => page.data.map((post) => <PostCard key={post.id} post={post} />))}
-        </ul>
+        <m.ul variants={parentVariants} initial="hidden" animate="visible" className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          {posts?.pages.map((page) =>
+            page.data.map((post) => (
+              <m.div  key={post.id}>
+                <PostCard post={post} />
+              </m.div>
+            )),
+          )}
+        </m.ul>
       </InfinityScrollComponent>
     </div>
   );

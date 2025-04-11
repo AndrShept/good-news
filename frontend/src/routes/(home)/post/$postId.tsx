@@ -6,10 +6,12 @@ import { SortByFilter } from '@/components/SortByFilter';
 import { Spinner } from '@/components/Spinner';
 import { CommentCard } from '@/components/comment/CommentCard';
 import { PostCard } from '@/components/post/PostCard';
+import { childrenVariants, parentVariants } from '@/lib/animation';
 import { paginationSchema } from '@/shared/types';
-import { useQuery, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { zodValidator } from '@tanstack/zod-adapter';
+import * as m from 'motion/react-m';
 import React from 'react';
 
 import { SearchSchema } from '..';
@@ -17,7 +19,6 @@ import { SearchSchema } from '..';
 export const Route = createFileRoute('/(home)/post/$postId')({
   component: PostPage,
   validateSearch: zodValidator(SearchSchema),
-
 });
 
 export function PostPage() {
@@ -49,9 +50,9 @@ export function PostPage() {
         hasNextPage={postCommentsQuery.hasNextPage}
         isFetchingNextPage={postCommentsQuery.isFetchingNextPage}
       >
-        <ul className="flex flex-col gap-2">
+        <m.ul variants={parentVariants} initial="hidden" animate="visible" className="flex flex-col gap-2">
           {postCommentsQuery.data.pages.map((page) => page.data.map((comment) => <CommentCard key={comment.id} comment={comment} />))}
-        </ul>
+        </m.ul>
       </InfinityScrollComponent>
     </section>
   );
