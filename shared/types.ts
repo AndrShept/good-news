@@ -19,13 +19,22 @@ export type ErrorResponse = {
   isFormError?: boolean;
 };
 export const loginSchema = z.object({
-  username: z
-    .string()
-    .min(3)
-    .max(31)
-    .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+  email: z.string().email(),
   password: z.string().min(3).max(255),
 });
+export const registerSchema = loginSchema
+  .extend({
+    confirmPassword: z.string().min(3).max(255),
+    username: z
+      .string()
+      .min(3)
+      .max(31)
+      .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+  })
+  .refine((val) => val.password === val.confirmPassword, {
+    message: 'Passwords must match!',
+    path: ['confirmPassword'],
+  });
 
 export const createPostSchema = createInsertSchema(postTable, {
   title: z.string().min(3),

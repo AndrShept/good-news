@@ -1,1 +1,0 @@
-ALTER TABLE "comment" ADD COLUMN "parent_comment_id" integer;

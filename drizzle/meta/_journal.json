@@ -5,57 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1740913009789,
-      "tag": "0000_fixed_ezekiel",
+      "when": 1744801116882,
+      "tag": "0000_furry_menace",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1740913289096,
-      "tag": "0001_new_molly_hayes",
+      "when": 1744801494366,
+      "tag": "0001_boring_ma_gnuci",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1740913349473,
-      "tag": "0002_exotic_terror",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1740913511815,
-      "tag": "0003_dusty_stryfe",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1741699696482,
-      "tag": "0004_marvelous_valkyrie",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1741700597708,
-      "tag": "0005_blue_nuke",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1741771708744,
-      "tag": "0006_sparkling_arachne",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1744101135345,
-      "tag": "0007_tranquil_mindworm",
+      "when": 1744801666078,
+      "tag": "0002_daffy_korvac",
       "breakpoints": true
     }
   ]

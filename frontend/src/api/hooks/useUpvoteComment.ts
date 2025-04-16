@@ -15,7 +15,6 @@ export const useUpvoteComment = ({ queryKey }: { queryKey: string[] }) => {
           queryKey,
         },
         (oldData) => {
-          console.log(oldData);
           if (!oldData) return;
           prevData = oldData;
           return {

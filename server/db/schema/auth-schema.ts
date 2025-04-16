@@ -8,6 +8,7 @@ import { commentUpvotesTable, postUpvotesTable } from './upvotes-schema';
 export const userTable = pgTable('user', {
   id: text().primaryKey(),
   username: text().notNull().unique(),
+  email: text().notNull().unique(),
   password_hash: text('password_hash').notNull(),
   age: integer('age'),
   image: text().notNull(),

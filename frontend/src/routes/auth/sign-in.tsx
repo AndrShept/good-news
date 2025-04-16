@@ -2,6 +2,7 @@ import { getUserQueryOptions, signIn } from '@/api/auth-api';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { loginSchema } from '@/shared/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
@@ -14,32 +15,25 @@ export const Route = createFileRoute('/auth/sign-in')({
     if (context.auth) throw redirect({ to: '/auth/sign-up' });
   },
 });
-const loginSchema = z.object({
-  username: z
-    .string()
-    .min(3)
-    .max(31)
-    .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
-  password: z.string().min(3).max(255),
-});
+
 function SignIn() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: '',
+      email: '',
       password: '',
     },
   });
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    const { password, username } = values;
+    const { password, email } = values;
     form.clearErrors('root');
     const res = await signIn({
       password,
-      username,
+      email,
     });
     if (!res.success) {
       form.setError('root', {
@@ -58,10 +52,11 @@ function SignIn() {
         <p className="mb-4"> Enter your details to login an account</p>
         <FormField
           control={form.control}
-          name="username"
+          name="email"
+          disabled={isLoading}
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-primary">Username</FormLabel>
+              <FormLabel className="text-primary">Email</FormLabel>
               <FormControl>
                 <Input className="placeholder:text-sm" {...field} />
               </FormControl>
@@ -72,12 +67,14 @@ function SignIn() {
         />
         <FormField
           control={form.control}
+          disabled={isLoading}
           name="password"
+          
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-primary">Password</FormLabel>
               <FormControl>
-                <Input className="placeholder:text-sm" {...field} />
+                <Input type='password' className="placeholder:text-sm" {...field} />
               </FormControl>
               {/* <FormDescription>This is your public display name.</FormDescription> */}
               <FormMessage />
@@ -92,7 +89,7 @@ function SignIn() {
         </Button>
         <div className="mx-auto flex items-center gap-1">
           <p className="text-muted-foreground"> Already have an account? </p>
-          <Link className="text-blue-500 hover:underline" to={'/auth/sign-up'}>
+          <Link disabled={isLoading} className="text-blue-500 hover:underline" to={'/auth/sign-up'}>
             register
           </Link>
         </div>

@@ -1,7 +1,9 @@
 import { getUserQueryOptions, signUp } from '@/api/auth-api';
+import { Spinner } from '@/components/Spinner';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { loginSchema, registerSchema } from '@/shared/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
@@ -11,38 +13,24 @@ import { z } from 'zod';
 export const Route = createFileRoute('/auth/sign-up')({
   component: SignUp,
 });
-const loginSchema = z
-  .object({
-    username: z
-      .string()
-      .min(3)
-      .max(31)
-      .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
-    password: z.string().min(3).max(255),
-    confirmPassword: z.string().min(3).max(255),
-  })
-  .refine((val) => val.password === val.confirmPassword, {
-    message: 'Passwords must match!',
-    path: ['confirmPassword'],
-  });
+
 function SignUp() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
+      email: '',
       username: '',
       password: '',
       confirmPassword: '',
     },
   });
-  const isLoading = form.formState.isSubmitting;
+  const isLoading = form.formState.isLoading;
 
-  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    const { password, username } = values;
+  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
     form.clearErrors('root');
-    const res = await signUp(username, password);
-    console.log(res);
+    const res = await signUp(values);
     if (!res.success) {
       form.setError('root', {
         message: res.message,
@@ -62,10 +50,11 @@ function SignUp() {
         <p className="mb-4"> Enter your details to create an account</p>
         <FormField
           control={form.control}
-          name="username"
+          name="email"
+          disabled={isLoading}
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-primary">Username</FormLabel>
+              <FormLabel className="text-primary">Email*</FormLabel>
               <FormControl>
                 <Input className="placeholder:text-sm" {...field} />
               </FormControl>
@@ -76,12 +65,28 @@ function SignUp() {
         />
         <FormField
           control={form.control}
+          name="username"
+          disabled={isLoading}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-primary">Username*</FormLabel>
+              <FormControl>
+                <Input className="placeholder:text-sm" {...field} />
+              </FormControl>
+              {/* <FormDescription>This is your public display name.</FormDescription> */}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          disabled={isLoading}
+          control={form.control}
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-primary">Password</FormLabel>
+              <FormLabel className="text-primary">Password*</FormLabel>
               <FormControl>
-                <Input className="placeholder:text-sm" {...field} />
+                <Input type='password' className="placeholder:text-sm" {...field} />
               </FormControl>
               {/* <FormDescription>This is your public display name.</FormDescription> */}
               <FormMessage />
@@ -91,11 +96,12 @@ function SignUp() {
         <FormField
           control={form.control}
           name="confirmPassword"
+          disabled={isLoading}
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-primary">Confirm password</FormLabel>
+              <FormLabel className="text-primary">Confirm password*</FormLabel>
               <FormControl>
-                <Input className="placeholder:text-sm" {...field} />
+                <Input type='password' className="placeholder:text-sm" {...field} />
               </FormControl>
               {/* <FormDescription>This is your public display name.</FormDescription> */}
               <FormMessage />
@@ -105,10 +111,11 @@ function SignUp() {
         {form.formState.errors.root && <p className="text-sm text-red-500">{form.formState.errors.root.message}</p>}
         <Button className="mt-4" disabled={isLoading} variant={'outline'} type="submit">
           Sign Up 🔥
+          <p>{isLoading && <Spinner className="ml-1" size={'sm'} />}</p>
         </Button>
         <div className="mx-auto flex items-center gap-1">
           <p className="text-muted-foreground"> Already have an account? </p>
-          <Link className="text-blue-500 hover:underline" to={'/auth/sign-in'}>
+          <Link disabled={isLoading} className="text-blue-500 hover:underline" to={'/auth/sign-in'}>
             login
           </Link>
         </div>

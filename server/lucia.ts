@@ -18,6 +18,6 @@ export const lucia = new Lucia(adapter, {
 declare module 'lucia' {
   interface Register {
     Lucia: typeof lucia;
-    DatabaseUserAttributes: { username: string };
+    DatabaseUserAttributes: { username: string,  };
   }
 }

@@ -1,1 +1,0 @@
-ALTER TABLE "comment" DROP COLUMN "parent_comment_id";

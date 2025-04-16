@@ -1,2 +1,0 @@
-ALTER TABLE "comment_upvotes" ADD CONSTRAINT "comment_upvotes_comment_id_comment_id_fk" FOREIGN KEY ("comment_id") REFERENCES "public"."comment"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "post_upvotes" ADD CONSTRAINT "post_upvotes_post_id_post_id_fk" FOREIGN KEY ("post_id") REFERENCES "public"."post"("id") ON DELETE cascade ON UPDATE no action;

@@ -23,7 +23,6 @@ function About() {
   const boolean = useTransform(scrollY, [0, 1], [false, true]);
   const [isBorderShow, setIsBorderShow] = useState(false);
   useMotionValueEvent(boolean, 'change', (prev) => {
-    console.log(prev);
     setIsBorderShow(prev);
   });
 

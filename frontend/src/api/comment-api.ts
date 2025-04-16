@@ -24,7 +24,6 @@ export const getCommentRepliesQueryOptions = ({ id, query }: { id: string; query
   return infiniteQueryOptions({
     queryKey: ['post', 'comment', 'replys', id],
     queryFn: ({ pageParam }) => {
-      console.log(pageParam);
       return getCommentReplies({
         id: id.toString(),
         query: {

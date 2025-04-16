@@ -1,16 +1,14 @@
-import { ErrorResponse, SuccessResponse } from '@/shared/types';
+import { ErrorResponse, SuccessResponse, registerSchema } from '@/shared/types';
 import '@/shared/types';
 import { queryOptions } from '@tanstack/react-query';
+import { z } from 'zod';
 
 import { client } from './api';
 
-export const signUp = async (username: string, password: string) => {
+export const signUp = async (data: z.infer<typeof registerSchema>) => {
   try {
     const res = await client.auth.sighup.$post({
-      form: {
-        password,
-        username,
-      },
+      form: data,
     });
     if (res.ok) {
       return (await res.json()) as SuccessResponse;
@@ -26,7 +24,7 @@ export const signUp = async (username: string, password: string) => {
   }
 };
 
-export const signIn = async (data: { password: string; username: string }) => {
+export const signIn = async (data: { password: string; email: string }) => {
   try {
     const res = await client.auth.login.$post({
       form: { ...data },

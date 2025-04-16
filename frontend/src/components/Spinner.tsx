@@ -1,4 +1,6 @@
+import { cn } from '@/lib/utils';
 import { VariantProps, cva } from 'class-variance-authority';
+import { ComponentProps } from 'react';
 
 import SvgSpinnersBarsRotateFade from './SvgSpinnersBarsRotateFade';
 
@@ -15,9 +17,9 @@ const spinnerVariants = cva('', {
   },
 });
 
-export const Spinner = ({ size }: VariantProps<typeof spinnerVariants>) => {
+export const Spinner = ({ size, className, ...props }: ComponentProps<'div'> & VariantProps<typeof spinnerVariants>) => {
   return (
-    <div className="m-auto">
+    <div className={cn('m-auto', className)}>
       <SvgSpinnersBarsRotateFade className={spinnerVariants({ size })} />
     </div>
   );

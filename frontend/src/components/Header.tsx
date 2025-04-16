@@ -11,7 +11,6 @@ import { Button } from './ui/button';
 
 export const Header = () => {
   const user = useAuth();
-  console.log(user);
   const queryClient = useQueryClient();
   return (
     <header className="bg-background/50 sticky top-0 z-50 flex h-14 border-b p-3 backdrop-blur-sm">
