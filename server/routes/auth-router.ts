@@ -6,7 +6,6 @@ import { HTTPException } from 'hono/http-exception';
 import { type User, generateId } from 'lucia';
 import nodemailer from 'nodemailer';
 import { AvatarGenerator } from 'random-avatar-generator';
-import { Resend } from 'resend';
 import z from 'zod';
 
 import { type SuccessResponse, loginSchema, registerSchema } from '../../shared/types';
@@ -16,7 +15,6 @@ import { userTable } from '../db/schema/auth-schema';
 import { lucia } from '../lucia';
 import { loggedIn } from '../middleware/loggedIn';
 
-const resend = new Resend('re_SbE8KtbW_L8vyHr7Cviepg48o9WhejvPR');
 export const authRouter = new Hono<Context>()
   .post('/sighup', zValidator('form', registerSchema), async (c) => {
     const { password, username, email } = c.req.valid('form');
@@ -43,33 +41,6 @@ export const authRouter = new Hono<Context>()
         message: 'Email already used',
       });
     }
-
-    // const { data, error } = await resend.emails.send({
-    //   from: 'Good News <no-reply@on.resend.dev>',
-    //   to: email,
-    //   subject: 'register',
-    //   html: `<Html>
-    //   <Head />
-    //   <Preview>Скидання пароля для вашого акаунту</Preview>
-    //   <Body style={{ backgroundColor: '#f4f4f4', padding: '20px' }}>
-    //     <Container style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '8px' }}>
-    //       <Heading style={{ fontSize: '24px' }}>Привіт, {username}!</Heading>
-    //       <Text>
-    //         Ми отримали запит на скидання пароля. Щоб встановити новий пароль, перейдіть за посиланням нижче:
-    //       </Text>
-    //       <Link href={resetLink} style={{ color: '#007bff', fontWeight: 'bold' }}>
-    //         Скинути пароль
-    //       </Link>
-    //       <Text>
-    //         Якщо ви не надсилали цей запит, просто проігноруйте цей лист.
-    //       </Text>
-    //       <Text style={{ fontSize: '12px', color: '#999' }}>
-    //         Дякуємо, команда Good News!
-    //       </Text>
-    //     </Container>
-    //   </Body>
-    // </Html>`,
-    // });
 
     const transporter = nodemailer.createTransport({
       host: 'smtp-relay.brevo.com',

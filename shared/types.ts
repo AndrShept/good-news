@@ -7,6 +7,9 @@ import type { client } from '../frontend/src/api/api';
 import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import { postTable } from '../server/db/schema/posts-schema';
+import type { ApiRoutes } from '../server/index';
+
+export type AppType = ApiRoutes;
 
 export type SuccessResponse<T = undefined> = {
   success: true;

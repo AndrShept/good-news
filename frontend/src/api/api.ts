@@ -1,6 +1,6 @@
 import { hc } from 'hono/client';
 
-import { ApiRoutes } from '../../../server/index';
+import type { ApiRoutes } from '../../../server';
 
 export const client = hc<ApiRoutes>('/', {
   fetch: (input: RequestInfo | URL, init?: RequestInit) =>
@@ -9,3 +9,4 @@ export const client = hc<ApiRoutes>('/', {
       credentials: 'include',
     }),
 }).api;
+

@@ -1,4 +1,4 @@
-import { Post, createCommentSchema, createPostSchema, paginationSchema } from '@/shared/types';
+import { createCommentSchema, createPostSchema, paginationSchema } from '@/shared/types';
 import { infiniteQueryOptions, keepPreviousData, queryOptions } from '@tanstack/react-query';
 import { z } from 'zod';
 
@@ -29,6 +29,7 @@ export const getPost = async (postId: string) => {
 };
 
 export const getPostComments = async ({ postId, query }: { postId: string; query: z.infer<typeof paginationSchema> }) => {
+  
   const res = await client.post[':id'].comment.$get({
     query: {
       ...query,
@@ -48,6 +49,7 @@ export const getPostComments = async ({ postId, query }: { postId: string; query
 };
 
 export const createPost = async (form: z.infer<typeof createPostSchema>) => {
+  
   const res = await client.post.$post({
     form,
   });
