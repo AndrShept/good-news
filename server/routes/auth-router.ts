@@ -1,8 +1,13 @@
+import { Email } from '@/lib/Email';
+import { processEnv } from '@/lib/utils';
 import type { User as UserType } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
+import { render } from '@react-email/components';
+import { password } from 'bun';
 import { and, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import jwt from 'jsonwebtoken';
 import { type User, generateId } from 'lucia';
 import nodemailer from 'nodemailer';
 import { AvatarGenerator } from 'random-avatar-generator';
@@ -18,11 +23,6 @@ import { loggedIn } from '../middleware/loggedIn';
 export const authRouter = new Hono<Context>()
   .post('/sighup', zValidator('form', registerSchema), async (c) => {
     const { password, username, email } = c.req.valid('form');
-    console.log(password, username, email);
-    const passwordHash = await Bun.password.hash(password);
-    const userId = generateId(15);
-    const generator = new AvatarGenerator();
-    const randomAvatarUrl = generator.generateRandomAvatar().replace('Circle', 'Transparent');
 
     const existUsername = await db.query.userTable.findFirst({
       where: eq(userTable.username, username),
@@ -42,43 +42,97 @@ export const authRouter = new Hono<Context>()
       });
     }
 
+    const payload = { password, email, username };
+    const token = jwt.sign(payload, processEnv.JWT_SECRET, { expiresIn: '15m' });
+    const confirmUrl = `${processEnv.BASE_URL_FRONT}/auth/confirm-email?token=${token}`;
     const transporter = nodemailer.createTransport({
       host: 'smtp-relay.brevo.com',
       port: 587, // або 465 для SSL
       secure: false, // true якщо порт 465
       auth: {
-        user: '8a9cd7001@smtp-brevo.com',
-        pass: 'JmO7EKrFj9HUfWan',
+        user: processEnv.BREVO_USERNAME,
+        pass: processEnv.BREVO_PASS,
       },
     });
+
+    // const emailHtml = await render(<Email url="https://example.com"/>);
 
     await transporter.sendMail({
       from: '"Good News" <no-reply@good-news.space>', // рекомендовано свій домен
       to: email,
       subject: 'Реєстрація успішна!',
       text: 'Дякуємо за реєстрацію!',
-      html: '<h1>Дякуємо за реєстрацію!</h1><p>Тепер ви з нами 🙌</p>',
+      html: `Натисніть <a href="${confirmUrl}">сюди</a>, щоб підтвердити реєстрацію.`,
     });
 
-    await db.insert(userTable).values({
-      username,
-      password_hash: passwordHash,
-      id: userId,
-      email,
-      image: randomAvatarUrl,
-    });
-
-    const session = await lucia.createSession(userId, { username });
-    const sessionCookie = lucia.createSessionCookie(session.id).serialize();
-    c.header('Set-Cookie', sessionCookie, { append: true });
     return c.json<SuccessResponse>(
       {
         success: true,
-        message: 'User created',
+        message: 'email sended ',
       },
       201,
     );
   })
+  .post(
+    '/confirm',
+    zValidator(
+      'query',
+      z.object({
+        token: z.string().min(1),
+      }),
+    ),
+    async (c) => {
+      const { token } = c.req.valid('query');
+
+      console.log('DAADDAADADADADADDAAD');
+      let verifyToken;
+      try {
+        verifyToken = jwt.verify(token, processEnv.JWT_SECRET) as {
+          username: string;
+          email: string;
+          password: string;
+        };
+      } catch (e) {
+        return c.text('Invalid or expired token', 400);
+      }
+      const { email, password, username } = verifyToken;
+      const passwordHash = await Bun.password.hash(password);
+      const userId = generateId(15);
+      const generator = new AvatarGenerator();
+      const randomAvatarUrl = generator.generateRandomAvatar().replace('Circle', 'Transparent');
+      const existUsername = await db.query.userTable.findFirst({
+        where: eq(userTable.username, username),
+      });
+      const existEmail = await db.query.userTable.findFirst({
+        where: eq(userTable.email, email),
+      });
+      if (existUsername) {
+        throw new HTTPException(409, {
+          message: 'Username already used',
+        });
+      }
+      if (existEmail) {
+        throw new HTTPException(409, {
+          message: 'Email already used',
+        });
+      }
+      await db.insert(userTable).values({
+        username,
+        password_hash: passwordHash,
+        id: userId,
+        email,
+        image: randomAvatarUrl,
+      });
+
+      const session = await lucia.createSession(userId, { username });
+      const sessionCookie = lucia.createSessionCookie(session.id).serialize();
+      c.header('Set-Cookie', sessionCookie, { append: true });
+      return c.json<SuccessResponse>({
+        message: 'account created',
+        success: true,
+      });
+    },
+  )
 
   .post('/login', zValidator('form', loginSchema), async (c) => {
     const { password, email } = c.req.valid('form');

@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
 import { hc } from 'hono/client';
@@ -18,7 +19,6 @@ app.use('*', cors(), sessionHandler);
 
 //APP ROUTES
 const routes = app.basePath('/api').route('/auth', authRouter).route('/post', postRouter).route('/comment', commentRouter);
-const client = hc<typeof routes>('/');
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
@@ -53,8 +53,8 @@ app.onError((err, c) => {
 });
 export type ApiRoutes = typeof routes;
 
-app.get('*', serveStatic({ root: './frontend/dist' }));
-app.get('*', serveStatic({ path: './frontend/dist/index.html' }));
+// app.get('*', serveStatic({ root: './frontend/dist' }));
+// app.get('*', serveStatic({ path: './frontend/dist/index.html' }));
 
 export default {
   port: process.env['PORT'] || 3000,

@@ -26,7 +26,7 @@ function SignUp() {
       confirmPassword: '',
     },
   });
-  const isLoading = form.formState.isLoading;
+  const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof registerSchema>) => {
     form.clearErrors('root');
@@ -37,10 +37,7 @@ function SignUp() {
       });
     }
     if (res.success) {
-      await queryClient.invalidateQueries({
-        queryKey: getUserQueryOptions().queryKey,
-      });
-      navigate({ to: '/' });
+      navigate({ to: '/auth/confirm-email', search: { email: values.email } });
     }
   };
   return (
@@ -86,7 +83,7 @@ function SignUp() {
             <FormItem>
               <FormLabel className="text-primary">Password*</FormLabel>
               <FormControl>
-                <Input type='password' className="placeholder:text-sm" {...field} />
+                <Input type="password" className="placeholder:text-sm" {...field} />
               </FormControl>
               {/* <FormDescription>This is your public display name.</FormDescription> */}
               <FormMessage />
@@ -101,7 +98,7 @@ function SignUp() {
             <FormItem>
               <FormLabel className="text-primary">Confirm password*</FormLabel>
               <FormControl>
-                <Input type='password' className="placeholder:text-sm" {...field} />
+                <Input type="password" className="placeholder:text-sm" {...field} />
               </FormControl>
               {/* <FormDescription>This is your public display name.</FormDescription> */}
               <FormMessage />

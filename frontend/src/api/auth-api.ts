@@ -1,6 +1,8 @@
 import { ErrorResponse, SuccessResponse, registerSchema } from '@/shared/types';
 import '@/shared/types';
 import { queryOptions } from '@tanstack/react-query';
+import { redirect } from '@tanstack/react-router';
+import toast from 'react-hot-toast';
 import { z } from 'zod';
 
 import { client } from './api';
@@ -20,6 +22,22 @@ export const signUp = async (data: z.infer<typeof registerSchema>) => {
       return { success: false, message: error.message };
     }
     console.error(error);
+
+    return { success: false, message: 'Something went wrong' };
+  }
+};
+export const createAccount = async (token: string) => {
+  try {
+    const res = await client.auth.confirm.$post({
+      query: { token },
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+    toast.error('Something went wrong');
+  } catch (error) {
+    console.error(error);
+    toast.error('Something went wrong');
     return { success: false, message: 'Something went wrong' };
   }
 };

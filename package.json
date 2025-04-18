@@ -13,15 +13,24 @@
     "@hono/zod-validator": "^0.4.3",
     "@lucia-auth/adapter-drizzle": "^1.1.0",
     "@neondatabase/serverless": "^1.0.0",
+    "@react-email/components": "0.0.36",
+    "@react-email/html": "0.0.11",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/nodemailer": "^6.4.17",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "dotenv": "^16.5.0",
     "drizzle-orm": "^0.42.0",
     "drizzle-zod": "^0.7.0",
     "hono": "4.7.7",
+    "jsonwebtoken": "^9.0.2",
     "lucia": "^3.2.2",
     "nodemailer": "^6.10.1",
     "pg": "^8.13.3",
     "postgres": "^3.4.5",
     "random-avatar-generator": "^2.0.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
@@ -31,6 +40,7 @@
     "@types/pg": "^8.11.11",
     "drizzle-kit": "^0.30.4",
     "prettier": "^3.5.2",
-    "prettier-plugin-tailwindcss": "^0.6.11"
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "react-email": "4.0.7"
   }
 }
