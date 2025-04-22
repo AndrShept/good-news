@@ -53,12 +53,11 @@ function SignIn() {
         <FormField
           control={form.control}
           name="email"
-          disabled={isLoading}
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-primary">Email</FormLabel>
               <FormControl>
-                <Input className="placeholder:text-sm" {...field} />
+                <Input disabled={isLoading} className="placeholder:text-sm" {...field} />
               </FormControl>
               {/* <FormDescription>This is your public display name.</FormDescription> */}
               <FormMessage />
@@ -67,14 +66,12 @@ function SignIn() {
         />
         <FormField
           control={form.control}
-          disabled={isLoading}
           name="password"
-          
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-primary">Password</FormLabel>
               <FormControl>
-                <Input type='password' className="placeholder:text-sm" {...field} />
+                <Input disabled={isLoading} type="password" className="placeholder:text-sm" {...field} />
               </FormControl>
               {/* <FormDescription>This is your public display name.</FormDescription> */}
               <FormMessage />

@@ -16,7 +16,6 @@ export const Route = createFileRoute('/auth/sign-up')({
 
 function SignUp() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -48,12 +47,11 @@ function SignUp() {
         <FormField
           control={form.control}
           name="email"
-          disabled={isLoading}
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-primary">Email*</FormLabel>
               <FormControl>
-                <Input className="placeholder:text-sm" {...field} />
+                <Input disabled={isLoading} className="placeholder:text-sm" {...field} />
               </FormControl>
               {/* <FormDescription>This is your public display name.</FormDescription> */}
               <FormMessage />
@@ -63,12 +61,11 @@ function SignUp() {
         <FormField
           control={form.control}
           name="username"
-          disabled={isLoading}
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-primary">Username*</FormLabel>
               <FormControl>
-                <Input className="placeholder:text-sm" {...field} />
+                <Input disabled={isLoading} className="placeholder:text-sm" {...field} />
               </FormControl>
               {/* <FormDescription>This is your public display name.</FormDescription> */}
               <FormMessage />
@@ -76,14 +73,13 @@ function SignUp() {
           )}
         />
         <FormField
-          disabled={isLoading}
           control={form.control}
           name="password"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-primary">Password*</FormLabel>
               <FormControl>
-                <Input type="password" className="placeholder:text-sm" {...field} />
+                <Input disabled={isLoading} type="password" className="placeholder:text-sm" {...field} />
               </FormControl>
               {/* <FormDescription>This is your public display name.</FormDescription> */}
               <FormMessage />
@@ -93,12 +89,11 @@ function SignUp() {
         <FormField
           control={form.control}
           name="confirmPassword"
-          disabled={isLoading}
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-primary">Confirm password*</FormLabel>
               <FormControl>
-                <Input type="password" className="placeholder:text-sm" {...field} />
+                <Input disabled={isLoading} type="password" className="placeholder:text-sm" {...field} />
               </FormControl>
               {/* <FormDescription>This is your public display name.</FormDescription> */}
               <FormMessage />

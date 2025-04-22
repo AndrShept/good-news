@@ -25,3 +25,7 @@ primary_region = 'ams'
 [[env]]
 PORT = "3000"
 DATABASE_URL = "postgres://postgres:v0TXiKbeo3LREC3@good-news-db.flycast:5432"
+BREVO_USERNAME="8a9cd7001@smtp-brevo.com"
+BREVO_PASS="JmO7EKrFj9HUfWan"
+JWT_SECRET="v0TXiKbeo3LREC3"
+BASE_URL_FRONT="good-news.space"

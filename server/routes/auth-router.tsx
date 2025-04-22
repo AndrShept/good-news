@@ -1,15 +1,11 @@
-import { Email } from '@/lib/Email';
-import { processEnv } from '@/lib/utils';
 import type { User as UserType } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
-import { render } from '@react-email/components';
 import { password } from 'bun';
 import { and, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import jwt from 'jsonwebtoken';
 import { type User, generateId } from 'lucia';
-import nodemailer from 'nodemailer';
 import { AvatarGenerator } from 'random-avatar-generator';
 import z from 'zod';
 
@@ -17,6 +13,8 @@ import { type SuccessResponse, loginSchema, registerSchema } from '../../shared/
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { userTable } from '../db/schema/auth-schema';
+import { SuccessRegister } from '../lib/emails/SuccessRegister';
+import { processEnv, sendEmail } from '../lib/utils';
 import { lucia } from '../lucia';
 import { loggedIn } from '../middleware/loggedIn';
 
@@ -45,24 +43,11 @@ export const authRouter = new Hono<Context>()
     const payload = { password, email, username };
     const token = jwt.sign(payload, processEnv.JWT_SECRET, { expiresIn: '15m' });
     const confirmUrl = `${processEnv.BASE_URL_FRONT}/auth/confirm-email?token=${token}`;
-    const transporter = nodemailer.createTransport({
-      host: 'smtp-relay.brevo.com',
-      port: 587, // або 465 для SSL
-      secure: false, // true якщо порт 465
-      auth: {
-        user: processEnv.BREVO_USERNAME,
-        pass: processEnv.BREVO_PASS,
-      },
-    });
 
-    // const emailHtml = await render(<Email url="https://example.com"/>);
-
-    await transporter.sendMail({
-      from: '"Good News" <no-reply@good-news.space>', // рекомендовано свій домен
+    await sendEmail({
       to: email,
       subject: 'Реєстрація успішна!',
-      text: 'Дякуємо за реєстрацію!',
-      html: `Натисніть <a href="${confirmUrl}">сюди</a>, щоб підтвердити реєстрацію.`,
+      reactElement: <SuccessRegister url={confirmUrl} />,
     });
 
     return c.json<SuccessResponse>(
@@ -84,7 +69,6 @@ export const authRouter = new Hono<Context>()
     async (c) => {
       const { token } = c.req.valid('query');
 
-      console.log('DAADDAADADADADADDAAD');
       let verifyToken;
       try {
         verifyToken = jwt.verify(token, processEnv.JWT_SECRET) as {
@@ -188,4 +172,9 @@ export const authRouter = new Hono<Context>()
       message: 'User fetched',
       data: user,
     });
+  })
+  .post('/test', zValidator('form', z.object({ name: z.string() })), async (c) => {
+    const { name } = c.req.valid('form');
+    console.log('@@@@@@', name);
+    return c.json({ name: name , success: true });
   });

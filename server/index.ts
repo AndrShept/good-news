@@ -53,8 +53,8 @@ app.onError((err, c) => {
 });
 export type ApiRoutes = typeof routes;
 
-// app.get('*', serveStatic({ root: './frontend/dist' }));
-// app.get('*', serveStatic({ path: './frontend/dist/index.html' }));
+app.get('*', serveStatic({ root: './frontend/dist' }));
+app.get('*', serveStatic({ path: './frontend/dist/index.html' }));
 
 export default {
   port: process.env['PORT'] || 3000,
