@@ -10,6 +10,7 @@ import * as m from 'motion/react-m';
 import { useEffect, useState } from 'react';
 
 import { SearchSchema } from '.';
+import { useSocket } from '@/api/hooks/useSocket';
 
 export const Route = createFileRoute('/(home)/about')({
   component: About,
@@ -17,7 +18,8 @@ export const Route = createFileRoute('/(home)/about')({
 });
 
 function About() {
-  console.log('asdasdads');
+  const {socket} = useSocket()
+  console.log(socket);
   const { sortBy, order } = Route.useSearch();
   const x = useMotionValue(0);
   const { scrollYProgress, scrollY } = useScroll();

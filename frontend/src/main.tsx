@@ -6,6 +6,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 
+import { SocketProvider } from './api/hooks/useSocket.tsx';
 import { App } from './components/App.tsx';
 import { ErrorLoadingData } from './components/ErrorLoadingData.tsx';
 import { NotFound } from './components/NotFound.tsx';
@@ -52,7 +53,9 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <LazyMotion features={domAnimation}>
-          <App />
+          <SocketProvider>
+            <App />
+          </SocketProvider>
         </LazyMotion>
       </AuthProvider>
       <Toaster />

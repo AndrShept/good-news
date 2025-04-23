@@ -4,6 +4,8 @@ import { useQueryClient } from '@tanstack/react-query';
 export const useAuth = () => {
   const queryClient = useQueryClient();
   const user = queryClient.getQueryData(getUserQueryOptions().queryKey);
-
+  if (!user) {
+    return
+  }
   return user;
 };

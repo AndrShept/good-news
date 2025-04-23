@@ -1,0 +1,64 @@
+import { ReactNode, createContext, useContext, useEffect, useRef, useState } from 'react';
+import { Socket, io } from 'socket.io-client';
+
+import { useAuth } from './useAuth';
+import { User } from '@/shared/types';
+
+// "undefined" means the URL will be computed from the `window.location` object
+const URL = import.meta.env.SOCKET_SERVER || 'http://localhost:3000';
+
+// export const socket = io(URL);
+
+interface SocketContextProps {
+  socket: null | Socket;
+  isConnected: boolean;
+}
+
+const SocketContext = createContext<SocketContextProps>({
+  socket: null,
+  isConnected: false,
+});
+export const useSocket = () => {
+  const context = useContext(SocketContext);
+  if (!context) {
+    throw new Error('useSocket context not found');
+  }
+  return context;
+};
+
+export const SocketProvider = ({ children }: { children: ReactNode }) => {
+  const [isConnected, setIsConnected] = useState(false);
+  const socketRef = useRef<null | Socket>(null);
+  const { id, username } = useAuth() as User;
+  console.log(id)
+  useEffect(() => {
+    if (!id) return;
+    const socketInstance = io(URL, {
+      extraHeaders: {
+        userId: id,
+        username,
+      },
+      auth: {
+        userId: id,
+      },
+    });
+
+    const onConnect = async () => {
+      setIsConnected(true);
+      socketRef.current = socketInstance;
+      // await userOnline();
+    };
+    const onDisconnect = async () => {
+      setIsConnected(false);
+    };
+    socketInstance.on('connect', onConnect);
+    socketInstance.on('disconnect', onDisconnect);
+
+    return () => {
+      socketInstance.off('connect', onConnect);
+      socketInstance.off('disconnect', onDisconnect);
+    };
+  }, [id, username]);
+
+  return <SocketContext.Provider value={{ isConnected, socket: socketRef.current }}>{children}</SocketContext.Provider>;
+};
