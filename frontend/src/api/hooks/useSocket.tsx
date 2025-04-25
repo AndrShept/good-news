@@ -1,13 +1,11 @@
+import { User } from '@/shared/types';
 import { ReactNode, createContext, useContext, useEffect, useRef, useState } from 'react';
 import { Socket, io } from 'socket.io-client';
 
 import { useAuth } from './useAuth';
-import { User } from '@/shared/types';
 
-// "undefined" means the URL will be computed from the `window.location` object
 const URL = import.meta.env.SOCKET_SERVER || 'http://localhost:3000';
-
-// export const socket = io(URL);
+// const URL = 'https://good-news.space'
 
 interface SocketContextProps {
   socket: null | Socket;
@@ -29,17 +27,16 @@ export const useSocket = () => {
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef<null | Socket>(null);
-  const { id, username } = useAuth() as User;
-  console.log(id)
+  const user = useAuth();
   useEffect(() => {
-    if (!id) return;
+    if (!user) return;
     const socketInstance = io(URL, {
       extraHeaders: {
-        userId: id,
-        username,
+        userId: user.id,
+        username: user.username,
       },
       auth: {
-        userId: id,
+        userId: user.id,
       },
     });
 
@@ -58,7 +55,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       socketInstance.off('connect', onConnect);
       socketInstance.off('disconnect', onDisconnect);
     };
-  }, [id, username]);
+  }, [user, user?.id, user?.username]);
 
   return <SocketContext.Provider value={{ isConnected, socket: socketRef.current }}>{children}</SocketContext.Provider>;
 };

@@ -81,7 +81,7 @@ export const authRouter = new Hono<Context>()
       }
       const { email, password, username } = verifyToken;
       const passwordHash = await Bun.password.hash(password);
-      const userId = generateId(15);
+      const userId = Bun.randomUUIDv7()
       const generator = new AvatarGenerator();
       const randomAvatarUrl = generator.generateRandomAvatar().replace('Circle', 'Transparent');
       const existUsername = await db.query.userTable.findFirst({
@@ -173,8 +173,3 @@ export const authRouter = new Hono<Context>()
       data: user,
     });
   })
-  .post('/test', zValidator('form', z.object({ name: z.string() })), async (c) => {
-    const { name } = c.req.valid('form');
-    console.log('@@@@@@', name);
-    return c.json({ name: name , success: true });
-  });

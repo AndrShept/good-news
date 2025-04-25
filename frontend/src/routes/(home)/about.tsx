@@ -1,4 +1,5 @@
 import { client } from '@/api/api';
+import { useSocket } from '@/api/hooks/useSocket';
 import { SortByFilter } from '@/components/SortByFilter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +11,6 @@ import * as m from 'motion/react-m';
 import { useEffect, useState } from 'react';
 
 import { SearchSchema } from '.';
-import { useSocket } from '@/api/hooks/useSocket';
 
 export const Route = createFileRoute('/(home)/about')({
   component: About,
@@ -18,8 +18,7 @@ export const Route = createFileRoute('/(home)/about')({
 });
 
 function About() {
-  const {socket} = useSocket()
-  console.log(socket);
+  const { socket } = useSocket();
   const { sortBy, order } = Route.useSearch();
   const x = useMotionValue(0);
   const { scrollYProgress, scrollY } = useScroll();
@@ -33,22 +32,22 @@ function About() {
   });
   const [name, setName] = useState('');
   const [result, setResult] = useState('');
-  const onSubmit = async () => {
-    const res = await client.auth.test.$post({
-      form: {
-        name,
-      },
+
+  useEffect(() => {
+    socket?.on('test', (data) => {
+      console.log(data);
+      setResult(data)
     });
-    const data = await res.json();
-    if (data.success) {
-      setResult(data.name);
-    }
-  };
+
+    
+  }, [socket]);
   return (
     <div>
       <Input value={name} onChange={(e) => setName(e.target.value)} />
-      <Button onClick={onSubmit}>GO</Button>
-      {result && <h1 className='text-3xl text-red-700'>{result}</h1>}
+      <Button onClick={() => socket?.emit('test', name)}>
+        GO
+      </Button>
+      {result && <h1 className="text-3xl text-red-700">{result}</h1>}
       <m.div
         className={cn('sticky top-14 h-10 w-full', {
           border: isBorderShow,

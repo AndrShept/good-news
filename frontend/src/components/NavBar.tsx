@@ -6,7 +6,7 @@ import { ScrollArea } from './ui/scroll-area';
 
 export const NavBar = () => {
   const navLinks = [{ id: 1, name: 'about', url: '/about' }, {
-     id: 1, name: 'test', url: '/test' 
+     id: 2, name: 'test', url: '/test' 
   }];
   return (
     <ScrollArea className="h-full pr-2">

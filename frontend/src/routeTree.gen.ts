@@ -18,6 +18,7 @@ import { Route as homeIndexImport } from './routes/(home)/index'
 import { Route as AuthSignUpImport } from './routes/auth/sign-up'
 import { Route as AuthSignInImport } from './routes/auth/sign-in'
 import { Route as AuthConfirmEmailImport } from './routes/auth/confirm-email'
+import { Route as homeTestImport } from './routes/(home)/test'
 import { Route as homeAboutImport } from './routes/(home)/about'
 import { Route as homePostPostIdImport } from './routes/(home)/post/$postId'
 
@@ -64,6 +65,12 @@ const AuthConfirmEmailRoute = AuthConfirmEmailImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any)
 
+const homeTestRoute = homeTestImport.update({
+  id: '/test',
+  path: '/test',
+  getParentRoute: () => homeRouteRoute,
+} as any)
+
 const homeAboutRoute = homeAboutImport.update({
   id: '/about',
   path: '/about',
@@ -99,6 +106,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof homeAboutImport
+      parentRoute: typeof homeRouteImport
+    }
+    '/(home)/test': {
+      id: '/(home)/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof homeTestImport
       parentRoute: typeof homeRouteImport
     }
     '/auth/confirm-email': {
@@ -150,12 +164,14 @@ declare module '@tanstack/react-router' {
 
 interface homeRouteRouteChildren {
   homeAboutRoute: typeof homeAboutRoute
+  homeTestRoute: typeof homeTestRoute
   homeIndexRoute: typeof homeIndexRoute
   homePostPostIdRoute: typeof homePostPostIdRoute
 }
 
 const homeRouteRouteChildren: homeRouteRouteChildren = {
   homeAboutRoute: homeAboutRoute,
+  homeTestRoute: homeTestRoute,
   homeIndexRoute: homeIndexRoute,
   homePostPostIdRoute: homePostPostIdRoute,
 }
@@ -186,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/': typeof homeIndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/about': typeof homeAboutRoute
+  '/test': typeof homeTestRoute
   '/auth/confirm-email': typeof AuthConfirmEmailRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -195,6 +212,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/about': typeof homeAboutRoute
+  '/test': typeof homeTestRoute
   '/auth/confirm-email': typeof AuthConfirmEmailRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -208,6 +226,7 @@ export interface FileRoutesById {
   '/(home)': typeof homeRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
   '/(home)/about': typeof homeAboutRoute
+  '/(home)/test': typeof homeTestRoute
   '/auth/confirm-email': typeof AuthConfirmEmailRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -222,6 +241,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/about'
+    | '/test'
     | '/auth/confirm-email'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -230,6 +250,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/about'
+    | '/test'
     | '/auth/confirm-email'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -241,6 +262,7 @@ export interface FileRouteTypes {
     | '/(home)'
     | '/auth'
     | '/(home)/about'
+    | '/(home)/test'
     | '/auth/confirm-email'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -278,6 +300,7 @@ export const routeTree = rootRoute
       "filePath": "(home)/route.tsx",
       "children": [
         "/(home)/about",
+        "/(home)/test",
         "/(home)/",
         "/(home)/post/$postId"
       ]
@@ -293,6 +316,10 @@ export const routeTree = rootRoute
     },
     "/(home)/about": {
       "filePath": "(home)/about.tsx",
+      "parent": "/(home)"
+    },
+    "/(home)/test": {
+      "filePath": "(home)/test.tsx",
       "parent": "/(home)"
     },
     "/auth/confirm-email": {

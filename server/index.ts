@@ -77,6 +77,11 @@ const io = new Server(httpServer as HTTPServer, {
 io.on('connection', (socket) => {
   console.log('user connected', socket.handshake.headers['username']);
 
+  socket.on('test', (data) => {
+    console.log(data);
+    socket.emit('test', data)
+  });
+
   socket.on('disconnect', () => {
     console.log('disconnect ' + socket.handshake.headers['username']);
   });
