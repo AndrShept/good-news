@@ -1,9 +1,9 @@
-import { getPostsQueryOptions } from '@/api/post-api';
 import { InfinityScrollComponent } from '@/components/InfinityScrollComponent';
 import { SortByFilter } from '@/components/SortByFilter';
 import { Spinner } from '@/components/Spinner';
-import { PostCard } from '@/components/post/PostCard';
-import { PostCreateFrom } from '@/components/post/PostCreateFrom';
+import { getPostsQueryOptions } from '@/features/post/api/get-posts';
+import { PostCard } from '@/features/post/components/PostCard';
+import { PostCreateFrom } from '@/features/post/components/PostCreateFrom';
 import { childrenVariants, parentVariants } from '@/lib/animation';
 import { orderSchema, paginationSchema, sortBySchema } from '@/shared/types';
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';

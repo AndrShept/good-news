@@ -1,5 +1,4 @@
-import { LogOut } from '@/api/auth-api';
-import { useAuth } from '@/api/hooks/useAuth';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
@@ -8,6 +7,7 @@ import { MenuIcon } from 'lucide-react';
 import { NavBar } from './NavBar';
 import { UserAvatar } from './UserAvatar';
 import { Button } from './ui/button';
+import { LogOut } from '@/features/auth/api/logout';
 
 export const Header = () => {
   const user = useAuth();

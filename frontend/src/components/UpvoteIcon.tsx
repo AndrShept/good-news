@@ -1,4 +1,4 @@
-import { useAuth } from '@/api/hooks/useAuth';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { HeartIcon } from 'lucide-react';
 import React from 'react';

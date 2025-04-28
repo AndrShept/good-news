@@ -6,7 +6,6 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 
-import { SocketProvider } from './api/hooks/useSocket.tsx';
 import { App } from './components/App.tsx';
 import { ErrorLoadingData } from './components/ErrorLoadingData.tsx';
 import { NotFound } from './components/NotFound.tsx';
@@ -15,6 +14,7 @@ import { AuthProvider } from './components/providerts/AuthProvider.tsx';
 import { ThemeProvider } from './components/providerts/theme-provider.tsx';
 import './index.css';
 import { routeTree } from './routeTree.gen.ts';
+import { SocketProvider } from './hooks/useSocket.tsx';
 
 declare module '@tanstack/react-router' {
   interface Register {

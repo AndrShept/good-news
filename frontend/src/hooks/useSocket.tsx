@@ -1,8 +1,8 @@
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { User } from '@/shared/types';
 import { ReactNode, createContext, useContext, useEffect, useRef, useState } from 'react';
 import { Socket, io } from 'socket.io-client';
 
-import { useAuth } from './useAuth';
 
 const URL = import.meta.env.SOCKET_SERVER || 'http://localhost:3000';
 // const URL = 'https://good-news.space'

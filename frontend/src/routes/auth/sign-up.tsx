@@ -1,8 +1,8 @@
-import { getUserQueryOptions, signUp } from '@/api/auth-api';
 import { Spinner } from '@/components/Spinner';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { signUp } from '@/features/auth/api/sign-up';
 import { loginSchema, registerSchema } from '@/shared/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';

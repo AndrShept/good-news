@@ -4,6 +4,8 @@ import { integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { commentTable } from './comments-schema';
 import { postTable } from './posts-schema';
 import { commentUpvotesTable, postUpvotesTable } from './upvotes-schema';
+import { sessionTable } from './session-schema';
+import { hero } from './hero-schema';
 
 export const userTable = pgTable('user', {
   id: text().primaryKey(),
@@ -28,24 +30,6 @@ export const userRelations = relations(userTable, ({ many }) => ({
   comments: many(commentTable),
   postUpvotes: many(postUpvotesTable),
   commentUpvotes: many(commentUpvotesTable),
+  heroes: many(hero),
 }));
 
-export const sessionTable = pgTable('session', {
-  id: text().primaryKey(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => userTable.id, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
-  expiresAt: timestamp('expires_at', {
-    withTimezone: true,
-  }).notNull(),
-});
-
-export const sessionRelations = relations(sessionTable, ({ one }) => ({
-  user: one(userTable, {
-    fields: [sessionTable.userId],
-    references: [userTable.id],
-  }),
-}));

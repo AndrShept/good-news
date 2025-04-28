@@ -1,21 +1,24 @@
-import { createCommentReplies, getCommentRepliesQueryOptions } from '@/api/comment-api';
-import { useCreateComment } from '@/api/hooks/useCreatePostComment';
-import { useUpvoteComment } from '@/api/hooks/useUpvoteComment';
+
+import { useCreateComment } from '@/features/post/components/useCreatePostComment';
+import { useUpvoteComment } from '@/features/comment/hooks/useUpvoteComment';
 import { getFormatDateTime } from '@/lib/utils';
 import { Comments, paginationSchema } from '@/shared/types';
 import { useInfiniteQuery, useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { CommentIcon } from '../CommentIcon';
-import { CreateCommentForm } from '../CreateCommentForm';
-import { InfinityScrollComponent } from '../InfinityScrollComponent';
-import { Spinner } from '../Spinner';
-import { UpvoteIcon } from '../UpvoteIcon';
-import { UserAvatar } from '../UserAvatar';
-import { Button } from '../ui/button';
+
 import * as m from "motion/react-m"
 import { childrenVariants } from '@/lib/animation';
+import { UserAvatar } from '@/components/UserAvatar';
+import { UpvoteIcon } from '@/components/UpvoteIcon';
+import { CommentIcon } from '@/components/CommentIcon';
+import { CreateCommentForm } from '@/components/CreateCommentForm';
+import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/Spinner';
+import { InfinityScrollComponent } from '@/components/InfinityScrollComponent';
+import { getCommentRepliesQueryOptions } from '../api/get-comment-replies';
+import { createCommentReplies } from '../api/create-commnet-replies';
 interface Props {
   comment: Comments;
 }

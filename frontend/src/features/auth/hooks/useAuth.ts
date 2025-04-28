@@ -1,5 +1,5 @@
-import { getUserQueryOptions } from '@/api/auth-api';
 import { useQueryClient } from '@tanstack/react-query';
+import { getUserQueryOptions } from '../api/get-user';
 
 export const useAuth = () => {
   const queryClient = useQueryClient();

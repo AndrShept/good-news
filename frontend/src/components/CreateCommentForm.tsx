@@ -1,4 +1,4 @@
-import { useAuth } from '@/api/hooks/useAuth';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { createCommentSchema } from '@/shared/types';
 import { SendHorizonalIcon } from 'lucide-react';

@@ -1,11 +1,11 @@
-import { useUpvotePost } from '@/api/hooks/useUpvotePost';
+import { useUpvotePost } from '@/features/post/hooks/useUpvotePost';
 import { getFormatDateTime } from '@/lib/utils';
 import { Post } from '@/shared/types';
 import { useNavigate } from '@tanstack/react-router';
 
-import { CommentIcon } from '../CommentIcon';
-import { UpvoteIcon } from '../UpvoteIcon';
-import { UserAvatar } from '../UserAvatar';
+import { CommentIcon } from '../../../components/CommentIcon';
+import { UpvoteIcon } from '../../../components/UpvoteIcon';
+import { UserAvatar } from '../../../components/UserAvatar';
 
 interface Props {
   post: Post;

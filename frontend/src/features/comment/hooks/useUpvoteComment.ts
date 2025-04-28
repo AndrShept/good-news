@@ -1,4 +1,4 @@
-import { upvoteComment } from '@/api/post-api';
+import { upvoteComment } from '@/features/post/api/upvote-post-comments';
 import { Comments, SuccessResponse } from '@/shared/types';
 import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';

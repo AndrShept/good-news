@@ -1,4 +1,3 @@
-import { createPost, getPostsQueryOptions } from '@/api/post-api';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { getPostsQueryOptions } from '../api/get-posts';
+import { createPost } from '../api/create-post';
 
 export const PostCreateFrom = () => {
   const queryClient = useQueryClient();

@@ -1,11 +1,10 @@
-import { useCreateComment } from '@/api/hooks/useCreatePostComment';
-import { createPostComment, getPostCommentsQueryOptions, getPostQueryOptions } from '@/api/post-api';
+import { useCreateComment } from '@/features/post/components/useCreatePostComment';
+
 import { CreateCommentForm } from '@/components/CreateCommentForm';
 import { InfinityScrollComponent } from '@/components/InfinityScrollComponent';
 import { SortByFilter } from '@/components/SortByFilter';
 import { Spinner } from '@/components/Spinner';
-import { CommentCard } from '@/components/comment/CommentCard';
-import { PostCard } from '@/components/post/PostCard';
+import { PostCard } from '@/features/post/components/PostCard';
 import { childrenVariants, parentVariants } from '@/lib/animation';
 import { Comments, paginationSchema, SuccessResponse } from '@/shared/types';
 import { InfiniteData, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
@@ -15,6 +14,10 @@ import * as m from 'motion/react-m';
 import React from 'react';
 
 import { SearchSchema } from '..';
+import { CommentCard } from '@/features/comment/components/CommentCard';
+import { getPostQueryOptions } from '@/features/post/api/get-post';
+import { getPostCommentsQueryOptions } from '@/features/post/api/get-post-comments';
+import { createPostComment } from '@/features/post/api/create-post-comments';
 
 export const Route = createFileRoute('/(home)/post/$postId')({
   component: PostPage,

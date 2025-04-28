@@ -3,11 +3,11 @@ import { createInsertSchema } from 'drizzle-zod';
 import type { InferResponseType } from 'hono';
 import { z } from 'zod';
 
-import type { client } from '../frontend/src/api/api';
 import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { ApiRoutes } from '../server/index';
+import type { client } from '../frontend/src/lib/utils';
 
 export type AppType = ApiRoutes;
 

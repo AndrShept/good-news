@@ -1,7 +1,10 @@
-import { getPostQueryOptions, getPostsQueryOptions, upvotePost } from '@/api/post-api';
+
 import { GetPostsData, PaginatedResponse, Post, SuccessResponse } from '@/shared/types';
 import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import { getPostsQueryOptions } from '../api/get-posts';
+import { upvotePost } from '../api/upvote-post';
+import { getPostQueryOptions } from '../api/get-post';
 
 export const useUpvotePost = () => {
   const queryClient = useQueryClient();

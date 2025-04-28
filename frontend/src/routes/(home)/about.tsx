@@ -1,5 +1,3 @@
-import { client } from '@/api/api';
-import { useSocket } from '@/api/hooks/useSocket';
 import { SortByFilter } from '@/components/SortByFilter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +9,7 @@ import * as m from 'motion/react-m';
 import { useEffect, useState } from 'react';
 
 import { SearchSchema } from '.';
+import { useSocket } from '@/hooks/useSocket';
 
 export const Route = createFileRoute('/(home)/about')({
   component: About,

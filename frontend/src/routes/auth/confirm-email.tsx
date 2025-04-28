@@ -1,4 +1,5 @@
-import { createAccount, getUserQueryOptions } from '@/api/auth-api';
+import { createAccount } from '@/features/auth/api/create-account';
+import { getUserQueryOptions } from '@/features/auth/api/get-user';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import toast from 'react-hot-toast';
 
