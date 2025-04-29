@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth/route'
 import { Route as homeRouteImport } from './routes/(home)/route'
+import { Route as CreateHeroIndexImport } from './routes/create-hero/index'
 import { Route as AuthIndexImport } from './routes/auth/index'
 import { Route as homeIndexImport } from './routes/(home)/index'
 import { Route as AuthSignUpImport } from './routes/auth/sign-up'
@@ -20,6 +21,7 @@ import { Route as AuthSignInImport } from './routes/auth/sign-in'
 import { Route as AuthConfirmEmailImport } from './routes/auth/confirm-email'
 import { Route as homeTestImport } from './routes/(home)/test'
 import { Route as homeAboutImport } from './routes/(home)/about'
+import { Route as homeGameRouteImport } from './routes/(home)/game/route'
 import { Route as homePostPostIdImport } from './routes/(home)/post/$postId'
 
 // Create/Update Routes
@@ -32,6 +34,12 @@ const AuthRouteRoute = AuthRouteImport.update({
 
 const homeRouteRoute = homeRouteImport.update({
   id: '/(home)',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CreateHeroIndexRoute = CreateHeroIndexImport.update({
+  id: '/create-hero/',
+  path: '/create-hero/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -77,6 +85,12 @@ const homeAboutRoute = homeAboutImport.update({
   getParentRoute: () => homeRouteRoute,
 } as any)
 
+const homeGameRouteRoute = homeGameRouteImport.update({
+  id: '/game',
+  path: '/game',
+  getParentRoute: () => homeRouteRoute,
+} as any)
+
 const homePostPostIdRoute = homePostPostIdImport.update({
   id: '/post/$postId',
   path: '/post/$postId',
@@ -100,6 +114,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRoute
+    }
+    '/(home)/game': {
+      id: '/(home)/game'
+      path: '/game'
+      fullPath: '/game'
+      preLoaderRoute: typeof homeGameRouteImport
+      parentRoute: typeof homeRouteImport
     }
     '/(home)/about': {
       id: '/(home)/about'
@@ -150,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIndexImport
       parentRoute: typeof AuthRouteImport
     }
+    '/create-hero/': {
+      id: '/create-hero/'
+      path: '/create-hero'
+      fullPath: '/create-hero'
+      preLoaderRoute: typeof CreateHeroIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/(home)/post/$postId': {
       id: '/(home)/post/$postId'
       path: '/post/$postId'
@@ -163,6 +191,7 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface homeRouteRouteChildren {
+  homeGameRouteRoute: typeof homeGameRouteRoute
   homeAboutRoute: typeof homeAboutRoute
   homeTestRoute: typeof homeTestRoute
   homeIndexRoute: typeof homeIndexRoute
@@ -170,6 +199,7 @@ interface homeRouteRouteChildren {
 }
 
 const homeRouteRouteChildren: homeRouteRouteChildren = {
+  homeGameRouteRoute: homeGameRouteRoute,
   homeAboutRoute: homeAboutRoute,
   homeTestRoute: homeTestRoute,
   homeIndexRoute: homeIndexRoute,
@@ -201,16 +231,19 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '/': typeof homeIndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/game': typeof homeGameRouteRoute
   '/about': typeof homeAboutRoute
   '/test': typeof homeTestRoute
   '/auth/confirm-email': typeof AuthConfirmEmailRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/': typeof AuthIndexRoute
+  '/create-hero': typeof CreateHeroIndexRoute
   '/post/$postId': typeof homePostPostIdRoute
 }
 
 export interface FileRoutesByTo {
+  '/game': typeof homeGameRouteRoute
   '/about': typeof homeAboutRoute
   '/test': typeof homeTestRoute
   '/auth/confirm-email': typeof AuthConfirmEmailRoute
@@ -218,6 +251,7 @@ export interface FileRoutesByTo {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/': typeof homeIndexRoute
   '/auth': typeof AuthIndexRoute
+  '/create-hero': typeof CreateHeroIndexRoute
   '/post/$postId': typeof homePostPostIdRoute
 }
 
@@ -225,6 +259,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/(home)': typeof homeRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/(home)/game': typeof homeGameRouteRoute
   '/(home)/about': typeof homeAboutRoute
   '/(home)/test': typeof homeTestRoute
   '/auth/confirm-email': typeof AuthConfirmEmailRoute
@@ -232,6 +267,7 @@ export interface FileRoutesById {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/(home)/': typeof homeIndexRoute
   '/auth/': typeof AuthIndexRoute
+  '/create-hero/': typeof CreateHeroIndexRoute
   '/(home)/post/$postId': typeof homePostPostIdRoute
 }
 
@@ -240,15 +276,18 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/game'
     | '/about'
     | '/test'
     | '/auth/confirm-email'
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/'
+    | '/create-hero'
     | '/post/$postId'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/game'
     | '/about'
     | '/test'
     | '/auth/confirm-email'
@@ -256,11 +295,13 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/'
     | '/auth'
+    | '/create-hero'
     | '/post/$postId'
   id:
     | '__root__'
     | '/(home)'
     | '/auth'
+    | '/(home)/game'
     | '/(home)/about'
     | '/(home)/test'
     | '/auth/confirm-email'
@@ -268,6 +309,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/(home)/'
     | '/auth/'
+    | '/create-hero/'
     | '/(home)/post/$postId'
   fileRoutesById: FileRoutesById
 }
@@ -275,11 +317,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   homeRouteRoute: typeof homeRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  CreateHeroIndexRoute: typeof CreateHeroIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   homeRouteRoute: homeRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  CreateHeroIndexRoute: CreateHeroIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -293,12 +337,14 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/(home)",
-        "/auth"
+        "/auth",
+        "/create-hero/"
       ]
     },
     "/(home)": {
       "filePath": "(home)/route.tsx",
       "children": [
+        "/(home)/game",
         "/(home)/about",
         "/(home)/test",
         "/(home)/",
@@ -313,6 +359,10 @@ export const routeTree = rootRoute
         "/auth/sign-up",
         "/auth/"
       ]
+    },
+    "/(home)/game": {
+      "filePath": "(home)/game/route.tsx",
+      "parent": "/(home)"
     },
     "/(home)/about": {
       "filePath": "(home)/about.tsx",
@@ -341,6 +391,9 @@ export const routeTree = rootRoute
     "/auth/": {
       "filePath": "auth/index.tsx",
       "parent": "/auth"
+    },
+    "/create-hero/": {
+      "filePath": "create-hero/index.tsx"
     },
     "/(home)/post/$postId": {
       "filePath": "(home)/post/$postId.tsx",

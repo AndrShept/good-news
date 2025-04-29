@@ -8,25 +8,24 @@ export const hero = pgTable('hero', {
   id: text().primaryKey().notNull(),
   name: text().notNull().unique(),
   image: text().notNull(),
-  level: integer().default(1),
-  goldCoins: integer().default(100),
-  premiumCoins: integer().default(0),
-  isInBattle: boolean().default(false),
-  isInDungeon: boolean().default(false),
+  level: integer().default(1).notNull(),
+  goldCoins: integer().default(100).notNull(),
+  premiumCoins: integer().default(0).notNull(),
+  isInBattle: boolean().default(false).notNull(),
+  isInDungeon: boolean().default(false).notNull(),
 
-  currentStatPoints: integer().default(10),
-  freeStatPoints: integer().default(0),
+  freeStatPoints: integer().default(10).notNull(),
 
-  currentHealth: integer().default(100),
-  currentMana: integer().default(100),
-  maxHealth: integer().default(100),
-  maxMana: integer().default(100),
+  currentHealth: integer().default(100).notNull(),
+  currentMana: integer().default(100).notNull(),
+  maxHealth: integer().default(100).notNull(),
+  maxMana: integer().default(100).notNull(),
 
-  inventorySlotCount: integer().default(40),
-  inventorySlotMax: integer().default(40),
+  inventorySlotCount: integer().default(40).notNull(),
+  inventorySlotMax: integer().default(40).notNull(),
 
-  currentExperience: integer().default(0),
-  maxExperience: integer().default(100),
+  currentExperience: integer().default(0).notNull(),
+  maxExperience: integer().default(100).notNull(),
 
   createdAt: timestamp('created_at', {
     withTimezone: true,
@@ -38,9 +37,7 @@ export const hero = pgTable('hero', {
     mode: 'string',
   }),
 
-  modifierId: text().references(() => modifier.id, {
-    onDelete: 'cascade',
-  }),
+  modifierId: text().references(() => modifier.id),
   userId: text()
     .notNull()
     .references(() => userTable.id, {

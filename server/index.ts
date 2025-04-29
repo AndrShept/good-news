@@ -15,6 +15,7 @@ import { processEnv } from './lib/utils';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
+import { heroRouter } from './routes/hero-router';
 import { postRouter } from './routes/post-router';
 
 const app = new Hono<Context>();
@@ -23,7 +24,12 @@ app.use(logger());
 app.use('*', cors(), sessionHandler);
 
 //APP ROUTES
-const routes = app.basePath('/api').route('/auth', authRouter).route('/post', postRouter).route('/comment', commentRouter);
+const routes = app
+  .basePath('/api')
+  .route('/auth', authRouter)
+  .route('/post', postRouter)
+  .route('/comment', commentRouter)
+  .route('/hero', heroRouter);
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
@@ -31,7 +37,6 @@ app.onError((err, c) => {
       {
         success: false,
         message: err.message,
-        isFormError: err instanceof HTTPException && 'cause' in err ? true : false,
       },
       err.status,
     );
@@ -79,7 +84,7 @@ io.on('connection', (socket) => {
 
   socket.on('test', (data) => {
     console.log(data);
-    socket.emit('test', data)
+    socket.emit('test', data);
   });
 
   socket.on('disconnect', () => {

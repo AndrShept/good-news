@@ -15,6 +15,27 @@
       "when": 1745834198916,
       "tag": "0001_parallel_clea",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1745846793834,
+      "tag": "0002_futuristic_moira_mactaggert",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1745929042085,
+      "tag": "0003_cynical_thundra",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1745929342808,
+      "tag": "0004_simple_captain_cross",
+      "breakpoints": true
     }
   ]
 }

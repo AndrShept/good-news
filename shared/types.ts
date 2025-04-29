@@ -3,11 +3,12 @@ import { createInsertSchema } from 'drizzle-zod';
 import type { InferResponseType } from 'hono';
 import { z } from 'zod';
 
+import type { client } from '../frontend/src/lib/utils';
+import { hero, type modifier } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { ApiRoutes } from '../server/index';
-import type { client } from '../frontend/src/lib/utils';
 
 export type AppType = ApiRoutes;
 
@@ -19,7 +20,7 @@ export type SuccessResponse<T = undefined> = {
 export type ErrorResponse = {
   success: false;
   message: string;
-  isFormError?: boolean;
+  isShowError?: boolean;
 };
 export const loginSchema = z.object({
   email: z.string().email(),
@@ -116,3 +117,18 @@ export type PaginatedResponse<T> = {
 } & Omit<SuccessResponse, 'data'>;
 
 export type GetPostsData = InferResponseType<typeof client.post.$get>;
+
+export type Hero = InferSelectModel<typeof hero>;
+export type Modifier = InferSelectModel<typeof modifier>;
+
+export const createHeroSchema = createInsertSchema(hero, {
+  name: z
+    .string()
+    .min(3)
+    .max(20)
+    .regex(/^[a-zA-Z0-9_]+$/, 'hero name can only contain letters, numbers, and underscores'),
+  image: z.string(),
+}).pick({
+  name: true,
+  image: true,
+});

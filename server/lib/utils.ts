@@ -1,6 +1,5 @@
 import { render } from '@react-email/components';
 import nodemailer from 'nodemailer';
-
 import z from 'zod';
 
 const schema = z.object({
@@ -40,4 +39,8 @@ export const sendEmail = async ({ to, subject, text = '', reactElement }: ISendE
     text,
     html: emailHtml,
   });
+};
+
+export const generateRandomUuid = () => {
+  return Bun.randomUUIDv7();
 };
