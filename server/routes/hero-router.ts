@@ -41,10 +41,7 @@ export const heroRouter = new Hono<Context>()
       where: eq(hero.name, name),
     });
     if (nameExist) {
-      // throw new HTTPException(409, {
-      //   message: 'Hero name already taken. Please try another name.',
 
-      // });
       return c.json<ErrorResponse>(
         {
           message: 'Hero name already taken. Please try another name.',
@@ -57,11 +54,11 @@ export const heroRouter = new Hono<Context>()
     const heroExist = await db.query.hero.findFirst({
       where: eq(hero.userId, userId),
     });
-    if (heroExist) {
-      throw new HTTPException(409, {
-        message: 'Hero already exists for this user.',
-      });
-    }
+    // if (heroExist) {
+    //   throw new HTTPException(409, {
+    //     message: 'Hero already exists for this user.',
+    //   });
+    // }
     const newHero = await db.transaction(async (tx) => {
       const [newModifier] = await tx
         .insert(modifier)

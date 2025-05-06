@@ -1,16 +1,16 @@
 import { Background } from '@/components/Background';
 import { HeroAvatarList } from '@/components/HeroAvatarList';
+import { HeroStat, Stat } from '@/components/HeroStat';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { createHero } from '@/features/hero/api/create-hero';
+import { useCreateHero } from '@/features/hero/hooks/useCreateHero';
+import { BASE_FREE_POINTS, BASE_STATS } from '@/shared/constants';
 import { createHeroSchema } from '@/shared/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
 import { z } from 'zod';
 
 export const Route = createFileRoute('/create-hero/')({
@@ -23,7 +23,13 @@ const heroNameSchema = createHeroSchema.pick({
 
 function RouteComponent() {
   const [image, setImage] = useState('');
-
+  const initialStats = Object.entries(BASE_STATS).map(([key, value]) => ({
+    name: key,
+    value,
+  }));
+  const [freePoints, setFreePoints] = useState(BASE_FREE_POINTS);
+  const [stats, setStats] = useState<Stat[]>(initialStats);
+  const mutation = useCreateHero();
   const form = useForm<z.infer<typeof heroNameSchema>>({
     defaultValues: {
       name: '',
@@ -31,25 +37,23 @@ function RouteComponent() {
     resolver: zodResolver(heroNameSchema),
   });
   const isLoading = form.formState.isSubmitting;
-  const { mutate } = useMutation({
-    mutationFn: createHero,
-    onSuccess(data, variables, context) {
-      if (!data.success && data.isShowError) {
-        form.setError('name', { message: data.message });
-      }
-      if (data.success) {
-        console.log(data.data);
-      }
-    },
-    onError(error, variables, context) {
-      console.log('onError -', error.cause);
-      console.log('onError -', error.message);
-      toast.error('Something went wrong')
 
-    },
-  });
   const onSubmit = (values: z.infer<typeof heroNameSchema>) => {
-    const res = mutate({ image, name: values.name });
+    console.log('freePoints', freePoints);
+    console.log('stats', stats);
+    mutation.mutate(
+      { image, name: values.name },
+      {
+        onSuccess(data, variables, context) {
+          if (!data.success && data.isShowError) {
+            form.setError('name', { message: data.message });
+          }
+          if (data.success) {
+            console.log(data.data);
+          }
+        },
+      },
+    );
   };
   return (
     <Background imageUrl="/sprites/shrine6.png">
@@ -66,7 +70,7 @@ function RouteComponent() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>name</FormLabel>
+                    <FormLabel>Name</FormLabel>
                     <FormControl>
                       <Input disabled={isLoading} className="bg-secondary" placeholder="" {...field} />
                     </FormControl>
@@ -75,7 +79,8 @@ function RouteComponent() {
                   </FormItem>
                 )}
               />
-              <Button className="w-full" type="submit" disabled={isLoading} variant={'secondary'} onClick={() => {}}>
+              <HeroStat freePoints={freePoints} setFreePoints={setFreePoints} setStats={setStats} stats={stats} reset={false} />
+              <Button className="w-full" type="submit" disabled={isLoading} variant={'default'}>
                 {isLoading ? 'Creating... ' : 'Create Hero'}
               </Button>
             </form>
