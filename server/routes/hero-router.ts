@@ -6,9 +6,10 @@ import { HTTPException } from 'hono/http-exception';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { hero, modifier, userTable } from '../db/schema';
+import { heroTable, modifierTable } from '../db/schema';
 import { generateRandomUuid } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
+import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/constants';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -16,9 +17,12 @@ export const heroRouter = new Hono<Context>()
     loggedIn,
 
     async (c) => {
-      const id = c.get('user')?.id;
-      const hero = await db.query.hero.findFirst({
-        where: eq(userTable.id, id!),
+      const id = c.get('user')?.id as string;
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.userId, id),
+        with: {
+          modifier: true
+        }
       });
 
       if (!hero) {
@@ -34,14 +38,13 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post('/create', loggedIn, zValidator('form', createHeroSchema), async (c) => {
-    const { name, image } = c.req.valid('form');
+    const { name, image, freeStatPoints, modifier: heroStats } = c.req.valid('form');
     const userId = c.get('user')?.id as string;
 
-    const nameExist = await db.query.hero.findFirst({
-      where: eq(hero.name, name),
+    const nameExist = await db.query.heroTable.findFirst({
+      where: eq(heroTable.name, name),
     });
     if (nameExist) {
-
       return c.json<ErrorResponse>(
         {
           message: 'Hero name already taken. Please try another name.',
@@ -51,29 +54,33 @@ export const heroRouter = new Hono<Context>()
         409,
       );
     }
-    const heroExist = await db.query.hero.findFirst({
-      where: eq(hero.userId, userId),
+    const heroExist = await db.query.heroTable.findFirst({
+      where: eq(heroTable.userId, userId),
     });
-    // if (heroExist) {
-    //   throw new HTTPException(409, {
-    //     message: 'Hero already exists for this user.',
-    //   });
-    // }
+    if (heroExist) {
+      throw new HTTPException(409, {
+        message: 'Hero already exists for this user.',
+      });
+    }
     const newHero = await db.transaction(async (tx) => {
       const [newModifier] = await tx
-        .insert(modifier)
+        .insert(modifierTable)
         .values({
           id: generateRandomUuid(),
+          ...heroStats,
         })
-        .returning({ id: modifier.id });
+        .returning({ id: modifierTable.id });
       const [newHero] = await tx
-        .insert(hero)
+        .insert(heroTable)
         .values({
           id: generateRandomUuid(),
           image,
           name,
           userId,
           modifierId: newModifier.id,
+          freeStatPoints,
+          maxHealth: heroStats.constitution *  HP_MULTIPLIER_COST,
+          maxMana: heroStats.intelligence * MANA_MULTIPLIER_INT
         })
         .returning();
       return newHero;

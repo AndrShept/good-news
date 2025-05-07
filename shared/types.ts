@@ -1,14 +1,14 @@
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
-import { createInsertSchema } from 'drizzle-zod';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import type { InferResponseType } from 'hono';
 import { z } from 'zod';
 
 import type { client } from '../frontend/src/lib/utils';
-import { hero, type modifier } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { ApiRoutes } from '../server/index';
+import { heroTable, modifierTable } from '../server/db/schema';
 
 export type AppType = ApiRoutes;
 
@@ -118,17 +118,32 @@ export type PaginatedResponse<T> = {
 
 export type GetPostsData = InferResponseType<typeof client.post.$get>;
 
-export type Hero = InferSelectModel<typeof hero>;
-export type Modifier = InferSelectModel<typeof modifier>;
-
-export const createHeroSchema = createInsertSchema(hero, {
+export type Modifier = InferSelectModel<typeof modifierTable>;
+export type Hero = InferSelectModel<typeof heroTable> & {
+  modifier: Modifier
+};
+export const statsSchema = createSelectSchema(modifierTable).pick({
+  constitution: true,
+  dexterity: true,
+  luck: true,
+  intelligence: true,
+  strength: true,
+});
+export type HeroStats = z.infer<typeof statsSchema>;
+export const createHeroSchema = createInsertSchema(heroTable, {
   name: z
     .string()
     .min(3)
     .max(20)
     .regex(/^[a-zA-Z0-9_]+$/, 'hero name can only contain letters, numbers, and underscores'),
-  image: z.string(),
-}).pick({
-  name: true,
-  image: true,
-});
+  freeStatPoints: z.number({ coerce: true }),
+  image: z.string().min(1)
+})
+  .pick({
+    name: true,
+    image: true,
+    freeStatPoints: true,
+  })
+  .extend({
+    modifier: z.string().transform((val) => JSON.parse(val) as HeroStats),
+  });

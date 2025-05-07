@@ -5,7 +5,7 @@ import { commentTable } from './comments-schema';
 import { postTable } from './posts-schema';
 import { commentUpvotesTable, postUpvotesTable } from './upvotes-schema';
 import { sessionTable } from './session-schema';
-import { hero } from './hero-schema';
+import { heroTable } from './hero-schema';
 
 export const userTable = pgTable('user', {
   id: text().primaryKey(),
@@ -30,6 +30,6 @@ export const userRelations = relations(userTable, ({ many }) => ({
   comments: many(commentTable),
   postUpvotes: many(postUpvotesTable),
   commentUpvotes: many(commentUpvotesTable),
-  heroes: many(hero),
+  heroes: many(heroTable),
 }));
 

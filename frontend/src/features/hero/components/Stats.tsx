@@ -1,55 +1,37 @@
-import { BASE_STATS } from '@/shared/constants';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { HeroStats } from '@/shared/types';
+import { CheckIcon } from 'lucide-react';
+import { Dispatch, SetStateAction } from 'react';
 
-import { Button } from './ui/button';
+import { Button } from '../../../components/ui/button';
+import { useChangeHeroStats } from '../hooks/useChangeHeroStats';
+import { ResetStatsButton } from './ResetStatsButton';
 
 export interface Stat {
-  name: string;
+  name: keyof HeroStats;
   value: number;
 }
 
 interface Props {
   reset: boolean;
-  setStats: Dispatch<SetStateAction<Stat[]>>;
-  stats: Stat[];
+  setCurrentStats: Dispatch<SetStateAction<HeroStats>>;
+  currentStats: HeroStats;
   freePoints: number;
   setFreePoints: Dispatch<SetStateAction<number>>;
+  baseStats: HeroStats;
+  baseFreePoints?: number;
 }
 
-export const HeroStat = ({ reset, setStats, stats, freePoints, setFreePoints }: Props) => {
-  const onIncrement = (data: Stat) => {
-    setStats((prev) => {
-      const updatedStats = prev.map((stat) => {
-        if (stat.name === data.name) {
-          return { ...stat, value: stat.value + 1 };
-        }
-        return stat;
-      });
-
-      setFreePoints((prev) => {
-        return prev - 1;
-      });
-      return updatedStats;
-    });
-  };
-  const onDecrement = (data: Stat) => {
-    setStats((prev) => {
-      const updatedStats = prev.map((stat) => {
-        if (stat.name === data.name && stat.value > BASE_STATS[stat.name as keyof typeof BASE_STATS]) {
-          setFreePoints((prev) => prev + 1);
-          return { ...stat, value: stat.value - 1 };
-        }
-        return stat;
-      });
-
-      return updatedStats;
-    });
-  };
+export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFreePoints, baseStats, baseFreePoints }: Props) => {
+  const { initialStats, onDecrement, onIncrement } = useChangeHeroStats({
+    baseStats,
+    currentStats,
+    setCurrentStats,
+    setFreePoints,
+  });
   return (
     <section className="bg-secondary rounded border p-4">
-
       <ul className="flex flex-col gap-0.5">
-        {stats.map((stat, idx) => (
+        {initialStats.map((stat, idx) => (
           <li className="flex items-center justify-between" key={idx}>
             <p>{stat.name}</p>
 
@@ -57,7 +39,7 @@ export const HeroStat = ({ reset, setStats, stats, freePoints, setFreePoints }: 
               {!reset && (
                 <Button
                   onClick={() => onDecrement(stat)}
-                  disabled={stat.value === BASE_STATS[stat.name as keyof typeof BASE_STATS]}
+                  disabled={stat.value === baseStats[stat.name]}
                   type="button"
                   className="size-6 p-0.5"
                   variant={'ghost'}
@@ -66,7 +48,7 @@ export const HeroStat = ({ reset, setStats, stats, freePoints, setFreePoints }: 
                   -
                 </Button>
               )}
-              <p className={stat.value > BASE_STATS[stat.name as keyof typeof BASE_STATS] ? 'text-yellow-400' : ''}>{stat.value}</p>
+              <p className={stat.value > baseStats[stat.name] ? 'text-yellow-400' : ''}>{stat.value}</p>
               {!reset && (
                 <Button
                   onClick={() => onIncrement(stat)}
@@ -86,6 +68,12 @@ export const HeroStat = ({ reset, setStats, stats, freePoints, setFreePoints }: 
           <p className="font-semibold text-green-400">Free points</p>
           <p className="">{freePoints}</p>
         </div>
+        {(baseFreePoints ?? 0) > freePoints && (
+          <Button className="mt-2 w-full text-green-500" variant={'outline'} size={'icon'}>
+            <p>confirm</p> <CheckIcon className="size-4" />
+          </Button>
+        )}
+        <ResetStatsButton />
       </ul>
     </section>
   );

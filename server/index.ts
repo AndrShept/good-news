@@ -2,7 +2,6 @@ import { serve } from '@hono/node-server';
 import 'dotenv/config';
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
-import { hc } from 'hono/client';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
@@ -11,7 +10,6 @@ import { Server } from 'socket.io';
 
 import type { ErrorResponse } from '../shared/types';
 import type { Context } from './context';
-import { processEnv } from './lib/utils';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
@@ -31,36 +29,27 @@ const routes = app
   .route('/comment', commentRouter)
   .route('/hero', heroRouter);
 
-app.onError((err, c) => {
-  if (err instanceof HTTPException) {
-    return c.json<ErrorResponse>(
-      {
-        success: false,
-        message: err.message,
-      },
-      err.status,
-    );
-  }
+// app.onError((err, c) => {
+//   // Обробка помилки підключення до бази даних
+//   if (err instanceof Error && 'code' in err && err.code === 'ECONNREFUSED') {
+//     return c.json<ErrorResponse>(
+//       {
+//         success: false,
+//         message: 'Database connection failed. Please try again later.',
+//       },
+//       503, // 503 Service Unavailable
+//     );
+//   }
 
-  // Обробка помилки підключення до бази даних
-  if (err instanceof Error && 'code' in err && err.code === 'ECONNREFUSED') {
-    return c.json<ErrorResponse>(
-      {
-        success: false,
-        message: 'Database connection failed. Please try again later.',
-      },
-      503, // 503 Service Unavailable
-    );
-  }
-
-  return c.json<ErrorResponse>(
-    {
-      success: false,
-      message: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : (err.stack ?? err.message),
-    },
-    500,
-  );
-});
+//   // return c.json<ErrorResponse>(
+//   //   {
+//   //     success: false,
+//   //     message: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : (err.stack ?? err.message),
+//   //   },
+//   //   500,
+//   // );
+//   throw new HTTPException(405, { message: err.message || 'OOPPPSS' });
+// });
 export type ApiRoutes = typeof routes;
 
 app.get('*', serveStatic({ root: './frontend/dist' }));
@@ -97,4 +86,4 @@ io.on('connection', (socket) => {
 //   hostname: '0.0.0.0',
 //   fetch: app.fetch,
 // };
-console.log('Server Running on port', process.env['PORT'] || 3000);
+console.log('Server Running on port 🚀', process.env['PORT'] || 3000);

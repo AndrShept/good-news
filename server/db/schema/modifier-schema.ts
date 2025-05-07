@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
-export const modifier = pgTable('modifier', {
+export const modifierTable = pgTable('modifier', {
   id: text().primaryKey().notNull(),
 
   maxDamage: integer().default(0).notNull(),

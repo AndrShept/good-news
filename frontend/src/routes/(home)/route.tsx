@@ -14,7 +14,7 @@ function App() {
     <section className="flex min-h-screen flex-col">
       <Header />
       <section className="mx-auto flex w-full max-w-7xl">
-        <aside className="sticky top-14 hidden h-[calc(100vh-56px)] w-60 flex-col border border-y-0 p-3 pr-0 md:flex">
+        <aside className="sticky top-14 hidden h-[calc(100vh-56px)] w-60 flex-col  border-y-0 p-3 pr-0 md:flex">
           <NavBar />
         </aside>
         <main className="flex w-full flex-col p-3">

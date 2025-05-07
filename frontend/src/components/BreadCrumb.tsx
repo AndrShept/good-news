@@ -14,7 +14,7 @@ export const BreadCrumb = () => {
   const arr = pathname.split('/');
 
   return (
-    <Breadcrumb className="mb-2 border-b pb-2">
+    <Breadcrumb className="mb-2 pb-2">
       <ul className="flex items-center">
         {arr.map((item, idx) => (
           <BreadcrumbList key={idx} className="hover:text-primary hover:underline sm:gap-1">

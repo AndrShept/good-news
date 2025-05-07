@@ -2,9 +2,9 @@ import { relations } from 'drizzle-orm';
 import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 import { userTable } from './auth-schema';
-import { modifier } from './modifier-schema';
+import { modifierTable } from './modifier-schema';
 
-export const hero = pgTable('hero', {
+export const heroTable = pgTable('hero', {
   id: text().primaryKey().notNull(),
   name: text().notNull().unique(),
   image: text().notNull(),
@@ -18,8 +18,8 @@ export const hero = pgTable('hero', {
 
   currentHealth: integer().default(100).notNull(),
   currentMana: integer().default(100).notNull(),
-  maxHealth: integer().default(100).notNull(),
-  maxMana: integer().default(100).notNull(),
+  maxHealth: integer().default(0).notNull(),
+  maxMana: integer().default(0).notNull(),
 
   inventorySlotCount: integer().default(40).notNull(),
   inventorySlotMax: integer().default(40).notNull(),
@@ -37,7 +37,7 @@ export const hero = pgTable('hero', {
     mode: 'string',
   }),
 
-  modifierId: text().references(() => modifier.id),
+  modifierId: text().references(() => modifierTable.id),
   userId: text()
     .notNull()
     .references(() => userTable.id, {
@@ -45,13 +45,13 @@ export const hero = pgTable('hero', {
     }),
 });
 
-export const heroRelations = relations(hero, ({ one }) => ({
-  modifier: one(modifier, {
-    fields: [hero.modifierId],
-    references: [modifier.id],
+export const heroRelations = relations(heroTable, ({ one }) => ({
+  modifier: one(modifierTable, {
+    fields: [heroTable.modifierId],
+    references: [modifierTable.id],
   }),
   user: one(userTable, {
-    fields: [hero.userId],
+    fields: [heroTable.userId],
     references: [userTable.id],
   }),
 }));

@@ -1,5 +1,11 @@
 import { getHeroOptions } from '@/features/hero/api/get-hero';
+import { Inventory } from '@/features/hero/components/Inventory';
+import { Modifiers } from '@/features/hero/components/Modifier';
+import { Paperdoll } from '@/features/hero/components/Paperdoll';
+import { useHero } from '@/hooks/useHero';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, redirect } from '@tanstack/react-router';
+import { use } from 'react';
 
 export const Route = createFileRoute('/(home)/game')({
   component: RouteComponent,
@@ -18,5 +24,12 @@ export const Route = createFileRoute('/(home)/game')({
 });
 
 function RouteComponent() {
-  return <section className="flex min-h-full flex-col">GAME</section>;
+  const hero = useSuspenseQuery(getHeroOptions());
+  return (
+    <section className="flex min-h-full gap-4">
+      <Paperdoll hero={hero.data!.data!} />
+      <Modifiers />
+      <Inventory />
+    </section>
+  );
 }

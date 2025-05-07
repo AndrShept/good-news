@@ -9,5 +9,6 @@ export const useCreateHero = () =>
 
     onError(error, variables, context) {
       toastError();
+      console.error(error.message);
     },
   });
