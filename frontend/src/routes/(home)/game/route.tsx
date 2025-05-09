@@ -1,10 +1,11 @@
+import { GameMessage } from '@/components/GameMessage';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { Inventory } from '@/features/hero/components/Inventory';
 import { Modifiers } from '@/features/hero/components/Modifier';
 import { Paperdoll } from '@/features/hero/components/Paperdoll';
 import { useHero } from '@/hooks/useHero';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
 import { use } from 'react';
 
 export const Route = createFileRoute('/(home)/game')({
@@ -26,10 +27,19 @@ export const Route = createFileRoute('/(home)/game')({
 function RouteComponent() {
   const hero = useSuspenseQuery(getHeroOptions());
   return (
-    <section className="flex min-h-full gap-4">
-      <Paperdoll hero={hero.data!.data!} />
-      <Modifiers />
-      <Inventory />
-    </section>
+    <>
+      <div className="flex gap-4">
+        <Paperdoll hero={hero.data!.data!} />
+        <Modifiers />
+        <Inventory />
+      </div>
+      <div>
+        <Outlet />
+      </div>
+
+      <div className="bg-background/90 sticky bottom-0 h-[250px]">
+        <GameMessage />
+      </div>
+    </>
   );
 }

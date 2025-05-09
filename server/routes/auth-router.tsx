@@ -1,4 +1,4 @@
-import type { User as UserType } from '@/shared/types';
+import type { ErrorResponse, User as UserType } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { password } from 'bun';
 import { and, eq } from 'drizzle-orm';
@@ -30,14 +30,22 @@ export const authRouter = new Hono<Context>()
     });
 
     if (existUsername) {
-      throw new HTTPException(409, {
-        message: 'Username already used',
-      });
+      return c.json<ErrorResponse>(
+        {
+          success: false,
+          message: 'Username already used',
+        },
+        409,
+      );
     }
     if (existEmail) {
-      throw new HTTPException(409, {
-        message: 'Email already used',
-      });
+      return c.json<ErrorResponse>(
+        {
+          success: false,
+          message: 'Email already used',
+        },
+        409,
+      );
     }
 
     const payload = { password, email, username };
@@ -81,7 +89,7 @@ export const authRouter = new Hono<Context>()
       }
       const { email, password, username } = verifyToken;
       const passwordHash = await Bun.password.hash(password);
-      const userId = Bun.randomUUIDv7()
+      const userId = Bun.randomUUIDv7();
       const generator = new AvatarGenerator();
       const randomAvatarUrl = generator.generateRandomAvatar().replace('Circle', 'Transparent');
       const existUsername = await db.query.userTable.findFirst({
@@ -91,14 +99,22 @@ export const authRouter = new Hono<Context>()
         where: eq(userTable.email, email),
       });
       if (existUsername) {
-        throw new HTTPException(409, {
-          message: 'Username already used',
-        });
+        return c.json<ErrorResponse>(
+          {
+            success: false,
+            message: 'Username already used',
+          },
+          409,
+        );
       }
       if (existEmail) {
-        throw new HTTPException(409, {
-          message: 'Email already used',
-        });
+        return c.json<ErrorResponse>(
+          {
+            success: false,
+            message: 'Email already used',
+          },
+          409,
+        );
       }
       await db.insert(userTable).values({
         username,
@@ -125,15 +141,23 @@ export const authRouter = new Hono<Context>()
       where: eq(userTable.email, email),
     });
     if (!existingUser) {
-      throw new HTTPException(401, {
-        message: 'Incorrect password or email',
-      });
+      return c.json<ErrorResponse>(
+        {
+          message: 'Incorrect password or email',
+          success: false,
+        },
+        401,
+      );
     }
     const validPassword = await Bun.password.verify(password, existingUser.password_hash);
     if (!validPassword) {
-      throw new HTTPException(401, {
-        message: 'Incorrect password or email',
-      });
+      return c.json<ErrorResponse>(
+        {
+          message: 'Incorrect password or email',
+          success: false,
+        },
+        401,
+      );
     }
 
     const session = await lucia.createSession(existingUser.id, { username: existingUser.username });
@@ -172,4 +196,4 @@ export const authRouter = new Hono<Context>()
       message: 'User fetched',
       data: user,
     });
-  })
+  });

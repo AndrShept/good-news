@@ -1,15 +1,17 @@
+import { BASE_STATS, RESET_STATS_COST } from '@/shared/constants';
 import { type ErrorResponse, type Hero, type SuccessResponse, createHeroSchema } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { heroTable, modifierTable } from '../db/schema';
+import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/constants';
 import { generateRandomUuid } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
-import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/constants';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -21,8 +23,8 @@ export const heroRouter = new Hono<Context>()
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.userId, id),
         with: {
-          modifier: true
-        }
+          modifier: true,
+        },
       });
 
       if (!hero) {
@@ -33,7 +35,7 @@ export const heroRouter = new Hono<Context>()
       return c.json<SuccessResponse<Hero>>({
         success: true,
         message: 'hero fetched',
-        data: hero,
+        data: { ...hero, modifier: hero.modifier! },
       });
     },
   )
@@ -79,12 +81,72 @@ export const heroRouter = new Hono<Context>()
           userId,
           modifierId: newModifier.id,
           freeStatPoints,
-          maxHealth: heroStats.constitution *  HP_MULTIPLIER_COST,
-          maxMana: heroStats.intelligence * MANA_MULTIPLIER_INT
+          maxHealth: heroStats.constitution * HP_MULTIPLIER_COST,
+          maxMana: heroStats.intelligence * MANA_MULTIPLIER_INT,
         })
         .returning();
       return newHero;
     });
 
-    return c.json<SuccessResponse<Hero>>({ message: 'hero created!', success: true, data: newHero });
-  });
+    return c.json<SuccessResponse>({ message: 'hero created!', success: true });
+  })
+  .put(
+    '/:id/reset-stats',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+      }),
+    ),
+    async (c) => {
+      const { id } = c.req.valid('param');
+      const userId = c.get('user')?.id as string;
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+        with: { modifier: true },
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, { message: 'Hero not found' });
+      }
+
+      if (hero.userId !== userId) {
+        throw new HTTPException(403, { message: 'Access denied' });
+      }
+      if (!hero.modifierId) {
+        throw new HTTPException(404, { message: 'modifier_Id not found' });
+      }
+      if (hero.goldCoins < RESET_STATS_COST) {
+        return c.json<ErrorResponse>(
+          {
+            success: false,
+            message: 'Not enough gold to reset stats.',
+          },
+          422,
+        );
+      }
+      await db.transaction(async (tx) => {
+        await tx
+          .update(heroTable)
+          .set({
+            freeStatPoints: hero.level * 10,
+          })
+          .where(eq(heroTable.id, id));
+        await tx
+          .update(heroTable)
+          .set({
+            goldCoins: hero.goldCoins - RESET_STATS_COST,
+          })
+          .where(eq(heroTable.id, id));
+        await tx
+          .update(modifierTable)
+          .set({
+            ...BASE_STATS,
+          })
+          .where(eq(modifierTable.id, hero.modifierId!));
+      });
+
+      return c.json<SuccessResponse>({ message: 'Hero stats have been reset successfully.', success: true });
+    },
+  );

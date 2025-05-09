@@ -6,11 +6,13 @@ export const signIn = async (data: { password: string; email: string }) => {
     const res = await client.auth.login.$post({
       form: { ...data },
     });
-    if (res.ok) {
-      const data = await res.json();
-      return data;
+
+    if (!res.ok) {
+      const data = await res.json() as unknown as ErrorResponse
+      return data
     }
-    return (await res.json()) as unknown as ErrorResponse;
+    return await res.json()
+   
   } catch (error) {
     if (error instanceof Error) {
       console.error(error.message);

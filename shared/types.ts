@@ -4,11 +4,11 @@ import type { InferResponseType } from 'hono';
 import { z } from 'zod';
 
 import type { client } from '../frontend/src/lib/utils';
+import { heroTable, modifierTable } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { ApiRoutes } from '../server/index';
-import { heroTable, modifierTable } from '../server/db/schema';
 
 export type AppType = ApiRoutes;
 
@@ -120,7 +120,7 @@ export type GetPostsData = InferResponseType<typeof client.post.$get>;
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Hero = InferSelectModel<typeof heroTable> & {
-  modifier: Modifier
+  modifier: Modifier;
 };
 export const statsSchema = createSelectSchema(modifierTable).pick({
   constitution: true,
@@ -137,7 +137,7 @@ export const createHeroSchema = createInsertSchema(heroTable, {
     .max(20)
     .regex(/^[a-zA-Z0-9_]+$/, 'hero name can only contain letters, numbers, and underscores'),
   freeStatPoints: z.number({ coerce: true }),
-  image: z.string().min(1)
+  image: z.string().min(1),
 })
   .pick({
     name: true,

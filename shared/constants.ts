@@ -7,6 +7,7 @@ export const BASE_STATS = {
 };
 
 export const BASE_FREE_POINTS = 10;
+export const RESET_STATS_COST = 100
 
 // export const BASE_EQUIPMENTS_IMAGE = [
 //   {

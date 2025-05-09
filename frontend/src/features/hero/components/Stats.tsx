@@ -36,7 +36,7 @@ export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFre
             <p>{stat.name}</p>
 
             <div className="flex items-center gap-0.5">
-              {!reset && (
+           
                 <Button
                   onClick={() => onDecrement(stat)}
                   disabled={stat.value === baseStats[stat.name]}
@@ -47,9 +47,9 @@ export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFre
                 >
                   -
                 </Button>
-              )}
+            
               <p className={stat.value > baseStats[stat.name] ? 'text-yellow-400' : ''}>{stat.value}</p>
-              {!reset && (
+           
                 <Button
                   onClick={() => onIncrement(stat)}
                   disabled={freePoints === 0}
@@ -60,7 +60,7 @@ export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFre
                 >
                   +
                 </Button>
-              )}
+           
             </div>
           </li>
         ))}
@@ -73,7 +73,7 @@ export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFre
             <p>confirm</p> <CheckIcon className="size-4" />
           </Button>
         )}
-        <ResetStatsButton />
+        {reset && <ResetStatsButton />}
       </ul>
     </section>
   );

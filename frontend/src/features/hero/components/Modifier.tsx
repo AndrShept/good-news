@@ -22,7 +22,7 @@ export const Modifiers = () => {
   return (
     <section className="h-fit max-w-fit flex-col gap-2 rounded text-sm md:flex">
       <Stats
-        reset={false}
+        reset={true}
         currentStats={stats}
         setCurrentStats={setStats}
         freePoints={freePoints}
@@ -30,6 +30,7 @@ export const Modifiers = () => {
         baseStats={baseStats.current}
         baseFreePoints={baseFreePoints.current}
       />
+      <h2 className='text-xl font-semibold text-center'>Modifier</h2>
       <Separator />
       <div className="text-muted-foreground">
         <p className="mb-1 text-stone-600">DEF</p>
