@@ -7,6 +7,8 @@ import type { client } from '../frontend/src/lib/utils';
 import { heroTable, modifierTable } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
+import type { equipmentTable, slotEnum } from '../server/db/schema/equipment-schema';
+import type { gameItemEnum, gameItemTable, rarityEnum, weaponHandEnum } from '../server/db/schema/game-item-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { ApiRoutes } from '../server/index';
 
@@ -118,11 +120,25 @@ export type PaginatedResponse<T> = {
 
 export type GetPostsData = InferResponseType<typeof client.post.$get>;
 
+export type EquipmentsType = (typeof slotEnum.enumValues)[number];
+export type GameItemType = (typeof gameItemEnum.enumValues)[number];
+export type RarityType = (typeof rarityEnum.enumValues)[number];
+export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
+
 export type Modifier = InferSelectModel<typeof modifierTable>;
+export type Equipment = InferSelectModel<typeof equipmentTable>;
+export type GameItem = InferSelectModel<typeof gameItemTable>;
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier: Modifier;
+  equipments: Equipment[];
 };
-export const statsSchema = createSelectSchema(modifierTable).pick({
+export const statsSchema = createSelectSchema(modifierTable, {
+  strength: z.number({ coerce: true }),
+  constitution: z.number({ coerce: true }),
+  intelligence: z.number({ coerce: true }),
+  dexterity: z.number({ coerce: true }),
+  luck: z.number({ coerce: true }),
+}).pick({
   constitution: true,
   dexterity: true,
   luck: true,

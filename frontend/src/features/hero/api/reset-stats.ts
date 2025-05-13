@@ -2,7 +2,7 @@ import { client } from '@/lib/utils';
 import { ErrorResponse } from '@/shared/types';
 
 export const resetStats = async (id: string) => {
-  const res = await client.hero[':id']['reset-stats'].$put({
+  const res = await client.hero[':id'].stats.reset.$put({
     param: {
       id,
     },

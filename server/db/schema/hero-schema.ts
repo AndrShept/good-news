@@ -2,6 +2,7 @@ import { relations } from 'drizzle-orm';
 import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 import { userTable } from './auth-schema';
+import { equipmentTable } from './equipment-schema';
 import { modifierTable } from './modifier-schema';
 
 export const heroTable = pgTable('hero', {
@@ -45,7 +46,7 @@ export const heroTable = pgTable('hero', {
     }),
 });
 
-export const heroRelations = relations(heroTable, ({ one }) => ({
+export const heroRelations = relations(heroTable, ({ one, many }) => ({
   modifier: one(modifierTable, {
     fields: [heroTable.modifierId],
     references: [modifierTable.id],
@@ -54,4 +55,5 @@ export const heroRelations = relations(heroTable, ({ one }) => ({
     fields: [heroTable.userId],
     references: [userTable.id],
   }),
+  equipments: many(equipmentTable),
 }));

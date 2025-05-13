@@ -1,12 +1,13 @@
 import { Separator } from '@/components/ui/separator';
 import { useHero } from '@/hooks/useHero';
 import { HeroStats } from '@/shared/types';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Stats } from './Stats';
 
 export const Modifiers = () => {
   const hero = useHero();
+
   const initialHeroStats = {
     strength: hero.modifier.strength,
     constitution: hero.modifier.constitution,
@@ -19,6 +20,21 @@ export const Modifiers = () => {
   const baseStats = useRef<HeroStats>(initialHeroStats);
   const [freePoints, setFreePoints] = useState(hero.freeStatPoints);
   const baseFreePoints = useRef(hero.freeStatPoints);
+
+    useEffect(() => {
+  const newHeroStats = {
+    strength: hero.modifier.strength,
+    constitution: hero.modifier.constitution,
+    dexterity: hero.modifier.dexterity,
+    intelligence: hero.modifier.intelligence,
+    luck: hero.modifier.luck,
+  };
+
+  setStats(newHeroStats);
+  baseStats.current = newHeroStats;
+  setFreePoints(hero.freeStatPoints);
+  baseFreePoints.current = hero.freeStatPoints;
+}, [hero]);
   return (
     <section className="h-fit max-w-fit flex-col gap-2 rounded text-sm md:flex">
       <Stats
@@ -30,7 +46,8 @@ export const Modifiers = () => {
         baseStats={baseStats.current}
         baseFreePoints={baseFreePoints.current}
       />
-      <h2 className='text-xl font-semibold text-center'>Modifier</h2>
+      {hero.modifier.intelligence}
+      <h2 className="text-center text-xl font-semibold">Modifier</h2>
       <Separator />
       <div className="text-muted-foreground">
         <p className="mb-1 text-stone-600">DEF</p>

@@ -1,5 +1,5 @@
 import { BASE_STATS, RESET_STATS_COST } from '@/shared/constants';
-import { type ErrorResponse, type Hero, type SuccessResponse, createHeroSchema } from '@/shared/types';
+import { type ErrorResponse, type Hero, type SuccessResponse, createHeroSchema, statsSchema } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -24,6 +24,7 @@ export const heroRouter = new Hono<Context>()
         where: eq(heroTable.userId, id),
         with: {
           modifier: true,
+          equipments: true,
         },
       });
 
@@ -35,7 +36,7 @@ export const heroRouter = new Hono<Context>()
       return c.json<SuccessResponse<Hero>>({
         success: true,
         message: 'hero fetched',
-        data: { ...hero, modifier: hero.modifier! },
+        data: { ...hero, modifier: hero.modifier!},
       });
     },
   )
@@ -91,7 +92,7 @@ export const heroRouter = new Hono<Context>()
     return c.json<SuccessResponse>({ message: 'hero created!', success: true });
   })
   .put(
-    '/:id/reset-stats',
+    '/:id/stats/reset',
     loggedIn,
     zValidator(
       'param',
@@ -148,5 +149,58 @@ export const heroRouter = new Hono<Context>()
       });
 
       return c.json<SuccessResponse>({ message: 'Hero stats have been reset successfully.', success: true });
+    },
+  )
+  .put(
+    '/:id/stats/confirm',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+      }),
+    ),
+    zValidator(
+      'form',
+      statsSchema.extend({
+        freeStatPoints: z.number({
+          coerce: true,
+        }),
+      }),
+    ),
+    async (c) => {
+      const userId = c.get('user')?.id as string;
+      const { id } = c.req.valid('param');
+      const { freeStatPoints, ...newStats } = c.req.valid('form');
+
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'Hero not found',
+        });
+      }
+      if (hero.userId !== userId) {
+        throw new HTTPException(403, {
+          message: 'access denied',
+        });
+      }
+
+      await db.transaction(async (tx) => {
+        await tx
+          .update(heroTable)
+          .set({
+            freeStatPoints,
+          })
+          .where(eq(heroTable.id, id));
+        await tx
+          .update(modifierTable)
+          .set({
+            ...newStats,
+          })
+          .where(eq(modifierTable.id, hero.modifierId ?? ''));
+      });
+      return c.json<SuccessResponse>({ success: true, message: 'Stats have been successfully updated.' }, 200);
     },
   );

@@ -5,3 +5,5 @@ export * from './modifier-schema';
 export * from './upvotes-schema';
 export * from './posts-schema';
 export * from './session-schema';
+export * from './equipment-schema';
+export * from './game-item-schema';

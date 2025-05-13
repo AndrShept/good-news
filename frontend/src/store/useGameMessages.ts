@@ -24,3 +24,5 @@ export const useGameMessages = create<GameMessagesStore>((set) => ({
   setGameMessage: (newMessage) => set((state) => ({ gameMessages: [...state.gameMessages, { ...newMessage, createdAt: Date.now() }] })),
   clearGameMessage: () => set({ gameMessages: [] }),
 }));
+
+export const useSetGameMessage = () => useGameMessages((state) => state.setGameMessage);

@@ -1,9 +1,8 @@
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { Hero } from '@/shared/types';
-import { useQueryClient } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 
 export const useHero = () => {
-  const queryClient = useQueryClient();
-  const hero = queryClient.getQueryData(getHeroOptions().queryKey)
+  const { data: hero } = useSuspenseQuery(getHeroOptions());
   return hero?.data as Hero;
 };
