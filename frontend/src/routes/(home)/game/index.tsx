@@ -15,6 +15,9 @@ function RouteComponent() {
       <Paperdoll hero={hero} />
       <Modifiers />
       <Inventory />
+      <div className="w-[150px] h-[250px] shrink-0 border rounded  flex items-center justify-center">
+        <img className="size-full object-contain scale-x-[-1] " src="/sprites/new/mobs.jpg" alt="mob-image" style={{ imageRendering: 'pixelated' }} />
+      </div>
     </div>
   );
 }

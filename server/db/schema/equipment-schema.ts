@@ -3,7 +3,7 @@ import { pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 import { heroTable } from './hero-schema';
 
-export const slotEnum = pgEnum('equipment_slot', [
+export const slotEnum = pgEnum('equipment_slot_enum', [
   'RIGHT_HAND',
   'LEFT_HAND',
   'HELMET',

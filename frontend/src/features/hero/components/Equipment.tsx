@@ -1,74 +1,114 @@
-
 import { cn } from '@/lib/utils';
-import { BASE_EQUIPMENTS_IMAGE } from '@/shared/constants';
+import { Equipment, EquipmentSlotType } from '@/shared/types';
 
 interface Props {
   equipments: Equipment[];
 }
 
-export const HeroEquipments = ({ equipments }: Props) => {
+interface EquipmentImage {
+  id: number;
+  image: string;
+  slot: EquipmentSlotType;
+}
+const BASE_EQUIPMENTS_IMAGE: EquipmentImage[] = [
+  {
+    id: 1,
+    slot: 'HELMET',
+    image: '/sprites/icons/helmet.png',
+  },
+  {
+    id: 2,
+    slot: 'CHESTPLATE',
+    image: '/sprites/icons/armor.png',
+  },
+  {
+    id: 3,
+    slot: 'BELT',
+    image: '/sprites/icons/belt.png',
+  },
+  {
+    id: 4,
+    slot: 'LEGS',
+    image: '/sprites/icons/legs.png',
+  },
+  {
+    id: 5,
+    slot: 'BOOTS',
+    image: '/sprites/icons/boots.png',
+  },
+
+  {
+    id: 8,
+    slot: 'AMULET',
+    image: '/sprites/icons/amulet.png',
+  },
+  {
+    id: 9,
+    slot: 'RING_LEFT',
+    image: '/sprites/icons/ring.png',
+  },
+  {
+    id: 10,
+    slot: 'RING_RIGHT',
+    image: '/sprites/icons/ring.png',
+  },
+  {
+    id: 6,
+    slot: 'RIGHT_HAND',
+    image: '/sprites/icons/weapon.png',
+  },
+  {
+    id: 7,
+    slot: 'LEFT_HAND',
+    image: '/sprites/icons/shield.png',
+  },
+];
+
+export const Equipments = ({ equipments }: Props) => {
   const equipmentBySlot = equipments.reduce(
     (acc, equip) => {
       acc[equip.slot] = equip;
       return acc;
     },
-    {} as Record<EquipmentSlot, Equipment>,
+    {} as Record<EquipmentSlotType, Equipment>,
   );
 
   return (
     <div className="flex">
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(0, 5).map((equipment) => (
-          <li className="size-12 border flex" key={equipment.id}>
+          <li className="flex size-12 border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
-              <EquipmentItemCard
-                equipment={equipmentBySlot[equipment.slot]}
-                isContextMenuShow={true}
-                isDoubleCLick={true}
-              />
+              <div>GOGOGOGOG</div>
             ) : (
               <img
                 style={{ imageRendering: 'pixelated' }}
-                className={cn('grayscale opacity-15 size-full', {
-                  'size-8 m-auto':
-                    equipment.slot === 'RING_LEFT' ||
-                    equipment.slot === 'RING_RIGHT' ||
-                    equipment.slot === 'AMULET',
+                className={cn('size-full opacity-15 grayscale', {
+                  'm-auto size-8': equipment.slot === 'RING_LEFT' || equipment.slot === 'RING_RIGHT' || equipment.slot === 'AMULET',
                 })}
-                src={equipment.imageUrl}
-                alt=""
+                src={equipment.image}
+                alt="equip_slot_image"
               />
             )}
           </li>
         ))}
       </ul>
-      <div className="mx-auto">
-        <img
-          className=" "
-          src={'sprites/hero-image/hero-2.jpg'}
-          alt="hero-image"
-        />
+      <div className="flex h-[250px] w-[150px] shrink-0 items-center justify-center">
+        <img className="size-full object-contain" src={'/sprites/new/mobs.jpg'} alt="hero-image" style={{ imageRendering: 'pixelated' }} />
       </div>
       <ul className="flex flex-col gap-0.5">
-        {equipmentsHeroList.slice(5, 10).map((equipment) => (
-          <li className="size-12 border flex" key={equipment.id}>
+        {BASE_EQUIPMENTS_IMAGE.slice(5, 10).map((equipment) => (
+          <li className="flex size-12 border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
-              <EquipmentItemCard
-                equipment={equipmentBySlot[equipment.slot]}
-                isContextMenuShow={true}
-                isDoubleCLick={true}
-              />
+              <div>GOGOGOG</div>
             ) : (
               <img
                 style={{ imageRendering: 'pixelated' }}
-                className={cn('grayscale opacity-15 size-full', {
-                  'size-8 m-auto':
-                    equipment.slot === 'RING_LEFT' ||
-                    equipment.slot === 'RING_RIGHT' ||
-                    equipment.slot === 'AMULET',
+                className={cn('size-full opacity-15 grayscale', {
+                  'm-auto size-8': equipment.slot === 'RING_LEFT' || equipment.slot === 'RING_RIGHT' || equipment.slot === 'AMULET',
                 })}
-                src={equipment.imageUrl}
-                alt=""
+                src={equipment.image}
+                alt="equip_slot_image"
               />
             )}
           </li>

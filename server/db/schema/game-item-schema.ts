@@ -3,7 +3,7 @@ import { integer, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 import { modifierTable } from './modifier-schema';
 
-export const gameItemEnum = pgEnum('game_item', [
+export const gameItemEnum = pgEnum('game_item_enum', [
   'POTION',
   'BOOK',
   'DAGGER',
@@ -20,8 +20,8 @@ export const gameItemEnum = pgEnum('game_item', [
   'AMULET',
   'MISC',
 ]);
-export const rarityEnum = pgEnum('rarity', ['COMMON', 'MAGIC', 'EPIC', 'RARE', 'LEGENDARY']);
-export const weaponHandEnum = pgEnum('weapon_hand', ['ONE_HANDED', 'TWO_HANDED']);
+export const rarityEnum = pgEnum('rarity_enum', ['COMMON', 'MAGIC', 'EPIC', 'RARE', 'LEGENDARY']);
+export const weaponHandEnum = pgEnum('weapon_hand_enum', ['ONE_HANDED', 'TWO_HANDED']);
 
 export const gameItemTable = pgTable('game_item', {
   id: text().primaryKey().notNull(),
@@ -47,8 +47,8 @@ export const gameItemTable = pgTable('game_item', {
   }),
 });
 
-export const gameItemRelations = relations(gameItemTable, ({ many, one }) => ({
-  // inventoryItems: many()
+export const gameItemRelations = relations(gameItemTable, ({  one }) => ({
+ 
   modifier: one(modifierTable, {
     fields: [gameItemTable.modifierId],
     references: [modifierTable.id],

@@ -1,5 +1,5 @@
 import { BASE_STATS, RESET_STATS_COST } from '@/shared/constants';
-import { type ErrorResponse, type Hero, type SuccessResponse, createHeroSchema, statsSchema } from '@/shared/types';
+import { type ErrorResponse, type Hero, type InventoryItem, type SuccessResponse, createHeroSchema, statsSchema } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { heroTable, modifierTable } from '../db/schema';
+import { heroTable, inventoryItemTable, modifierTable } from '../db/schema';
 import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/constants';
 import { generateRandomUuid } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
@@ -36,7 +36,7 @@ export const heroRouter = new Hono<Context>()
       return c.json<SuccessResponse<Hero>>({
         success: true,
         message: 'hero fetched',
-        data: { ...hero, modifier: hero.modifier!},
+        data: hero as Hero,
       });
     },
   )
@@ -202,5 +202,45 @@ export const heroRouter = new Hono<Context>()
           .where(eq(modifierTable.id, hero.modifierId ?? ''));
       });
       return c.json<SuccessResponse>({ success: true, message: 'Stats have been successfully updated.' }, 200);
+    },
+  )
+  .get(
+    '/:id/inventories',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+      }),
+    ),
+    async (c) => {
+      const userId = c.get('user')?.id as string;
+      const { id } = c.req.valid('param');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'Hero not found',
+        });
+      }
+      if (hero.userId !== userId) {
+        throw new HTTPException(403, {
+          message: 'access denied',
+        });
+      }
+
+      const inventories = await db.query.inventoryItemTable.findMany({
+        where: eq(inventoryItemTable.heroId, id),
+        with: {
+          gameItem: true,
+        },
+      });
+
+      return c.json<SuccessResponse<InventoryItem[]>>({
+        message: 'inventories fetched !',
+        success: true,
+        data: inventories as InventoryItem[],
+      });
     },
   );

@@ -2,6 +2,7 @@ import { Hero } from '@/shared/types';
 
 import { FillBar } from './FillBar';
 import { HeroStatus } from './Status';
+import { Equipments } from './Equipment';
 
 interface Props {
   hero: Hero;
@@ -9,7 +10,7 @@ interface Props {
 
 export const Paperdoll = ({ hero }: Props) => {
   return (
-    <section className=" flex h-fit min-w-[240px] max-w-fit flex-col gap-6 border p-6">
+    <section className=" flex h-fit shrink-0  flex-col gap-6  p-6 ">
       <HeroStatus
         avatarUrl={hero.image}
         health={hero.currentHealth}
@@ -21,7 +22,7 @@ export const Paperdoll = ({ hero }: Props) => {
         // buffs={hero.buffs}
       />
 
-      {/* <HeroEquipments equipments={hero.equipments} /> */}
+      <Equipments equipments={hero.equipments} />
 
       <div className="mt-auto">
         <FillBar maxValue={hero.maxExperience} value={hero.currentExperience} color="violet" />

@@ -4,6 +4,7 @@ import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 import { userTable } from './auth-schema';
 import { equipmentTable } from './equipment-schema';
 import { modifierTable } from './modifier-schema';
+import { inventoryItemTable } from './inventory-item-schema';
 
 export const heroTable = pgTable('hero', {
   id: text().primaryKey().notNull(),
@@ -56,4 +57,5 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
     references: [userTable.id],
   }),
   equipments: many(equipmentTable),
+  inventoryItem: many(inventoryItemTable),
 }));

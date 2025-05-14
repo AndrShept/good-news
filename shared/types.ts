@@ -4,7 +4,7 @@ import type { InferResponseType } from 'hono';
 import { z } from 'zod';
 
 import type { client } from '../frontend/src/lib/utils';
-import { heroTable, modifierTable } from '../server/db/schema';
+import { heroTable, inventoryItemTable, modifierTable } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import type { equipmentTable, slotEnum } from '../server/db/schema/equipment-schema';
@@ -120,14 +120,19 @@ export type PaginatedResponse<T> = {
 
 export type GetPostsData = InferResponseType<typeof client.post.$get>;
 
-export type EquipmentsType = (typeof slotEnum.enumValues)[number];
+export type EquipmentSlotType = (typeof slotEnum.enumValues)[number];
 export type GameItemType = (typeof gameItemEnum.enumValues)[number];
 export type RarityType = (typeof rarityEnum.enumValues)[number];
 export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Equipment = InferSelectModel<typeof equipmentTable>;
-export type GameItem = InferSelectModel<typeof gameItemTable>;
+export type InventoryItem = InferSelectModel<typeof inventoryItemTable> & {
+  gameItem: GameItem;
+};
+export type GameItem = InferSelectModel<typeof gameItemTable> & {
+  modifier: Modifier;
+};
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier: Modifier;
   equipments: Equipment[];

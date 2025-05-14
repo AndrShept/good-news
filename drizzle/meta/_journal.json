@@ -36,6 +36,20 @@
       "when": 1745929342808,
       "tag": "0004_simple_captain_cross",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1747141706694,
+      "tag": "0005_boring_sumo",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1747141825960,
+      "tag": "0006_blushing_bill_hollister",
+      "breakpoints": true
     }
   ]
 }
