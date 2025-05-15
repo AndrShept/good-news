@@ -13,7 +13,7 @@ interface Props {
   //   buffs: Buff[];
 }
 
-export const HeroStatus = ({
+export const CharacterStatusBar = ({
   avatarUrl,
   health,
   mana,

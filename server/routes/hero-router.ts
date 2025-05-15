@@ -41,7 +41,7 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post('/create', loggedIn, zValidator('form', createHeroSchema), async (c) => {
-    const { name, image, freeStatPoints, modifier: heroStats } = c.req.valid('form');
+    const { name,  avatarImage, freeStatPoints, modifier: heroStats } = c.req.valid('form');
     const userId = c.get('user')?.id as string;
 
     const nameExist = await db.query.heroTable.findFirst({
@@ -77,7 +77,8 @@ export const heroRouter = new Hono<Context>()
         .insert(heroTable)
         .values({
           id: generateRandomUuid(),
-          image,
+          avatarImage,
+          characterImage: '',
           name,
           userId,
           modifierId: newModifier.id,

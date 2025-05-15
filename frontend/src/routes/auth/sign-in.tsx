@@ -81,7 +81,7 @@ function SignIn() {
 
         {form.formState.errors.root && <p className="text-sm text-red-500">{form.formState.errors.root.message}</p>}
 
-        <Button disabled={isLoading} variant={'outline'} type="submit">
+        <Button disabled={isLoading} variant={'default'} type="submit">
           Sign in ✨
         </Button>
         <div className="mx-auto flex items-center gap-1">

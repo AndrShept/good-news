@@ -3,7 +3,7 @@ import { GoldIcon } from '@/components/game-icons/GoldIcon';
 import { PremIcon } from '@/components/game-icons/PremIcon';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { HeroHeader } from '@/features/hero/components/HeroHeader';
-import { useHero } from '@/hooks/useHero';
+import { useHero } from '@/features/hero/hooks/useHero';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
 
@@ -24,7 +24,7 @@ export const Route = createFileRoute('/(home)/game')({
 });
 
 function RouteComponent() {
-  const { data } = useSuspenseQuery(getHeroOptions());
+  // const { data } = useSuspenseQuery(getHeroOptions());
 
   return (
     <>

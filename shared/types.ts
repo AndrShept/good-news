@@ -158,12 +158,16 @@ export const createHeroSchema = createInsertSchema(heroTable, {
     .max(20)
     .regex(/^[a-zA-Z0-9_]+$/, 'hero name can only contain letters, numbers, and underscores'),
   freeStatPoints: z.number({ coerce: true }),
-  image: z.string().min(1),
+  avatarImage: z.string().min(1),
+  // characterImage: z.string().min(1),
+
 })
   .pick({
     name: true,
-    image: true,
+    avatarImage: true,
     freeStatPoints: true,
+    characterImage: true
+
   })
   .extend({
     modifier: z.string().transform((val) => JSON.parse(val) as HeroStats),

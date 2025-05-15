@@ -101,7 +101,7 @@ function SignUp() {
           )}
         />
         {form.formState.errors.root && <p className="text-sm text-red-500">{form.formState.errors.root.message}</p>}
-        <Button className="mt-4" disabled={isLoading} variant={'outline'} type="submit">
+        <Button className="mt-4" disabled={isLoading} variant={'default'} type="submit">
           Sign Up 🔥
           <p>{isLoading && <Spinner className="ml-1" size={'sm'} />}</p>
         </Button>

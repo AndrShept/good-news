@@ -11,9 +11,20 @@ interface Props {
 }
 
 export const useChangeHeroStats = ({ currentStats, setCurrentStats, setFreePoints, baseStats }: Props) => {
+  const getStatPriority = (stat: keyof HeroStats) => {
+    const priority: Record<keyof HeroStats, number> = {
+      strength: 1,
+      dexterity: 2,
+      intelligence: 3,
+      constitution: 4,
+      luck: 5,
+    };
+    return priority[stat];
+  };
   const initialStats = Object.entries(currentStats).map(([key, value]) => ({
     name: key as keyof HeroStats,
     value,
+    sort: getStatPriority(key as keyof HeroStats),
   }));
   const onIncrement = (data: Stat) => {
     setCurrentStats((prev) => {

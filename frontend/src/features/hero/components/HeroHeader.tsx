@@ -1,6 +1,6 @@
 import { GoldIcon } from '@/components/game-icons/GoldIcon';
 import { PremIcon } from '@/components/game-icons/PremIcon';
-import { useHero } from '@/hooks/useHero';
+import { useHero } from '@/features/hero/hooks/useHero';
 import React from 'react';
 
 export const HeroHeader = () => {

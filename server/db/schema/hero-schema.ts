@@ -9,7 +9,8 @@ import { inventoryItemTable } from './inventory-item-schema';
 export const heroTable = pgTable('hero', {
   id: text().primaryKey().notNull(),
   name: text().notNull().unique(),
-  image: text().notNull(),
+  avatarImage: text().notNull(),
+  characterImage: text().notNull(),
   level: integer().default(1).notNull(),
   goldCoins: integer().default(100).notNull(),
   premiumCoins: integer().default(0).notNull(),

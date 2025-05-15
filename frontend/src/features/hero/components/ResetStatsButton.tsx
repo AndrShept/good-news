@@ -1,7 +1,7 @@
 import { ConfirmPopover } from '@/components/ConfirmPopover';
 import { GoldIcon } from '@/components/game-icons/GoldIcon';
 import { Button } from '@/components/ui/button';
-import { useHero } from '@/hooks/useHero';
+import { useHero } from '@/features/hero/hooks/useHero';
 
 import { useResetStats } from '../hooks/useResetStats';
 

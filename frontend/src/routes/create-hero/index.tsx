@@ -22,7 +22,7 @@ const heroNameSchema = createHeroSchema.pick({
 });
 
 function RouteComponent() {
-  const [image, setImage] = useState(`/sprites/avatar/Icon${1}.png`);
+  const [avatarImage, setAvatarImage] = useState(`/sprites/avatar/Icon${1}.png`);
   const navigate = useNavigate();
   const [freePoints, setFreePoints] = useState(BASE_FREE_POINTS);
   const [stats, setStats] = useState(BASE_STATS);
@@ -36,9 +36,11 @@ function RouteComponent() {
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = (values: z.infer<typeof heroNameSchema>) => {
+    console.log(avatarImage)
     mutation.mutate(
       {
-        image,
+        avatarImage:avatarImage ,
+        characterImage: '',
         name: values.name,
         freeStatPoints: freePoints,
         modifier: {
@@ -67,7 +69,7 @@ function RouteComponent() {
     <Background imageUrl="/sprites/shrine6.png">
       <div className="m-auto flex max-w-5xl flex-col gap-4 rounded-lg border bg-black/70 p-4 text-[15px] backdrop-blur-md md:flex-row md:p-10">
         <div className="mx-auto">
-          <HeroAvatarList avatar={image} setAvatar={setImage} />
+          <HeroAvatarList avatar={avatarImage} setAvatar={setAvatarImage} />
         </div>
 
         <div className="mx-auto flex max-w-[220px] flex-col gap-4">
@@ -94,6 +96,7 @@ function RouteComponent() {
                 currentStats={stats}
                 reset={false}
                 baseStats={BASE_STATS}
+
               />
               <Button className="w-full" type="submit" disabled={isLoading} variant={'default'}>
                 {isLoading ? 'Creating... ' : 'Create Hero'}

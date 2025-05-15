@@ -1,5 +1,8 @@
+import { ArmorIcon } from '@/components/game-icons/ArmorIcon';
+import { ShieldIcon } from '@/components/game-icons/ShieldIcon';
+import { StaffIcon } from '@/components/game-icons/StaffIcon';
 import { Separator } from '@/components/ui/separator';
-import { useHero } from '@/hooks/useHero';
+import { useHero } from '@/features/hero/hooks/useHero';
 import { HeroStats } from '@/shared/types';
 import { useEffect, useRef, useState } from 'react';
 
@@ -7,13 +10,13 @@ import { Stats } from './Stats';
 
 export const Modifiers = () => {
   const hero = useHero();
-
+  if (!hero) throw new Error('Hero not found');
   const initialHeroStats = {
-    strength: hero.modifier.strength,
-    constitution: hero.modifier.constitution,
-    dexterity: hero.modifier.dexterity,
-    intelligence: hero.modifier.intelligence,
-    luck: hero.modifier.luck,
+    strength: 0,
+    constitution: 0,
+    dexterity: 0,
+    intelligence: 0,
+    luck: 0,
   };
   const modifiers = hero.modifier;
   const [stats, setStats] = useState<HeroStats>(initialHeroStats);
@@ -46,12 +49,12 @@ export const Modifiers = () => {
         baseStats={baseStats.current}
         baseFreePoints={baseFreePoints.current}
       />
-      {hero.modifier.intelligence}
       <h2 className="text-center text-xl font-semibold">Modifier</h2>
       <Separator />
       <div className="text-muted-foreground">
-        <div className="flex items-center">
-          <img src="sprites/new/shield.png" className="size-8" style={{ imageRendering: 'pixelated' }} />
+        <div className="flex items-center gap-1">
+          <ShieldIcon />
+          {/* <ArmorIcon /> */}
           <p className="text-stone-600">DEF</p>
         </div>
         <p>
@@ -83,7 +86,8 @@ export const Modifiers = () => {
       <Separator />
       <div className="text-muted-foreground">
         <div className="flex items-center">
-          <img src="sprites/new/staff.png" className="size-8" style={{ imageRendering: 'pixelated' }} />
+          <StaffIcon />
+
           <p className="text-blue-400">MAGIC</p>
         </div>
 

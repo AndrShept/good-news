@@ -1,6 +1,8 @@
 import { cn } from '@/lib/utils';
 import { Equipment, EquipmentSlotType } from '@/shared/types';
 
+import { CharacterSprite  } from './CharacterSprite';
+
 interface Props {
   equipments: Equipment[];
 }
@@ -93,9 +95,7 @@ export const Equipments = ({ equipments }: Props) => {
           </li>
         ))}
       </ul>
-      <div className="flex h-[250px] w-[150px] shrink-0 items-center justify-center">
-        <img className="size-full object-contain" src={'/sprites/new/mobs.jpg'} alt="hero-image" style={{ imageRendering: 'pixelated' }} />
-      </div>
+      <CharacterSprite  src={'/sprites/new/shade.webp'} />
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(5, 10).map((equipment) => (
           <li className="flex size-12 border" key={equipment.id}>
