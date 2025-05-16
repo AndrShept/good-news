@@ -13,8 +13,13 @@ export const modifierTable = pgTable('modifier', {
   constitution: integer().default(10).notNull(),
   luck: integer().default(5).notNull(),
 
+  maxHealth: integer().default(0).notNull(),
+  maxMana: integer().default(0).notNull(),
+
   manaRegeneration: integer().default(0).notNull(),
   healthRegeneration: integer().default(0).notNull(),
+  restoreHealth: integer().default(0).notNull(),
+  restoreMana: integer().default(0).notNull(),
 
   armor: integer().default(0).notNull(),
   magicResistances: integer().default(0).notNull(),
@@ -27,8 +32,6 @@ export const modifierTable = pgTable('modifier', {
   meleeDamage: integer().default(0).notNull(),
   meleeDamageCritPower: integer().default(0).notNull(),
   meleeDamageCritChance: integer().default(0).notNull(),
-
-
 
   createdAt: timestamp('created_at', {
     withTimezone: true,

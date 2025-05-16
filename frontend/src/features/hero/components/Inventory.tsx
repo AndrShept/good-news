@@ -1,11 +1,13 @@
 import { useHero } from '@/features/hero/hooks/useHero';
+import { GameItemType } from '@/shared/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { getInventoryOptions } from '../api/get-inventory';
 
 export const Inventory = () => {
   const { inventorySlotMax, id } = useHero();
+  const [gameItemType, setGameItemType] = useState<GameItemType>('AMULET');
   const { data: inventories } = useSuspenseQuery(getInventoryOptions(id));
   const inventoriesData = useMemo(() => {
     return Array.from({ length: inventorySlotMax }, (_, idx) => {
