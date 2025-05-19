@@ -7,7 +7,7 @@ import { heroTable } from './hero-schema';
 export const inventoryItemTable = pgTable('inventory_item', {
   id: text().primaryKey().notNull(),
 
-  quantity: integer().notNull().default(0),
+  quantity: integer().notNull().default(1),
 
   gameItemId: text()
     .notNull()

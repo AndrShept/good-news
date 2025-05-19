@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { heroTable, inventoryItemTable, modifierTable } from '../db/schema';
+import { gameItemTable, heroTable, inventoryItemTable, modifierTable } from '../db/schema';
 import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/constants';
 import { generateRandomUuid } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
@@ -41,7 +41,7 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post('/create', loggedIn, zValidator('form', createHeroSchema), async (c) => {
-    const { name,  avatarImage, freeStatPoints, modifier: heroStats } = c.req.valid('form');
+    const { name, avatarImage, freeStatPoints, modifier: heroStats } = c.req.valid('form');
     const userId = c.get('user')?.id as string;
 
     const nameExist = await db.query.heroTable.findFirst({
@@ -242,6 +242,87 @@ export const heroRouter = new Hono<Context>()
         message: 'inventories fetched !',
         success: true,
         data: inventories as InventoryItem[],
+      });
+    },
+  )
+  .post(
+    '/:id/shop/items/:itemId/buy',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+        itemId: z.string(),
+      }),
+    ),
+    async (c) => {
+      const { id, itemId } = c.req.valid('param');
+      const userId = c.get('user')?.id as string;
+
+      const gameItem = await db.query.gameItemTable.findFirst({
+        where: eq(gameItemTable.id, itemId),
+      });
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+      if (!gameItem) {
+        throw new HTTPException(404, {
+          message: 'game item not found',
+        });
+      }
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      if (hero.userId !== userId) {
+        throw new HTTPException(404, {
+          message: 'access denied',
+        });
+      }
+      if (hero.currentInventorySlots === hero.maxInventorySlots) {
+        return c.json<ErrorResponse>({
+          success: false,
+          message: 'Inventory is  full',
+          isShowError: true,
+        });
+      }
+      if (hero.goldCoins < gameItem.price) {
+        return c.json<ErrorResponse>({
+          success: false,
+          message: 'Not enough gold',
+          isShowError: true,
+        });
+      }
+      const inventoryItem = await db.query.inventoryItemTable.findFirst({
+        where: eq(inventoryItemTable.gameItemId, itemId),
+      });
+      if (gameItem.type === 'POTION' && inventoryItem) {
+        await db
+          .update(inventoryItemTable)
+          .set({
+            quantity: inventoryItem.quantity + 1,
+          })
+          .where(eq(inventoryItemTable.id, inventoryItem.id));
+      }
+
+      const [newInventoryItem] = await db.transaction(async (tx) => {
+        await tx
+          .update(heroTable)
+          .set({
+            currentInventorySlots: hero.currentInventorySlots + 1,
+          })
+          .where(eq(heroTable.id, id));
+        return await tx.insert(inventoryItemTable).values({
+          id: generateRandomUuid(),
+          gameItemId: itemId,
+          heroId: id,
+        });
+      });
+      return c.json<SuccessResponse<InventoryItem>>({
+        success: true,
+        message: 'You success buy item',
+        data: newInventoryItem,
       });
     },
   );

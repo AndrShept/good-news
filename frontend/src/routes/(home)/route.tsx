@@ -18,7 +18,7 @@ function App() {
           <NavBar />
         </aside>
         <main className="flex size-full flex-col p-3">
-          {pathname !== '/' && <BreadCrumb />}
+          {pathname !== '/' && !pathname.includes('/game') && <BreadCrumb />}
           <Outlet />
         </main>
       </section>

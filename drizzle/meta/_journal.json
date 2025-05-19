@@ -64,6 +64,34 @@
       "when": 1747383796624,
       "tag": "0008_lonely_mother_askani",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1747400748672,
+      "tag": "0009_bizarre_thing",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1747401013837,
+      "tag": "0010_quick_sprite",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1747661584001,
+      "tag": "0011_icy_imperial_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1747662291701,
+      "tag": "0012_fair_bloodstrike",
+      "breakpoints": true
     }
   ]
 }

@@ -34,7 +34,9 @@ export const gameItemTable = pgTable('game_item', {
 
   modifierId: text()
     .notNull()
-    .references(() => modifierTable.id),
+    .references(() => modifierTable.id, {
+      onDelete: 'cascade'
+    }),
 
   createdAt: timestamp('created_at', {
     withTimezone: true,

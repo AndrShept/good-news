@@ -1,0 +1,1 @@
+ALTER TABLE "inventory_item" ALTER COLUMN "quantity" SET DEFAULT 1;

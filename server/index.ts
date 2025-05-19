@@ -15,6 +15,7 @@ import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
 import { heroRouter } from './routes/hero-router';
 import { postRouter } from './routes/post-router';
+import { shopRouter } from './routes/shop-router';
 
 const app = new Hono<Context>();
 
@@ -27,7 +28,8 @@ const routes = app
   .route('/auth', authRouter)
   .route('/post', postRouter)
   .route('/comment', commentRouter)
-  .route('/hero', heroRouter);
+  .route('/hero', heroRouter)
+  .route('/shop', shopRouter);
 
 // app.onError((err, c) => {
 //   // Обробка помилки підключення до бази даних

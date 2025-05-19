@@ -58,7 +58,7 @@ function RouteComponent() {
           }
           if (data.success) {
             navigate({
-              to: '/game',
+              to: '/',
             });
           }
         },

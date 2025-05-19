@@ -126,6 +126,7 @@ export type RarityType = (typeof rarityEnum.enumValues)[number];
 export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
+export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;
 export type Equipment = InferSelectModel<typeof equipmentTable>;
 export type InventoryItem = InferSelectModel<typeof inventoryItemTable> & {
   gameItem: GameItem;
@@ -160,14 +161,12 @@ export const createHeroSchema = createInsertSchema(heroTable, {
   freeStatPoints: z.number({ coerce: true }),
   avatarImage: z.string().min(1),
   // characterImage: z.string().min(1),
-
 })
   .pick({
     name: true,
     avatarImage: true,
     freeStatPoints: true,
-    characterImage: true
-
+    characterImage: true,
   })
   .extend({
     modifier: z.string().transform((val) => JSON.parse(val) as HeroStats),

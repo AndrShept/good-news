@@ -1,17 +1,20 @@
 import { relations } from 'drizzle-orm';
 import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
+import { gameItemTable } from './game-item-schema';
+import { heroTable } from './hero-schema';
+
 export const modifierTable = pgTable('modifier', {
   id: text().primaryKey().notNull(),
 
   maxDamage: integer().default(0).notNull(),
   minDamage: integer().default(0).notNull(),
 
-  strength: integer().default(10).notNull(),
-  dexterity: integer().default(10).notNull(),
-  intelligence: integer().default(10).notNull(),
-  constitution: integer().default(10).notNull(),
-  luck: integer().default(5).notNull(),
+  strength: integer().default(0).notNull(),
+  dexterity: integer().default(0).notNull(),
+  intelligence: integer().default(0).notNull(),
+  constitution: integer().default(0).notNull(),
+  luck: integer().default(0).notNull(),
 
   maxHealth: integer().default(0).notNull(),
   maxMana: integer().default(0).notNull(),
@@ -43,3 +46,8 @@ export const modifierTable = pgTable('modifier', {
     mode: 'string',
   }),
 });
+
+const modifierRelations = relations(modifierTable, ({ many }) => ({
+  gameItems: many(gameItemTable),
+  heroes: many(heroTable),
+}));

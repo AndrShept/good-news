@@ -41,7 +41,7 @@ function SignIn() {
       });
     }
     if (res.success) {
-      await queryClient.invalidateQueries();
+     await queryClient.invalidateQueries();
       navigate({ to: '/' });
     }
   };

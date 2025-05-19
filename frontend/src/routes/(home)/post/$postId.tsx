@@ -13,11 +13,11 @@ import { zodValidator } from '@tanstack/zod-adapter';
 import * as m from 'motion/react-m';
 import React from 'react';
 
-import { SearchSchema } from '..';
 import { CommentCard } from '@/features/comment/components/CommentCard';
 import { getPostQueryOptions } from '@/features/post/api/get-post';
 import { getPostCommentsQueryOptions } from '@/features/post/api/get-post-comments';
 import { createPostComment } from '@/features/post/api/create-post-comments';
+import { SearchSchema } from '.';
 
 export const Route = createFileRoute('/(home)/post/$postId')({
   component: PostPage,

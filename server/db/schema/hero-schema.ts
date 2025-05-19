@@ -16,6 +16,7 @@ export const heroTable = pgTable('hero', {
   premiumCoins: integer().default(0).notNull(),
   isInBattle: boolean().default(false).notNull(),
   isInDungeon: boolean().default(false).notNull(),
+  isOnline: boolean().default(true).notNull(),
 
   freeStatPoints: integer().default(10).notNull(),
 
@@ -24,8 +25,8 @@ export const heroTable = pgTable('hero', {
   maxHealth: integer().default(0).notNull(),
   maxMana: integer().default(0).notNull(),
 
-  inventorySlotCount: integer().default(40).notNull(),
-  inventorySlotMax: integer().default(40).notNull(),
+  currentInventorySlots : integer().default(40).notNull(),
+  maxInventorySlots: integer().default(40).notNull(),
 
   currentExperience: integer().default(0).notNull(),
   maxExperience: integer().default(100).notNull(),

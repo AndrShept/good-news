@@ -1,11 +1,12 @@
 import { cn } from '@/lib/utils';
+import React, { ComponentProps } from 'react';
 
-export const BackpackIcon = ({ className }: { className?: string }) => {
+type Props = ComponentProps<'div'>;
+
+export const BackpackIcon = ({ className = 'size-8', ...props }: Props) => {
   return (
-    <img
-      className={cn('size-8', className)}
-      src="/sprites/icons/backpack.png"
-      alt="backpack-image"
-    />
+    <div className={cn('p-0.5', className)}>
+      <img style={{ imageRendering: 'pixelated' }} className="size-full object-contain" src="/sprites/new/backpack.png" alt="shield-icon" />
+    </div>
   );
 };

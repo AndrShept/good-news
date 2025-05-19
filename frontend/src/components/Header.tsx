@@ -1,13 +1,14 @@
-import { useAuth } from '@/features/auth/hooks/useAuth';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { LogOut } from '@/features/auth/api/logout';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { MenuIcon } from 'lucide-react';
 
 import { NavBar } from './NavBar';
 import { UserAvatar } from './UserAvatar';
+import { LogoIcon } from './game-icons/LogoIcon';
 import { Button } from './ui/button';
-import { LogOut } from '@/features/auth/api/logout';
 
 export const Header = () => {
   const user = useAuth();
@@ -15,7 +16,9 @@ export const Header = () => {
   return (
     <header className="bg-background/50 sticky top-0 z-50 flex h-14 border-b p-3 backdrop-blur-sm">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between">
-        <Link to={'/'}>🎇</Link>
+        <Link to={'/'}>
+          <LogoIcon />
+        </Link>
 
         <section className="flex items-center gap-2">
           {user && (
