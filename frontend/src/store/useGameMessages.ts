@@ -1,3 +1,4 @@
+import { GameItem, InventoryItem, SuccessResponse } from '@/shared/types';
 import { create } from 'zustand';
 
 export const gameMessageType = {
@@ -6,22 +7,22 @@ export const gameMessageType = {
   error: 'ERROR',
   success: 'SUCCESS',
 } as const;
-export interface IGameMessage<T = unknown> {
+export interface IGameMessage {
   text: string;
-  data?: T | null;
+  data?: InventoryItem;
   success?: boolean;
   type: keyof typeof gameMessageType;
   createdAt?: number;
 }
 interface GameMessagesStore {
   gameMessages: IGameMessage[];
-  setGameMessage: (newMessage: IGameMessage) => void;
+  setGameMessage:(newMessage: IGameMessage) => void;
   clearGameMessage: () => void;
 }
 
 export const useGameMessages = create<GameMessagesStore>((set) => ({
   gameMessages: [],
-  setGameMessage: (newMessage) => set((state) => ({ gameMessages: [...state.gameMessages, { ...newMessage, createdAt: Date.now() }] })),
+  setGameMessage: (newMessage) => set((state) => ({ gameMessages: [...state.gameMessages, { ...newMessage, createdAt: Date.now()  }] })),
   clearGameMessage: () => set({ gameMessages: [] }),
 }));
 

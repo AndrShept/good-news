@@ -25,7 +25,7 @@ export const heroTable = pgTable('hero', {
   maxHealth: integer().default(0).notNull(),
   maxMana: integer().default(0).notNull(),
 
-  currentInventorySlots : integer().default(40).notNull(),
+  currentInventorySlots : integer().default(0).notNull(),
   maxInventorySlots: integer().default(40).notNull(),
 
   currentExperience: integer().default(0).notNull(),

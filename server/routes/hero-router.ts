@@ -20,7 +20,23 @@ export const heroRouter = new Hono<Context>()
 
     async (c) => {
       const id = c.get('user')?.id as string;
+
       const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.userId, id),
+      });
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      const inventoryCount = await db.$count(inventoryItemTable, eq(inventoryItemTable.heroId, hero.id));
+      await db
+        .update(heroTable)
+        .set({
+          currentInventorySlots: inventoryCount,
+        })
+        .where(eq(heroTable.id, hero.id));
+      const updatedHero = await db.query.heroTable.findFirst({
         where: eq(heroTable.userId, id),
         with: {
           modifier: true,
@@ -28,15 +44,10 @@ export const heroRouter = new Hono<Context>()
         },
       });
 
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
       return c.json<SuccessResponse<Hero>>({
         success: true,
         message: 'hero fetched',
-        data: hero as Hero,
+        data: updatedHero as Hero,
       });
     },
   )
@@ -261,6 +272,9 @@ export const heroRouter = new Hono<Context>()
 
       const gameItem = await db.query.gameItemTable.findFirst({
         where: eq(gameItemTable.id, itemId),
+        with: {
+          modifier: true,
+        },
       });
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
@@ -276,34 +290,64 @@ export const heroRouter = new Hono<Context>()
         });
       }
       if (hero.userId !== userId) {
-        throw new HTTPException(404, {
+        throw new HTTPException(403, {
           message: 'access denied',
         });
       }
-      if (hero.currentInventorySlots === hero.maxInventorySlots) {
-        return c.json<ErrorResponse>({
-          success: false,
-          message: 'Inventory is  full',
-          isShowError: true,
-        });
+      if (hero.currentInventorySlots >= hero.maxInventorySlots) {
+        return c.json<ErrorResponse>(
+          {
+            success: false,
+            message: 'Inventory is  full',
+            isShowError: true,
+          },
+          400,
+        );
       }
       if (hero.goldCoins < gameItem.price) {
-        return c.json<ErrorResponse>({
-          success: false,
-          message: 'Not enough gold',
-          isShowError: true,
-        });
+        return c.json<ErrorResponse>(
+          {
+            success: false,
+            message: 'Not enough gold',
+            isShowError: true,
+          },
+          422,
+        );
       }
       const inventoryItem = await db.query.inventoryItemTable.findFirst({
         where: eq(inventoryItemTable.gameItemId, itemId),
+        with: {
+          gameItem: {
+            with: {
+              modifier: true,
+            },
+          },
+        },
       });
       if (gameItem.type === 'POTION' && inventoryItem) {
-        await db
-          .update(inventoryItemTable)
-          .set({
-            quantity: inventoryItem.quantity + 1,
-          })
-          .where(eq(inventoryItemTable.id, inventoryItem.id));
+        await db.transaction(async (tx) => {
+          await tx
+            .update(heroTable)
+            .set({
+              goldCoins: hero.goldCoins - gameItem.price,
+            })
+            .where(eq(heroTable.id, id));
+          await tx
+            .update(inventoryItemTable)
+            .set({
+              quantity: inventoryItem.quantity + 1,
+            })
+            .where(eq(inventoryItemTable.id, inventoryItem.id));
+        });
+
+        return c.json<SuccessResponse<InventoryItem>>(
+          {
+            success: true,
+            message: 'You success buy item',
+            data: inventoryItem,
+          },
+          200,
+        );
       }
 
       const [newInventoryItem] = await db.transaction(async (tx) => {
@@ -313,16 +357,29 @@ export const heroRouter = new Hono<Context>()
             currentInventorySlots: hero.currentInventorySlots + 1,
           })
           .where(eq(heroTable.id, id));
-        return await tx.insert(inventoryItemTable).values({
-          id: generateRandomUuid(),
-          gameItemId: itemId,
-          heroId: id,
-        });
+        await tx
+          .update(heroTable)
+          .set({
+            goldCoins: hero.goldCoins - gameItem.price,
+          })
+          .where(eq(heroTable.id, id));
+        return await tx
+          .insert(inventoryItemTable)
+          .values({
+            id: generateRandomUuid(),
+            gameItemId: itemId,
+            heroId: id,
+          })
+          .returning();
       });
-      return c.json<SuccessResponse<InventoryItem>>({
-        success: true,
-        message: 'You success buy item',
-        data: newInventoryItem,
-      });
+
+      return c.json<SuccessResponse<InventoryItem>>(
+        {
+          success: true,
+          message: 'You success buy item',
+          data: { ...newInventoryItem, gameItem },
+        },
+        201,
+      );
     },
   );

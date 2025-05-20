@@ -6,18 +6,18 @@ import { useMemo, useState } from 'react';
 import { getInventoryOptions } from '../api/get-inventory';
 
 export const Inventory = () => {
-  const { inventorySlotMax, id } = useHero();
+  const { maxInventorySlots, id } = useHero();
   const [gameItemType, setGameItemType] = useState<GameItemType>('AMULET');
   const { data: inventories } = useSuspenseQuery(getInventoryOptions(id));
   const inventoriesData = useMemo(() => {
-    return Array.from({ length: inventorySlotMax }, (_, idx) => {
+    return Array.from({ length: maxInventorySlots }, (_, idx) => {
       const item = inventories?.data?.[idx];
       if (item) {
         return item;
       }
       return null;
     });
-  }, [inventories?.data, inventorySlotMax]);
+  }, [inventories?.data, maxInventorySlots]);
   return (
     <ul className="flex h-fit flex-wrap gap-1">
       {inventoriesData.map((inventory, idx) => (

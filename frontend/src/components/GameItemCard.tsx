@@ -1,3 +1,4 @@
+import { ShopBuyButton } from '@/features/shop/components/ShopBuyButton';
 import { GameItem } from '@/shared/types';
 import React from 'react';
 
@@ -18,7 +19,7 @@ export const GameItemCard = ({ gameItem }: Props) => {
           </div>
         </div>
         <div className="">
-          <h3 className="capitalize line-clamp-2">{gameItem.name}</h3>
+          <h3 className="line-clamp-2 capitalize">{gameItem.name}</h3>
           <p className="text-muted-foreground/30 text-xs">{gameItem.type}</p>
           <ModifierInfoCard modifier={gameItem.modifier} />
         </div>
@@ -29,9 +30,7 @@ export const GameItemCard = ({ gameItem }: Props) => {
           <p className="text-muted-foreground text-xs">{gameItem.price}</p>
         </div>
         <div>
-          <Button variant={'outline'} className="">
-            Buy
-          </Button>
+          <ShopBuyButton itemId={gameItem.id} />
         </div>
       </div>
     </li>

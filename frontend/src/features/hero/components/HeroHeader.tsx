@@ -36,7 +36,7 @@ export const HeroHeader = () => {
           <BackpackIcon />
         </Button>
       </section>
-      <section className="flex items-center gap-0.5">
+      <section className="flex items-center gap-1 text-[15px]">
         <div className="flex items-center gap-0.5">
           <GoldIcon classname="size-6" />
           <p>{hero.goldCoins}</p>
@@ -44,6 +44,10 @@ export const HeroHeader = () => {
         <div className="flex items-center gap-0.5">
           <PremIcon classname="size-6" />
           <p>{hero.premiumCoins}</p>
+        </div>
+        <div className="flex items-center">
+          <BackpackIcon />
+          <p>{hero.currentInventorySlots}</p>/<p>{hero.maxInventorySlots}</p>
         </div>
       </section>
     </header>

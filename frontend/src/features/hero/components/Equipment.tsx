@@ -95,7 +95,7 @@ export const Equipments = ({ equipments }: Props) => {
           </li>
         ))}
       </ul>
-      <CharacterSprite  src={'/sprites/new/mage1.webp'} />
+      <CharacterSprite  src={'/sprites/new/newb-mage.webp'} />
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(5, 10).map((equipment) => (
           <li className="flex size-12 border" key={equipment.id}>
