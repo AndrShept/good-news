@@ -1,38 +1,33 @@
-import { ShopBuyButton } from '@/features/shop/components/ShopBuyButton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { GameItem } from '@/shared/types';
 import React from 'react';
-
-import { ModifierInfoCard } from './ModifierInfoCard';
-import { GoldIcon } from './game-icons/GoldIcon';
-import { Button } from './ui/button';
+import { GameItemCardShowInfo } from './GameItemCardShowInfo';
 
 interface Props {
-  gameItem: GameItem;
+  gameItem: GameItem | undefined;
+  quantity?: number;
 }
-export const GameItemCard = ({ gameItem }: Props) => {
+
+export const GameItemCard = ({ gameItem, quantity }: Props) => {
+  console.log(gameItem)
   return (
-    <li key={gameItem.id} className="flex flex-col gap-4 border p-4">
-      <section className="flex gap-4">
-        <div>
-          <div className="size-8 shrink-0">
-            <img className="size-full object-contain" src={gameItem.image} alt={'item-image'} />
-          </div>
-        </div>
-        <div className="">
-          <h3 className="line-clamp-2 capitalize">{gameItem.name}</h3>
-          <p className="text-muted-foreground/30 text-xs">{gameItem.type}</p>
-          <ModifierInfoCard modifier={gameItem.modifier} />
-        </div>
-      </section>
-      <div className="mt-auto flex justify-between">
-        <div className="flex items-center gap-0.5">
-          <GoldIcon classname="size-6" />
-          <p className="text-muted-foreground text-xs">{gameItem.price}</p>
-        </div>
-        <div>
-          <ShopBuyButton itemId={gameItem.id} />
-        </div>
-      </div>
+    <li className="hover:border-primary/20 relative size-12 border">
+      {gameItem ? (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger className="size-full">
+              {' '}
+              <img className="size-full object-contain opacity-85 hover:opacity-100" src={gameItem.image} alt="inventory-image" />
+            </TooltipTrigger>
+            <TooltipContent sideOffset={10} align='start' side="right">
+             <GameItemCardShowInfo gameItem={gameItem} />
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ) : null}
+      {quantity && quantity > 1 && (
+        <div className="absolute bottom-1 right-0 size-3 rounded-full text-center text-[11px] font-semibold">{quantity}</div>
+      )}
     </li>
   );
 };

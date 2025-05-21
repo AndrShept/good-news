@@ -8,7 +8,6 @@ export const GameMessage = () => {
   const ref = useRef<null | HTMLUListElement>(null);
   const gameMessages = useGameMessages((state) => state.gameMessages);
 
-  console.log(gameMessages);
   useEffect(() => {
     ref.current?.lastElementChild?.scrollIntoView({
       block: 'nearest',

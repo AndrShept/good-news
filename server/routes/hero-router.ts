@@ -245,14 +245,14 @@ export const heroRouter = new Hono<Context>()
       const inventories = await db.query.inventoryItemTable.findMany({
         where: eq(inventoryItemTable.heroId, id),
         with: {
-          gameItem: true,
+          gameItem: { with: { modifier: true } },
         },
       });
 
       return c.json<SuccessResponse<InventoryItem[]>>({
         message: 'inventories fetched !',
         success: true,
-        data: inventories as InventoryItem[],
+        data: inventories,
       });
     },
   )

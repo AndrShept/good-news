@@ -13,7 +13,6 @@ export const HeroHeader = () => {
   const hero = useHero();
   const isOpen = useBackpack((state) => state.isOpen);
   const onOpen = useBackpack((state) => state.onOpen);
-  console.log(isOpen);
   return (
     <header className="mb-3 flex h-10 items-center justify-between">
       <section className="flex gap-0.5">
