@@ -12,7 +12,7 @@ interface Props {
 }
 export const GameItemCardShowInfo = ({ gameItem, isShowBuyButton = false, isShowPrice = false }: Props) => {
   return (
-    <li key={gameItem.id} className="flex flex-col gap-4 border p-4">
+    <article key={gameItem.id} className="flex flex-col gap-4 border p-4">
       <section className="flex gap-4">
         <div>
           <div className="size-8 shrink-0">
@@ -38,6 +38,6 @@ export const GameItemCardShowInfo = ({ gameItem, isShowBuyButton = false, isShow
           </div>
         )}
       </div>
-    </li>
+    </article>
   );
 };

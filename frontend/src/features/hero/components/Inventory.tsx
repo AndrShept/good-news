@@ -1,9 +1,7 @@
 import { GameItemCard } from '@/components/GameItemCard';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { GameItemType } from '@/shared/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { p } from 'motion/react-m';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { getInventoryOptions } from '../api/get-inventory';
 
@@ -21,8 +19,8 @@ export const Inventory = () => {
   }, [inventories?.data, maxInventorySlots]);
   return (
     <ul className="flex h-fit flex-wrap gap-1">
-      {inventoriesData.map((inventory) => (
-        <GameItemCard key={inventory?.id} gameItem={inventory?.gameItem} quantity={inventory?.quantity} />
+      {inventoriesData.map((inventory, idx) => (
+        <GameItemCard key={inventory?.id ?? idx} gameItem={inventory?.gameItem} quantity={inventory?.quantity} />
       ))}
     </ul>
   );

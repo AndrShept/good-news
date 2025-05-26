@@ -38,7 +38,7 @@ export const ModifierInfoCard = ({ modifier }: Props) => {
   return (
     <ul className="mt-2 flex flex-col gap-0.5 text-[15px]">
       {modifiers.map((modifier) => (
-        <li className="flex items-center gap-1">
+        <li key={modifier.name} className="flex items-center gap-1">
           <p className="text-green-500">+{modifier.value}</p>
           <p className="text-muted-foreground">{modifier.name}</p>
         </li>
