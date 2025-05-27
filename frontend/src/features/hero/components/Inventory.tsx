@@ -20,7 +20,7 @@ export const Inventory = () => {
   return (
     <ul className="flex h-fit flex-wrap gap-1">
       {inventoriesData.map((inventory, idx) => (
-        <GameItemCard key={inventory?.id ?? idx} gameItem={inventory?.gameItem} quantity={inventory?.quantity} />
+        <GameItemCard key={inventory?.id ?? idx} item={inventory ? inventory : undefined} />
       ))}
     </ul>
   );

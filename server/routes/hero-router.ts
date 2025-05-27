@@ -491,7 +491,7 @@ export const heroRouter = new Hono<Context>()
       }
       return c.json<SuccessResponse>({
         success: true,
-        message: 'ОКОК ОКОКОК  ОКО ККОКО',
+        message: `ОКОК ОКОКОК  ОКО ККОКО ${newEQuipSlot}`,
       });
     },
   );
