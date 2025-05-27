@@ -27,6 +27,7 @@ export const gameItemTable = pgTable('game_item', {
   id: text().primaryKey().notNull(),
 
   type: gameItemEnum().notNull(),
+  weaponHand: weaponHandEnum(), 
   name: text().notNull(),
   image: text().notNull(),
   price: integer().default(0).notNull(),

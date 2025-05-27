@@ -1,5 +1,15 @@
 import { BASE_STATS, RESET_STATS_COST } from '@/shared/constants';
-import { type ErrorResponse, type Hero, type InventoryItem, type SuccessResponse, createHeroSchema, statsSchema } from '@/shared/types';
+import {
+  type EquipmentSlotType,
+  type ErrorResponse,
+  type GameItemType,
+  type Hero,
+  type InventoryItem,
+  type SuccessResponse,
+  type WeaponHandType,
+  createHeroSchema,
+  statsSchema,
+} from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -8,7 +18,7 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { gameItemTable, heroTable, inventoryItemTable, modifierTable } from '../db/schema';
+import { equipmentTable, gameItemTable, heroTable, inventoryItemTable, modifierTable } from '../db/schema';
 import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/constants';
 import { generateRandomUuid } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
@@ -381,5 +391,107 @@ export const heroRouter = new Hono<Context>()
         },
         201,
       );
+    },
+  )
+  .post(
+    '/:id/inventory/:itemId/equip',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+        itemId: z.string(),
+      }),
+    ),
+
+    async (c) => {
+      const { id, itemId } = c.req.valid('param');
+      const userId = c.get('user')?.id as string;
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      if (hero.userId !== userId) {
+        throw new HTTPException(403, {
+          message: 'access denied',
+        });
+      }
+      const inventoryItem = await db.query.inventoryItemTable.findFirst({
+        where: eq(inventoryItemTable.id, itemId),
+        with: {
+          gameItem: {
+            with: {
+              modifier: true,
+            },
+          },
+        },
+      });
+      if (!inventoryItem) {
+        throw new HTTPException(404, {
+          message: 'inventory item not found',
+        });
+      }
+      if (inventoryItem.gameItem.type === 'MISC') {
+        throw new HTTPException(403, {
+          message: 'You cannot equip this item.',
+        });
+      }
+      const getSlot = async (itemType: GameItemType, weaponHand: WeaponHandType | null): Promise<EquipmentSlotType | null> => {
+        if (weaponHand === 'TWO_HANDED') {
+          const findRightHandSlot = await db.query.equipmentTable.findFirst({
+            where: eq(equipmentTable.slot, 'RIGHT_HAND'),
+          });
+          const findLeftHandSlot = await db.query.equipmentTable.findFirst({
+            where: eq(equipmentTable.slot, 'LEFT_HAND'),
+          });
+          if (findRightHandSlot || findLeftHandSlot) {
+            return null;
+          }
+        }
+        if (weaponHand === 'ONE_HANDED') {
+          const findRightHandSlot = await db.query.equipmentTable.findFirst({
+            where: eq(equipmentTable.slot, 'RIGHT_HAND'),
+          });
+          if (!findRightHandSlot) {
+            return 'RING_RIGHT';
+          }
+          const findLeftHandSlot = await db.query.equipmentTable.findFirst({
+            where: eq(equipmentTable.slot, 'LEFT_HAND'),
+          });
+          if (!findLeftHandSlot) {
+            return 'LEFT_HAND';
+          }
+          return null;
+        }
+        if (itemType === 'SHIELD') {
+          const findLeftHandSlot = await db.query.equipmentTable.findFirst({
+            where: eq(equipmentTable.slot, 'LEFT_HAND'),
+          });
+          if (findLeftHandSlot) {
+            return null;
+          }
+          return 'LEFT_HAND';
+        }
+
+        return itemType;
+      };
+
+      const newEQuipSlot = await getSlot(inventoryItem.gameItem.type, inventoryItem.gameItem.weaponHand);
+      if (!newEQuipSlot) {
+        return c.json<ErrorResponse>({
+          success: false,
+          message: 'ЗНІМИ ВЕЩЬ',
+          isShowError: true,
+        });
+      }
+      return c.json<SuccessResponse>({
+        success: true,
+        message: 'ОКОК ОКОКОК  ОКО ККОКО',
+      });
     },
   );
