@@ -1,7 +1,8 @@
+import { GameItemCard } from '@/components/GameItemCard';
 import { cn } from '@/lib/utils';
 import { Equipment, EquipmentSlotType } from '@/shared/types';
 
-import { CharacterSprite  } from './CharacterSprite';
+import { CharacterSprite } from './CharacterSprite';
 
 interface Props {
   equipments: Equipment[];
@@ -74,14 +75,14 @@ export const Equipments = ({ equipments }: Props) => {
     },
     {} as Record<EquipmentSlotType, Equipment>,
   );
-
+  console.log(equipmentBySlot);
   return (
     <div className="flex">
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(0, 5).map((equipment) => (
           <li className="flex size-12 border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
-              <div>GOGOGOGOG</div>
+              <GameItemCard item={equipmentBySlot[equipment.slot]} />
             ) : (
               <img
                 style={{ imageRendering: 'pixelated' }}
@@ -95,12 +96,12 @@ export const Equipments = ({ equipments }: Props) => {
           </li>
         ))}
       </ul>
-      <CharacterSprite  src={'/sprites/new/newb-mage.webp'} />
+      <CharacterSprite src={'/sprites/new/newb-mage.webp'} />
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(5, 10).map((equipment) => (
           <li className="flex size-12 border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
-              <div>GOGOGOG</div>
+              <GameItemCard item={equipmentBySlot[equipment.slot]} />
             ) : (
               <img
                 style={{ imageRendering: 'pixelated' }}

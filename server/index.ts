@@ -33,6 +33,8 @@ const routes = app
 
 // app.onError((err, c) => {
 //   // Обробка помилки підключення до бази даних
+//   console.log('err',err)
+//   console.log('c',c)
 //   if (err instanceof Error && 'code' in err && err.code === 'ECONNREFUSED') {
 //     return c.json<ErrorResponse>(
 //       {

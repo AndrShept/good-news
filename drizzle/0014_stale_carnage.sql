@@ -1,0 +1,1 @@
+ALTER TABLE "equipment" ADD COLUMN "gameItemId" text NOT NULL;

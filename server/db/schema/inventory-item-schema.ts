@@ -12,7 +12,7 @@ export const inventoryItemTable = pgTable('inventory_item', {
   gameItemId: text()
     .notNull()
     .references(() => gameItemTable.id),
-  heroId: text()
+  inventoryHeroId: text()
     .notNull()
     .references(() => heroTable.id, {
       onDelete: 'cascade',
@@ -28,13 +28,13 @@ export const inventoryItemTable = pgTable('inventory_item', {
   }),
 });
 
-export const inventoryItemRelations = relations(inventoryItemTable, ({ many, one }) => ({
+export const inventoryItemRelations = relations(inventoryItemTable, ({  one }) => ({
   gameItem: one(gameItemTable, {
     fields: [inventoryItemTable.gameItemId],
     references: [gameItemTable.id],
   }),
   hero: one(heroTable, {
-    fields: [inventoryItemTable.heroId],
+    fields: [inventoryItemTable.inventoryHeroId],
     references: [heroTable.id],
   }),
 }));

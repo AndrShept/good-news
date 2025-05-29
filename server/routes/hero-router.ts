@@ -39,7 +39,7 @@ export const heroRouter = new Hono<Context>()
           message: 'hero not found',
         });
       }
-      const inventoryCount = await db.$count(inventoryItemTable, eq(inventoryItemTable.heroId, hero.id));
+      const inventoryCount = await db.$count(inventoryItemTable, eq(inventoryItemTable.inventoryHeroId, hero.id));
       await db
         .update(heroTable)
         .set({
@@ -50,7 +50,15 @@ export const heroRouter = new Hono<Context>()
         where: eq(heroTable.userId, id),
         with: {
           modifier: true,
-          equipments: true,
+          equipments: {
+            with: {
+              gameItem: {
+                with: {
+                  modifier: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -253,7 +261,7 @@ export const heroRouter = new Hono<Context>()
       }
 
       const inventories = await db.query.inventoryItemTable.findMany({
-        where: eq(inventoryItemTable.heroId, id),
+        where: eq(inventoryItemTable.inventoryHeroId, id),
         with: {
           gameItem: { with: { modifier: true } },
         },
@@ -378,7 +386,7 @@ export const heroRouter = new Hono<Context>()
           .values({
             id: generateRandomUuid(),
             gameItemId: itemId,
-            heroId: id,
+            inventoryHeroId: id,
           })
           .returning();
       });
@@ -431,12 +439,14 @@ export const heroRouter = new Hono<Context>()
           },
         },
       });
+
+      const isNotEquipment = inventoryItem?.gameItem.type === 'MISC' || inventoryItem?.gameItem.type === 'POTION';
       if (!inventoryItem) {
         throw new HTTPException(404, {
           message: 'inventory item not found',
         });
       }
-      if (inventoryItem.gameItem.type === 'MISC') {
+      if (isNotEquipment) {
         throw new HTTPException(403, {
           message: 'You cannot equip this item.',
         });
@@ -478,7 +488,7 @@ export const heroRouter = new Hono<Context>()
           return 'LEFT_HAND';
         }
 
-        return itemType;
+        return 'BELT'
       };
 
       const newEQuipSlot = await getSlot(inventoryItem.gameItem.type, inventoryItem.gameItem.weaponHand);
@@ -489,6 +499,13 @@ export const heroRouter = new Hono<Context>()
           isShowError: true,
         });
       }
+
+      await db.insert(equipmentTable).values({
+        id: generateRandomUuid(),
+        equipmentHeroId: hero.id,
+        gameItemId: inventoryItem.gameItemId,
+        slot: newEQuipSlot,
+      });
       return c.json<SuccessResponse>({
         success: true,
         message: `ОКОК ОКОКОК  ОКО ККОКО ${newEQuipSlot}`,
