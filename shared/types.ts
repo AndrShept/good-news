@@ -8,7 +8,7 @@ import { heroTable, inventoryItemTable, modifierTable } from '../server/db/schem
 import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import type { equipmentTable, slotEnum } from '../server/db/schema/equipment-schema';
-import type { gameItemEnum, gameItemTable, rarityEnum, weaponHandEnum } from '../server/db/schema/game-item-schema';
+import type { gameItemEnum, gameItemTable, rarityEnum, weaponHandEnum, weaponTypeEnum } from '../server/db/schema/game-item-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { ApiRoutes } from '../server/index';
 
@@ -124,6 +124,7 @@ export type EquipmentSlotType = (typeof slotEnum.enumValues)[number];
 export type GameItemType = (typeof gameItemEnum.enumValues)[number];
 export type RarityType = (typeof rarityEnum.enumValues)[number];
 export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
+export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;

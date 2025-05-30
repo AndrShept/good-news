@@ -1,4 +1,4 @@
-import { GameItem, InventoryItem, SuccessResponse } from '@/shared/types';
+import { Equipment, GameItem, InventoryItem, SuccessResponse } from '@/shared/types';
 import { create } from 'zustand';
 
 export const gameMessageType = {
@@ -9,7 +9,7 @@ export const gameMessageType = {
 } as const;
 export interface IGameMessage {
   text: string;
-  data?: InventoryItem;
+  data?: InventoryItem | Equipment;
   success?: boolean;
   type: keyof typeof gameMessageType;
   createdAt?: number;

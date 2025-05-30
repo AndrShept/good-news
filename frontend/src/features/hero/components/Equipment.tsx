@@ -75,12 +75,11 @@ export const Equipments = ({ equipments }: Props) => {
     },
     {} as Record<EquipmentSlotType, Equipment>,
   );
-  console.log(equipmentBySlot);
   return (
     <div className="flex">
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(0, 5).map((equipment) => (
-          <li className="flex size-12 border" key={equipment.id}>
+          <li className="size-12 border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
               <GameItemCard item={equipmentBySlot[equipment.slot]} />
             ) : (
@@ -99,14 +98,14 @@ export const Equipments = ({ equipments }: Props) => {
       <CharacterSprite src={'/sprites/new/newb-mage.webp'} />
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(5, 10).map((equipment) => (
-          <li className="flex size-12 border" key={equipment.id}>
+          <li className="size-12 border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
               <GameItemCard item={equipmentBySlot[equipment.slot]} />
             ) : (
               <img
                 style={{ imageRendering: 'pixelated' }}
                 className={cn('size-full opacity-15 grayscale', {
-                  'm-auto size-8': equipment.slot === 'RING_LEFT' || equipment.slot === 'RING_RIGHT' || equipment.slot === 'AMULET',
+                  'm-auto mt-1 size-9': equipment.slot === 'RING_LEFT' || equipment.slot === 'RING_RIGHT' || equipment.slot === 'AMULET',
                 })}
                 src={equipment.image}
                 alt="equip_slot_image"

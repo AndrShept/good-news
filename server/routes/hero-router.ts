@@ -1,5 +1,6 @@
 import { BASE_STATS, RESET_STATS_COST } from '@/shared/constants';
 import {
+  type Equipment,
   type EquipmentSlotType,
   type ErrorResponse,
   type GameItemType,
@@ -18,7 +19,7 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { equipmentTable, gameItemTable, heroTable, inventoryItemTable, modifierTable } from '../db/schema';
+import { equipmentTable, gameItemEnum, gameItemTable, heroTable, inventoryItemTable, modifierTable, slotEnum } from '../db/schema';
 import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/constants';
 import { generateRandomUuid } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
@@ -451,7 +452,14 @@ export const heroRouter = new Hono<Context>()
           message: 'You cannot equip this item.',
         });
       }
-      const getSlot = async (itemType: GameItemType, weaponHand: WeaponHandType | null): Promise<EquipmentSlotType | null> => {
+      const getEquipSlot = async (itemType: GameItemType, weaponHand: WeaponHandType | null): Promise<EquipmentSlotType | undefined> => {
+        const findEnumSlot = slotEnum.enumValues.find((type) => type === itemType);
+        if (!findEnumSlot) {
+          throw new HTTPException(404, {
+            message: 'equip slot not find',
+          });
+        }
+
         if (weaponHand === 'TWO_HANDED') {
           const findRightHandSlot = await db.query.equipmentTable.findFirst({
             where: eq(equipmentTable.slot, 'RIGHT_HAND'),
@@ -459,14 +467,21 @@ export const heroRouter = new Hono<Context>()
           const findLeftHandSlot = await db.query.equipmentTable.findFirst({
             where: eq(equipmentTable.slot, 'LEFT_HAND'),
           });
-          if (findRightHandSlot || findLeftHandSlot) {
-            return null;
+          if (!findRightHandSlot && !findLeftHandSlot) {
+            return 'RIGHT_HAND';
           }
+          return undefined;
         }
         if (weaponHand === 'ONE_HANDED') {
           const findRightHandSlot = await db.query.equipmentTable.findFirst({
             where: eq(equipmentTable.slot, 'RIGHT_HAND'),
+            with: {
+              gameItem: true,
+            },
           });
+          if (findRightHandSlot?.gameItem.weaponHand === 'TWO_HANDED') {
+            return undefined;
+          }
           if (!findRightHandSlot) {
             return 'RING_RIGHT';
           }
@@ -476,39 +491,178 @@ export const heroRouter = new Hono<Context>()
           if (!findLeftHandSlot) {
             return 'LEFT_HAND';
           }
-          return null;
+          return undefined;
         }
         if (itemType === 'SHIELD') {
+          const findRightHandSlot = await db.query.equipmentTable.findFirst({
+            where: eq(equipmentTable.slot, 'RIGHT_HAND'),
+            with: { gameItem: true },
+          });
+          if (findRightHandSlot?.gameItem.weaponHand === 'TWO_HANDED') {
+            return undefined;
+          }
           const findLeftHandSlot = await db.query.equipmentTable.findFirst({
             where: eq(equipmentTable.slot, 'LEFT_HAND'),
           });
-          if (findLeftHandSlot) {
-            return null;
+          if (!findLeftHandSlot) {
+            return 'LEFT_HAND';
           }
-          return 'LEFT_HAND';
+          return undefined;
+        }
+        if (itemType === 'RING') {
+          const findLeftRing = await db.query.equipmentTable.findFirst({
+            where: eq(equipmentTable.slot, 'RING_LEFT'),
+          });
+          if (!findLeftRing) {
+            return 'RING_LEFT';
+          }
+          const findRightRing = await db.query.equipmentTable.findFirst({
+            where: eq(equipmentTable.slot, 'RING_RIGHT'),
+          });
+          if (!findRightRing) {
+            return 'RING_RIGHT';
+          }
+          return undefined;
         }
 
-        return 'BELT'
+        const existing = await db.query.equipmentTable.findFirst({
+          where: eq(equipmentTable.slot, findEnumSlot),
+        });
+        if (existing) {
+          return undefined;
+        }
+        return findEnumSlot;
       };
 
-      const newEQuipSlot = await getSlot(inventoryItem.gameItem.type, inventoryItem.gameItem.weaponHand);
-      if (!newEQuipSlot) {
-        return c.json<ErrorResponse>({
-          success: false,
-          message: 'ЗНІМИ ВЕЩЬ',
-          isShowError: true,
+      const newEquipSlot = await getEquipSlot(inventoryItem.gameItem.type, inventoryItem.gameItem.weaponHand);
+      if (!newEquipSlot) {
+        return c.json<ErrorResponse>(
+          {
+            success: false,
+            message: 'Please unequip the currently equipped item before replacing it.',
+            isShowError: true,
+          },
+          409,
+        );
+      }
+
+      await db.transaction(async (tx) => {
+        const existSlot = await db.query.equipmentTable.findFirst({
+          where: eq(equipmentTable.slot, newEquipSlot),
+        });
+        if (existSlot) {
+          tx.rollback();
+        }
+        await tx.insert(equipmentTable).values({
+          id: generateRandomUuid(),
+          equipmentHeroId: hero.id,
+          gameItemId: inventoryItem.gameItemId,
+          slot: newEquipSlot,
+        });
+        await tx.delete(inventoryItemTable).where(eq(inventoryItemTable.id, inventoryItem.id));
+      });
+
+      return c.json<SuccessResponse<InventoryItem>>(
+        {
+          success: true,
+          message: `success equipped item `,
+          data: inventoryItem,
+        },
+        201,
+      );
+    },
+  )
+  .post(
+    '/:id/equipment/:itemId/unequip',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+        itemId: z.string(),
+      }),
+    ),
+
+    async (c) => {
+      const { id, itemId } = c.req.valid('param');
+      const userId = c.get('user')?.id as string;
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      const isInventoryFull = hero.currentInventorySlots >= hero.maxInventorySlots;
+
+      if (hero.userId !== userId) {
+        throw new HTTPException(403, {
+          message: 'access denied',
+        });
+      }
+      if (isInventoryFull) {
+        return c.json<ErrorResponse>(
+          {
+            success: false,
+            message: `inventory is full`,
+          },
+          409,
+        );
+      }
+      const equipmentItem = await db.query.equipmentTable.findFirst({
+        where: eq(equipmentTable.id, itemId),
+        with: {
+          gameItem: {
+            with: {
+              modifier: true,
+            },
+          },
+        },
+      });
+      if (!equipmentItem) {
+        throw new HTTPException(404, {
+          message: 'equipment item not found',
         });
       }
 
-      await db.insert(equipmentTable).values({
-        id: generateRandomUuid(),
-        equipmentHeroId: hero.id,
-        gameItemId: inventoryItem.gameItemId,
-        slot: newEQuipSlot,
+      await db.transaction(async (tx) => {
+        const hero = await tx.query.heroTable.findFirst({
+          where: eq(heroTable.id, id),
+        });
+
+        if (!hero) {
+          throw new HTTPException(404, {
+            message: 'hero not found',
+          });
+        }
+        const isInventoryFull = hero.currentInventorySlots >= hero.maxInventorySlots;
+        if (isInventoryFull) {
+          tx.rollback();
+        }
+
+        await tx.delete(equipmentTable).where(eq(equipmentTable.id, itemId));
+        await tx
+          .update(heroTable)
+          .set({
+            currentInventorySlots: hero.currentInventorySlots + 1,
+          })
+          .where(eq(heroTable.id, hero.id));
+        await tx.insert(inventoryItemTable).values({
+          id: generateRandomUuid(),
+          inventoryHeroId: hero.id,
+          gameItemId: equipmentItem.gameItemId,
+        });
       });
-      return c.json<SuccessResponse>({
-        success: true,
-        message: `ОКОК ОКОКОК  ОКО ККОКО ${newEQuipSlot}`,
-      });
+
+      return c.json<SuccessResponse<Equipment>>(
+        {
+          success: true,
+          message: `success unequipped item `,
+          data: equipmentItem,
+        },
+        201,
+      );
     },
   );

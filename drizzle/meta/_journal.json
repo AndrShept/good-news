@@ -120,6 +120,13 @@
       "when": 1748525662220,
       "tag": "0016_useful_mole_man",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1748592992254,
+      "tag": "0017_magenta_slyde",
+      "breakpoints": true
     }
   ]
 }

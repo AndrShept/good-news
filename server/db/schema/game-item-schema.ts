@@ -6,10 +6,7 @@ import { modifierTable } from './modifier-schema';
 export const gameItemEnum = pgEnum('game_item_enum', [
   'POTION',
   'BOOK',
-  'DAGGER',
-  'SWORD',
-  'AXE',
-  'STAFF',
+  'WEAPON',
   'CHESTPLATE',
   'BELT',
   'BOOTS',
@@ -21,13 +18,16 @@ export const gameItemEnum = pgEnum('game_item_enum', [
   'MISC',
 ]);
 export const rarityEnum = pgEnum('rarity_enum', ['COMMON', 'MAGIC', 'EPIC', 'RARE', 'LEGENDARY']);
+export const weaponTypeEnum = pgEnum('weapon_type_enum', ['DAGGER', 'SWORD', 'AXE', 'STAFF']);
+
 export const weaponHandEnum = pgEnum('weapon_hand_enum', ['ONE_HANDED', 'TWO_HANDED']);
 
 export const gameItemTable = pgTable('game_item', {
   id: text().primaryKey().notNull(),
 
   type: gameItemEnum().notNull(),
-  weaponHand: weaponHandEnum(), 
+  weaponHand: weaponHandEnum(),
+  weaponType: weaponTypeEnum(),
   name: text().notNull(),
   image: text().notNull(),
   price: integer().default(0).notNull(),
@@ -36,7 +36,7 @@ export const gameItemTable = pgTable('game_item', {
   modifierId: text()
     .notNull()
     .references(() => modifierTable.id, {
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     }),
 
   createdAt: timestamp('created_at', {
@@ -50,8 +50,7 @@ export const gameItemTable = pgTable('game_item', {
   }),
 });
 
-export const gameItemRelations = relations(gameItemTable, ({  one }) => ({
- 
+export const gameItemRelations = relations(gameItemTable, ({ one }) => ({
   modifier: one(modifierTable, {
     fields: [gameItemTable.modifierId],
     references: [modifierTable.id],
