@@ -45,6 +45,7 @@ export const ConfirmPopover: React.FC<Props> & ConfirmPopoverCompound = ({ child
   );
 };
 ConfirmPopover.Content = ({ children, side }) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { setIsOpen, onConfirm, setIsShow } = useConfirmPopover();
 
   return (
@@ -80,10 +81,10 @@ ConfirmPopover.Content = ({ children, side }) => {
 };
 
 ConfirmPopover.Title = ({ children, ...props }) => {
-  return <p {...props}> {children}</p>;
+  return <div {...props}> {children}</div>;
 };
 ConfirmPopover.Message = ({ children, ...props }) => {
-  return <p {...props}> {children}</p>;
+  return <div {...props}> {children}</div>;
 };
 ConfirmPopover.Trigger = ({ children, ...props }) => {
   return (

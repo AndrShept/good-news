@@ -559,6 +559,12 @@ export const heroRouter = new Hono<Context>()
           gameItemId: inventoryItem.gameItemId,
           slot: newEquipSlot,
         });
+        await tx
+          .update(heroTable)
+          .set({
+            currentInventorySlots: hero.currentInventorySlots - 1,
+          })
+          .where(eq(heroTable.id, hero.id));
         await tx.delete(inventoryItemTable).where(eq(inventoryItemTable.id, inventoryItem.id));
       });
 
@@ -661,6 +667,73 @@ export const heroRouter = new Hono<Context>()
           success: true,
           message: `success unequipped item `,
           data: equipmentItem,
+        },
+        201,
+      );
+    },
+  )
+  .delete(
+    '/:id/inventory/:itemId/delete',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+        itemId: z.string(),
+      }),
+    ),
+
+    async (c) => {
+      const { id, itemId } = c.req.valid('param');
+      const userId = c.get('user')?.id as string;
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+
+      if (hero.userId !== userId) {
+        throw new HTTPException(403, {
+          message: 'access denied',
+        });
+      }
+
+      const inventoryItem = await db.query.inventoryItemTable.findFirst({
+        where: eq(inventoryItemTable.id, itemId),
+        with: {
+          gameItem: {
+            with: {
+              modifier: true,
+            },
+          },
+        },
+      });
+
+      if (!inventoryItem) {
+        throw new HTTPException(404, {
+          message: 'Inventory item not found',
+        });
+      }
+
+      await db.transaction(async (tx) => {
+        await tx.delete(inventoryItemTable).where(eq(inventoryItemTable.id, inventoryItem.id));
+        await tx
+          .update(heroTable)
+          .set({
+            currentInventorySlots: hero.currentInventorySlots + 1,
+          })
+          .where(eq(heroTable.id, id));
+      });
+
+      return c.json<SuccessResponse<InventoryItem>>(
+        {
+          success: true,
+          message: `Success deleted item`,
+          data: inventoryItem,
         },
         201,
       );

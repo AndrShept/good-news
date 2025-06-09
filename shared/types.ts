@@ -129,10 +129,10 @@ export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;
 export type Equipment = typeof equipmentTable.$inferSelect & {
-  gameItem: GameItem;
+  gameItem?: GameItem 
 };
 export type InventoryItem = InferSelectModel<typeof inventoryItemTable> & {
-  gameItem: GameItem;
+  gameItem?: GameItem 
 };
 export type GameItem = InferSelectModel<typeof gameItemTable> & {
   modifier: Modifier;
