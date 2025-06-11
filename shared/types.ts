@@ -135,7 +135,7 @@ export type InventoryItem = InferSelectModel<typeof inventoryItemTable> & {
   gameItem?: GameItem 
 };
 export type GameItem = InferSelectModel<typeof gameItemTable> & {
-  modifier: Modifier;
+  modifier?: Modifier;
 };
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier: Modifier;

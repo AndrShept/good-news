@@ -1,4 +1,5 @@
 import { useDeleteInventoryItem } from '@/features/hero/hooks/useDeleteInventoryItem';
+import { useDrinkPotion } from '@/features/hero/hooks/useDrinkPotion';
 import { useEquipItem } from '@/features/hero/hooks/useEquipItem';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useUnEquipItem } from '@/features/hero/hooks/useUnEquipItem';
@@ -17,12 +18,13 @@ export const GameItemCardPopupMenu = ({ item, onClose }: Props) => {
   const inventoryItem = item && 'inventoryHeroId' in item ? item : (undefined as InventoryItem | undefined);
   const equipmentItem = item && 'equipmentHeroId' in item ? item : (undefined as Equipment | undefined);
   const isPotionItem = inventoryItem?.gameItem?.type === 'POTION';
-  const isMiscItem = inventoryItem?.gameItem?.type === 'POTION';
+  const isMiscItem = inventoryItem?.gameItem?.type === 'MISC';
   const gameItem = isGameItem ? undefined : (item as unknown as GameItem | undefined);
   const isCanEquip = item && inventoryItem && !equipmentItem && !isPotionItem && !isMiscItem;
 
   const equipItemMutation = useEquipItem();
   const unEquipItemMutation = useUnEquipItem();
+  const drinkPotionMutation = useDrinkPotion();
   const deleteInventoryItemMutation = useDeleteInventoryItem(inventoryItem?.id ?? '');
   const isMutationPending = equipItemMutation.isPending || deleteInventoryItemMutation.isPending || unEquipItemMutation.isPending;
   const onEquip = () => {
@@ -51,7 +53,19 @@ export const GameItemCardPopupMenu = ({ item, onClose }: Props) => {
       },
     );
   };
-  const onDrink = () => {};
+  const onDrink = () => {
+    drinkPotionMutation.mutate(
+      {
+        id: heroId,
+        itemId: inventoryItem?.id ?? '',
+      },
+      {
+        onSuccess: () => {
+          onClose();
+        },
+      },
+    );
+  };
   const onDeleteInventoryItem = () => {
     deleteInventoryItemMutation.mutate();
     onClose();
@@ -70,6 +84,13 @@ export const GameItemCardPopupMenu = ({ item, onClose }: Props) => {
           <p className="text-[12px]">Drink</p>
         </Button>
       )}
+
+      {equipmentItem && (
+        <Button disabled={isMutationPending} onClick={unOnEquip} variant={'ghost'} className="flex w-full items-center">
+          <img className="size-6" src="/sprites/icons/equip.png" />
+          <p className="text-[12px]">un equip</p>
+        </Button>
+      )}
       {inventoryItem && (
         <ConfirmPopover onConfirm={onDeleteInventoryItem} setIsShow={onClose}>
           <ConfirmPopover.Trigger>
@@ -84,17 +105,11 @@ export const GameItemCardPopupMenu = ({ item, onClose }: Props) => {
             <ConfirmPopover.Message className="inline-flex text-yellow-500">
               <p>
                 {inventoryItem.gameItem?.name}
-                {inventoryItem.quantity > 1 && <span className='text-primary'> x{inventoryItem.quantity}</span>}
+                {inventoryItem.quantity > 1 && <span className="text-primary"> x{inventoryItem.quantity}</span>}
               </p>
             </ConfirmPopover.Message>
           </ConfirmPopover.Content>
         </ConfirmPopover>
-      )}
-      {equipmentItem && (
-        <Button disabled={isMutationPending} onClick={unOnEquip} variant={'ghost'} className="flex w-full items-center">
-          <img className="size-6" src="/sprites/icons/equip.png" />
-          <p className="text-[12px]">un equip</p>
-        </Button>
       )}
     </section>
   );

@@ -43,7 +43,7 @@ export const GameItemCard = ({ item }: Props) => {
                 <img
                   style={{ imageRendering: 'pixelated' }}
                   className="size-full object-contain opacity-85 group-hover:opacity-100"
-                  src={inventoryItem?.gameItem.image || equipmentItem?.gameItem?.image || gameItem?.image}
+                  src={inventoryItem?.gameItem?.image || equipmentItem?.gameItem?.image || gameItem?.image}
                   alt="inventory-image"
                 />
                 {inventoryItem && inventoryItem.quantity > 1 && (
