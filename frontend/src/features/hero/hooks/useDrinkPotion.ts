@@ -2,10 +2,10 @@ import { toastError } from '@/lib/utils';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { drinkPotion } from '../api/drinkPotion';
 import { getHeroOptions } from '../api/get-hero';
 import { getInventoryOptions } from '../api/get-inventory';
 import { useHero } from './useHero';
-import { drinkPotion } from '../api/drinkPotion';
 
 export const useDrinkPotion = () => {
   const setGameMessage = useSetGameMessage();
@@ -28,6 +28,7 @@ export const useDrinkPotion = () => {
           success: true,
           type: 'success',
           text: data.message,
+          data: data.data,
         });
       } else {
         setGameMessage({

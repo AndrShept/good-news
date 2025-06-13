@@ -5,6 +5,7 @@ import { userTable } from './auth-schema';
 import { equipmentTable } from './equipment-schema';
 import { modifierTable } from './modifier-schema';
 import { inventoryItemTable } from './inventory-item-schema';
+import { buffTable } from './buff-schema';
 
 export const heroTable = pgTable('hero', {
   id: text().primaryKey().notNull(),
@@ -60,4 +61,5 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
   }),
   equipments: many(equipmentTable),
   inventoryItem: many(inventoryItemTable),
+  buffs: many(buffTable),
 }));

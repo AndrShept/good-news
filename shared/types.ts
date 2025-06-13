@@ -6,6 +6,7 @@ import { z } from 'zod';
 import type { client } from '../frontend/src/lib/utils';
 import { heroTable, inventoryItemTable, modifierTable } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
+import { buffTable } from '../server/db/schema/buff-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import type { equipmentTable, slotEnum } from '../server/db/schema/equipment-schema';
 import type { gameItemEnum, gameItemTable, rarityEnum, weaponHandEnum, weaponTypeEnum } from '../server/db/schema/game-item-schema';
@@ -129,10 +130,10 @@ export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;
 export type Equipment = typeof equipmentTable.$inferSelect & {
-  gameItem?: GameItem 
+  gameItem?: GameItem;
 };
 export type InventoryItem = InferSelectModel<typeof inventoryItemTable> & {
-  gameItem?: GameItem 
+  gameItem?: GameItem;
 };
 export type GameItem = InferSelectModel<typeof gameItemTable> & {
   modifier?: Modifier;
@@ -141,6 +142,11 @@ export type Hero = InferSelectModel<typeof heroTable> & {
   modifier: Modifier;
   equipments: Equipment[];
 };
+export type Buff = typeof buffTable.$inferSelect & {
+  expired: number | unknown ;
+  modifier?: Modifier;
+};
+
 export const statsSchema = createSelectSchema(modifierTable, {
   strength: z.number({ coerce: true }),
   constitution: z.number({ coerce: true }),

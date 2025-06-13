@@ -3,6 +3,7 @@ import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 
 import { gameItemTable } from './game-item-schema';
 import { heroTable } from './hero-schema';
+import { buffTable } from './buff-schema';
 
 export const modifierTable = pgTable('modifier', {
   id: text().primaryKey().notNull(),
@@ -50,4 +51,5 @@ export const modifierTable = pgTable('modifier', {
 const modifierRelations = relations(modifierTable, ({ many }) => ({
   gameItems: many(gameItemTable),
   heroes: many(heroTable),
+  buffs: many(buffTable),
 }));

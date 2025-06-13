@@ -1,0 +1,1 @@
+ALTER TABLE "buff" ADD COLUMN " completed_at" timestamp with time zone NOT NULL;

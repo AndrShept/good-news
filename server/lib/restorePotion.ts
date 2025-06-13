@@ -1,4 +1,3 @@
-
 import { eq } from 'drizzle-orm';
 
 import { db } from '../db/db';
@@ -7,37 +6,38 @@ import { heroTable, inventoryItemTable } from '../db/schema';
 type PotionType = 'health' | 'mana';
 
 interface IRestorePotion {
-  currentValue: number;
-  restorePotionValue: number;
-  heroMaxValue: number;
+  currentHealth: number;
+  currentMana: number;
+  maxHealth: number;
+  maxMana: number;
+  restoreHealth: number;
+  restoreMana: number;
   heroId: string;
   itemId: string;
   potionQuantity: number;
-  type: PotionType;
 }
 
 export const restorePotion = async ({
-  currentValue,
-  heroMaxValue,
-  restorePotionValue,
+  currentHealth,
+  currentMana,
+  maxHealth,
+  maxMana,
+  restoreMana,
+  restoreHealth,
   heroId,
   itemId,
   potionQuantity,
-  type,
 }: IRestorePotion) => {
-  const restoredValue = currentValue + restorePotionValue;
+  const restoredHealth = Math.min(maxHealth, currentHealth + restoreHealth);
+  const restoredMana = Math.min(maxMana, currentMana + restoreMana);
+
   await db.transaction(async (tx) => {
     await tx
       .update(heroTable)
-      .set(
-        type === 'health'
-          ? {
-              currentHealth: Math.min(restoredValue, heroMaxValue),
-            }
-          : {
-              currentMana: Math.min(restoredValue, heroMaxValue),
-            },
-      )
+      .set({
+        currentHealth: restoredHealth,
+        currentMana: restoredMana,
+      })
       .where(eq(heroTable.id, heroId));
     if (potionQuantity > 1) {
       await tx

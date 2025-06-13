@@ -127,6 +127,20 @@
       "when": 1748592992254,
       "tag": "0017_magenta_slyde",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1749823184656,
+      "tag": "0018_lazy_the_professor",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1749824025219,
+      "tag": "0019_natural_rictor",
+      "breakpoints": true
     }
   ]
 }
