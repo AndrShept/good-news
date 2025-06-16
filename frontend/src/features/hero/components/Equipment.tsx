@@ -76,7 +76,7 @@ export const Equipments = ({ equipments }: Props) => {
     {} as Record<EquipmentSlotType, Equipment>,
   );
   return (
-    <div className="flex">
+    <div className="flex mx-auto">
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(0, 5).map((equipment) => (
           <li className="size-12 border" key={equipment.id}>

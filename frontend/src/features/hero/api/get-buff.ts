@@ -3,7 +3,7 @@ import { queryOptions } from '@tanstack/react-query';
 
 export const getBuff = async (id: string) => {
   try {
-    const res = await client.hero[':id'].inventories.$get({
+    const res = await client.hero[':id'].buffs.$get({
       param: { id },
     });
     const data = await res.json();

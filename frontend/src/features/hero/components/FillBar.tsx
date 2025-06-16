@@ -34,4 +34,4 @@ export const FillBar = ({ value, maxValue, color }: Props) => {
       </div>
     </div>
   );
-};
+}

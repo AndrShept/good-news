@@ -1,5 +1,5 @@
 import { HeroAvatar } from '@/components/HeroAvatar';
-
+import { BuffList } from './BuffList';
 import { FillBar } from './FillBar';
 
 interface Props {
@@ -10,21 +10,12 @@ interface Props {
   maxMana: number;
   name: string;
   level: number;
-  //   buffs: Buff[];
+  id: string;
 }
 
-export const CharacterStatusBar = ({
-  avatarUrl,
-  health,
-  mana,
-  maxHealth,
-  maxMana,
-  name,
-  level,
-  //   buffs,
-}: Props) => {
+export const CharacterStatusBar = ({ avatarUrl, health, mana, maxHealth, maxMana, name, level, id }: Props) => {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 w-full">
       <div>
         <HeroAvatar src={avatarUrl} />
       </div>
@@ -36,14 +27,7 @@ export const CharacterStatusBar = ({
 
         <FillBar value={health} color="green" maxValue={maxHealth} />
         <FillBar value={mana} color="blue" maxValue={maxMana} />
-
-        {/* <ul className='flex gap-1 flex-wrap'>
-          {buffs.map((buff) => (
-            <li  key={buff.id}>
-              <BuffCard buff={buff} />
-            </li>
-          ))}
-        </ul> */}
+        <BuffList id={id} />
       </div>
     </div>
   );

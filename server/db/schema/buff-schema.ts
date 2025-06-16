@@ -43,4 +43,8 @@ export const buffRelations = relations(buffTable, ({ one }) => ({
     fields: [buffTable.modifierId],
     references: [modifierTable.id],
   }),
+    hero: one(heroTable, {
+    fields: [buffTable.heroId],
+    references: [heroTable.id],
+  }),
 }));

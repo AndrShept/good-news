@@ -10,7 +10,7 @@ interface Props {
 
 export const Paperdoll = ({ hero }: Props) => {
   return (
-    <section className="flex h-fit shrink-0 flex-col gap-6 p-6">
+    <section className="flex h-fit w-[300px] shrink-0 flex-col gap-6 p-3 ">
       <CharacterStatusBar
         avatarUrl={hero.avatarImage}
         health={hero.currentHealth}
@@ -19,7 +19,7 @@ export const Paperdoll = ({ hero }: Props) => {
         maxMana={hero.maxMana}
         name={hero.name}
         level={hero.level}
-        // buffs={hero.buffs}
+        id={hero.id}
       />
 
       <Equipments equipments={hero.equipments} />
