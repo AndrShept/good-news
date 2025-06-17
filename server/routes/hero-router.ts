@@ -13,8 +13,7 @@ import {
   statsSchema,
 } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
-import { eq, sql } from 'drizzle-orm';
-import { duration } from 'drizzle-orm/gel-core';
+import { and, asc, desc, eq, lte, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
@@ -52,6 +51,7 @@ export const heroRouter = new Hono<Context>()
           currentInventorySlots: inventoryCount,
         })
         .where(eq(heroTable.id, hero.id));
+      await db.delete(buffTable).where(and(eq(buffTable.heroId, hero.id), lte(buffTable.completedAt, new Date().toISOString())));
       const updatedHero = await db.query.heroTable.findFirst({
         where: eq(heroTable.userId, id),
         with: {
@@ -271,6 +271,7 @@ export const heroRouter = new Hono<Context>()
         with: {
           gameItem: { with: { modifier: true } },
         },
+        orderBy: asc(inventoryItemTable.id),
       });
 
       return c.json<SuccessResponse<InventoryItem[]>>({
@@ -784,7 +785,7 @@ export const heroRouter = new Hono<Context>()
       }
       const isHealthPotion = inventoryItemPotion.gameItem.modifier.restoreHealth && !inventoryItemPotion.gameItem.modifier.restoreMana;
       const isManaPotion = inventoryItemPotion.gameItem.modifier.restoreMana && !inventoryItemPotion.gameItem.modifier.restoreHealth;
-      const isRestorePotion = !!inventoryItemPotion.gameItem.modifier.restoreHealth && !!inventoryItemPotion.gameItem.modifier.restoreMana;
+
       const isBuffPotion = inventoryItemPotion.gameItem.duration > 0;
       const isFullHealth = hero.currentHealth >= hero.maxHealth;
       const isFullMana = hero.currentMana >= hero.maxMana;
@@ -841,9 +842,15 @@ export const heroRouter = new Hono<Context>()
       }
 
       if (isBuffPotion) {
+        const statKeys = Object.keys(statsSchema.shape) as (keyof typeof statsSchema.shape)[];
+        const findStatBuffName = inventoryItemPotion.gameItem.name
+          .split(' ')
+          .find((text) => statKeys.includes(text as keyof typeof statsSchema.shape));
+        if (findStatBuffName) {
+          await db.delete(buffTable).where(and(eq(buffTable.heroId, id), eq(buffTable.name, inventoryItemPotion.gameItem.name)));
+        }
         await db.transaction(async (tx) => {
-          const buffName = inventoryItemPotion.gameItem.name.split(' ')[0];
-          const completedAt = new Date(inventoryItemPotion.gameItem.duration + Date.now()).toISOString();
+          const completedAt = new Date(Date.now() + inventoryItemPotion.gameItem.duration).toISOString();
           const [modifier] = await tx
             .insert(modifierTable)
             .values({
@@ -855,7 +862,7 @@ export const heroRouter = new Hono<Context>()
 
           await tx.insert(buffTable).values({
             id: generateRandomUuid(),
-            name: buffName,
+            name: inventoryItemPotion.gameItem.name,
             image: inventoryItemPotion.gameItem.image,
             duration: inventoryItemPotion.gameItem.duration,
             type: 'POTION',
@@ -920,9 +927,6 @@ export const heroRouter = new Hono<Context>()
     const buffs = await db.query.buffTable.findMany({
       with: {
         modifier: true,
-      },
-      extras: {
-        expired: sql`EXTRACT(EPOCH FROM (${buffTable.completedAt} - NOW()))`.as('expired'),
       },
     });
     return c.json<SuccessResponse<Buff[]>>({

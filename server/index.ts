@@ -10,6 +10,7 @@ import { Server } from 'socket.io';
 
 import type { ErrorResponse } from '../shared/types';
 import type { Context } from './context';
+import { game } from './lib/game';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
@@ -74,11 +75,11 @@ const io = new Server(httpServer as HTTPServer, {
 
 io.on('connection', (socket) => {
   console.log('user connected', socket.handshake.headers['username']);
-
-  socket.on('test', (data) => {
-    console.log(data);
-    socket.emit('test', data);
-  });
+  const heroId = socket.handshake.headers['heroid'] as string | undefined;
+  if (heroId) {
+    console.log('@@@@@@@@');
+    game({ socket, heroId });
+  }
 
   socket.on('disconnect', () => {
     console.log('disconnect ' + socket.handshake.headers['username']);

@@ -1,6 +1,7 @@
 import { GameMessage } from '@/components/GameMessage';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { HeroHeader } from '@/features/hero/components/HeroHeader';
+import { SocketProvider } from '@/hooks/useSocket';
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(home)/game')({
@@ -17,15 +18,17 @@ export const Route = createFileRoute('/(home)/game')({
 function RouteComponent() {
   return (
     <>
-      <HeroHeader />
+      <SocketProvider>
+        <HeroHeader />
 
-      <section className="size-full">
-        <Outlet />
-      </section>
+        <section className="size-full">
+          <Outlet />
+        </section>
 
-      <section className="bg-background/90 sticky bottom-0 h-[250px]">
-        <GameMessage />
-      </section>
+        <section className="bg-background/90 sticky bottom-0 h-[250px]">
+          <GameMessage />
+        </section>
+      </SocketProvider>
     </>
   );
 }

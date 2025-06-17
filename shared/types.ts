@@ -143,7 +143,6 @@ export type Hero = InferSelectModel<typeof heroTable> & {
   equipments: Equipment[];
 };
 export type Buff = typeof buffTable.$inferSelect & {
-  expired: number | unknown ;
   modifier?: Modifier;
 };
 

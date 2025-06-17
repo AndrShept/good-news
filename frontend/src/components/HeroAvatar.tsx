@@ -12,7 +12,7 @@ export const HeroAvatar = ({ src, isSelected = false, classname, onClick }: Hero
   return (
     <article
       onClick={onClick}
-      className={cn('relative size-12 rounded-full border ', classname, {
+      className={cn('relative size-12 rounded-full border', classname, {
         'border-primary opacity-100 ring-1 hover:opacity-100': isSelected,
       })}
     >
