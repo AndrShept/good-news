@@ -20,10 +20,9 @@ function RouteComponent() {
     <>
       <SocketProvider>
         <GameHeader />
-
-        <section className="flex-1">
+        <div className='flex-1'>
           <Outlet />
-        </section>
+        </div>
 
         <section className="bg-background/90 sticky bottom-0 h-[250px]">
           <GameMessage />
