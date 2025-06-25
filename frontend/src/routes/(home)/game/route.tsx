@@ -1,6 +1,6 @@
 import { GameMessage } from '@/components/GameMessage';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
-import { HeroHeader } from '@/features/hero/components/HeroHeader';
+import { GameHeader } from '@/features/hero/components/GameHeader';
 import { SocketProvider } from '@/hooks/useSocket';
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
 
@@ -19,9 +19,9 @@ function RouteComponent() {
   return (
     <>
       <SocketProvider>
-        <HeroHeader />
+        <GameHeader />
 
-        <section className="size-full">
+        <section className="flex-1">
           <Outlet />
         </section>
 

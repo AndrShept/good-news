@@ -16,7 +16,7 @@ const SocketContext = createContext<SocketContextProps>({
   socket: null,
   isConnected: false,
 });
-export const useSocket = () => {
+ export const useSocket = () => {
   const context = useContext(SocketContext);
   if (!context) {
     throw new Error('useSocket context not found');
@@ -24,7 +24,7 @@ export const useSocket = () => {
   return context;
 };
 
-export const SocketProvider = ({ children }: { children: ReactNode }) => {
+ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef<null | Socket>(null);
   const user = useAuth();

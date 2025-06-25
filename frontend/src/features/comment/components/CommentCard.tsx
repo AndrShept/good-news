@@ -1,29 +1,28 @@
-
-import { useCreateComment } from '@/features/post/components/useCreatePostComment';
+import { CommentIcon } from '@/components/CommentIcon';
+import { CreateCommentForm } from '@/components/CreateCommentForm';
+import { InfinityScrollComponent } from '@/components/InfinityScrollComponent';
+import { Spinner } from '@/components/Spinner';
+import { UpvoteIcon } from '@/components/UpvoteIcon';
+import { UserAvatar } from '@/components/UserAvatar';
+import { Button } from '@/components/ui/button';
 import { useUpvoteComment } from '@/features/comment/hooks/useUpvoteComment';
+import { useCreateComment } from '@/features/post/components/useCreatePostComment';
+import { childrenVariants } from '@/lib/animation';
 import { getFormatDateTime } from '@/lib/utils';
 import { Comments, paginationSchema } from '@/shared/types';
 import { useInfiniteQuery, useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import React, { useState } from 'react';
+import * as m from 'motion/react-m';
+import React, { memo, useState } from 'react';
 
-
-import * as m from "motion/react-m"
-import { childrenVariants } from '@/lib/animation';
-import { UserAvatar } from '@/components/UserAvatar';
-import { UpvoteIcon } from '@/components/UpvoteIcon';
-import { CommentIcon } from '@/components/CommentIcon';
-import { CreateCommentForm } from '@/components/CreateCommentForm';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/Spinner';
-import { InfinityScrollComponent } from '@/components/InfinityScrollComponent';
-import { getCommentRepliesQueryOptions } from '../api/get-comment-replies';
 import { createCommentReplies } from '../api/create-commnet-replies';
+import { getCommentRepliesQueryOptions } from '../api/get-comment-replies';
+
 interface Props {
   comment: Comments;
 }
 
-export const CommentCard = ({ comment }: Props) => {
+export const CommentCard = memo(function CommentCard({ comment }: Props) {
   const { mutate } = useUpvoteComment({
     queryKey: comment.parentCommentId
       ? ['post', 'comment', 'replys', comment.parentCommentId.toString()]
@@ -50,9 +49,8 @@ export const CommentCard = ({ comment }: Props) => {
     mutationFn: createCommentReplies,
   });
 
-
   return (
-    <m.li variants={childrenVariants}  className="flex flex-col gap-2 rounded">
+    <m.li variants={childrenVariants} className="flex flex-col gap-2 rounded">
       <section className="hover:bg-secondary/30 flex gap-2 p-3">
         <div>
           <UserAvatar url={comment.author?.image} />
@@ -108,4 +106,4 @@ export const CommentCard = ({ comment }: Props) => {
       )}
     </m.li>
   );
-};
+});

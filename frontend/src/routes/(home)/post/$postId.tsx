@@ -35,6 +35,7 @@ export function PostPage() {
       query: { ...query, order, sortBy },
     }),
   );
+  console.log('render CARD BY ID')
   const { mutate, isPending } = useCreateComment({
     queryKey: [
       ['post', 'comments', postId as string],

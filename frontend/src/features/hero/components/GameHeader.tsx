@@ -9,7 +9,7 @@ import { useBackpack } from '@/store/useBackpack';
 import { Link } from '@tanstack/react-router';
 import React from 'react';
 
-export const HeroHeader = () => {
+export const GameHeader = () => {
   const hero = useHero();
   const isOpen = useBackpack((state) => state.isOpen);
   const onOpen = useBackpack((state) => state.onOpen);

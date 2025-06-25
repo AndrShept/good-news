@@ -2,6 +2,7 @@ import { useUpvotePost } from '@/features/post/hooks/useUpvotePost';
 import { getFormatDateTime } from '@/lib/utils';
 import { Post } from '@/shared/types';
 import { useNavigate } from '@tanstack/react-router';
+import { memo } from 'react';
 
 import { CommentIcon } from '../../../components/CommentIcon';
 import { UpvoteIcon } from '../../../components/UpvoteIcon';
@@ -11,10 +12,9 @@ interface Props {
   post: Post;
 }
 
-export const PostCard = ({ post }: Props) => {
+export const PostCard = memo(({ post }: Props) => {
   const { mutate } = useUpvotePost();
   const navigate = useNavigate();
-
   return (
     <li className="hover:border-primary/70 hover:bg-secondary/50 flex flex-col gap-2 border p-3">
       <div>
@@ -38,4 +38,4 @@ export const PostCard = ({ post }: Props) => {
       </section>
     </li>
   );
-};
+});
