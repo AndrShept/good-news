@@ -1,8 +1,10 @@
 import { getHeroOptions } from '@/features/hero/api/get-hero';
-import { Hero } from '@/shared/types';
-import {  useSuspenseQuery } from '@tanstack/react-query';
+import { ApiHeroResponse } from '@/shared/types';
+import { useSuspenseQuery } from '@tanstack/react-query';
 
-export const useHero = () => {
-  const { data: hero } = useSuspenseQuery(getHeroOptions());
-  return hero?.data  as Hero
+export const useHero = <T = ApiHeroResponse>(
+  fn?: (data: ApiHeroResponse | undefined) => T
+): T => {
+  const { data } = useSuspenseQuery({ ...getHeroOptions(), select: fn });
+  return data
 };

@@ -7,10 +7,13 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useBackpack } from '@/store/useBackpack';
 import { Link } from '@tanstack/react-router';
-import React from 'react';
+
 
 export const GameHeader = () => {
-  const hero = useHero();
+  const goldCoins = useHero((state) => state?.data?.goldCoins ?? 0);
+  const premiumCoins = useHero((state) => state?.data?.premiumCoins ?? 0);
+  const currentInventorySlots = useHero((state) => state?.data?.currentInventorySlots ?? 0);
+  const maxInventorySlots = useHero((state) => state?.data?.maxInventorySlots ?? 0);
   const isOpen = useBackpack((state) => state.isOpen);
   const onOpen = useBackpack((state) => state.onOpen);
   return (
@@ -38,15 +41,15 @@ export const GameHeader = () => {
       <section className="flex items-center gap-1 text-[15px]">
         <div className="flex items-center gap-0.5">
           <GoldIcon classname="size-6" />
-          <p>{hero.goldCoins}</p>
+          <p>{goldCoins}</p>
         </div>
         <div className="flex items-center gap-0.5">
           <PremIcon classname="size-6" />
-          <p>{hero.premiumCoins}</p>
+          <p>{premiumCoins}</p>
         </div>
         <div className="flex items-center">
           <BackpackIcon />
-          <p>{hero.currentInventorySlots}</p>/<p>{hero.maxInventorySlots}</p>
+          <p>{currentInventorySlots}</p>/<p>{maxInventorySlots}</p>
         </div>
       </section>
     </header>

@@ -146,6 +146,9 @@ export type Buff = typeof buffTable.$inferSelect & {
   modifier?: Modifier;
 };
 
+//API RESPONSE
+export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>
+
 export const statsSchema = createSelectSchema(modifierTable, {
   strength: z.number({ coerce: true }),
   constitution: z.number({ coerce: true }),

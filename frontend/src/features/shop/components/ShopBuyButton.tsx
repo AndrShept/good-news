@@ -14,7 +14,7 @@ interface Props {
 
 export const ShopBuyButton = ({ itemId }: Props) => {
   const setGameMessage = useSetGameMessage();
-  const heroId = useHero().id;
+  const heroId = useHero((state) => state?.data?.id ?? '');
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
     mutationFn: shopBuyItems,

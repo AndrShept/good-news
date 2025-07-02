@@ -10,7 +10,7 @@ import { useHero } from './useHero';
 export const useDeleteInventoryItem = (itemId: string) => {
   const setGameMessage = useSetGameMessage();
   const queryClient = useQueryClient();
-  const { id } = useHero();
+  const id = useHero((state) => state?.data?.id ?? '');
   return useMutation({
     mutationFn: () =>
       deleteInventoryItem({

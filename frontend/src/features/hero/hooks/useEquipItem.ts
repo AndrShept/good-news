@@ -10,7 +10,7 @@ import { useHero } from './useHero';
 export const useEquipItem = () => {
   const setGameMessage = useSetGameMessage();
   const queryClient = useQueryClient();
-  const heroId = useHero().id;
+  const heroId = useHero((state) => state?.data?.id ?? '');
   return useMutation({
     mutationFn: equipItem,
     onError: () => {

@@ -1,4 +1,4 @@
-import { Hero } from '@/shared/types';
+import { Equipment } from '@/shared/types';
 import { memo } from 'react';
 
 import { CharacterStatusBar } from './CharacterStatusBar';
@@ -6,32 +6,53 @@ import { Equipments } from './Equipment';
 import { FillBar } from './FillBar';
 
 interface Props {
-  hero: Hero;
+  avatarImage: string;
+  currentHealth: number;
+  maxHealth: number;
+  currentMana: number;
+  maxMana: number;
+  name: string;
+  level: number;
+  id: string;
+  maxExperience: number;
+  currentExperience: number;
+  equipments: Equipment[];
 }
 
 export const Paperdoll = memo(
-  ({ hero }: Props) => {
+  ({
+    avatarImage,
+    currentExperience,
+    equipments,
+    currentHealth,
+    id,
+    level,
+    currentMana,
+    maxExperience,
+    maxHealth,
+    maxMana,
+    name,
+  }: Props) => {
     console.log('Paperdoll RENDER');
     return (
       <section className="flex h-fit w-[300px] shrink-0 flex-col gap-6 p-3">
         <CharacterStatusBar
-          avatarUrl={hero.avatarImage}
-          health={hero.currentHealth}
-          maxHealth={hero.maxHealth}
-          mana={hero.currentMana}
-          maxMana={hero.maxMana}
-          name={hero.name}
-          level={hero.level}
-          id={hero.id}
+          avatarImage={avatarImage}
+          currentHealth={currentHealth}
+          maxHealth={maxHealth}
+          currentMana={currentMana}
+          maxMana={maxMana}
+          name={name}
+          level={level}
+          id={id}
         />
 
-        <Equipments equipments={hero.equipments} />
+        <Equipments equipments={equipments} />
 
         <div className="mt-auto">
-          <FillBar maxValue={hero.maxExperience} value={hero.currentExperience} type="exp" />
+          <FillBar maxValue={maxExperience} value={currentExperience} type="exp" />
         </div>
       </section>
     );
   },
-  
 );

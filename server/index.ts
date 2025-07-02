@@ -7,8 +7,6 @@ import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
-
-import type { ErrorResponse } from '../shared/types';
 import type { Context } from './context';
 import { game } from './lib/game';
 import { sessionHandler } from './middleware/sessionHandler';

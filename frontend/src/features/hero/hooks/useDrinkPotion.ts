@@ -10,7 +10,7 @@ import { useHero } from './useHero';
 export const useDrinkPotion = () => {
   const setGameMessage = useSetGameMessage();
   const queryClient = useQueryClient();
-  const { id: heroId } = useHero();
+  const heroId = useHero((state) => state?.data?.id ?? '');
   return useMutation({
     mutationFn: drinkPotion,
     onError: () => {

@@ -6,7 +6,7 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { useResetStats } from '../hooks/useResetStats';
 
 export const ResetStatsButton = () => {
-  const { id } = useHero();
+  const id = useHero((state) => state?.data?.id ?? '');
   const { mutate, isPending } = useResetStats();
   const onReset = () => {
     mutate(id);

@@ -13,7 +13,7 @@ interface Props {
   onClose: () => void;
 }
 export const GameItemCardPopupMenu = ({ item, onClose }: Props) => {
-  const { id: heroId } = useHero();
+  const  heroId  = useHero(state => state?.data?.id ?? '');
   const isGameItem = !(item && 'inventoryHeroId' in item) || (item && 'equipmentHeroId' in item);
   const inventoryItem = item && 'inventoryHeroId' in item ? item : (undefined as InventoryItem | undefined);
   const equipmentItem = item && 'equipmentHeroId' in item ? item : (undefined as Equipment | undefined);
