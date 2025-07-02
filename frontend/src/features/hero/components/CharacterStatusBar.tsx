@@ -1,4 +1,6 @@
 import { HeroAvatar } from '@/components/HeroAvatar';
+import { memo } from 'react';
+
 import { BuffList } from './BuffList';
 import { FillBar } from './FillBar';
 
@@ -13,9 +15,11 @@ interface Props {
   id: string;
 }
 
-export const CharacterStatusBar = ({ avatarUrl, health, mana, maxHealth, maxMana, name, level, id }: Props) => {
+export const CharacterStatusBar = memo(({ avatarUrl, health, mana, maxHealth, maxMana, name, level, id }: 
+  Props) => {
+    console.log('render CharacterStatusBar')
   return (
-    <div className="flex items-center gap-2 w-full">
+    <div className="flex w-full items-center gap-2">
       <div>
         <HeroAvatar src={avatarUrl} />
       </div>
@@ -25,10 +29,10 @@ export const CharacterStatusBar = ({ avatarUrl, health, mana, maxHealth, maxMana
           <span className="text-muted-foreground">lvl:{level}</span>
         </div>
 
-        <FillBar value={health} color="green" maxValue={maxHealth} />
-        <FillBar value={mana} color="blue" maxValue={maxMana} />
+        <FillBar value={health} type="health" maxValue={maxHealth} />
+        <FillBar value={mana} type="mana" maxValue={maxMana} />
         <BuffList id={id} />
       </div>
     </div>
   );
-};
+});

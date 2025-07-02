@@ -1,6 +1,8 @@
 import { GameMessage } from '@/components/GameMessage';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { GameHeader } from '@/features/hero/components/GameHeader';
+import { useHero } from '@/features/hero/hooks/useHero';
 import { SocketProvider } from '@/hooks/useSocket';
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
 
@@ -16,11 +18,13 @@ export const Route = createFileRoute('/(home)/game')({
 });
 
 function RouteComponent() {
+  const user = useAuth();
+  const hero = useHero();
   return (
     <>
-      <SocketProvider>
+      <SocketProvider user={{ id: user?.id ?? '', username: user?.username ?? '' }} heroId={hero.id}>
         <GameHeader />
-        <div className='flex-1'>
+        <div className="flex-1">
           <Outlet />
         </div>
 

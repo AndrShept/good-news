@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Equipment, EquipmentSlotType } from '@/shared/types';
 
 import { CharacterSprite } from './CharacterSprite';
+import { memo } from 'react';
 
 interface Props {
   equipments: Equipment[];
@@ -67,14 +68,16 @@ const BASE_EQUIPMENTS_IMAGE: EquipmentImage[] = [
   },
 ];
 
-export const Equipments = ({ equipments }: Props) => {
+export const Equipments = memo(({ equipments }: Props) => {
   const equipmentBySlot = equipments.reduce(
     (acc, equip) => {
       acc[equip.slot] = equip;
       return acc;
     },
     {} as Record<EquipmentSlotType, Equipment>,
+    
   );
+   console.log('render Equipments')
   return (
     <div className="flex mx-auto">
       <ul className="flex flex-col gap-0.5">
@@ -116,4 +119,4 @@ export const Equipments = ({ equipments }: Props) => {
       </ul>
     </div>
   );
-};
+})
