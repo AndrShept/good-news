@@ -2,7 +2,11 @@ import { Inventory } from '@/features/hero/components/Inventory';
 import { Modifiers } from '@/features/hero/components/Modifier';
 import { Paperdoll } from '@/features/hero/components/Paperdoll';
 import { useHero } from '@/features/hero/hooks/useHero';
+import { socket } from '@/main';
+import { ApiHeroResponse } from '@/shared/types';
+import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { useEffect } from 'react';
 
 export const Route = createFileRoute('/(home)/game/')({
   component: RouteComponent,
@@ -21,6 +25,31 @@ function RouteComponent() {
   const level = useHero((state) => state?.data?.level ?? 0);
   const equipments = useHero((state) => state?.data?.equipments ?? []);
 
+  const isFullHealth = currentHealth >= maxHealth;
+  const isFullMana = currentMana >= maxMana;
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    const listener = (data: { currentHealth: number } | { currentMana: number }) => {
+      queryClient.setQueryData<ApiHeroResponse>(['hero'], (oldData) => {
+        if (!oldData || !oldData.data) return;
+
+        return { ...oldData, data: { ...oldData.data, ...data } };
+      });
+    };
+
+    if (!isFullHealth) {
+      socket.emit('go-health', id);
+      socket.on(`health-regeneration-${id}`, listener);
+    }
+    if (!isFullMana) {
+      socket.emit('go-mana', id);
+      socket.on(`mana-regeneration-${id}`, listener);
+    }
+    return () => {
+      socket.off(`health-regeneration`, listener);
+      socket.off(`mana-regeneration-${id}`, listener);
+    };
+  }, [id, isFullHealth, isFullMana]);
   return (
     <div className="flex gap-4">
       <Paperdoll

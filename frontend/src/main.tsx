@@ -57,17 +57,17 @@ const URL = import.meta.env.SOCKET_SERVER || 'http://localhost:3000';
 export const socket = io(URL);
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ThemeProvider defaultTheme="dark">
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <LazyMotion features={domAnimation}>
-            <App />
-          </LazyMotion>
-        </AuthProvider>
-        <Toaster />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </ThemeProvider>
-  </StrictMode>,
+  // <StrictMode>
+  <ThemeProvider defaultTheme="dark">
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <LazyMotion features={domAnimation}>
+          <App />
+        </LazyMotion>
+      </AuthProvider>
+      <Toaster />
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  </ThemeProvider>,
+  // </StrictMode>,
 );

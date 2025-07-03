@@ -4,8 +4,8 @@ import { regeneration } from './regenaration';
 
 interface IGame {
   socket: Socket;
-  heroId: string;
+  heroId?: string;
 }
-export const game = ({ socket, heroId }: IGame) => {
-  regeneration({ socket, heroId });
+export const game = ({ socket }: IGame) => {
+  regeneration({ socket });
 };

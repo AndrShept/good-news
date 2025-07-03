@@ -2,7 +2,7 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { HeroStats } from '@/shared/types';
 import { useQuery } from '@tanstack/react-query';
 import { CheckIcon } from 'lucide-react';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, memo } from 'react';
 
 import { Button } from '../../../components/ui/button';
 import { getHeroOptions } from '../api/get-hero';
@@ -31,10 +31,11 @@ export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFre
     currentStats,
     setCurrentStats,
     setFreePoints,
+    freePoints,
   });
 
   const { data: hero } = useQuery(getHeroOptions());
-  const { mutate } = useConfirmStats(hero?.data?.id ?? '', { ...currentStats, freeStatPoints: freePoints });
+  const { mutate, isPending } = useConfirmStats(hero?.data?.id ?? '', { ...currentStats, freeStatPoints: freePoints });
   const onConfirm = async () => {
     mutate();
   };
@@ -82,7 +83,7 @@ export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFre
           <p className="">{freePoints}</p>
         </div>
         {!areStatsEqual(baseStats, currentStats) && reset && (
-          <Button onClick={onConfirm} className="mt-2 w-full" variant={'outline'} size={'icon'}>
+          <Button onClick={onConfirm} disabled={isPending} className="mt-2 w-full" variant={'outline'} size={'icon'}>
             <p>Confirm</p> <CheckIcon className="size-4 text-green-500" />
           </Button>
         )}
@@ -90,4 +91,4 @@ export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFre
       </ul>
     </section>
   );
-};
+}

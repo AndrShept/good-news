@@ -8,7 +8,6 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { useBackpack } from '@/store/useBackpack';
 import { Link } from '@tanstack/react-router';
 
-
 export const GameHeader = () => {
   const goldCoins = useHero((state) => state?.data?.goldCoins ?? 0);
   const premiumCoins = useHero((state) => state?.data?.premiumCoins ?? 0);
@@ -34,13 +33,14 @@ export const GameHeader = () => {
         >
           <ShopIcon />
         </Link>
+
         <Button onClick={onOpen} className="" variant={isOpen ? 'default' : 'outline'} size={'icon'}>
           <BackpackIcon />
         </Button>
       </section>
       <section className="flex items-center gap-1 text-[15px]">
         <div className="flex items-center gap-0.5">
-          <GoldIcon classname="size-6" />
+          <GoldIcon />
           <p>{goldCoins}</p>
         </div>
         <div className="flex items-center gap-0.5">
@@ -54,4 +54,4 @@ export const GameHeader = () => {
       </section>
     </header>
   );
-};
+}

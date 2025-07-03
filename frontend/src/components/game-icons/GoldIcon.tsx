@@ -1,15 +1,12 @@
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import React from 'react';
+import React, { ComponentProps, memo } from 'react';
 
-export const GoldIcon = ({ classname }: { classname?: string }) => {
+type Props = ComponentProps<'div'>;
+
+export const GoldIcon = ({ className, ...props }: Props) => {
   return (
-    <>
-      <img
-        className={cn(classname)}
-        src={'/sprites/icons/gold.png'}
-        alt="gold-image"
-      />
-    </>
+    <div className={cn('size-6', className)}>
+   <img className="size-full" src={'/sprites/icons/gold.png'} alt="gold-image" />
+    </div>
   );
-};
+}

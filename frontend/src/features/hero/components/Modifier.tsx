@@ -3,11 +3,11 @@ import { StaffIcon } from '@/components/game-icons/StaffIcon';
 import { Separator } from '@/components/ui/separator';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { HeroStats } from '@/shared/types';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 import { Stats } from './Stats';
 
-export const Modifiers = () => {
+export const Modifiers = memo(() => {
   const modifier = useHero((state) => state?.data?.modifier);
   const freeStatPoints = useHero((state) => state?.data?.freeStatPoints ?? 0);
   if (!modifier) throw new Error('modifier not found');
@@ -18,7 +18,6 @@ export const Modifiers = () => {
     intelligence: 0,
     luck: 0,
   };
-  const modifiers = modifier;
   const [stats, setStats] = useState<HeroStats>(initialHeroStats);
   const baseStats = useRef<HeroStats>(initialHeroStats);
   const [freePoints, setFreePoints] = useState(freeStatPoints);
@@ -58,29 +57,29 @@ export const Modifiers = () => {
           <p className="text-stone-600">DEF</p>
         </div>
         <p>
-          <span>armor:</span> {modifiers.armor}
+          <span>armor:</span> {modifier.armor}
         </p>
         <p>
-          <span>evasion:</span> {modifiers.evasion}
+          <span>evasion:</span> {modifier.evasion}
         </p>
         <p>
-          <span>magic resistances:</span> {modifiers.magicResistances}
+          <span>magic resistances:</span> {modifier.magicResistances}
         </p>
       </div>
       <Separator />
       <div className="text-muted-foreground">
         <p className="mb-1 text-amber-300">PHYS</p>
         <p>
-          <span>damage:</span> {modifiers.minDamage} - {modifiers.maxDamage}
+          <span>damage:</span> {modifier.minDamage} - {modifier.maxDamage}
         </p>
         <p>
-          <span>melee damage:</span> {modifiers.meleeDamage}
+          <span>melee damage:</span> {modifier.meleeDamage}
         </p>
         <p>
-          <span>melee crit chance:</span> {modifiers.meleeDamageCritChance}
+          <span>melee crit chance:</span> {modifier.meleeDamageCritChance}
         </p>
         <p>
-          <span>melee crit power:</span> {modifiers.meleeDamageCritPower}
+          <span>melee crit power:</span> {modifier.meleeDamageCritPower}
         </p>
       </div>
       <Separator />
@@ -92,15 +91,15 @@ export const Modifiers = () => {
         </div>
 
         <p>
-          <span>spell damage:</span> {modifiers.spellDamage}
+          <span>spell damage:</span> {modifier.spellDamage}
         </p>
         <p>
-          <span>spell crit chance</span> {modifiers.spellDamageCritChance}
+          <span>spell crit chance</span> {modifier.spellDamageCritChance}
         </p>
         <p>
-          <span>spell crit power</span> {modifiers.spellDamageCritPower}
+          <span>spell crit power</span> {modifier.spellDamageCritPower}
         </p>
       </div>
     </section>
   );
-};
+});

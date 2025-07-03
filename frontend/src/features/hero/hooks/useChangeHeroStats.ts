@@ -8,9 +8,10 @@ interface Props {
   currentStats: HeroStats;
   setFreePoints: Dispatch<SetStateAction<number>>;
   baseStats: HeroStats;
+  freePoints: number;
 }
 
-export const useChangeHeroStats = ({ currentStats, setCurrentStats, setFreePoints, baseStats }: Props) => {
+export const useChangeHeroStats = ({ currentStats, setCurrentStats, setFreePoints, baseStats, freePoints }: Props) => {
   const getStatPriority = (stat: keyof HeroStats) => {
     const priority: Record<keyof HeroStats, number> = {
       strength: 1,
@@ -28,9 +29,7 @@ export const useChangeHeroStats = ({ currentStats, setCurrentStats, setFreePoint
   }));
   const onIncrement = (data: Stat) => {
     setCurrentStats((prev) => {
-      setFreePoints((prev) => {
-        return prev - 1;
-      });
+      setFreePoints(freePoints - 1);
       return { ...prev, [data.name]: prev[data.name] + 1 };
     });
   };
@@ -38,7 +37,7 @@ export const useChangeHeroStats = ({ currentStats, setCurrentStats, setFreePoint
   const onDecrement = (data: Stat) => {
     setCurrentStats((prev) => {
       if (prev[data.name] >= baseStats[data.name]) {
-        setFreePoints((prev) => prev + 1);
+        setFreePoints(freePoints + 1);
         return { ...prev, [data.name]: prev[data.name] - 1 };
       }
       return prev;

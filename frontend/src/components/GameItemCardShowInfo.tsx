@@ -31,7 +31,7 @@ export const GameItemCardShowInfo = ({ gameItem, isShowBuyButton = false, isShow
       <div className="mt-auto flex justify-between">
         {isShowPrice && (
           <div className="flex items-center gap-0.5">
-            <GoldIcon classname="size-6" />
+            <GoldIcon  />
             <p className="text-muted-foreground text-xs">{gameItem?.price}</p>
           </div>
         )}

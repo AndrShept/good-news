@@ -33,7 +33,6 @@ export const Paperdoll = memo(
     maxMana,
     name,
   }: Props) => {
-    console.log('Paperdoll RENDER');
     return (
       <section className="flex h-fit w-[300px] shrink-0 flex-col gap-6 p-3">
         <CharacterStatusBar

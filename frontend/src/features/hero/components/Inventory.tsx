@@ -1,11 +1,11 @@
 import { GameItemCard } from '@/components/GameItemCard';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 
 import { getInventoryOptions } from '../api/get-inventory';
 
-export const Inventory = () => {
+export const Inventory = memo(() => {
   const maxInventorySlots = useHero((state) => state?.data?.maxInventorySlots ?? 0);
   const id = useHero((state) => state?.data?.id ?? '');
   const { data: inventories } = useSuspenseQuery(getInventoryOptions(id));
@@ -25,4 +25,4 @@ export const Inventory = () => {
       ))}
     </ul>
   );
-};
+});

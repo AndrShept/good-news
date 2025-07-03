@@ -7,6 +7,7 @@ import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
+
 import type { Context } from './context';
 import { game } from './lib/game';
 import { sessionHandler } from './middleware/sessionHandler';
@@ -72,21 +73,23 @@ const io = new Server(httpServer as HTTPServer, {
 });
 
 io.on('connection', (socket) => {
-  console.log('user connected', socket.handshake.headers['username']);
-  const heroId = socket.handshake.headers['heroid'] as string | undefined;
-  if (heroId) {
-    console.log('@@@@@@@@');
-    game({ socket, heroId });
-  }
+  // console.log('user connected', socket.handshake.headers['username']);
+  // const heroId = socket.handshake.headers['heroid'] as string | undefined;
+  // if (heroId) {
+  //   console.log('@@@@@@@@');
+    game({ socket });
+  // }
+  console.log('user connected ' + socket.id);
 
   socket.on('disconnect', () => {
-    console.log('disconnect ' + socket.handshake.headers['username']);
+    // console.log('disconnect ' + socket.handshake.headers['username']);
+    console.log('disconnect ' + socket.id);
   });
 });
 
+console.log('Server Running on port 🚀', process.env['PORT'] || 3000);
 // export default {
 //   port: process.env['PORT'] || 3000,
 //   hostname: '0.0.0.0',
 //   fetch: app.fetch,
 // };
-console.log('Server Running on port 🚀', process.env['PORT'] || 3000);

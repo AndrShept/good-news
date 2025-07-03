@@ -1,5 +1,8 @@
 import { HeroAvatar } from '@/components/HeroAvatar';
-import { memo } from 'react';
+import { socket } from '@/main';
+import { ApiHeroResponse } from '@/shared/types';
+import { useQueryClient } from '@tanstack/react-query';
+import { memo, useEffect } from 'react';
 
 import { BuffList } from './BuffList';
 import { FillBar } from './FillBar';
@@ -16,7 +19,7 @@ interface Props {
 }
 
 export const CharacterStatusBar = memo(({ avatarImage, currentHealth, currentMana, maxHealth, maxMana, name, level, id }: Props) => {
-  console.log('render CharacterStatusBar');
+ 
   return (
     <div className="flex w-full items-center gap-2">
       <div>

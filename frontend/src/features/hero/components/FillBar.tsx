@@ -12,32 +12,9 @@ interface Props {
   type: 'health' | 'mana' | 'exp';
 }
 
-export const FillBar = memo(({ value, maxValue, type }: Props) => {
+export const FillBar = ({ value, maxValue, type }: Props) => {
   const lowPercentHealth = maxValue * 0.3;
-  const { socket } = useSocket();
-  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (value < maxValue && type === 'health') {
-      socket?.emit('regen', value);
-    }
-    const socketListener = (data) => {
-      queryClient.setQueryData(getHeroOptions().queryKey, (oldData) => {
-        if (!oldData || !oldData.data) return oldData;
-        return {
-          ...oldData,
-          data: {
-            ...oldData.data,
-            currentHealth: oldData.data.currentHealth + data,
-          },
-        };
-      });
-    };
-    socket?.on(type, socketListener);
-    return () => {
-      socket?.off(type, socketListener);
-    };
-  }, [maxValue, socket, value]);
 
   return (
     <div className="bg-secondary/40 relative h-4 w-full rounded border">
@@ -57,4 +34,4 @@ export const FillBar = memo(({ value, maxValue, type }: Props) => {
       </div>
     </div>
   );
-})
+}
