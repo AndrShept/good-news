@@ -6,10 +6,12 @@ import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 import type { Server as HTTPServer } from 'node:http';
+import { prototype } from 'node:stream';
 import { Server } from 'socket.io';
 
 import type { Context } from './context';
 import { game } from './lib/game';
+import { processEnv } from './lib/utils';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
@@ -61,14 +63,14 @@ app.get('*', serveStatic({ path: './frontend/dist/index.html' }));
 
 const httpServer = serve({
   fetch: app.fetch,
-  port: 3000,
+  port: Number(process.env['PORT']) || 3000,
   hostname: '0.0.0.0',
 });
 
 const io = new Server(httpServer as HTTPServer, {
   cors: {
     credentials: true,
-    origin: '*',
+    origin: process.env.DEV ?  process.env['BASE_URL_FRONT'] : process.env['BASE_URL_PROD'],
   },
 });
 
@@ -77,7 +79,7 @@ io.on('connection', (socket) => {
   // const heroId = socket.handshake.headers['heroid'] as string | undefined;
   // if (heroId) {
   //   console.log('@@@@@@@@');
-    game({ socket });
+  game({ socket });
   // }
   console.log('user connected ' + socket.id);
 

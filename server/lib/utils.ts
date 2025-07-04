@@ -9,6 +9,7 @@ const schema = z.object({
   PORT: z.string(),
   JWT_SECRET: z.string(),
   BASE_URL_FRONT: z.string(),
+  BASE_URL_PROD: z.string(),
 });
 export const processEnv = schema.parse(process.env);
 

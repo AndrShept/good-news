@@ -53,9 +53,12 @@ export const router = createRouter({
   },
   defaultErrorComponent: ({ error, reset }) => <ErrorLoadingData error={error} reset={reset} />,
 });
-const URL = import.meta.env.SOCKET_SERVER || 'http://localhost:3000';
-export const socket = io(URL);
-
+const URL = import.meta.env.VITE_SOCKET_SERVER || 'http://localhost:3000';
+export const socket = io(URL, {
+  transports: ['websocket'],
+  withCredentials: true,
+  
+});
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
   <ThemeProvider defaultTheme="dark">
