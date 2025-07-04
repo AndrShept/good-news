@@ -11,7 +11,6 @@ import { Server } from 'socket.io';
 
 import type { Context } from './context';
 import { game } from './lib/game';
-import { processEnv } from './lib/utils';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
@@ -70,7 +69,7 @@ const httpServer = serve({
 const io = new Server(httpServer as HTTPServer, {
   cors: {
     credentials: true,
-    origin: process.env.DEV ?  process.env['BASE_URL_FRONT'] : process.env['BASE_URL_PROD'],
+    origin: process.env['BASE_URL_FRONT'],
   },
 });
 

@@ -23,7 +23,6 @@ declare module '@tanstack/react-router' {
   }
 }
 export interface MyRouterContext {
-  // The ReturnType of your useAuth hook or the value of your AuthContext
   auth: User | undefined;
   queryClient: QueryClient;
   socket: Socket | undefined;
@@ -57,7 +56,7 @@ const URL = import.meta.env.VITE_SOCKET_SERVER || 'http://localhost:3000';
 export const socket = io(URL, {
   transports: ['websocket'],
   withCredentials: true,
-  
+
 });
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
