@@ -2,6 +2,7 @@ import { BreadCrumb } from '@/components/BreadCrumb';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { NavBar } from '@/components/NavBar';
+import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
 import { Link, Outlet, createFileRoute, useLocation } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(home)')({
@@ -10,6 +11,7 @@ export const Route = createFileRoute('/(home)')({
 
 function App() {
   const { pathname } = useLocation();
+    useRegeneration()
   return (
     <section className="flex  flex-col">
       <Header />

@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router';
-import React from 'react';
+import React, { memo } from 'react';
 
 import { buttonVariants } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 
-export const NavBar = () => {
+export const NavBar = memo(() => {
   const navLinks = [
     {
       id: 2,
@@ -35,4 +35,4 @@ export const NavBar = () => {
       </ul>
     </ScrollArea>
   );
-};
+});

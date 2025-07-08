@@ -4,13 +4,14 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { MenuIcon } from 'lucide-react';
+import { memo } from 'react';
 
 import { NavBar } from './NavBar';
 import { UserAvatar } from './UserAvatar';
 import { LogoIcon } from './game-icons/LogoIcon';
 import { Button } from './ui/button';
 
-export const Header = () => {
+export const Header = memo(() => {
   const user = useAuth();
   const queryClient = useQueryClient();
   return (
@@ -60,4 +61,4 @@ export const Header = () => {
       </div>
     </header>
   );
-};
+});

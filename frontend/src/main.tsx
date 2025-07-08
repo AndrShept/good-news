@@ -6,7 +6,7 @@ import { LazyMotion, domAnimation } from 'motion/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
-import { Socket, io } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 
 import { App } from './components/App.tsx';
 import { ErrorLoadingData } from './components/ErrorLoadingData.tsx';
@@ -52,12 +52,7 @@ export const router = createRouter({
   },
   defaultErrorComponent: ({ error, reset }) => <ErrorLoadingData error={error} reset={reset} />,
 });
-const URL = import.meta.env.VITE_SOCKET_SERVER || 'http://localhost:3000';
-export const socket = io(URL, {
-  transports: ['websocket'],
-  withCredentials: true,
 
-});
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
   <ThemeProvider defaultTheme="dark">

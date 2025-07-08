@@ -62,8 +62,7 @@ app.get('*', serveStatic({ path: './frontend/dist/index.html' }));
 
 const httpServer = serve({
   fetch: app.fetch,
-  port: Number(process.env['PORT']) || 3000,
-  hostname: '0.0.0.0',
+  port: 3000,
 });
 
 const io = new Server(httpServer as HTTPServer, {
