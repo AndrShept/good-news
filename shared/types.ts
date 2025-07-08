@@ -20,6 +20,10 @@ export type SuccessResponse<T = undefined> = {
   message: string;
   data?: T;
 };
+export type SocketResponse = {
+  success: boolean;
+  message: string;
+};
 export type ErrorResponse = {
   success: false;
   message: string;
@@ -147,7 +151,7 @@ export type Buff = typeof buffTable.$inferSelect & {
 };
 
 //API RESPONSE
-export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>
+export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>;
 
 export const statsSchema = createSelectSchema(modifierTable, {
   strength: z.number({ coerce: true }),

@@ -11,7 +11,7 @@ export const Route = createFileRoute('/(home)')({
 
 function App() {
   const { pathname } = useLocation();
-    useRegeneration()
+ useRegeneration()
   return (
     <section className="flex  flex-col">
       <Header />

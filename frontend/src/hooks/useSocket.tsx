@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Socket, io } from 'socket.io-client';
 
-const URL = import.meta.env.SOCKET_SERVER || 'http://localhost:3000';
+const URL = 'http://localhost:3000';
 
 interface SocketContextProps {
   socket: Socket | null;
@@ -20,50 +20,30 @@ export const useSocket = () => {
 };
 
 interface SocketProviderProps {
-  user: {
-    id: string;
-    username: string;
-  };
-  heroId: string;
   children: ReactNode;
 }
 
-export const SocketProvider = ({ user, heroId, children }: SocketProviderProps) => {
+export const SocketProvider = ({ children }: SocketProviderProps) => {
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    if (!user || !heroId) return;
-
     if (!socketRef.current) {
       socketRef.current = io(URL, {
-        extraHeaders: {
-          userId: user.id,
-          username: user.username,
-          heroId,
-        },
-        auth: {
-          userId: user.id,
-        },
+        // extraHeaders: {
+        //   userId: user.id,
+        //   username: user.username,
+        //   heroId,
+        // },
+        // auth: {
+        //   userId: user.id,
+        // },
       });
 
       socketRef.current.on('connect', () => setIsConnected(true));
       socketRef.current.on('disconnect', () => setIsConnected(false));
     }
+  }, []);
 
-    return () => {
-      socketRef.current?.disconnect();
-      socketRef.current = null;
-    };
-  }, [user.id, user.username, heroId]);
-
-  const contextValue = useMemo(
-    () => ({
-      isConnected,
-      socket: socketRef.current,
-    }),
-    [isConnected]
-  );
-
-  return <SocketContext.Provider value={contextValue}>{children}</SocketContext.Provider>;
+  return <SocketContext.Provider value={{ isConnected, socket: socketRef.current }}>{children}</SocketContext.Provider>;
 };

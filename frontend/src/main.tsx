@@ -59,7 +59,9 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <LazyMotion features={domAnimation}>
-          <App />
+          {/* <SocketProvider> */}
+            <App />
+          {/* </SocketProvider> */}
         </LazyMotion>
       </AuthProvider>
       <Toaster />

@@ -1,6 +1,7 @@
 import type { Socket } from 'socket.io';
 
 import { regeneration } from './regenaration';
+import { inviteParty } from './inviteParty';
 
 interface IGame {
   socket: Socket;
@@ -8,4 +9,5 @@ interface IGame {
 }
 export const game = ({ socket }: IGame) => {
   regeneration({ socket });
+  inviteParty(socket)
 };

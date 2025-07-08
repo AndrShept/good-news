@@ -80,7 +80,7 @@ io.on('connection', (socket) => {
   game({ socket });
   // }
   console.log('user connected ' + socket.id);
-
+  socket.join('main')
   socket.on('disconnect', () => {
     // console.log('disconnect ' + socket.handshake.headers['username']);
     console.log('disconnect ' + socket.id);

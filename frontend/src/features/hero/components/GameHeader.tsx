@@ -3,6 +3,7 @@ import { GoldIcon } from '@/components/game-icons/GoldIcon';
 import { HeroIcon } from '@/components/game-icons/HeroIcon';
 import { PremIcon } from '@/components/game-icons/PremIcon';
 import { ShopIcon } from '@/components/game-icons/ShopIcon';
+import { InvitePartyButtons } from '@/components/InvitePartyButtons';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useBackpack } from '@/store/useBackpack';
@@ -37,6 +38,7 @@ export const GameHeader = () => {
         <Button onClick={onOpen} className="" variant={isOpen ? 'default' : 'outline'} size={'icon'}>
           <BackpackIcon />
         </Button>
+        <InvitePartyButtons />
       </section>
       <section className="flex items-center gap-1 text-[15px]">
         <div className="flex items-center gap-0.5">
@@ -54,4 +56,4 @@ export const GameHeader = () => {
       </section>
     </header>
   );
-}
+};

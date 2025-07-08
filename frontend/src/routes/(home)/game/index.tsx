@@ -26,7 +26,7 @@ function RouteComponent() {
   const level = useHero((state) => state?.data?.level ?? 0);
   const equipments = useHero((state) => state?.data?.equipments ?? []);
 
- 
+
   return (
     <div className="flex gap-4">
       <Paperdoll

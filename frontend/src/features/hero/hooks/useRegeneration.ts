@@ -1,9 +1,9 @@
 import { ApiHeroResponse } from '@/shared/types';
-import { socket } from '@/socket';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import { useHero } from './useHero';
+import { socket } from '@/socket';
 
 export const useRegeneration = () => {
   const currentHealth = useHero((state) => state?.data?.currentHealth ?? 0);
@@ -35,5 +35,5 @@ export const useRegeneration = () => {
       socket.off(`health-regeneration`, listener);
       socket.off(`mana-regeneration-${id}`, listener);
     };
-  }, [id, isFullHealth, isFullMana]);
+  }, [id, isFullHealth, isFullMana, socket]);
 };
