@@ -11,7 +11,7 @@ function RouteComponent() {
   const { data: shopItems } = useSuspenseQuery(getShopItemsOptions());
   return (
     <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-      {shopItems?.data?.map((item) => <GameItemCardShowInfo gameItem={item} isShowBuyButton isShowPrice />)}
+      {shopItems?.data?.map((item) => <GameItemCardShowInfo key={item.id} gameItem={item} isShowBuyButton isShowPrice />)}
     </ul>
   );
 }

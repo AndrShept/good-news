@@ -6,7 +6,6 @@ import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 import type { Server as HTTPServer } from 'node:http';
-import { prototype } from 'node:stream';
 import { Server } from 'socket.io';
 
 import type { Context } from './context';
@@ -73,23 +72,14 @@ const io = new Server(httpServer as HTTPServer, {
 });
 
 io.on('connection', (socket) => {
-  // console.log('user connected', socket.handshake.headers['username']);
-  // const heroId = socket.handshake.headers['heroid'] as string | undefined;
-  // if (heroId) {
-  //   console.log('@@@@@@@@');
+  const { username } = socket.handshake.auth as { username: string; id: string };
+
   game({ socket });
-  // }
-  console.log('user connected ' + socket.id);
-  socket.join('main')
+
+  console.log('connected ' + username);
   socket.on('disconnect', () => {
-    // console.log('disconnect ' + socket.handshake.headers['username']);
-    console.log('disconnect ' + socket.id);
+    console.log('disconnect ' + username);
   });
 });
 
 console.log('Server Running on port 🚀', process.env['PORT'] || 3000);
-// export default {
-//   port: process.env['PORT'] || 3000,
-//   hostname: '0.0.0.0',
-//   fetch: app.fetch,
-// };

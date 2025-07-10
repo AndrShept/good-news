@@ -1,16 +1,16 @@
 import { useHero } from '@/features/hero/hooks/useHero';
 import type { SocketResponse } from '@/shared/types';
-import { socket } from '@/socket';
 import { useGameMessages } from '@/store/useGameMessages';
 import React, { useState } from 'react';
 
+import { useSocket } from './providers/SocketProvider';
 import { Button } from './ui/button';
 
 export const InvitePartyButtons = () => {
   const selfId = useHero((state) => state?.data?.id ?? '');
-
+  const { socket } = useSocket();
   const [isLoading, setIsLoading] = useState(false);
-  const invitedHeroId = '0197a6cf-72c1-7000-8c1b-47c82eeae2d7';
+  const invitedHeroId = '0197f3c6-a892-7000-bc4f-95123dfcc99c';
   const setGameMessage = useGameMessages((state) => state.setGameMessage);
   const onInvite = async () => {
     setIsLoading(true);

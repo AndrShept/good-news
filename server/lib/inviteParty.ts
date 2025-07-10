@@ -18,15 +18,20 @@ export const inviteParty = (socket: Socket) => {
       if (!self || !invitedHero) {
         return response({ message: 'hero no found', success: false });
       }
+      const filteredSelf = {
+        name: self.name,
+        level: self.level,
+        avatarImage: self.avatarImage,
+      };
       try {
-        const cb = await socket.timeout(5_000).to('main').emitWithAck(`invite-party-${invitedHeroId}`, self);
+        const cb = await socket.timeout(5_000).emitWithAck(`invite-party-${invitedHeroId}`, filteredSelf);
         if (!cb.accept) {
-          return response({ success: true, message: `${invitedHero.name} ot accpeted accepted` });
+          response({ success: false, message: `${invitedHero.name} not accept` });
         } else {
-          return response({ success: true, message: `${invitedHero.name} ACCEPT` });
+          response({ success: true, message: `${invitedHero.name} ACCEPT` });
         }
       } catch (error) {
-        return response({ message: `${invitedHero.name} AFK`, success: false });
+        response({ message: `${invitedHero.name} AFK`, success: false });
       }
     },
   );

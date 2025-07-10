@@ -2,12 +2,7 @@ import { Inventory } from '@/features/hero/components/Inventory';
 import { Modifiers } from '@/features/hero/components/Modifier';
 import { Paperdoll } from '@/features/hero/components/Paperdoll';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
-import { ApiHeroResponse } from '@/shared/types';
-import { socket } from '@/socket';
-import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { useEffect } from 'react';
 
 export const Route = createFileRoute('/(home)/game/')({
   component: RouteComponent,
@@ -25,7 +20,6 @@ function RouteComponent() {
   const maxMana = useHero((state) => state?.data?.maxMana ?? 0);
   const level = useHero((state) => state?.data?.level ?? 0);
   const equipments = useHero((state) => state?.data?.equipments ?? []);
-
 
   return (
     <div className="flex gap-4">

@@ -26,16 +26,16 @@ export const postRouter = new Hono<Context>()
     const { title, content, url } = c.req.valid('form');
     const userId = c.get('user')?.id;
     const [post] = await db
-    .insert(postTable)
-    .values({
-      authorId: userId!,
-      content,
-      title,
-      url,
-    })
-    .returning({
-      id: postTable.id,
-    });
+      .insert(postTable)
+      .values({
+        authorId: userId!,
+        content,
+        title,
+        url,
+      })
+      .returning({
+        id: postTable.id,
+      });
     return c.json<
       SuccessResponse<{
         id: number;
@@ -68,7 +68,6 @@ export const postRouter = new Hono<Context>()
         })
         .from(postTable)
         .where(and(author ? eq(postTable.authorId, author) : undefined, site ? eq(postTable.url, site) : undefined));
-      console.log(page);
       const posts = await db.query.postTable.findMany({
         limit,
         offset,

@@ -6,20 +6,20 @@ import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
 import { Link, Outlet, createFileRoute, useLocation } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(home)')({
-  component: App,
+  component: AppRouteComponent,
 });
 
-function App() {
+function AppRouteComponent() {
   const { pathname } = useLocation();
- useRegeneration()
+  useRegeneration();
   return (
-    <section className="flex  flex-col">
+    <section className="flex flex-col">
       <Header />
-      <section className="mx-auto flex size-full max-w-7xl ">
+      <section className="mx-auto flex size-full max-w-7xl">
         <aside className="sticky top-14 hidden h-[calc(100vh-56px)] w-60 flex-col border-y-0 p-3 pr-0 md:flex">
           <NavBar />
         </aside>
-        <main className="flex  min-h-screen flex-col size-full p-3">
+        <main className="flex size-full min-h-screen flex-col p-3">
           {pathname !== '/' && !pathname.includes('/game') && <BreadCrumb />}
           <Outlet />
         </main>

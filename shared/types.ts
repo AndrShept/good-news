@@ -104,7 +104,7 @@ export const paginationSchema = z.object({
   site: z.string().optional(),
 });
 export type IPaginationSchema = z.infer<typeof paginationSchema>;
-export type User = InferSelectModel<typeof userTable>;
+export type User = Omit<typeof userTable.$inferSelect, 'password_hash'>;
 export type Post = InferSelectModel<typeof postTable> & {
   author?: Omit<User, 'password_hash'>;
   isUpvoted?: boolean;

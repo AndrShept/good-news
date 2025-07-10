@@ -77,7 +77,6 @@ export const Equipments = memo(({ equipments }: Props) => {
     {} as Record<EquipmentSlotType, Equipment>,
     
   );
-   console.log('render Equipments')
   return (
     <div className="flex mx-auto">
       <ul className="flex flex-col gap-0.5">

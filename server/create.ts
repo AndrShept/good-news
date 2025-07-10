@@ -10,7 +10,7 @@ const go = async () => {
     .insert(modifierTable)
     .values({
       id: generateRandomUuid(),
-      restoreHealth: 10
+      restoreHealth: 10,
     })
     .returning();
   await db.insert(gameItemTable).values({
@@ -22,6 +22,7 @@ const go = async () => {
     modifierId: modifier.id,
   });
   console.log('item cteated !!!');
+  return;
 };
 
 go();

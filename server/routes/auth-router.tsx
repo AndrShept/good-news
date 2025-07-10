@@ -189,7 +189,7 @@ export const authRouter = new Hono<Context>()
     const userId = c.get('user')?.id;
     const user = await db.query.userTable.findFirst({
       where: eq(userTable.id, userId!),
-      with: {},
+      columns: { password_hash: false },
     });
     return c.json<SuccessResponse<UserType>>({
       success: true,

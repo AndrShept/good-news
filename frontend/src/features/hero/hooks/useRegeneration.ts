@@ -1,9 +1,9 @@
+import { useSocket } from '@/components/providers/SocketProvider';
 import { ApiHeroResponse } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import { useHero } from './useHero';
-import { socket } from '@/socket';
 
 export const useRegeneration = () => {
   const currentHealth = useHero((state) => state?.data?.currentHealth ?? 0);
@@ -13,6 +13,7 @@ export const useRegeneration = () => {
   const id = useHero((state) => state?.data?.id ?? '');
   const isFullHealth = currentHealth >= maxHealth;
   const isFullMana = currentMana >= maxMana;
+  const { socket } = useSocket();
   const queryClient = useQueryClient();
   useEffect(() => {
     const listener = (data: { currentHealth: number } | { currentMana: number }) => {
