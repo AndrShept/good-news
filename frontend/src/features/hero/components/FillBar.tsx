@@ -1,10 +1,4 @@
-import { useSocket } from '@/hooks/useSocket';
 import { cn } from '@/lib/utils';
-import { useQueryClient } from '@tanstack/react-query';
-import React, { memo, useEffect } from 'react';
-
-import { getHeroOptions } from '../api/get-hero';
-import { useHero } from '../hooks/useHero';
 
 interface Props {
   value: number;
@@ -14,7 +8,6 @@ interface Props {
 
 export const FillBar = ({ value, maxValue, type }: Props) => {
   const lowPercentHealth = maxValue * 0.3;
-
 
   return (
     <div className="bg-secondary/40 relative h-4 w-full rounded border">
@@ -34,4 +27,4 @@ export const FillBar = ({ value, maxValue, type }: Props) => {
       </div>
     </div>
   );
-}
+};

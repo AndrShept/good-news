@@ -1,7 +1,5 @@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { LogOut } from '@/features/auth/api/logout';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { MenuIcon } from 'lucide-react';
 import { memo } from 'react';
@@ -9,7 +7,6 @@ import { memo } from 'react';
 import { LogOutButton } from './LogOutButton';
 import { NavBar } from './NavBar';
 import { UserAvatar } from './UserAvatar';
-import { LogoIcon } from './game-icons/LogoIcon';
 import { Button, buttonVariants } from './ui/button';
 
 const navLinks = [
@@ -49,9 +46,9 @@ export const Header = memo(() => {
           {user && (
             <div className="flex items-center gap-2">
               <LogOutButton />
-              <div>
+              <div className="flex max-w-[70px] flex-col items-center">
                 <UserAvatar url={user?.image} />
-                <p className="text-muted-foreground text-sm">{user?.username}</p>
+                <p className="text-muted-foreground line-clamp-1 text-sm">{user?.username} </p>
               </div>
             </div>
           )}

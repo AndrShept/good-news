@@ -23,7 +23,7 @@ function RouteComponent() {
         className="mx-auto flex w-full max-w-[500px] flex-col items-center justify-center gap-14"
       >
         <SparklesText sparklesCount={2} className="scroll-m-20 text-balance text-center text-6xl font-extrabold tracking-tight">
-          MAGIC WORLD BEST GAME EVER
+          MAGIC WORLD <span className="text-muted-foreground">BEST GAME EVER</span>
         </SparklesText>
         <m.div
           transition={{ duration: 0.4, ease: 'easeInOut', delay: 0.5 }}

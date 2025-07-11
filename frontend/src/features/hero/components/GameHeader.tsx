@@ -20,7 +20,7 @@ export const GameHeader = () => {
   const isOpen = useBackpack((state) => state.isOpen);
   const onOpen = useBackpack((state) => state.onOpen);
   return (
-    <header className="bg-background/80 backdrop-blur-xs sticky top-0 z-50 mb-3 flex items-center justify-between border-b p-2">
+    <header className="bg-background/80 backdrop-blur-xs sticky top-0 z-50 mb-3 flex items-center justify-between border-b px-4 py-2">
       <section>
         <Link to="/">
           <LogoIcon />

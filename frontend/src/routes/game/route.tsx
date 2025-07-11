@@ -1,4 +1,5 @@
 import { GameMessage } from '@/components/GameMessage';
+import { Spinner } from '@/components/Spinner';
 import { SocketProvider } from '@/components/providers/SocketProvider';
 import { getUserQueryOptions } from '@/features/auth/api/get-user';
 import { getHeroOptions } from '@/features/hero/api/get-hero';

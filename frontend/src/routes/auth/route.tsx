@@ -8,11 +8,11 @@ export const Route = createFileRoute('/auth')({
 function RouteComponent() {
   return (
     <section className="flex h-screen flex-col">
-      <Background imageUrl='/sprites/new/background.png'>
-        <div className="m-auto bg-background/80 backdrop-blur-sm  p-9 border">
-          <Outlet />
-        </div>
-      </Background>
+      {/* <Background imageUrl='/sprites/new/background.png'> */}
+      <div className="bg-background/80 m-auto border p-9 backdrop-blur-sm">
+        <Outlet />
+      </div>
+      {/* </Background> */}
     </section>
   );
 }

@@ -1,6 +1,3 @@
-import { SocketProvider } from '@/components/providers/SocketProvider';
-import { getUserQueryOptions } from '@/features/auth/api/get-user';
-import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { Inventory } from '@/features/hero/components/Inventory';
 import { Modifiers } from '@/features/hero/components/Modifier';
 import { Paperdoll } from '@/features/hero/components/Paperdoll';

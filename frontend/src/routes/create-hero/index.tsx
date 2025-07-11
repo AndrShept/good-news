@@ -3,6 +3,7 @@ import { HeroAvatarList } from '@/components/HeroAvatarList';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { getUserQueryOptions } from '@/features/auth/api/get-user';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { Stats } from '@/features/hero/components/Stats';
 import { useCreateHero } from '@/features/hero/hooks/useCreateHero';
@@ -16,7 +17,16 @@ import { z } from 'zod';
 
 export const Route = createFileRoute('/create-hero/')({
   component: RouteComponent,
-  async beforeLoad({ context }) {},
+  async beforeLoad({ context }) {
+    const hero = await context.queryClient.ensureQueryData(getHeroOptions());
+    const user = await context.queryClient.ensureQueryData(getUserQueryOptions());
+    if (!user) {
+      throw redirect({ to: '/' });
+    }
+    if (user && hero) {
+      throw redirect({ to: '/' });
+    }
+  },
 });
 
 const heroNameSchema = createHeroSchema.pick({
@@ -59,7 +69,7 @@ function RouteComponent() {
           }
           if (data.success) {
             navigate({
-              to: '/',
+              to: '/game',
             });
           }
         },
