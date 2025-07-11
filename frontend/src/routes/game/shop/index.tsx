@@ -3,7 +3,7 @@ import { getShopItemsOptions } from '@/features/shop/api/get-shop-items';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/(home)/game/shop/')({
+export const Route = createFileRoute('/game/shop/')({
   component: RouteComponent,
 });
 

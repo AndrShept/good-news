@@ -3,18 +3,20 @@ import { HeroAvatarList } from '@/components/HeroAvatarList';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { Stats } from '@/features/hero/components/Stats';
 import { useCreateHero } from '@/features/hero/hooks/useCreateHero';
 import { BASE_FREE_POINTS, BASE_STATS } from '@/shared/constants';
 import { createHeroSchema } from '@/shared/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
+import { Link, createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 export const Route = createFileRoute('/create-hero/')({
   component: RouteComponent,
+  async beforeLoad({ context }) {},
 });
 
 const heroNameSchema = createHeroSchema.pick({
@@ -35,10 +37,10 @@ function RouteComponent() {
   });
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = (values: z.infer<typeof heroNameSchema>) => {
-    mutation.mutate(
+  const onSubmit = async (values: z.infer<typeof heroNameSchema>) => {
+    await mutation.mutateAsync(
       {
-        avatarImage:avatarImage ,
+        avatarImage: avatarImage,
         characterImage: '',
         name: values.name,
         freeStatPoints: freePoints,
@@ -95,7 +97,6 @@ function RouteComponent() {
                 currentStats={stats}
                 reset={false}
                 baseStats={BASE_STATS}
-
               />
               <Button className="w-full" type="submit" disabled={isLoading} variant={'default'}>
                 {isLoading ? 'Creating... ' : 'Create Hero'}

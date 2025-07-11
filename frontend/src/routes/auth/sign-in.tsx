@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { signIn } from '@/features/auth/api/sign-in';
 import { loginSchema } from '@/shared/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQueryClient } from '@tanstack/react-query';
 import { Link, createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -12,13 +11,12 @@ import { z } from 'zod';
 export const Route = createFileRoute('/auth/sign-in')({
   component: SignIn,
   beforeLoad: ({ context }) => {
-    if (context.auth) throw redirect({ to: '/auth/sign-up' });
+    if (context.auth) throw redirect({ to: '/' });
   },
 });
 
 function SignIn() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -41,7 +39,6 @@ function SignIn() {
       });
     }
     if (res.success) {
-     await queryClient.invalidateQueries();
       navigate({ to: '/' });
     }
   };

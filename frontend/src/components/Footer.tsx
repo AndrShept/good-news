@@ -5,7 +5,7 @@ type Props = ComponentPropsWithRef<'footer'>;
 export const Footer = forwardRef<HTMLInputElement, Props>(({ className, ...props }, ref) => {
   return (
     <footer ref={ref} {...props} className={cn('mt-auto border-t p-4 text-center', className)}>
-      <p>✨ GoodNews ✨</p>
+      <p>✨ MAGIC WORLD ✨</p>
     </footer>
   );
 });

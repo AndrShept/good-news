@@ -1,18 +1,16 @@
-import { User } from '@/shared/types.ts';
+import { Hero, User } from '@/shared/types.ts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { createRouter } from '@tanstack/react-router';
+import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { LazyMotion, domAnimation } from 'motion/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 import { Socket } from 'socket.io-client';
 
-import { App } from './components/App.tsx';
 import { ErrorLoadingData } from './components/ErrorLoadingData.tsx';
 import { NotFound } from './components/NotFound.tsx';
 import { Spinner } from './components/Spinner.tsx';
-import { AuthProvider } from './components/providers/AuthProvider.tsx';
 import { ThemeProvider } from './components/providers/theme-provider.tsx';
 import './index.css';
 import { routeTree } from './routeTree.gen.ts';
@@ -26,6 +24,7 @@ export interface MyRouterContext {
   auth: User | undefined;
   queryClient: QueryClient;
   socket: Socket | undefined;
+  hero: Hero | undefined;
 }
 
 const queryClient = new QueryClient({
@@ -40,7 +39,7 @@ export const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 0,
-  context: { queryClient, auth: undefined, socket: undefined },
+  context: { queryClient, auth: undefined, socket: undefined, hero: undefined },
   scrollRestoration: true,
   defaultNotFoundComponent: NotFound,
   defaultPendingComponent: () => {
@@ -57,11 +56,10 @@ createRoot(document.getElementById('root')!).render(
   // <StrictMode>
   <ThemeProvider defaultTheme="dark">
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <LazyMotion features={domAnimation}>
-          <App />
-        </LazyMotion>
-      </AuthProvider>
+      <LazyMotion features={domAnimation}>
+        <RouterProvider router={router} />
+        {/* <TanStackRouterDevtools /> */}
+      </LazyMotion>
       <Toaster />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

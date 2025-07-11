@@ -1,29 +1,44 @@
+import { RainbowButton } from '@/components/magicui/rainbow-button';
+import { SparklesText } from '@/components/magicui/sparkles-text';
 import { getUserQueryOptions } from '@/features/auth/api/get-user';
-import { getHeroOptions } from '@/features/hero/api/get-hero';
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import * as m from 'motion/react-m';
 
 export const Route = createFileRoute('/(home)/')({
   component: RouteComponent,
-  beforeLoad: async ({ context }) => {
+  loader: async ({ context }) => {
     const user = await context.queryClient.ensureQueryData(getUserQueryOptions());
-    if (!user)
-      throw redirect({
-        to: '/auth',
-      });
-
-    const hero = await context.queryClient.ensureQueryData(getHeroOptions());
-    if (!hero) {
-      throw redirect({
-        to: '/create-hero',
-      });
-    } else {
-      throw redirect({
-        to: '/game',
-      });
-    }
+    return user;
   },
 });
 
 function RouteComponent() {
-  return <></>;
+  const navigate = useNavigate();
+  return (
+    <section className="flex-co flex flex-1">
+      <m.div
+        transition={{ duration: 0.5, ease: 'easeInOut' }}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mx-auto flex w-full max-w-[500px] flex-col items-center justify-center gap-14"
+      >
+        <SparklesText sparklesCount={2} className="scroll-m-20 text-balance text-center text-6xl font-extrabold tracking-tight">
+          MAGIC WORLD BEST GAME EVER
+        </SparklesText>
+        <m.div
+          transition={{ duration: 0.4, ease: 'easeInOut', delay: 0.5 }}
+          initial={{ opacity: 0, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex w-full max-w-[160px] flex-col items-center justify-center gap-6"
+        >
+          <RainbowButton onClick={() => navigate({ to: '/game' })} className="h-12 w-full">
+            PLAY
+          </RainbowButton>
+          {/* <RainbowButton variant={'outline'} className="w-full">
+            REGISTER
+          </RainbowButton> */}
+        </m.div>
+      </m.div>
+    </section>
+  );
 }

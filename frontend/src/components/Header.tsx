@@ -6,38 +6,53 @@ import { Link } from '@tanstack/react-router';
 import { MenuIcon } from 'lucide-react';
 import { memo } from 'react';
 
+import { LogOutButton } from './LogOutButton';
 import { NavBar } from './NavBar';
 import { UserAvatar } from './UserAvatar';
 import { LogoIcon } from './game-icons/LogoIcon';
-import { Button } from './ui/button';
+import { Button, buttonVariants } from './ui/button';
 
+const navLinks = [
+  {
+    id: 2,
+    name: 'test',
+    url: '/test',
+  },
+  { id: 4, name: 'post', url: '/post' },
+];
 export const Header = memo(() => {
   const user = useAuth();
-  const queryClient = useQueryClient();
+
   return (
     <header className="bg-background/50 sticky top-0 z-50 flex h-14 border-b p-3 backdrop-blur-sm">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between">
-        <Link to={'/'}>
-          <LogoIcon />
-        </Link>
-
+        <div></div>
         <section className="flex items-center gap-2">
+          <ul className="text-muted-foreground flex gap-0.5">
+            {navLinks.map((item) => (
+              <Link
+                className={buttonVariants({
+                  variant: 'ghost',
+                })}
+                key={item.id}
+                to={item.url}
+                activeProps={{
+                  className: buttonVariants({
+                    variant: 'secondary',
+                  }),
+                }}
+              >
+                <p className="mr-auto">{item.name}</p>
+              </Link>
+            ))}
+          </ul>
           {user && (
             <div className="flex items-center gap-2">
+              <LogOutButton />
               <div>
                 <UserAvatar url={user?.image} />
                 <p className="text-muted-foreground text-sm">{user?.username}</p>
               </div>
-
-              <Button
-                variant={'ghost'}
-                onClick={async () => {
-                  await LogOut();
-                  queryClient.removeQueries();
-                }}
-              >
-                Log out
-              </Button>
             </div>
           )}
           {!user && <Link to={'/auth/sign-in'}>login</Link>}

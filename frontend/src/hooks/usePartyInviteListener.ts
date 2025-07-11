@@ -1,5 +1,6 @@
 import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
+import { socketEvents } from '@/shared/socket-events';
 import { useEffect, useRef, useState } from 'react';
 
 type IAcceptPartyResponse = (params: { accept: boolean }) => void;
@@ -11,7 +12,7 @@ type IPartyLeader = {
 
 export const usePartyInviteListener = () => {
   const heroId = useHero((state) => state?.data?.id ?? '');
-  const refFn = useRef<null | IAcceptPartyResponse>(null);
+  const responseCb = useRef<null | IAcceptPartyResponse>(null);
   const partyLeader = useRef<null | IPartyLeader>(null);
   const [isShow, setIsShow] = useState(false);
   const { socket } = useSocket();
@@ -21,15 +22,15 @@ export const usePartyInviteListener = () => {
   };
 
   useEffect(() => {
-    socket.on(`invite-party-${heroId}`, (data: IPartyLeader, acceptPartyResponse: IAcceptPartyResponse) => {
-      refFn.current = acceptPartyResponse;
+    socket.on(socketEvents.partyInvited(heroId), (data: IPartyLeader, acceptPartyResponse: IAcceptPartyResponse) => {
+      responseCb.current = acceptPartyResponse;
       partyLeader.current = data;
       setIsShow(true);
     });
   }, [heroId, socket]);
 
   return {
-    refFn,
+    responseCb,
     partyLeader,
     isShow,
     onClose,
