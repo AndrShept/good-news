@@ -1,18 +1,34 @@
 import { cn } from '@/lib/utils';
-import React from 'react';
+import { VariantProps, cva } from 'class-variance-authority';
+import React, { ComponentProps } from 'react';
 
-interface HeroAvatarProps {
+const avatarVariants = cva('relative rounded-full border', {
+  variants: {
+    size: {
+      xs: 'size-6',
+      sm: 'size-8',
+      md: 'size-10',
+      lg: 'size-12',
+      xl : 'size-14'
+    },
+    variant: {},
+  },
+  defaultVariants: {
+    size: 'lg',
+  },
+});
+
+interface HeroAvatarProps extends VariantProps<typeof avatarVariants>, ComponentProps<'article'> {
   src: string | undefined;
   isSelected?: boolean;
-  classname?: string;
   onClick?: () => void;
 }
 
-export const HeroAvatar = ({ src, isSelected = false, classname, onClick }: HeroAvatarProps) => {
+export const HeroAvatar = ({ src, isSelected = false, onClick, className, size, ...props }: HeroAvatarProps) => {
   return (
     <article
       onClick={onClick}
-      className={cn('relative size-12 rounded-full border', classname, {
+      className={cn(avatarVariants({ className, size }), {
         'border-primary opacity-100 ring-1 hover:opacity-100': isSelected,
       })}
     >

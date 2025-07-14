@@ -55,7 +55,7 @@ export const authRouter = new Hono<Context>()
     await sendEmail({
       to: email,
       subject: 'Реєстрація успішна!',
-      reactElement: <SuccessRegister url={confirmUrl} />,
+      reactElement: SuccessRegister({url: confirmUrl}) ,
     });
 
     return c.json<SuccessResponse>(

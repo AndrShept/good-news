@@ -13,6 +13,7 @@ import { game } from './lib/game';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
+import { groupRouter } from './routes/group-router';
 import { heroRouter } from './routes/hero-router';
 import { postRouter } from './routes/post-router';
 import { shopRouter } from './routes/shop-router';
@@ -29,7 +30,8 @@ const routes = app
   .route('/post', postRouter)
   .route('/comment', commentRouter)
   .route('/hero', heroRouter)
-  .route('/shop', shopRouter);
+  .route('/shop', shopRouter)
+  .route('/group', groupRouter);
 
 // app.onError((err, c) => {
 //   // Обробка помилки підключення до бази даних

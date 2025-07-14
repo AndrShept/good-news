@@ -119,6 +119,7 @@ export type PaginatedResponse<T> = {
   pagination: {
     page: number;
     totalPages: number;
+    isMore?: boolean;
   };
   data: T;
 } & Omit<SuccessResponse, 'data'>;
@@ -143,8 +144,8 @@ export type GameItem = InferSelectModel<typeof gameItemTable> & {
   modifier?: Modifier;
 };
 export type Hero = InferSelectModel<typeof heroTable> & {
-  modifier: Modifier;
-  equipments: Equipment[];
+  modifier?: Modifier;
+  equipments?: Equipment[];
 };
 export type Buff = typeof buffTable.$inferSelect & {
   modifier?: Modifier;

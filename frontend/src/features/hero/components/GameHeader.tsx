@@ -11,6 +11,8 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { useBackpack } from '@/store/useBackpack';
 import { Link } from '@tanstack/react-router';
 
+import { AddPartyButton } from '../../group/components/AddGroupButton';
+
 export const GameHeader = () => {
   const { currentInventorySlots, goldCoins, maxInventorySlots, premiumCoins } = useHero((state) => ({
     goldCoins: state?.data?.goldCoins,
@@ -48,6 +50,7 @@ export const GameHeader = () => {
           <BackpackIcon />
         </Button>
         <InvitePartyButtons />
+        <AddPartyButton />
       </section>
       <section className="flex items-center gap-1 text-[15px]">
         <LogOutButton />
