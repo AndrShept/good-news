@@ -1,4 +1,3 @@
-import { useHero } from '@/features/hero/hooks/useHero';
 import { HeroStats } from '@/shared/types';
 import { useQuery } from '@tanstack/react-query';
 import { CheckIcon } from 'lucide-react';
@@ -8,6 +7,7 @@ import { Button } from '../../../components/ui/button';
 import { getHeroOptions } from '../api/get-hero';
 import { useChangeHeroStats } from '../hooks/useChangeHeroStats';
 import { useConfirmStats } from '../hooks/useConfirmStats';
+import { useHero } from '../hooks/useHero';
 import { ResetStatsButton } from './ResetStatsButton';
 
 export interface Stat {
@@ -34,8 +34,8 @@ export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFre
     freePoints,
   });
 
-  const { data: hero } = useQuery(getHeroOptions());
-  const { mutate, isPending } = useConfirmStats(hero?.data?.id ?? '', { ...currentStats, freeStatPoints: freePoints });
+  const id = useHero((state) => state?.data?.id ?? '');
+  const { mutate, isPending } = useConfirmStats(id, { ...currentStats, freeStatPoints: freePoints });
   const onConfirm = async () => {
     mutate();
   };
@@ -91,4 +91,4 @@ export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFre
       </ul>
     </section>
   );
-}
+};

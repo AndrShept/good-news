@@ -6,11 +6,13 @@ import { useEffect } from 'react';
 import { useHero } from './useHero';
 
 export const useRegeneration = () => {
-  const currentHealth = useHero((state) => state?.data?.currentHealth ?? 0);
-  const currentMana = useHero((state) => state?.data?.currentMana ?? 0);
-  const maxHealth = useHero((state) => state?.data?.maxHealth ?? 0);
-  const maxMana = useHero((state) => state?.data?.maxMana ?? 0);
-  const id = useHero((state) => state?.data?.id ?? '');
+  const { currentHealth, currentMana, id, maxHealth, maxMana } = useHero((state) => ({
+    currentHealth: state?.data?.currentHealth ?? 0,
+    currentMana: state?.data?.currentMana ?? 0,
+    maxHealth: state?.data?.maxHealth ?? 0,
+    maxMana: state?.data?.maxMana ?? 0,
+    id: state?.data?.id,
+  }));
   const isFullHealth = currentHealth >= maxHealth;
   const isFullMana = currentMana >= maxMana;
   const { socket } = useSocket();

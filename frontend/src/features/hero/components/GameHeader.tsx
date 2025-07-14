@@ -10,13 +10,14 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useBackpack } from '@/store/useBackpack';
 import { Link } from '@tanstack/react-router';
-import { LogOutIcon } from 'lucide-react';
 
 export const GameHeader = () => {
-  const goldCoins = useHero((state) => state?.data?.goldCoins ?? 0);
-  const premiumCoins = useHero((state) => state?.data?.premiumCoins ?? 0);
-  const currentInventorySlots = useHero((state) => state?.data?.currentInventorySlots ?? 0);
-  const maxInventorySlots = useHero((state) => state?.data?.maxInventorySlots ?? 0);
+  const { currentInventorySlots, goldCoins, maxInventorySlots, premiumCoins } = useHero((state) => ({
+    goldCoins: state?.data?.goldCoins,
+    premiumCoins: state?.data?.premiumCoins,
+    currentInventorySlots: state?.data?.currentInventorySlots,
+    maxInventorySlots: state?.data?.maxInventorySlots,
+  }));
   const isOpen = useBackpack((state) => state.isOpen);
   const onOpen = useBackpack((state) => state.onOpen);
   return (

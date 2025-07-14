@@ -6,8 +6,10 @@ import { memo, useMemo } from 'react';
 import { getInventoryOptions } from '../api/get-inventory';
 
 export const Inventory = memo(() => {
-  const maxInventorySlots = useHero((state) => state?.data?.maxInventorySlots ?? 0);
-  const id = useHero((state) => state?.data?.id ?? '');
+  const { id, maxInventorySlots } = useHero((state) => ({
+    maxInventorySlots: state?.data?.maxInventorySlots ?? 0,
+    id: state?.data?.id ?? '',
+  }));
   const { data: inventories } = useSuspenseQuery(getInventoryOptions(id));
   const inventoriesData = useMemo(() => {
     return Array.from({ length: maxInventorySlots }, (_, idx) => {

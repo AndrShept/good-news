@@ -8,8 +8,11 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { Stats } from './Stats';
 
 export const Modifiers = memo(() => {
-  const modifier = useHero((state) => state?.data?.modifier);
-  const freeStatPoints = useHero((state) => state?.data?.freeStatPoints ?? 0);
+  const { freeStatPoints, modifier } = useHero((state) => ({
+    modifier: state?.data?.modifier,
+    freeStatPoints: state?.data?.freeStatPoints ?? 0,
+  }));
+
   if (!modifier) throw new Error('modifier not found');
   const initialHeroStats = {
     strength: 0,

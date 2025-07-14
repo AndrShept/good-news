@@ -10,17 +10,20 @@ export const Route = createFileRoute('/game/')({
 });
 
 function RouteComponent() {
-  const avatarImage = useHero((state) => state?.data?.avatarImage ?? '');
-  const name = useHero((state) => state?.data?.name ?? '');
-  const id = useHero((state) => state?.data?.id ?? '');
-  const currentExperience = useHero((state) => state?.data?.currentExperience ?? 0);
-  const maxExperience = useHero((state) => state?.data?.maxExperience ?? 0);
-  const currentHealth = useHero((state) => state?.data?.currentHealth ?? 0);
-  const currentMana = useHero((state) => state?.data?.currentMana ?? 0);
-  const maxHealth = useHero((state) => state?.data?.maxHealth ?? 0);
-  const maxMana = useHero((state) => state?.data?.maxMana ?? 0);
-  const level = useHero((state) => state?.data?.level ?? 0);
-  const equipments = useHero((state) => state?.data?.equipments ?? []);
+  const { avatarImage, currentExperience, currentHealth, equipments, id, level, maxExperience, maxHealth, maxMana, name, currentMana } =
+    useHero((state) => ({
+      avatarImage: state?.data?.avatarImage ?? '',
+      name: state?.data?.name ?? '',
+      id: state?.data?.id ?? '',
+      currentExperience: state?.data?.currentExperience ?? 0,
+      maxExperience: state?.data?.maxExperience ?? 0,
+      currentHealth: state?.data?.currentHealth ?? 0,
+      currentMana: state?.data?.currentMana ?? 0,
+      maxHealth: state?.data?.maxHealth ?? 0,
+      maxMana: state?.data?.maxMana ?? 0,
+      level: state?.data?.level ?? 0,
+      equipments: state?.data?.equipments ?? [],
+    }));
   useRegeneration();
   return (
     <div className="flex gap-4">
