@@ -2,6 +2,8 @@ import { BreadCrumb } from '@/components/BreadCrumb';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { NavBar } from '@/components/NavBar';
+import { SocketProvider } from '@/components/providers/SocketProvider';
+import { getUserQueryOptions } from '@/features/auth/api/get-user';
 import { Link, Outlet, createFileRoute, useLocation } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(home)')({
@@ -10,6 +12,7 @@ export const Route = createFileRoute('/(home)')({
 
 function AppRouteComponent() {
   const { pathname } = useLocation();
+
   return (
     <section className="flex flex-col">
       <Header />
@@ -19,6 +22,7 @@ function AppRouteComponent() {
         </aside> */}
         <main className="flex size-full min-h-[calc(100vh-113px)] flex-1 flex-col p-3">
           {pathname !== '/' && !pathname.includes('/game') && <BreadCrumb />}
+
           <Outlet />
         </main>
       </section>

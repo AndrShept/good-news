@@ -8,7 +8,7 @@ export const LogOutButton = () => {
   const queryClient = useQueryClient();
   return (
     <Button
-      variant={'ghost'}
+      variant={'outline'}
       onClick={async () => {
         await LogOut();
         queryClient.removeQueries();

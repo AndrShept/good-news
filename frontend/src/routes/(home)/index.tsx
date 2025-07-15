@@ -1,19 +1,17 @@
 import { RainbowButton } from '@/components/magicui/rainbow-button';
 import { SparklesText } from '@/components/magicui/sparkles-text';
-import { getUserQueryOptions } from '@/features/auth/api/get-user';
+import { TextEffect } from '@/components/ui/text-effect';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import * as m from 'motion/react-m';
 
 export const Route = createFileRoute('/(home)/')({
   component: RouteComponent,
-  loader: async ({ context }) => {
-    const user = await context.queryClient.ensureQueryData(getUserQueryOptions());
-    return user;
-  },
+
 });
 
 function RouteComponent() {
   const navigate = useNavigate();
+
   return (
     <section className="flex-co flex flex-1">
       <m.div
@@ -23,7 +21,10 @@ function RouteComponent() {
         className="mx-auto flex w-full max-w-[500px] flex-col items-center justify-center gap-14"
       >
         <SparklesText sparklesCount={2} className="scroll-m-20 text-balance text-center text-6xl font-extrabold tracking-tight">
-          MAGIC WORLD <span className="text-muted-foreground">BEST GAME EVER</span>
+          MAGIC WORLD
+          <TextEffect className="text-muted-foreground" delay={1} speedReveal={0.4} per="word" as="h3" preset="blur">
+            BEST GAME EVER
+          </TextEffect>
         </SparklesText>
         <m.div
           transition={{ duration: 0.4, ease: 'easeInOut', delay: 0.5 }}

@@ -1,4 +1,5 @@
 export const socketEvents = {
-  partyInvite: () => 'party:invite',
-  partyInvited: (toHeroId: string) => `party:invited-${toHeroId}`,
+  groupInvite: () => 'group:invite',
+  groupInvited: (toHeroId: string) => `group:invited-${toHeroId}`,
+
 };

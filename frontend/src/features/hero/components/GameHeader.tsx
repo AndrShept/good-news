@@ -1,4 +1,3 @@
-import { InvitePartyButtons } from '@/components/InvitePartyButtons';
 import { LogOutButton } from '@/components/LogOutButton';
 import { BackpackIcon } from '@/components/game-icons/BackpackIcon';
 import { GoldIcon } from '@/components/game-icons/GoldIcon';
@@ -7,13 +6,13 @@ import { LogoIcon } from '@/components/game-icons/LogoIcon';
 import { PremIcon } from '@/components/game-icons/PremIcon';
 import { ShopIcon } from '@/components/game-icons/ShopIcon';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { GroupMenuButton } from '@/features/group/components/GroupMenuButton';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useBackpack } from '@/store/useBackpack';
 import { Link } from '@tanstack/react-router';
+import { memo } from 'react';
 
-import { AddPartyButton } from '../../group/components/AddGroupButton';
-
-export const GameHeader = () => {
+export const GameHeader = memo(() => {
   const { currentInventorySlots, goldCoins, maxInventorySlots, premiumCoins } = useHero((state) => ({
     goldCoins: state?.data?.goldCoins,
     premiumCoins: state?.data?.premiumCoins,
@@ -49,8 +48,7 @@ export const GameHeader = () => {
         <Button onClick={onOpen} className="" variant={isOpen ? 'default' : 'outline'} size={'icon'}>
           <BackpackIcon />
         </Button>
-        <InvitePartyButtons />
-        <AddPartyButton />
+        <GroupMenuButton />
       </section>
       <section className="flex items-center gap-1 text-[15px]">
         <LogOutButton />
@@ -69,4 +67,4 @@ export const GameHeader = () => {
       </section>
     </header>
   );
-};
+});

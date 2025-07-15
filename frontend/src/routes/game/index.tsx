@@ -24,7 +24,7 @@ function RouteComponent() {
       level: state?.data?.level ?? 0,
       equipments: state?.data?.equipments ?? [],
     }));
-  useRegeneration();
+
   return (
     <div className="flex gap-4">
       <Paperdoll

@@ -1,9 +1,9 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn, getRarityColor, getTimeFns } from '@/lib/utils';
 import { useGameMessages } from '@/store/useGameMessages';
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 
-export const GameMessage = () => {
+export const GameMessage = memo(() => {
   const ref = useRef<null | HTMLUListElement>(null);
   const gameMessages = useGameMessages((state) => state.gameMessages);
 
@@ -44,4 +44,4 @@ export const GameMessage = () => {
       </ScrollArea>
     </section>
   );
-};
+});

@@ -6,9 +6,9 @@ import type { Socket } from 'socket.io';
 import { db } from '../db/db';
 import { heroTable } from '../db/schema';
 
-export const inviteParty = (socket: Socket) => {
+export const inviteGroup = (socket: Socket) => {
   socket.on(
-    socketEvents.partyInvite(),
+    socketEvents.groupInvite(),
     async ({ toHeroId, fromHeroId }: { fromHeroId: string; toHeroId: string }, response: (data: SocketResponse) => void) => {
       console.log(fromHeroId);
       console.log(toHeroId);
@@ -18,8 +18,11 @@ export const inviteParty = (socket: Socket) => {
       const invitedHero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, toHeroId),
       });
-      if (!self || !invitedHero) {
-        return response({ message: 'hero no found', success: false });
+      if (!self ) {
+        return response({ message: 'self no found', success: false });
+      }
+      if ( !invitedHero) {
+        return response({ message: 'invitedHero no found', success: false });
       }
       const filteredFromHero = {
         name: self.name,
@@ -27,13 +30,13 @@ export const inviteParty = (socket: Socket) => {
         avatarImage: self.avatarImage,
       };
       try {
-        const cb = await socket.timeout(5_000).emitWithAck(socketEvents.partyInvited(toHeroId), filteredFromHero);
+        const cb = await socket.timeout(5_000).emitWithAck(socketEvents.groupInvited(toHeroId), filteredFromHero);
         if (!cb.accept) {
-          response({ success: false, message: `${invitedHero.name} has declined the party invitation.` });
+          response({ success: false, message: `${invitedHero.name} has declined the group invitation.` });
         }
-        response({ success: true, message: `${invitedHero.name} has joined your party.` });
+        response({ success: true, message: `${invitedHero.name} has joined your group.` });
       } catch (error) {
-        response({ message: `${invitedHero.name} ignored the party invitation.`, success: false });
+        response({ message: `${invitedHero.name} ignored the group invitation.`, success: false });
       }
     },
   );
