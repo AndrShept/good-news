@@ -9,7 +9,7 @@ const avatarVariants = cva('relative rounded-full border', {
       sm: 'size-8',
       md: 'size-10',
       lg: 'size-12',
-      xl : 'size-14'
+      xl: 'size-14',
     },
     variant: {},
   },
@@ -19,15 +19,15 @@ const avatarVariants = cva('relative rounded-full border', {
 });
 
 interface HeroAvatarProps extends VariantProps<typeof avatarVariants>, ComponentProps<'article'> {
-  src: string | undefined;
+  src: string ;
   isSelected?: boolean;
-  onClick?: () => void;
+  setAvatar?: (image: string) => void;
 }
 
-export const HeroAvatar = ({ src, isSelected = false, onClick, className, size, ...props }: HeroAvatarProps) => {
+export const HeroAvatar = ({ src, isSelected = false, setAvatar, className, size, ...props }: HeroAvatarProps) => {
   return (
     <article
-      onClick={onClick}
+      onClick={() => setAvatar?.(src)}
       className={cn(avatarVariants({ className, size }), {
         'border-primary opacity-100 ring-1 hover:opacity-100': isSelected,
       })}

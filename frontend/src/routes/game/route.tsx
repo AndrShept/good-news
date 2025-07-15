@@ -1,4 +1,5 @@
 import { GameMessage } from '@/components/GameMessage';
+import { Spinner } from '@/components/Spinner';
 import { getUserQueryOptions } from '@/features/auth/api/get-user';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { GameHeader } from '@/features/hero/components/GameHeader';
@@ -7,6 +8,7 @@ import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/game')({
   component: GameRouteComponent,
+ 
   beforeLoad: async ({ context }) => {
     const auth = await context.queryClient.ensureQueryData(getUserQueryOptions());
     const hero = await context.queryClient.ensureQueryData(getHeroOptions());

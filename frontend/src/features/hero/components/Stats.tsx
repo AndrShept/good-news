@@ -34,8 +34,7 @@ export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFre
     freePoints,
   });
 
-  const id = useHero((state) => state?.data?.id ?? '');
-  const { mutate, isPending } = useConfirmStats(id, { ...currentStats, freeStatPoints: freePoints });
+  const { mutate, isPending } = useConfirmStats( { ...currentStats, freeStatPoints: freePoints });
   const onConfirm = async () => {
     mutate();
   };

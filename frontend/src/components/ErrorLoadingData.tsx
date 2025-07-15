@@ -13,6 +13,7 @@ export const ErrorLoadingData = ({ reset, error }: Props) => {
       <h1 className="text-primary mb-3 text-3xl font-semibold">Oops!</h1>
       <p>Sorry, an unexpected error occurred while loading data from the server.</p>
       <p>Data not found!</p>
+      <p>{error.stack}</p>
       {process.env.NODE_ENV === 'development' ? <p>{error.message}</p> : 'Something went wrong'}
       <Button className="mt-3" onClick={reset} size={'icon'} variant={'outline'}>
         <DatabaseBackupIcon />

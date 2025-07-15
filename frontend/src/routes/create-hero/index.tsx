@@ -11,7 +11,7 @@ import { BASE_FREE_POINTS, BASE_STATS } from '@/shared/constants';
 import { createHeroSchema } from '@/shared/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -46,7 +46,7 @@ function RouteComponent() {
     resolver: zodResolver(heroNameSchema),
   });
   const isLoading = form.formState.isSubmitting;
-
+  const onSetAvatarImage = useCallback((image: string) => setAvatarImage(image), []);
   const onSubmit = async (values: z.infer<typeof heroNameSchema>) => {
     await mutation.mutateAsync(
       {
@@ -80,7 +80,7 @@ function RouteComponent() {
     <Background imageUrl="/sprites/shrine6.png">
       <div className="m-auto flex max-w-5xl flex-col gap-4 rounded-lg border bg-black/70 p-4 text-[15px] backdrop-blur-md md:flex-row md:p-10">
         <div className="mx-auto">
-          <HeroAvatarList avatar={avatarImage} setAvatar={setAvatarImage} />
+          <HeroAvatarList avatar={avatarImage} setAvatar={onSetAvatarImage} />
         </div>
 
         <div className="mx-auto flex max-w-[220px] flex-col gap-4">

@@ -1,15 +1,15 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import React, { useMemo, useState } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 
 import { HeroAvatar } from './HeroAvatar';
 
 interface Props {
   avatar: string;
-  setAvatar: (str: string) => void;
+  setAvatar: (image: string) => void;
 }
 
-export const HeroAvatarList = ({ avatar, setAvatar }: Props) => {
+export const HeroAvatarList = memo(({ avatar, setAvatar }: Props) => {
   const avatars = useMemo(() => {
     return [...Array(48)].map((_, idx) => ({
       name: Date.now(),
@@ -22,13 +22,13 @@ export const HeroAvatarList = ({ avatar, setAvatar }: Props) => {
         {avatars.map((item) => (
           <HeroAvatar
             key={item.src}
-            onClick={() => setAvatar(item.src)}
+            setAvatar={setAvatar}
             src={item.src}
             isSelected={avatar === item.src}
-            classname="opacity-60 hover:opacity-100 cursor-pointer "
+            className="cursor-pointer opacity-60 hover:opacity-100"
           />
         ))}
       </ul>
     </ScrollArea>
   );
-};
+});
