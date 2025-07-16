@@ -18,10 +18,10 @@ export const inviteGroup = (socket: Socket) => {
       const invitedHero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, toHeroId),
       });
-      if (!self ) {
+      if (!self) {
         return response({ message: 'self no found', success: false });
       }
-      if ( !invitedHero) {
+      if (!invitedHero) {
         return response({ message: 'invitedHero no found', success: false });
       }
       const filteredFromHero = {
@@ -30,11 +30,16 @@ export const inviteGroup = (socket: Socket) => {
         avatarImage: self.avatarImage,
       };
       try {
-        const cb = await socket.timeout(5_000).emitWithAck(socketEvents.groupInvited(toHeroId), filteredFromHero);
-        if (!cb.accept) {
+        const cb = await socket.timeout(5_000).broadcast.emitWithAck(socketEvents.groupInvited(toHeroId), filteredFromHero);
+        if (!cb.accept && !!Object.keys(cb).length) {
           response({ success: false, message: `${invitedHero.name} has declined the group invitation.` });
         }
-        response({ success: true, message: `${invitedHero.name} has joined your group.` });
+        if (cb.accept) {
+          response({ success: true, message: `${invitedHero.name} has joined your group.` });
+        }
+        if (Object.keys(cb).length === 0) {
+          response({ success: false, message: `${invitedHero.name} offline` });
+        }
       } catch (error) {
         response({ message: `${invitedHero.name} ignored the group invitation.`, success: false });
       }

@@ -10,6 +10,7 @@ import { Server } from 'socket.io';
 
 import type { Context } from './context';
 import { game } from './lib/game';
+import { socketHandlers } from './lib/socket-handlers';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
@@ -66,7 +67,7 @@ const httpServer = serve({
   port: 3000,
 });
 
-const io = new Server(httpServer as HTTPServer, {
+export const io = new Server(httpServer as HTTPServer, {
   cors: {
     credentials: true,
     origin: process.env['BASE_URL_FRONT'],
@@ -77,7 +78,6 @@ io.on('connection', (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };
 
   game({ socket });
-
   console.log('connected ' + username);
   socket.on('disconnect', () => {
     console.log('disconnect ' + username);

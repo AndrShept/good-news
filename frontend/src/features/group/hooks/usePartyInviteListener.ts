@@ -22,11 +22,17 @@ export const usePartyInviteListener = () => {
   };
 
   useEffect(() => {
-    socket.on(socketEvents.partyInvited(heroId), (data: IPartyLeader, acceptPartyResponse: IAcceptPartyResponse) => {
+    const groupListener = (data: IPartyLeader, acceptPartyResponse: IAcceptPartyResponse) => {
+      console.log(data)
       responseCb.current = acceptPartyResponse;
       partyLeader.current = data;
       setIsShow(true);
-    });
+ 
+    };
+    socket.on(socketEvents.groupInvited(heroId), groupListener);
+    return () => {
+      socket.off(socketEvents.groupInvited(heroId), groupListener);
+    };
   }, [heroId, socket]);
 
   return {

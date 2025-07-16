@@ -12,7 +12,6 @@ export const useConfirmStats = (data: z.infer<typeof extendedStatsSchema>) => {
   const queryClient = useQueryClient();
   const setGameMessage = useSetGameMessage();
   const res = queryClient.getQueryData<ApiResponseHero>(['hero']);
-  console.log(res);
   return useMutation({
     mutationFn: () => confirmStats(res?.data?.id ?? '', data),
     onError: () => {
