@@ -1,3 +1,4 @@
+import { GroupInvitationModal } from '@/features/group/components/GroupInvitationModal';
 import { Inventory } from '@/features/hero/components/Inventory';
 import { Modifiers } from '@/features/hero/components/Modifier';
 import { Paperdoll } from '@/features/hero/components/Paperdoll';
@@ -42,6 +43,7 @@ function RouteComponent() {
       />
       <Modifiers />
       <Inventory />
+          <GroupInvitationModal />
     </div>
   );
 }

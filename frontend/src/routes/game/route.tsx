@@ -1,10 +1,10 @@
-import { GameMessage } from '@/components/GameMessage';
+import { Game } from '@/components/Game';
+import { SocketProvider } from '@/components/providers/SocketProvider';
 import { getUserQueryOptions } from '@/features/auth/api/get-user';
-import { GroupInvitationModal } from '@/features/group/components/GroupInvitationModal';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
-import { GameHeader } from '@/features/hero/components/GameHeader';
-import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
-import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
+import { useHero } from '@/features/hero/hooks/useHero';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/game')({
   component: GameRouteComponent,
@@ -27,18 +27,13 @@ export const Route = createFileRoute('/game')({
 });
 
 function GameRouteComponent() {
-  useRegeneration();
+  const auth = useAuth();
+  const user = auth ? { id: auth.id, username: auth.username } : undefined;
+  const heroId = useHero((state) => state?.data?.id ?? '');
 
   return (
-    <section className="flex flex-col">
-      <div className="mx-auto flex size-full max-w-7xl flex-col">
-        <GameHeader />
-        <div className="min-h-[calc(100vh-302px)] flex-1 p-3">
-          <Outlet />
-        </div>
-        <GameMessage />
-      </div>
-      <GroupInvitationModal />
-    </section>
+    <SocketProvider user={user} heroId={heroId}>
+      <Game />
+    </SocketProvider>
   );
 }

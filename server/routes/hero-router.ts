@@ -240,6 +240,50 @@ export const heroRouter = new Hono<Context>()
       return c.json<SuccessResponse>({ success: true, message: 'Stats have been successfully updated.' }, 200);
     },
   )
+  .put(
+    '/:id/status',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+      }),
+    ),
+    zValidator(
+      'json',
+      z.object({
+        isOnline: z.boolean(),
+      }),
+    ),
+
+    async (c) => {
+      const userId = c.get('user')?.id as string;
+      const { id } = c.req.valid('param');
+      const { isOnline } = c.req.valid('json');
+
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'Hero not found',
+        });
+      }
+      if (hero.userId !== userId) {
+        throw new HTTPException(403, {
+          message: 'access denied',
+        });
+      }
+
+      await db
+        .update(heroTable)
+        .set({
+          isOnline,
+        })
+        .where(eq(heroTable.id, id));
+      return c.json<SuccessResponse>({ success: true, message: 'hero status change' }, 200);
+    },
+  )
   .get(
     '/:id/inventories',
     loggedIn,

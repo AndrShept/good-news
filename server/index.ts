@@ -1,5 +1,6 @@
 import { serve } from '@hono/node-server';
 import 'dotenv/config';
+import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
 import { cors } from 'hono/cors';
@@ -9,7 +10,10 @@ import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
 
 import type { Context } from './context';
+import { db } from './db/db';
+import { heroTable } from './db/schema';
 import { game } from './lib/game';
+import { heroOffline } from './lib/heroOffline';
 import { socketHandlers } from './lib/socket-handlers';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
@@ -76,11 +80,13 @@ export const io = new Server(httpServer as HTTPServer, {
 
 io.on('connection', (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };
+  const { heroId } = socket.handshake.query as { heroId: string };
 
   game({ socket });
   console.log('connected ' + username);
   socket.on('disconnect', () => {
     console.log('disconnect ' + username);
+    heroOffline(heroId);
   });
 });
 

@@ -1,3 +1,6 @@
+import { changeHeroOnlineStatus } from '@/features/hero/api/change-status';
+import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
+import { client } from '@/lib/utils';
 import React, { PropsWithChildren, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Socket, io } from 'socket.io-client';
 
@@ -8,26 +11,29 @@ interface ISocketContext {
 
 const URL = process.env.NODE_ENV === 'production' ? import.meta.env.VITE_SOCKET_SERVER : 'http://localhost:3000';
 
-const SocketContext = createContext<ISocketContext | null>(null);
+const SocketContext = createContext({} as ISocketContext);
 export const useSocket = () => {
   const context = useContext(SocketContext);
-  if (!context) {
-    throw new Error('context not init');
-  }
+
   return context;
 };
 
-export const SocketProvider = ({ children, user }: PropsWithChildren<{ user: { id: string; username: string } | undefined }>) => {
+export const SocketProvider = ({
+  children,
+  user,
+  heroId,
+}: PropsWithChildren<{ user: { id: string; username: string } | undefined; heroId?: string }>) => {
   const socket = useMemo(
     () =>
       io(URL, {
         transports: ['websocket'],
         withCredentials: true,
         auth: user,
+        query: { heroId },
 
         autoConnect: false,
       }),
-    [user],
+    [heroId, user],
   );
   const [isConnected, setIsConnected] = useState(socket.connected);
 
@@ -37,17 +43,25 @@ export const SocketProvider = ({ children, user }: PropsWithChildren<{ user: { i
     }
     function onConnect() {
       setIsConnected(true);
+      changeHeroOnlineStatus({
+        heroId,
+        status: {
+          isOnline: true,
+        },
+      });
     }
 
-    function onDisconnect() {
+    async function onDisconnect() {
       setIsConnected(false);
     }
 
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
     return () => {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
     };
-  }, [socket, user]);
+  }, [heroId, socket, user]);
 
   return <SocketContext.Provider value={{ socket, isConnected }}>{children}</SocketContext.Provider>;
 };

@@ -8,14 +8,13 @@ import { usePartyInviteListener } from '../hooks/usePartyInviteListener';
 
 export const GroupInvitationModal = () => {
   const { isShow, onClose, responseData, responseCb } = usePartyInviteListener();
-  console.log('RENDER MODAL');
   const seconds = useRef(0);
   const onAccept = () => {
-    responseCb?.current?.({ accept: true });
+    responseCb.current?.({ accept: true });
     onClose();
   };
   const onDecline = () => {
-    responseCb?.current?.({ accept: false });
+    responseCb.current?.({ accept: false });
     onClose();
   };
 
@@ -28,7 +27,6 @@ export const GroupInvitationModal = () => {
         onClose();
       }
       seconds.current -= 1000;
-      console.log(seconds.current);
     }, 1000);
     return () => clearInterval(timer);
   }, [responseData.current, isShow]);

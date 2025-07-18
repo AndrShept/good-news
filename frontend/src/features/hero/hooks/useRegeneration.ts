@@ -15,7 +15,7 @@ export const useRegeneration = () => {
   }));
   const isFullHealth = currentHealth >= maxHealth;
   const isFullMana = currentMana >= maxMana;
-  const { socket } = useSocket();
+  const {socket} = useSocket();
   const queryClient = useQueryClient();
   useEffect(() => {
     const listener = (data: { currentHealth: number } | { currentMana: number }) => {
@@ -38,5 +38,5 @@ export const useRegeneration = () => {
       socket.off(`health-regeneration`, listener);
       socket.off(`mana-regeneration-${id}`, listener);
     };
-  }, [id, isFullHealth, isFullMana, socket]);
+  }, [id, isFullHealth, isFullMana, queryClient, socket]);
 };
