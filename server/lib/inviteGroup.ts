@@ -24,21 +24,19 @@ export const inviteGroup = (socket: Socket) => {
       if (!invitedHero) {
         return response({ message: 'invitedHero no found', success: false });
       }
-      const filteredFromHero = {
+      const data = {
         name: self.name,
         level: self.level,
         avatarImage: self.avatarImage,
+        waitTime: 20_000,
       };
       try {
-        const cb = await socket.timeout(5_000).broadcast.emitWithAck(socketEvents.groupInvited(toHeroId), filteredFromHero);
-        if (!cb.accept && !!Object.keys(cb).length) {
+        const cb = await socket.timeout(data.waitTime).emitWithAck(socketEvents.groupInvited(toHeroId), data);
+        if (!cb.accept) {
           response({ success: false, message: `${invitedHero.name} has declined the group invitation.` });
         }
         if (cb.accept) {
           response({ success: true, message: `${invitedHero.name} has joined your group.` });
-        }
-        if (Object.keys(cb).length === 0) {
-          response({ success: false, message: `${invitedHero.name} offline` });
         }
       } catch (error) {
         response({ message: `${invitedHero.name} ignored the group invitation.`, success: false });

@@ -31,7 +31,7 @@ export const GameHeader = memo(() => {
       <section className="flex gap-0.5">
         <Link
           className={buttonVariants({ variant: 'outline', size: 'icon', className: 'cursor-default' })}
-          to={'/game'}
+          to='/game'
           activeOptions={{ exact: true }}
           activeProps={{ className: buttonVariants({ variant: 'default', size: 'icon' }) }}
         >
@@ -39,13 +39,13 @@ export const GameHeader = memo(() => {
         </Link>
         <Link
           className={buttonVariants({ variant: 'outline', size: 'icon', className: 'cursor-default' })}
-          to={'/game/shop'}
+          to='/game/shop'
           activeProps={{ className: buttonVariants({ variant: 'default', size: 'icon' }) }}
         >
           <ShopIcon />
         </Link>
 
-        <Button onClick={onOpen} className="" variant={isOpen ? 'default' : 'outline'} size={'icon'}>
+        <Button onClick={onOpen} className="" variant={isOpen ? 'default' : 'outline'} size='icon'>
           <BackpackIcon />
         </Button>
         <GroupMenuButton />

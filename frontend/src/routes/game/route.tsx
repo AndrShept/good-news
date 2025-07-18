@@ -1,8 +1,6 @@
 import { GameMessage } from '@/components/GameMessage';
-import { Spinner } from '@/components/Spinner';
 import { getUserQueryOptions } from '@/features/auth/api/get-user';
-import { GroupInviteToast } from '@/features/group/components/GroupInviteToast';
-import { usePartyInviteListener } from '@/features/group/hooks/usePartyInviteListener';
+import { GroupInvitationModal } from '@/features/group/components/GroupInvitationModal';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { GameHeader } from '@/features/hero/components/GameHeader';
 import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
@@ -30,7 +28,7 @@ export const Route = createFileRoute('/game')({
 
 function GameRouteComponent() {
   useRegeneration();
-  const { partyLeader, isShow, responseCb, onClose } = usePartyInviteListener();
+
   return (
     <section className="flex flex-col">
       <div className="mx-auto flex size-full max-w-7xl flex-col">
@@ -38,9 +36,9 @@ function GameRouteComponent() {
         <div className="min-h-[calc(100vh-302px)] flex-1 p-3">
           <Outlet />
         </div>
-        {/* {isShow && <GroupInviteToast isShow={isShow}  />} */}
         <GameMessage />
       </div>
+      <GroupInvitationModal />
     </section>
   );
 }

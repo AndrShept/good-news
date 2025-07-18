@@ -3,17 +3,18 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { socketEvents } from '@/shared/socket-events';
 import { useEffect, useRef, useState } from 'react';
 
-type IAcceptPartyResponse = (params: { accept: boolean }) => void;
-type IPartyLeader = {
+type IAcceptGroupCb = (params: { accept: boolean }) => void;
+type IResponseData = {
   name: string;
   level: number;
   avatarImage: string;
+  waitTime : number
 };
 
 export const usePartyInviteListener = () => {
   const heroId = useHero((state) => state?.data?.id ?? '');
-  const responseCb = useRef<null | IAcceptPartyResponse>(null);
-  const partyLeader = useRef<null | IPartyLeader>(null);
+  const responseCb = useRef<null | IAcceptGroupCb>(null);
+  const responseData = useRef<null | IResponseData>(null);
   const [isShow, setIsShow] = useState(false);
   const { socket } = useSocket();
 
@@ -22,10 +23,10 @@ export const usePartyInviteListener = () => {
   };
 
   useEffect(() => {
-    const groupListener = (data: IPartyLeader, acceptPartyResponse: IAcceptPartyResponse) => {
+    const groupListener = (data: IResponseData, acceptPartyResponse: IAcceptGroupCb) => {
       console.log(data)
       responseCb.current = acceptPartyResponse;
-      partyLeader.current = data;
+      responseData.current = data;
       setIsShow(true);
  
     };
@@ -37,7 +38,7 @@ export const usePartyInviteListener = () => {
 
   return {
     responseCb,
-    partyLeader,
+    responseData,
     isShow,
     onClose,
   };
