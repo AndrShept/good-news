@@ -4,7 +4,7 @@ import type { InferResponseType } from 'hono';
 import { z } from 'zod';
 
 import type { client } from '../frontend/src/lib/utils';
-import { heroTable, inventoryItemTable, modifierTable } from '../server/db/schema';
+import { groupTable, heroTable, inventoryItemTable, modifierTable } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { buffTable } from '../server/db/schema/buff-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
@@ -133,6 +133,7 @@ export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
+export type Group = InferSelectModel<typeof groupTable>;
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;
 export type Equipment = typeof equipmentTable.$inferSelect & {
   gameItem?: GameItem;
@@ -145,6 +146,7 @@ export type GameItem = InferSelectModel<typeof gameItemTable> & {
 };
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier?: Modifier;
+  group?: Group;
   equipments?: Equipment[];
 };
 export type Buff = typeof buffTable.$inferSelect & {

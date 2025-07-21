@@ -1,0 +1,2 @@
+ALTER TABLE "hero" ADD COLUMN "groupId" text;--> statement-breakpoint
+ALTER TABLE "hero" ADD CONSTRAINT "hero_groupId_group_id_fk" FOREIGN KEY ("groupId") REFERENCES "public"."group"("id") ON DELETE cascade ON UPDATE no action;

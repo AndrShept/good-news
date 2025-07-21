@@ -1,3 +1,4 @@
+import { GroupInvitationModal } from '@/features/group/components/GroupInvitationModal';
 import { GameHeader } from '@/features/hero/components/GameHeader';
 import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
 import { Outlet } from '@tanstack/react-router';
@@ -16,6 +17,7 @@ export const Game = () => {
         </div>
         <GameMessage />
       </div>
+      <GroupInvitationModal />
     </section>
   );
 };

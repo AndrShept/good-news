@@ -141,6 +141,48 @@
       "when": 1749824025219,
       "tag": "0019_natural_rictor",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1753085766205,
+      "tag": "0020_premium_klaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1753085875908,
+      "tag": "0021_acoustic_bruce_banner",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1753086059367,
+      "tag": "0022_foamy_ravenous",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1753086977627,
+      "tag": "0023_next_cloak",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1753088454127,
+      "tag": "0024_omniscient_pestilence",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1753091840443,
+      "tag": "0025_curly_emma_frost",
+      "breakpoints": true
     }
   ]
 }

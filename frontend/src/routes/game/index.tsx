@@ -1,9 +1,7 @@
-import { GroupInvitationModal } from '@/features/group/components/GroupInvitationModal';
 import { Inventory } from '@/features/hero/components/Inventory';
 import { Modifiers } from '@/features/hero/components/Modifier';
 import { Paperdoll } from '@/features/hero/components/Paperdoll';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/game/')({
@@ -43,7 +41,7 @@ function RouteComponent() {
       />
       <Modifiers />
       <Inventory />
-          <GroupInvitationModal />
+       
     </div>
   );
 }

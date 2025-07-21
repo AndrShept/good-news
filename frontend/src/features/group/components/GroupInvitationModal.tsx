@@ -3,6 +3,7 @@ import { TimerBar } from '@/components/TimerBar';
 import { Button } from '@/components/ui/button';
 import * as m from 'motion/react-m';
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { usePartyInviteListener } from '../hooks/usePartyInviteListener';
 
@@ -32,7 +33,7 @@ export const GroupInvitationModal = () => {
   }, [responseData.current, isShow]);
 
   if (!isShow) return;
-  return (
+  return createPortal(
     <section className="fixed inset-0 z-50 flex overflow-hidden p-2">
       <m.div
         initial={{
@@ -70,6 +71,7 @@ export const GroupInvitationModal = () => {
           </Button>
         </div>
       </m.div>
-    </section>
+    </section>,
+    document.body,
   );
 };

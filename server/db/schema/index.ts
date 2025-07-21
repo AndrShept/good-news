@@ -9,3 +9,4 @@ export * from './equipment-schema';
 export * from './game-item-schema';
 export * from './inventory-item-schema';
 export * from './buff-schema';
+export * from './group-schema';

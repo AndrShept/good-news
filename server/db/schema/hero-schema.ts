@@ -2,10 +2,11 @@ import { relations } from 'drizzle-orm';
 import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 import { userTable } from './auth-schema';
-import { equipmentTable } from './equipment-schema';
-import { modifierTable } from './modifier-schema';
-import { inventoryItemTable } from './inventory-item-schema';
 import { buffTable } from './buff-schema';
+import { equipmentTable } from './equipment-schema';
+import { groupTable } from './group-schema';
+import { inventoryItemTable } from './inventory-item-schema';
+import { modifierTable } from './modifier-schema';
 
 export const heroTable = pgTable('hero', {
   id: text().primaryKey().notNull(),
@@ -26,7 +27,7 @@ export const heroTable = pgTable('hero', {
   maxHealth: integer().default(0).notNull(),
   maxMana: integer().default(0).notNull(),
 
-  currentInventorySlots : integer().default(0).notNull(),
+  currentInventorySlots: integer().default(0).notNull(),
   maxInventorySlots: integer().default(40).notNull(),
 
   currentExperience: integer().default(0).notNull(),
@@ -43,6 +44,10 @@ export const heroTable = pgTable('hero', {
   }),
 
   modifierId: text().references(() => modifierTable.id),
+  groupId: text()
+    .references(() => groupTable.id, {
+      onDelete: 'set null',
+    }),
   userId: text()
     .notNull()
     .references(() => userTable.id, {
@@ -54,6 +59,10 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
   modifier: one(modifierTable, {
     fields: [heroTable.modifierId],
     references: [modifierTable.id],
+  }),
+  group: one(groupTable, {
+    fields: [heroTable.groupId],
+    references: [groupTable.id],
   }),
   user: one(userTable, {
     fields: [heroTable.userId],

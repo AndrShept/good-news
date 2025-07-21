@@ -1,12 +1,13 @@
 import { client } from '@/lib/utils';
 import { infiniteQueryOptions, keepPreviousData, queryOptions } from '@tanstack/react-query';
 
-export const getGroupAvailableHeroes = async ({ page, searchTerm }: { page: number; searchTerm: string }) => {
+export const getGroupAvailableHeroes = async ({ page, searchTerm, selfId }: { page: number; searchTerm: string; selfId: string }) => {
   try {
     const res = await client.group['available-heroes'].$get({
       query: {
         page: page.toString(),
         searchTerm,
+        selfId,
       },
     });
     const data = await res.json();
@@ -17,10 +18,10 @@ export const getGroupAvailableHeroes = async ({ page, searchTerm }: { page: numb
   }
 };
 
-export const getGroupAvailableHeroesOptions = ({ searchTerm }: { searchTerm: string }) =>
+export const getGroupAvailableHeroesOptions = ({ searchTerm, selfId }: { searchTerm: string; selfId: string }) =>
   infiniteQueryOptions({
     queryKey: ['group-available-heroes', searchTerm],
-    queryFn: ({ pageParam }) => getGroupAvailableHeroes({ page: pageParam, searchTerm }),
+    queryFn: ({ pageParam }) => getGroupAvailableHeroes({ page: pageParam, searchTerm, selfId }),
     placeholderData: keepPreviousData,
     initialPageParam: 1,
     gcTime: 0,

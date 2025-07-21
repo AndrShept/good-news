@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getGroupAvailableHeroesOptions } from '@/features/group/api/get -group-available-heroes';
+import { useHero } from '@/features/hero/hooks/useHero';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { PlusIcon } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -13,8 +14,9 @@ import { InviteGroupButton } from './InviteGroupButton';
 export const GroupMenuButton = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isShow, setIsShow] = useState(false);
+  const selfId = useHero((state) => state?.data?.id ?? '');
   const { data, hasNextPage, fetchNextPage, isLoading } = useInfiniteQuery({
-    ...getGroupAvailableHeroesOptions({ searchTerm }),
+    ...getGroupAvailableHeroesOptions({ searchTerm, selfId }),
     enabled: isShow,
   });
   const onSearch = useCallback((value: string) => setSearchTerm(value), []);
