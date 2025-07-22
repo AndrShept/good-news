@@ -22,6 +22,7 @@ export const getGroupAvailableHeroesOptions = ({ searchTerm, selfId }: { searchT
   infiniteQueryOptions({
     queryKey: ['group-available-heroes', searchTerm],
     queryFn: ({ pageParam }) => getGroupAvailableHeroes({ page: pageParam, searchTerm, selfId }),
+    enabled: Boolean(searchTerm),
     placeholderData: keepPreviousData,
     initialPageParam: 1,
     gcTime: 0,

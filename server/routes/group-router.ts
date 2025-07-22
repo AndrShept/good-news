@@ -8,6 +8,7 @@ import { z } from 'zod';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { groupTable, heroTable } from '../db/schema';
+import { generateRandomUuid } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const groupRouter = new Hono<Context>()
@@ -79,6 +80,84 @@ export const groupRouter = new Hono<Context>()
           data: heroes,
         },
         200,
+      );
+    },
+  )
+  .delete(
+    '/:id/delete',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+      }),
+    ),
+    async (c) => {
+      const { id } = c.req.valid('param');
+      const group = await db.query.groupTable.findFirst({
+        where: eq(groupTable.id, id),
+      });
+      if (!group) {
+        throw new HTTPException(404, { message: 'group not found' });
+      }
+      const heroes = await db.query.heroTable.findMany({
+        where: eq(heroTable.groupId, id),
+      });
+
+      await db.delete(groupTable).where(eq(groupTable.id, id));
+
+      return c.json<SuccessResponse>(
+        {
+          message: 'group deleted',
+          success: true,
+        },
+        201,
+      );
+    },
+  )
+  .post(
+    '/create/hero/:id',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+      }),
+    ),
+    async (c) => {
+      const { id } = c.req.valid('param');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+      if (!hero) {
+        throw new HTTPException(404, { message: 'hero not found' });
+      }
+      if (hero.groupId) {
+        throw new HTTPException(404, { message: 'is already in a group and cannot be created.' });
+      }
+      const data = await db.transaction(async (tx) => {
+        const [{ groupId }] = await tx
+          .insert(groupTable)
+          .values({
+            id: generateRandomUuid(),
+            leaderId: hero.id,
+          })
+          .returning({ groupId: groupTable.id });
+        await tx
+          .update(heroTable)
+          .set({
+            groupId,
+          })
+          .where(eq(heroTable.id, id));
+        return { groupId };
+      });
+      return c.json<SuccessResponse<typeof data>>(
+        {
+          message: 'group created',
+          success: true,
+          data,
+        },
+        201,
       );
     },
   );

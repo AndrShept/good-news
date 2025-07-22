@@ -56,6 +56,7 @@ export const heroRouter = new Hono<Context>()
         where: eq(heroTable.userId, id),
         with: {
           modifier: true,
+          group: true,
           equipments: {
             with: {
               gameItem: {

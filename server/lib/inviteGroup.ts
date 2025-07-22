@@ -54,16 +54,16 @@ export const inviteGroup = async (socket: Socket) => {
       if (!invitedHero) {
         return response({ message: 'invitedHero no found', success: false });
       }
-      const validate = await validateGroupMembers({
-        fromHero: { ...fromHero, group: fromHero.group ?? undefined },
-        invitedHero,
-      });
-      if (validate) {
-        return response({
-          message: validate.message,
-          success: validate.success,
-        });
-      }
+      // const validate = await validateGroupMembers({
+      //   fromHero: { ...fromHero, group: fromHero.group ?? undefined },
+      //   invitedHero,
+      // });
+      // if (validate) {
+      //   return response({
+      //     message: validate.message,
+      //     success: validate.success,
+      //   });
+      // }
 
       const data = {
         name: fromHero.name,
@@ -93,16 +93,16 @@ export const inviteGroup = async (socket: Socket) => {
             return response({ message: 'invitedHero no found', success: false });
           }
 
-          const validate = await validateGroupMembers({
-            fromHero: { ...fromHero, group: fromHero.group ?? undefined },
-            invitedHero,
-          });
-          if (validate) {
-            return response({
-              message: validate.message,
-              success: validate.success,
-            });
-          }
+          // const validate = await validateGroupMembers({
+          //   fromHero: { ...fromHero, group: fromHero.group ?? undefined },
+          //   invitedHero,
+          // });
+          // if (validate) {
+          //   return response({
+          //     message: validate.message,
+          //     success: validate.success,
+          //   });
+          // }
 
           if (!fromHero.groupId) {
             db.transaction(async (tx) => {
