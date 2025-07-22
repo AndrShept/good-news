@@ -8,7 +8,8 @@ type IResponseData = {
   name: string;
   level: number;
   avatarImage: string;
-  waitTime : number
+  waitTime: number;
+  groupId: string
 };
 
 export const usePartyInviteListener = () => {
@@ -24,11 +25,9 @@ export const usePartyInviteListener = () => {
 
   useEffect(() => {
     const groupListener = (data: IResponseData, acceptPartyResponse: IAcceptGroupCb) => {
-      console.log(data)
       responseCb.current = acceptPartyResponse;
       responseData.current = data;
       setIsShow(true);
- 
     };
     socket.on(socketEvents.groupInvited(heroId), groupListener);
     return () => {

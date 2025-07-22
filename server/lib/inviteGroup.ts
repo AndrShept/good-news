@@ -28,7 +28,7 @@ const validateGroupMembers = async ({ fromHero, invitedHero }: IValidateGroupMem
   if (groupCount >= 3) {
     return { success: false, message: `The group is full and cannot accept more players.` };
   }
-  const isGroupLeader = !!((fromHero.group && fromHero.group.leaderId === fromHero.id && fromHero.groupId) || !fromHero.groupId);
+  const isGroupLeader = fromHero.group && fromHero.group.leaderId === fromHero.id;
 
   if (!isGroupLeader) {
     return { success: false, message: `Only the group leader can invite players to the group.` };
@@ -54,22 +54,23 @@ export const inviteGroup = async (socket: Socket) => {
       if (!invitedHero) {
         return response({ message: 'invitedHero no found', success: false });
       }
-      // const validate = await validateGroupMembers({
-      //   fromHero: { ...fromHero, group: fromHero.group ?? undefined },
-      //   invitedHero,
-      // });
-      // if (validate) {
-      //   return response({
-      //     message: validate.message,
-      //     success: validate.success,
-      //   });
-      // }
+      const validate = await validateGroupMembers({
+        fromHero: { ...fromHero, group: fromHero.group ?? undefined },
+        invitedHero,
+      });
+      if (validate) {
+        return response({
+          message: validate.message,
+          success: validate.success,
+        });
+      }
 
       const data = {
         name: fromHero.name,
         level: fromHero.level,
         avatarImage: fromHero?.avatarImage,
         waitTime: 20_000,
+        groupId: fromHero.groupId,
       };
       try {
         const [cb] = await socket.timeout(data.waitTime).broadcast.emitWithAck(socketEvents.groupInvited(toHeroId), data);
@@ -92,42 +93,15 @@ export const inviteGroup = async (socket: Socket) => {
           if (!invitedHero) {
             return response({ message: 'invitedHero no found', success: false });
           }
-
-          // const validate = await validateGroupMembers({
-          //   fromHero: { ...fromHero, group: fromHero.group ?? undefined },
-          //   invitedHero,
-          // });
-          // if (validate) {
-          //   return response({
-          //     message: validate.message,
-          //     success: validate.success,
-          //   });
-          // }
-
-          if (!fromHero.groupId) {
-            db.transaction(async (tx) => {
-              const [newGroup] = await tx
-                .insert(groupTable)
-                .values({
-                  id: generateRandomUuid(),
-                  leaderId: fromHero.id,
-                })
-                .returning({ id: groupTable.id });
-              await tx
-                .update(heroTable)
-                .set({
-                  groupId: newGroup.id,
-                })
-                .where(eq(heroTable.id, fromHero.id));
-              await tx
-                .update(heroTable)
-                .set({
-                  groupId: newGroup.id,
-                })
-                .where(eq(heroTable.id, invitedHero.id));
+          const validate = await validateGroupMembers({
+            fromHero: { ...fromHero, group: fromHero.group ?? undefined },
+            invitedHero,
+          });
+          if (validate) {
+            return response({
+              message: validate.message,
+              success: validate.success,
             });
-
-            return response({ success: true, message: `${invitedHero.name} has joined your group.` });
           }
           await db
             .update(heroTable)

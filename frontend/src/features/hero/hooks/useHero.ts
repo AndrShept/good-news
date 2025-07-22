@@ -4,5 +4,5 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 
 export const useHero = <T = ApiHeroResponse>(fn?: (data: ApiHeroResponse | undefined) => T): T => {
   const { data } = useSuspenseQuery({ ...getHeroOptions(), select: fn });
-  return data;
+  return data
 };

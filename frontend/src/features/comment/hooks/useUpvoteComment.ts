@@ -51,8 +51,8 @@ export const useUpvoteComment = ({ queryKey }: { queryKey: string[] }) => {
       );
     },
 
-    onSuccess(data, variables) {
-      queryClient.invalidateQueries({
+    async onSuccess() {
+      await queryClient.invalidateQueries({
         queryKey,
       });
     },

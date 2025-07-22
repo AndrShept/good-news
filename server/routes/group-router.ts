@@ -1,3 +1,4 @@
+import { socketEvents } from '@/shared/socket-events';
 import type { GameItem, Hero, PaginatedResponse, SuccessResponse, User } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq, ilike, isNull, ne } from 'drizzle-orm';
@@ -5,9 +6,11 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
+import { io } from '..';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { groupTable, heroTable } from '../db/schema';
+import { socketHandlers } from '../lib/socket-handlers';
 import { generateRandomUuid } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
 
@@ -94,6 +97,7 @@ export const groupRouter = new Hono<Context>()
     ),
     async (c) => {
       const { id } = c.req.valid('param');
+
       const group = await db.query.groupTable.findFirst({
         where: eq(groupTable.id, id),
       });
@@ -103,8 +107,9 @@ export const groupRouter = new Hono<Context>()
       const heroes = await db.query.heroTable.findMany({
         where: eq(heroTable.groupId, id),
       });
-
+      io.in(group.id).emit(socketEvents.groupSysMessages(), 'LEAVE');
       await db.delete(groupTable).where(eq(groupTable.id, id));
+      io.socketsLeave(group.id);
 
       return c.json<SuccessResponse>(
         {
@@ -151,6 +156,7 @@ export const groupRouter = new Hono<Context>()
           .where(eq(heroTable.id, id));
         return { groupId };
       });
+
       return c.json<SuccessResponse<typeof data>>(
         {
           message: 'group created',

@@ -18,5 +18,6 @@ export const getHeroOptions = () =>
   queryOptions({
     queryKey: ['hero'],
     queryFn: getHero,
+
     staleTime: 60_000,
   });

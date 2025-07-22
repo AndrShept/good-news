@@ -17,7 +17,7 @@ export const useCreateComment = ({
     onError() {
       toast.error('Something went wrong');
     },
-    onSettled() {
+     onSettled() {
       queryKey.map((key) => {
         queryClient.invalidateQueries({
           queryKey: key,

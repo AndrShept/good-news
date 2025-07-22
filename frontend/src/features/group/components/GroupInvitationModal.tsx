@@ -3,6 +3,7 @@ import { TimerBar } from '@/components/TimerBar';
 import { Button } from '@/components/ui/button';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { useHero } from '@/features/hero/hooks/useHero';
+import { ApiHeroResponse } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import * as m from 'motion/react-m';
 import React, { useEffect, useRef, useState } from 'react';
@@ -13,21 +14,18 @@ import { usePartyInviteListener } from '../hooks/usePartyInviteListener';
 
 export const GroupInvitationModal = () => {
   const { isShow, onClose, responseData, responseCb } = usePartyInviteListener();
-  const [isLoading, setIsLoading] = useState(false);
-  const groupId = useHero((state) => state?.data?.groupId ?? '');
   const queryClient = useQueryClient();
   const seconds = useRef(0);
   const onAccept = async () => {
-    setIsLoading(true);
     responseCb.current?.({ accept: true });
-    await new Promise((r) => setTimeout(r, 1000));
-    await queryClient.invalidateQueries({
-      queryKey: getHeroOptions().queryKey,
+    queryClient.setQueriesData<ApiHeroResponse>({ queryKey: getHeroOptions().queryKey }, (oldData) => {
+      if (!oldData || !oldData.data || !responseData.current?.groupId) return;
+
+      return {
+        ...oldData,
+        data: { ...oldData.data, groupId: responseData.current.groupId },
+      };
     });
-    await queryClient.invalidateQueries({
-      queryKey: getGroupMembersOptions(groupId).queryKey,
-    });
-    setIsLoading(false);
     onClose();
   };
   const onDecline = () => {
@@ -79,7 +77,7 @@ export const GroupInvitationModal = () => {
           <TimerBar second={responseData.current?.waitTime} />
         </div>
         <div className="ml-auto mt-auto flex gap-2">
-          <Button disabled={isLoading} size="sm" variant="default" onClick={onAccept}>
+          <Button size="sm" variant="default" onClick={onAccept}>
             Accept
           </Button>
           <Button size="sm" variant="outline" onClick={onDecline}>

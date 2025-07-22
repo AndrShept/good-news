@@ -1,11 +1,11 @@
 import { HeroAvatar } from '@/components/HeroAvatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import React from 'react';
 
-import { InviteGroupButton } from './InviteGroupButton';
 import { getGroupAvailableHeroesOptions } from '../api/get-group-available-heroes';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { InviteGroupButton } from './InviteGroupButton';
 
 interface Props {
   searchTerm: string;
@@ -33,7 +33,7 @@ export const GroupAvailableHeroesList = ({ isShow, searchTerm }: Props) => {
               </div>
 
               <div className="ml-auto">
-                <InviteGroupButton toHeroId={hero.id} />
+                <InviteGroupButton toHeroId={hero.id} searchTerm={searchTerm} />
               </div>
             </article>
           )),

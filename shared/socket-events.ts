@@ -1,5 +1,7 @@
 export const socketEvents = {
   groupInvite: () => 'group:invite',
   groupInvited: (toHeroId: string) => `group:invited-${toHeroId}`,
-
+  joinRoom: () => `join:room`,
+  leaveRoom: () => `leave:room`,
+  groupSysMessages: () => `group:sys-messages`,
 };

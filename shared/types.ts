@@ -3,7 +3,7 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import type { InferResponseType } from 'hono';
 import { z } from 'zod';
 
-import type { client } from '../frontend/src/lib/utils';
+import { client } from '../frontend/src/lib/utils';
 import { groupTable, heroTable, inventoryItemTable, modifierTable } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { buffTable } from '../server/db/schema/buff-schema';
@@ -155,6 +155,8 @@ export type Buff = typeof buffTable.$inferSelect & {
 
 //API RESPONSE
 export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>;
+const groupMembers = client.group[':id'].heroes.$get;
+export type ApiGroupMembersResponse = InferResponseType<typeof groupMembers>;
 
 export const statsSchema = createSelectSchema(modifierTable, {
   strength: z.number({ coerce: true }),
