@@ -4,7 +4,7 @@ import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { getGroupAvailableHeroesOptions } from '../api/get-group-available-heroes';
-import { useRemoveGroup } from '../hooks/useRemoveGroup';
+import { useRemoveGroupMutation } from '../hooks/useRemoveGroupMutation';
 
 interface Props {
   groupId: string;
@@ -14,7 +14,7 @@ export const RemoveGroupButton = ({ groupId }: Props) => {
   const heroId = useHeroId();
   const leaderId = useHero((state) => state?.data?.group?.leaderId ?? '');
   const isGroupLeader = leaderId === heroId;
-  const { mutateAsync, isPending } = useRemoveGroup({ groupId });
+  const { mutateAsync, isPending } = useRemoveGroupMutation({ groupId });
   const queryClient = useQueryClient();
 
   return (

@@ -8,7 +8,7 @@ interface Props {
 }
 
 export const BuffCard = ({ buff }: Props) => {
-  const minute = +((new Date(buff.completedAt).getTime() - Date.now()) / 60000).toFixed(0);
+  const minute = +((new Date(buff.completedAt).getTime() - new Date(buff.createdAt).getTime()) / 60000).toFixed(0);
   const [time, setTime] = useState(minute);
   useEffect(() => {
     const timer = setInterval(() => {

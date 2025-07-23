@@ -1,8 +1,10 @@
+import type { SocketGroupResponse } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import type { Group, Hero, SocketResponse } from '@/shared/types';
 import { eq } from 'drizzle-orm';
 import type { Socket } from 'socket.io';
 
+import { io } from '..';
 import { db } from '../db/db';
 import { groupTable, heroTable } from '../db/schema';
 import { generateRandomUuid } from './utils';
@@ -109,6 +111,13 @@ export const inviteGroup = async (socket: Socket) => {
               groupId: fromHero.groupId,
             })
             .where(eq(heroTable.id, invitedHero.id));
+          const messageData: SocketGroupResponse = {
+            message: `${invitedHero.name} has joined the group.`,
+            groupId: fromHero.groupId ?? '',
+            updateType: 'new-member',
+            messageType: 'success',
+          };
+          io.to(fromHero.groupId!).emit(socketEvents.groupUpdated(), messageData);
           return response({ success: true, message: `${invitedHero.name} has joined your group.` });
         }
         if (cb === undefined) {

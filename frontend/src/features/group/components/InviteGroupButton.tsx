@@ -27,7 +27,7 @@ export const InviteGroupButton = ({ toHeroId, searchTerm }: { toHeroId: string; 
     setIsLoading(false);
     if (!res.success) setGameMessage({ text: res.message, type: 'error' });
     if (res.success) {
-      setGameMessage({ text: res.message, type: 'success' });
+      // setGameMessage({ text: res.message, type: 'success' });
       await queryClient.invalidateQueries({
         queryKey: getGroupAvailableHeroesOptions({
           searchTerm,

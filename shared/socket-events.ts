@@ -4,4 +4,5 @@ export const socketEvents = {
   joinRoom: () => `join:room`,
   leaveRoom: () => `leave:room`,
   groupSysMessages: () => `group:sys-messages`,
+  groupUpdated: () => `group:updated`,
 };

@@ -1,5 +1,5 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useSysGroupMessages } from '@/features/group/hooks/useSysGroupMessages';
+import { useGroupListener } from '@/features/group/hooks/useGroupListener';
 import { cn, getRarityColor, getTimeFns } from '@/lib/utils';
 import { useGameMessages } from '@/store/useGameMessages';
 import { memo, useEffect, useRef } from 'react';
@@ -7,7 +7,7 @@ import { memo, useEffect, useRef } from 'react';
 export const GameMessage = memo(() => {
   const ref = useRef<null | HTMLUListElement>(null);
   const gameMessages = useGameMessages((state) => state.gameMessages);
-  useSysGroupMessages();
+  useGroupListener();
   useEffect(() => {
     ref.current?.lastElementChild?.scrollIntoView({
       block: 'nearest',

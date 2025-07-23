@@ -7,22 +7,24 @@ export const gameMessageType = {
   error: 'ERROR',
   success: 'SUCCESS',
 } as const;
+
+export type GameMessageType = keyof typeof gameMessageType;
 export interface IGameMessage {
   text: string;
   data?: InventoryItem | Equipment;
   success?: boolean;
-  type: keyof typeof gameMessageType;
+  type: GameMessageType;
   createdAt?: number;
 }
 interface GameMessagesStore {
   gameMessages: IGameMessage[];
-  setGameMessage:(newMessage: IGameMessage) => void;
+  setGameMessage: (newMessage: IGameMessage) => void;
   clearGameMessage: () => void;
 }
 
 export const useGameMessages = create<GameMessagesStore>((set) => ({
   gameMessages: [],
-  setGameMessage: (newMessage) => set((state) => ({ gameMessages: [...state.gameMessages, { ...newMessage, createdAt: Date.now()  }] })),
+  setGameMessage: (newMessage) => set((state) => ({ gameMessages: [...state.gameMessages, { ...newMessage, createdAt: Date.now() }] })),
   clearGameMessage: () => set({ gameMessages: [] }),
 }));
 

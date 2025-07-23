@@ -1,3 +1,4 @@
+import type { SocketGroupResponse } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import type { GameItem, Hero, PaginatedResponse, SuccessResponse, User } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
@@ -98,26 +99,42 @@ export const groupRouter = new Hono<Context>()
     async (c) => {
       const { id } = c.req.valid('param');
 
+      const user = c.get('user');
+
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.userId, user?.id ?? ''),
+      });
+      if (!hero) {
+        throw new HTTPException(404, { message: 'hero not found' });
+      }
       const group = await db.query.groupTable.findFirst({
         where: eq(groupTable.id, id),
       });
+
       if (!group) {
         throw new HTTPException(404, { message: 'group not found' });
+      }
+
+      const isGroupLeader = hero.id === group.leaderId;
+      if (!isGroupLeader) {
+        throw new HTTPException(403, { message: 'Only group leader can remove the group.' });
       }
       const heroes = await db.query.heroTable.findMany({
         where: eq(heroTable.groupId, id),
       });
-      io.in(group.id).emit(socketEvents.groupSysMessages(), 'LEAVE');
+      const messageData: SocketGroupResponse = {
+        message: 'The group has been disbanded by the leader.',
+        groupId: id,
+        updateType: 'remove',
+      };
+      io.to(group.id).emit(socketEvents.groupUpdated(), messageData);
       await db.delete(groupTable).where(eq(groupTable.id, id));
       io.socketsLeave(group.id);
 
-      return c.json<SuccessResponse>(
-        {
-          message: 'group deleted',
-          success: true,
-        },
-        201,
-      );
+      return c.json<SuccessResponse>({
+        message: 'group deleted',
+        success: true,
+      });
     },
   )
   .post(
