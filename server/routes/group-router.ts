@@ -137,6 +137,133 @@ export const groupRouter = new Hono<Context>()
       });
     },
   )
+  .delete(
+    '/:id/member/kick/:memberId',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+        memberId: z.string(),
+      }),
+    ),
+    async (c) => {
+      const { id, memberId } = c.req.valid('param');
+      const user = c.get('user');
+
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.userId, user?.id ?? ''),
+      });
+      if (!hero) {
+        throw new HTTPException(404, { message: 'hero not found' });
+      }
+
+      const member = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, memberId),
+      });
+      if (!member) {
+        throw new HTTPException(404, { message: 'member not found' });
+      }
+      const group = await db.query.groupTable.findFirst({
+        where: eq(groupTable.id, id),
+      });
+
+      if (!group) {
+        throw new HTTPException(404, { message: 'group not found' });
+      }
+
+      const isGroupLeader = hero.id === group.leaderId;
+      const isSelfKick = hero.id === member.id;
+      if (!isGroupLeader) {
+        throw new HTTPException(403, { message: 'Only group leader can kick members' });
+      }
+      if (isSelfKick) {
+        throw new HTTPException(403, { message: "You can't kick yourself from the group." });
+      }
+
+      const messageData: SocketGroupResponse = {
+        message: `${member.name} has been kicked from the group.`,
+        groupId: id,
+        updateType: 'kick',
+        messageType: 'error',
+        memberId: member.id,
+      };
+      await db
+        .update(heroTable)
+        .set({
+          groupId: null,
+        })
+        .where(eq(heroTable.id, member.id));
+      io.to(group.id).emit(socketEvents.groupUpdated(), messageData);
+
+      return c.json<SuccessResponse>({
+        message: 'member success kicked the group',
+        success: true,
+      });
+    },
+  )
+  .delete(
+    '/:id/member/leave/:memberId',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+        memberId: z.string(),
+      }),
+    ),
+    async (c) => {
+      const { id, memberId } = c.req.valid('param');
+      const user = c.get('user');
+
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.userId, user?.id ?? ''),
+      });
+      if (!hero) {
+        throw new HTTPException(404, { message: 'hero not found' });
+      }
+
+      const member = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, memberId),
+      });
+      if (!member) {
+        throw new HTTPException(404, { message: 'member not found' });
+      }
+      const group = await db.query.groupTable.findFirst({
+        where: eq(groupTable.id, id),
+      });
+
+      if (!group) {
+        throw new HTTPException(404, { message: 'group not found' });
+      }
+
+      const isCanLeave = hero.id === member.id;
+
+      if (!isCanLeave) {
+        throw new HTTPException(403, { message: "You can't leave only yourself." });
+      }
+
+      const messageData: SocketGroupResponse = {
+        message: `${member.name} has been leave from the group.`,
+        groupId: id,
+        updateType: 'leave',
+        messageType: 'error',
+        memberId: member.id,
+      };
+      await db
+        .update(heroTable)
+        .set({
+          groupId: null,
+        })
+        .where(eq(heroTable.id, member.id));
+      io.to(group.id).emit(socketEvents.groupUpdated(), messageData);
+
+      return c.json<SuccessResponse>({
+        message: 'you success leave the group',
+        success: true,
+      });
+    },
+  )
   .post(
     '/create/hero/:id',
     loggedIn,

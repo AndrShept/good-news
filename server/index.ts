@@ -81,7 +81,6 @@ export const io = new Server(httpServer as HTTPServer, {
 io.on('connection', (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };
   const { heroId } = socket.handshake.query as { heroId: string };
-
   game({ socket });
   console.log('connected ' + username);
   socket.on('disconnect', () => {
