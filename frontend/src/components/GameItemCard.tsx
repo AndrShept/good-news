@@ -12,7 +12,6 @@ interface Props {
 
 export const GameItemCard = memo(function GameItemCard({ item }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  console.log('CARD RENDER');
   const isGameItem = !(item && 'inventoryHeroId' in item) || (item && 'equipmentHeroId' in item);
   const inventoryItem = item && 'inventoryHeroId' in item ? item : (undefined as InventoryItem | undefined);
   const equipmentItem = item && 'equipmentHeroId' in item ? item : (undefined as Equipment | undefined);

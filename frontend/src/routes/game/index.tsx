@@ -1,3 +1,4 @@
+import { Spinner } from '@/components/Spinner';
 import { Inventory } from '@/features/hero/components/Inventory';
 import { Modifiers } from '@/features/hero/components/Modifier';
 import { Paperdoll } from '@/features/hero/components/Paperdoll';
@@ -6,6 +7,11 @@ import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/game/')({
   component: RouteComponent,
+  pendingComponent: () => (
+    <div className="flex h-[calc(100vh-295px)] items-center justify-center">
+      <Spinner size={'sm'} />
+    </div>
+  ),
 });
 
 function RouteComponent() {
@@ -41,7 +47,6 @@ function RouteComponent() {
       />
       <Modifiers />
       <Inventory />
-       
     </div>
   );
 }

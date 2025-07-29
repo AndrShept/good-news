@@ -1,4 +1,5 @@
 import { Game } from '@/components/Game';
+import { Spinner } from '@/components/Spinner';
 import { SocketProvider } from '@/components/providers/SocketProvider';
 import { getUserQueryOptions } from '@/features/auth/api/get-user';
 import { useAuth } from '@/features/auth/hooks/useAuth';

@@ -46,7 +46,7 @@ export const GameHeader = memo(() => {
         </Link>
 
         <Button onClick={onOpen} className="" variant={isOpen ? 'default' : 'outline'} size="icon">
-          <BackpackIcon  />
+          <BackpackIcon />
         </Button>
         <GroupMenuButton />
       </section>
@@ -61,7 +61,7 @@ export const GameHeader = memo(() => {
           <p>{premiumCoins}</p>
         </div>
         <div className="flex items-center">
-          <BackpackIcon />
+          <BackpackIcon className='size-7' />
           <p>{currentInventorySlots}</p>/<p>{maxInventorySlots}</p>
         </div>
       </section>

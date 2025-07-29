@@ -44,7 +44,7 @@ export const router = createRouter({
   defaultNotFoundComponent: NotFound,
   defaultPendingComponent: () => {
     return (
-      <div className="flex h-screen">
+      <div className="flex h-screen items-center justify-center">
         <Spinner size={'sm'} />
       </div>
     );

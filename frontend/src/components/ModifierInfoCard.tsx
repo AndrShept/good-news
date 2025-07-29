@@ -35,7 +35,10 @@ export const ModifierInfoCard = ({ modifier }: Props) => {
   const modifiers =
     modifier &&
     Object.entries(modifier)
-      .map(([key, value]) => ({ name: modifierChangeName(key as keyof OmitModifier), value: value }))
+      .map(([key, value]) => ({
+        name: modifierChangeName(key as keyof OmitModifier),
+        value: value,
+      }))
       .filter((item) => Boolean(Number(item.value)));
   return (
     <ul className="mt-2 flex flex-col gap-0.5 text-[15px]">

@@ -16,6 +16,13 @@ interface Props {
   freePoints: number;
 }
 
+export const statIcon: Record<keyof HeroStats, ComponentType<ComponentProps<'div'>>> = {
+  strength: StrengthIcon,
+  constitution: ConstitutionIcon,
+  dexterity: DexterityIcon,
+  intelligence: IntelligenceIcon,
+  luck: LuckIcon,
+};
 export const useChangeHeroStats = ({ currentStats, setCurrentStats, setFreePoints, baseStats, freePoints }: Props) => {
   const getStatPriority = (stat: keyof HeroStats) => {
     const priority: Record<keyof HeroStats, number> = {
@@ -28,13 +35,6 @@ export const useChangeHeroStats = ({ currentStats, setCurrentStats, setFreePoint
     return priority[stat];
   };
 
-  const statIcon: Record<keyof HeroStats, ComponentType<ComponentProps<'div'>>> = {
-    strength: StrengthIcon,
-    constitution: ConstitutionIcon,
-    dexterity: DexterityIcon,
-    intelligence: IntelligenceIcon,
-    luck: LuckIcon,
-  };
   const initialStats = Object.entries(currentStats).map(([key, value]) => ({
     name: key as keyof HeroStats,
     value,
