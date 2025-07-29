@@ -3,7 +3,7 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import type { InferResponseType } from 'hono';
 import { z } from 'zod';
 
-import { client } from '../frontend/src/lib/utils';
+import type { client } from '../frontend/src/lib/utils';
 import { groupTable, heroTable, inventoryItemTable, modifierTable } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { buffTable } from '../server/db/schema/buff-schema';
@@ -11,9 +11,6 @@ import { commentTable } from '../server/db/schema/comments-schema';
 import type { equipmentTable, slotEnum } from '../server/db/schema/equipment-schema';
 import type { gameItemEnum, gameItemTable, rarityEnum, weaponHandEnum, weaponTypeEnum } from '../server/db/schema/game-item-schema';
 import { postTable } from '../server/db/schema/posts-schema';
-import type { ApiRoutes } from '../server/index';
-
-export type AppType = ApiRoutes;
 
 export type SuccessResponse<T = undefined> = {
   success: true;
@@ -155,8 +152,7 @@ export type Buff = typeof buffTable.$inferSelect & {
 
 //API RESPONSE
 export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>;
-const groupMembers = client.group[':id'].heroes.$get;
-export type ApiGroupMembersResponse = InferResponseType<typeof groupMembers>;
+export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
 
 export const statsSchema = createSelectSchema(modifierTable, {
   strength: z.number({ coerce: true }),

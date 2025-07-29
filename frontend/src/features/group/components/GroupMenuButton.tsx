@@ -20,7 +20,7 @@ export const GroupMenuButton = () => {
     <Popover open={isShow} onOpenChange={setIsShow}>
       <PopoverTrigger asChild>
         <Button variant={isShow ? 'secondary' : 'outline'} size={'icon'}>
-          <PlusIcon className="size-5" />
+          <GroupIcon />
         </Button>
       </PopoverTrigger>
       <PopoverContent className={cn(`overflow-hidden p-0`)} side="right" align="start">

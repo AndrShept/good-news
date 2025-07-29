@@ -11,7 +11,6 @@ import { io } from '..';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { groupTable, heroTable } from '../db/schema';
-import { socketHandlers } from '../lib/socket-handlers';
 import { generateRandomUuid } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
 

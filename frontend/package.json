@@ -1,7 +1,7 @@
 {
-  "name": "test-test",
+  "name": "magic-world",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -29,7 +29,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "hono": "^4.7.7",
     "lucide-react": "^0.477.0",
     "motion": "^12.23.5",
     "query-string": "^9.1.1",

@@ -1,13 +1,10 @@
 import { HeroStats } from '@/shared/types';
-import { useQuery } from '@tanstack/react-query';
 import { CheckIcon } from 'lucide-react';
 import { Dispatch, SetStateAction, memo } from 'react';
 
 import { Button } from '../../../components/ui/button';
-import { getHeroOptions } from '../api/get-hero';
 import { useChangeHeroStats } from '../hooks/useChangeHeroStats';
 import { useConfirmStats } from '../hooks/useConfirmStats';
-import { useHero } from '../hooks/useHero';
 import { ResetStatsButton } from './ResetStatsButton';
 
 export interface Stat {
@@ -25,7 +22,7 @@ interface Props {
   baseFreePoints?: number;
 }
 
-export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFreePoints, baseStats }: Props) => {
+export const Stats = memo(({ reset, setCurrentStats, currentStats, freePoints, setFreePoints, baseStats }: Props) => {
   const { initialStats, onDecrement, onIncrement } = useChangeHeroStats({
     baseStats,
     currentStats,
@@ -34,7 +31,7 @@ export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFre
     freePoints,
   });
 
-  const { mutate, isPending } = useConfirmStats( { ...currentStats, freeStatPoints: freePoints });
+  const { mutate, isPending } = useConfirmStats({ ...currentStats, freeStatPoints: freePoints });
   const onConfirm = async () => {
     mutate();
   };
@@ -48,7 +45,10 @@ export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFre
           .sort((a, b) => a.sort - b.sort)
           .map((stat, idx) => (
             <li className="flex items-center justify-between" key={idx}>
-              <p>{stat.name}</p>
+              <div className="flex items-center gap-1.5">
+                <stat.icon className="size-4.5" />
+                <p>{stat.name}</p>
+              </div>
 
               <div className="flex items-center gap-0.5">
                 <Button
@@ -90,4 +90,4 @@ export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFre
       </ul>
     </section>
   );
-};
+});

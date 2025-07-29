@@ -3,10 +3,10 @@ import React, { ComponentProps, memo } from 'react';
 
 type Props = ComponentProps<'div'>;
 
-export const GroupIcon = ({ className, ...props }: Props) => {
+export const LuckIcon = ({ className, ...props }: Props) => {
   return (
     <div className={cn('size-7', className)}>
-      <img style={{imageRendering: 'pixelated'}} className="size-full " src={'/sprites/icons/group.png'} alt="group-image" />
+      <img style={{ imageRendering: 'pixelated' }} className="size-full" src={'/sprites/icons/stats/luck.png'} alt="luck-image" />
     </div>
   );
 };

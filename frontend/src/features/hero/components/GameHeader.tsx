@@ -46,7 +46,7 @@ export const GameHeader = memo(() => {
         </Link>
 
         <Button onClick={onOpen} className="" variant={isOpen ? 'default' : 'outline'} size="icon">
-          <BackpackIcon />
+          <BackpackIcon  />
         </Button>
         <GroupMenuButton />
       </section>

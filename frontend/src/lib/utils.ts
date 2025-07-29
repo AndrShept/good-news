@@ -25,10 +25,8 @@ export const getFormatDateTime = (time: string | undefined) => {
 export const getTimeFns = (timestamp: number) => {
   const date = new Date(timestamp);
   const hours = date.getUTCHours();
-  
-  return hours > 0 
-    ? format(date, 'HH:mm:ss') 
-    : format(date, 'mm:ss');
+
+  return hours > 0 ? format(date, 'HH:mm:ss') : format(date, 'mm:ss');
 };
 
 export const toastError = (msg = 'Something went wrong') => {
@@ -44,5 +42,3 @@ export const getRarityColor = (data: string) => {
     'text-red-500 ': data === 'LEGENDARY',
   };
 };
-
-
