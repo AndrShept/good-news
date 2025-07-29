@@ -183,6 +183,13 @@
       "when": 1753091840443,
       "tag": "0025_curly_emma_frost",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1753790196969,
+      "tag": "0026_bent_electro",
+      "breakpoints": true
     }
   ]
 }

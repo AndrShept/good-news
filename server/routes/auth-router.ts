@@ -50,7 +50,7 @@ export const authRouter = new Hono<Context>()
 
     const payload = { password, email, username };
     const token = jwt.sign(payload, processEnv.JWT_SECRET, { expiresIn: '15m' });
-    const confirmUrl = `/auth/confirm-email?token=${token}`;
+    const confirmUrl = `${processEnv.BASE_URL_FRONT}/auth/confirm-email?token=${token}`;
 
     await sendEmail({
       to: email,

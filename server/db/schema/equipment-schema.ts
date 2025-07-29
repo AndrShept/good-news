@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { gameItemTable } from './game-item-schema';
 import { heroTable } from './hero-schema';
@@ -18,7 +18,7 @@ export const slotEnum = pgEnum('equipment_slot_enum', [
 ]);
 
 export const equipmentTable = pgTable('equipment', {
-  id: text().primaryKey().notNull(),
+  id: uuid().primaryKey().notNull(),
 
   slot: slotEnum().notNull(),
 
@@ -32,12 +32,12 @@ export const equipmentTable = pgTable('equipment', {
     mode: 'string',
   }),
 
-  equipmentHeroId: text()
+  equipmentHeroId: uuid()
     .notNull()
     .references(() => heroTable.id, {
       onDelete: 'cascade',
     }),
-  gameItemId: text().notNull(),
+  gameItemId: uuid().notNull(),
 });
 
 export const equipmentRelations = relations(equipmentTable, ({ one }) => ({

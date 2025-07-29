@@ -1,10 +1,10 @@
 import { relations } from 'drizzle-orm';
-import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { heroTable } from './hero-schema';
 
 export const groupTable = pgTable('group', {
-  id: text().primaryKey().notNull(),
+  id: uuid().primaryKey().notNull(),
   leaderId: text().notNull(),
   createdAt: timestamp('created_at', {
     withTimezone: true,

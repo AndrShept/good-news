@@ -6,7 +6,7 @@ type Props = ComponentProps<'div'>;
 export const LogoIcon = ({ className = 'size-8', ...props }: Props) => {
   return (
     <div className={cn('p-0.5', className)}>
-      <img style={{ imageRendering: 'pixelated' }} className="size-full object-contain" src="/sprites/new/logo.png" alt="shield-icon" />
+      <img style={{ imageRendering: 'pixelated' }} className="size-full object-contain" src="/sprites/icons/logo.png" alt="shield-icon" />
     </div>
   );
 };

@@ -2,7 +2,6 @@ import { GroupInvitationModal } from '@/features/group/components/GroupInvitatio
 import { GameHeader } from '@/features/hero/components/GameHeader';
 import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
 import { Outlet } from '@tanstack/react-router';
-import React from 'react';
 
 import { GameMessage } from './GameMessage';
 

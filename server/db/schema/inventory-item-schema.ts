@@ -1,18 +1,18 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { gameItemTable } from './game-item-schema';
 import { heroTable } from './hero-schema';
 
 export const inventoryItemTable = pgTable('inventory_item', {
-  id: text().primaryKey().notNull(),
+  id: uuid().primaryKey().notNull(),
 
   quantity: integer().notNull().default(1),
 
-  gameItemId: text()
+  gameItemId: uuid()
     .notNull()
     .references(() => gameItemTable.id),
-  inventoryHeroId: text()
+  inventoryHeroId: uuid()
     .notNull()
     .references(() => heroTable.id, {
       onDelete: 'cascade',

@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { modifierTable } from './modifier-schema';
 
@@ -23,7 +23,7 @@ export const weaponTypeEnum = pgEnum('weapon_type_enum', ['DAGGER', 'SWORD', 'AX
 export const weaponHandEnum = pgEnum('weapon_hand_enum', ['ONE_HANDED', 'TWO_HANDED']);
 
 export const gameItemTable = pgTable('game_item', {
-  id: text().primaryKey().notNull(),
+  id: uuid().primaryKey().notNull(),
 
   type: gameItemEnum().notNull(),
   weaponHand: weaponHandEnum(),
@@ -33,7 +33,7 @@ export const gameItemTable = pgTable('game_item', {
   price: integer().default(0).notNull(),
   duration: integer().default(0).notNull(),
 
-  modifierId: text()
+  modifierId: uuid()
     .notNull()
     .references(() => modifierTable.id, {
       onDelete: 'cascade',

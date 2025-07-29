@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { heroTable } from './hero-schema';
 import { modifierTable } from './modifier-schema';
@@ -7,18 +7,18 @@ import { modifierTable } from './modifier-schema';
 export const buffType = pgEnum('buff_type_enum', ['SPELL', 'POTION']);
 
 export const buffTable = pgTable('buff', {
-  id: text().primaryKey().notNull(),
+  id: uuid().primaryKey().notNull(),
 
   name: text().notNull(),
   image: text().notNull(),
   duration: integer().default(0).notNull(),
   type: buffType().notNull(),
-  heroId: text()
+  heroId: uuid()
     .notNull()
     .references(() => heroTable.id, {
       onDelete: 'cascade',
     }),
-  modifierId: text()
+  modifierId: uuid()
     .notNull()
     .references(() => modifierTable.id, {
       onDelete: 'cascade',

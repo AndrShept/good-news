@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { userTable } from './auth-schema';
 import { buffTable } from './buff-schema';
@@ -9,7 +9,7 @@ import { inventoryItemTable } from './inventory-item-schema';
 import { modifierTable } from './modifier-schema';
 
 export const heroTable = pgTable('hero', {
-  id: text().primaryKey().notNull(),
+  id: uuid().primaryKey().notNull(),
   name: text().notNull().unique(),
   avatarImage: text().notNull(),
   characterImage: text().notNull(),
@@ -43,8 +43,8 @@ export const heroTable = pgTable('hero', {
     mode: 'string',
   }),
 
-  modifierId: text().references(() => modifierTable.id),
-  groupId: text()
+  modifierId: uuid().references(() => modifierTable.id),
+  groupId: uuid()
     .references(() => groupTable.id, {
       onDelete: 'set null',
     }),
