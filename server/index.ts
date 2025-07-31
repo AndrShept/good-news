@@ -1,4 +1,5 @@
 import { serve } from '@hono/node-server';
+import { Redis } from '@upstash/redis';
 import 'dotenv/config';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -77,6 +78,12 @@ export const io = new Server(httpServer as HTTPServer, {
     origin: process.env['BASE_URL_FRONT'],
   },
 });
+
+export const redis = new Redis({
+  url: process.env['UPSTASH_REDIS_REST_URL'],
+  token: process.env['UPSTASH_REDIS_REST_TOKEN'],
+});
+
 
 io.on('connection', (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };
