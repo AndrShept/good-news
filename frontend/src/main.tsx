@@ -12,6 +12,7 @@ import { NotFound } from './components/NotFound.tsx';
 import { Spinner } from './components/Spinner.tsx';
 import { ThemeProvider } from './components/providers/theme-provider.tsx';
 import './index.css';
+import { toastError } from './lib/utils.ts';
 import { routeTree } from './routeTree.gen.ts';
 
 declare module '@tanstack/react-router' {
@@ -30,6 +31,11 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000,
+    },
+    mutations: {
+      onError: () => {
+        toastError();
+      },
     },
   },
 });

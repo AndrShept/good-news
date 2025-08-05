@@ -1,7 +1,7 @@
-
 import { Spinner } from '@/components/Spinner';
 import { TownBuilding } from '@/components/TownBuilding';
 import { Inventory } from '@/features/hero/components/Inventory';
+import { TownMap } from '@/components/TownMap';
 import { Modifiers } from '@/features/hero/components/Modifier';
 import { Paperdoll } from '@/features/hero/components/Paperdoll';
 import { useHero } from '@/features/hero/hooks/useHero';
@@ -34,10 +34,8 @@ function RouteComponent() {
 
   return (
     <>
-      <div className="flex">
-    
-        <TownBuilding buildingType="MAGIC-SHOP" />
-        <TownBuilding buildingType="MINE-ENTRANCE" />
+      <div className="">
+        <TownMap />
       </div>
       <div className="flex gap-4">
         <Paperdoll

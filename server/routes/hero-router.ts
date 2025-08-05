@@ -35,7 +35,7 @@ import { buffTable } from '../db/schema/buff-schema';
 import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/constants';
 import { restorePotion } from '../lib/restorePotion';
 import { sumModifier } from '../lib/sumModifier';
-import { generateRandomUuid, setSqlNow } from '../lib/utils';
+import { generateRandomUuid, setSqlNow, setSqlNowByInterval, verifyHeroOwnership } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const heroRouter = new Hono<Context>()
@@ -67,6 +67,12 @@ export const heroRouter = new Hono<Context>()
         with: {
           modifier: true,
           group: true,
+          action: {
+            extras: {
+              timeRemaining: sql<number>`EXTRACT(EPOCH FROM ${actionTable.completedAt} - NOW())::INT`.as('timeRemaining'),
+            },
+          },
+          location: true,
           equipments: {
             with: {
               gameItem: {
@@ -997,5 +1003,29 @@ export const heroRouter = new Hono<Context>()
       message: 'buffs fetched!',
       success: true,
       data: buffs,
+    });
+  })
+  .post('/:id/action/walk-town', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
+    const user = c.get('user');
+    const { id } = c.req.valid('param');
+    const hero = await db.query.heroTable.findFirst({
+      where: eq(heroTable.id, id),
+    });
+
+    if (!hero) {
+      throw new HTTPException(404, {
+        message: 'hero not found',
+      });
+    }
+    verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+    await db.update(actionTable).set({
+      startedAt: setSqlNow(),
+      completedAt: setSqlNowByInterval(10),
+      type: 'WALK',
+    });
+    return c.json<SuccessResponse>({
+      message: 'action updated',
+      success: true,
     });
   });

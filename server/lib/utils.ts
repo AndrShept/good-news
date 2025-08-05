@@ -1,5 +1,6 @@
 import { render } from '@react-email/components';
 import { sql } from 'drizzle-orm';
+import { HTTPException } from 'hono/http-exception';
 import nodemailer from 'nodemailer';
 import z from 'zod';
 
@@ -47,4 +48,12 @@ export const sendEmail = async ({ to, subject, text = '', reactElement }: ISendE
 export const generateRandomUuid = () => Bun.randomUUIDv7();
 
 export const setSqlNow = () => sql`NOW()`;
-export const setSqlNowByInterval = (seconds: number) => sql`NOW() + INTERVAL ${sql.raw(`${seconds} seconds`)}`;
+export const setSqlNowByInterval = (seconds: number) => sql`NOW() + INTERVAL ${sql.raw(`'${seconds} seconds'`)}`;
+
+export const verifyHeroOwnership = ({ heroUserId, userId }: { heroUserId: string; userId: string | undefined }) => {
+  if (heroUserId !== userId) {
+    throw new HTTPException(403, {
+      message: 'access denied',
+    });
+  }
+};

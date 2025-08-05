@@ -11,11 +11,8 @@ import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
 
 import type { Context } from './context';
-import { db } from './db/db';
-import { heroTable } from './db/schema';
 import { game } from './lib/game';
 import { heroOffline } from './lib/heroOffline';
-import { socketHandlers } from './lib/socket-handlers';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';

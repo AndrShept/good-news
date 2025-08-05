@@ -4,8 +4,9 @@ import type { InferResponseType } from 'hono';
 import { z } from 'zod';
 
 import type { client } from '../frontend/src/lib/utils';
-import {actionTypeEnum, 
+import {
   actionTable,
+  actionTypeEnum,
   buildingTypeEnum,
   groupTable,
   heroTable,
@@ -159,7 +160,7 @@ export type GameItem = InferSelectModel<typeof gameItemTable> & {
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier?: Modifier;
   group?: Group;
-  action?: Action;
+  action?: Action & { timeRemaining: number };
   location?: Location;
   equipments?: Equipment[];
 };
