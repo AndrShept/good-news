@@ -1,4 +1,6 @@
+
 import { Spinner } from '@/components/Spinner';
+import { TownBuilding } from '@/components/TownBuilding';
 import { Inventory } from '@/features/hero/components/Inventory';
 import { Modifiers } from '@/features/hero/components/Modifier';
 import { Paperdoll } from '@/features/hero/components/Paperdoll';
@@ -31,22 +33,29 @@ function RouteComponent() {
     }));
 
   return (
-    <div className="flex gap-4">
-      <Paperdoll
-        avatarImage={avatarImage}
-        currentExperience={currentExperience}
-        currentHealth={currentHealth}
-        currentMana={currentMana}
-        id={id}
-        level={level}
-        maxExperience={maxExperience}
-        maxHealth={maxHealth}
-        maxMana={maxMana}
-        name={name}
-        equipments={equipments}
-      />
-      <Modifiers />
-      <Inventory />
-    </div>
+    <>
+      <div className="flex">
+    
+        <TownBuilding buildingType="MAGIC-SHOP" />
+        <TownBuilding buildingType="MINE-ENTRANCE" />
+      </div>
+      <div className="flex gap-4">
+        <Paperdoll
+          avatarImage={avatarImage}
+          currentExperience={currentExperience}
+          currentHealth={currentHealth}
+          currentMana={currentMana}
+          id={id}
+          level={level}
+          maxExperience={maxExperience}
+          maxHealth={maxHealth}
+          maxMana={maxMana}
+          name={name}
+          equipments={equipments}
+        />
+        <Modifiers />
+        <Inventory />
+      </div>
+    </>
   );
 }

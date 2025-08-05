@@ -1,11 +1,13 @@
 import { relations } from 'drizzle-orm';
 import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
+import { actionTable } from './action-schema';
 import { userTable } from './auth-schema';
 import { buffTable } from './buff-schema';
 import { equipmentTable } from './equipment-schema';
 import { groupTable } from './group-schema';
 import { inventoryItemTable } from './inventory-item-schema';
+import { locationTable } from './location-schema';
 import { modifierTable } from './modifier-schema';
 
 export const heroTable = pgTable('hero', {
@@ -33,6 +35,24 @@ export const heroTable = pgTable('hero', {
   currentExperience: integer().default(0).notNull(),
   maxExperience: integer().default(100).notNull(),
 
+  modifierId: uuid()
+    .references(() => modifierTable.id)
+    .notNull(),
+  groupId: uuid().references(() => groupTable.id, {
+    onDelete: 'set null',
+  }),
+  actionId: uuid()
+    .references(() => actionTable.id)
+    .notNull(),
+  locationId: uuid()
+    .references(() => locationTable.id)
+    .notNull(),
+  userId: text()
+    .notNull()
+    .references(() => userTable.id, {
+      onDelete: 'cascade',
+    }),
+
   createdAt: timestamp('created_at', {
     withTimezone: true,
     mode: 'string',
@@ -42,17 +62,6 @@ export const heroTable = pgTable('hero', {
   updatedAt: timestamp('updated_at', {
     mode: 'string',
   }),
-
-  modifierId: uuid().references(() => modifierTable.id),
-  groupId: uuid()
-    .references(() => groupTable.id, {
-      onDelete: 'set null',
-    }),
-  userId: text()
-    .notNull()
-    .references(() => userTable.id, {
-      onDelete: 'cascade',
-    }),
 });
 
 export const heroRelations = relations(heroTable, ({ one, many }) => ({
@@ -67,6 +76,14 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
   user: one(userTable, {
     fields: [heroTable.userId],
     references: [userTable.id],
+  }),
+  action: one(actionTable, {
+    fields: [heroTable.actionId],
+    references: [actionTable.id],
+  }),
+  location: one(locationTable, {
+    fields: [heroTable.locationId],
+    references: [locationTable.id],
   }),
   equipments: many(equipmentTable),
   inventoryItem: many(inventoryItemTable),

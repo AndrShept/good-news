@@ -20,12 +20,22 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { equipmentTable, gameItemEnum, gameItemTable, heroTable, inventoryItemTable, modifierTable, slotEnum } from '../db/schema';
+import {
+  actionTable,
+  equipmentTable,
+  gameItemEnum,
+  gameItemTable,
+  heroTable,
+  inventoryItemTable,
+  locationTable,
+  modifierTable,
+  slotEnum,
+} from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
 import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/constants';
 import { restorePotion } from '../lib/restorePotion';
 import { sumModifier } from '../lib/sumModifier';
-import { generateRandomUuid } from '../lib/utils';
+import { generateRandomUuid, setSqlNow } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const heroRouter = new Hono<Context>()
@@ -109,6 +119,13 @@ export const heroRouter = new Hono<Context>()
           ...heroStats,
         })
         .returning({ id: modifierTable.id });
+      const [newAction] = await tx
+        .insert(actionTable)
+        .values({
+          completedAt: setSqlNow(),
+        })
+        .returning({ id: actionTable.id });
+      const [newLocation] = await tx.insert(locationTable).values({}).returning({ id: locationTable.id });
       const [newHero] = await tx
         .insert(heroTable)
         .values({
@@ -117,6 +134,8 @@ export const heroRouter = new Hono<Context>()
           characterImage: '',
           name,
           userId,
+          actionId: newAction.id,
+          locationId: newLocation.id,
           modifierId: newModifier.id,
           freeStatPoints,
           maxHealth: heroStats.constitution * HP_MULTIPLIER_COST,

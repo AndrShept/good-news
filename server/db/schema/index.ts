@@ -10,3 +10,5 @@ export * from './game-item-schema';
 export * from './inventory-item-schema';
 export * from './buff-schema';
 export * from './group-schema';
+export * from './action-schema';
+export * from './location-schema';

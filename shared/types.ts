@@ -4,7 +4,16 @@ import type { InferResponseType } from 'hono';
 import { z } from 'zod';
 
 import type { client } from '../frontend/src/lib/utils';
-import { groupTable, heroTable, inventoryItemTable, modifierTable } from '../server/db/schema';
+import {actionTypeEnum, 
+  actionTable,
+  buildingTypeEnum,
+  groupTable,
+  heroTable,
+  inventoryItemTable,
+  locationTable,
+  locationTypeEnum,
+  modifierTable,
+} from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { buffTable } from '../server/db/schema/buff-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
@@ -128,9 +137,15 @@ export type GameItemType = (typeof gameItemEnum.enumValues)[number];
 export type RarityType = (typeof rarityEnum.enumValues)[number];
 export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
+export type LocationType = (typeof locationTypeEnum.enumValues)[number];
+export type BuildingType = (typeof buildingTypeEnum.enumValues)[number];
+export type ActionType = (typeof actionTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
+export type Action = InferSelectModel<typeof actionTable>;
+export type Location = InferSelectModel<typeof locationTable>;
+
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;
 export type Equipment = typeof equipmentTable.$inferSelect & {
   gameItem?: GameItem;
@@ -144,6 +159,8 @@ export type GameItem = InferSelectModel<typeof gameItemTable> & {
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier?: Modifier;
   group?: Group;
+  action?: Action;
+  location?: Location;
   equipments?: Equipment[];
 };
 export type Buff = typeof buffTable.$inferSelect & {

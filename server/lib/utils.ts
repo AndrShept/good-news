@@ -1,4 +1,5 @@
 import { render } from '@react-email/components';
+import { sql } from 'drizzle-orm';
 import nodemailer from 'nodemailer';
 import z from 'zod';
 
@@ -9,6 +10,8 @@ const schema = z.object({
   PORT: z.string(),
   JWT_SECRET: z.string(),
   BASE_URL_FRONT: z.string(),
+  UPSTASH_REDIS_REST: z.string(),
+  UPSTASH_REDIS_REST_TOKEN: z.string(),
 });
 export const processEnv = schema.parse(process.env);
 
@@ -33,7 +36,7 @@ export const sendEmail = async ({ to, subject, text = '', reactElement }: ISendE
   const emailHtml = await render(reactElement);
 
   await transporter.sendMail({
-    from: '"Good News" <no-reply@good-news.space>', // рекомендовано свій домен
+    from: '"Good News" <no-reply@good-news.space>',
     to,
     subject,
     text,
@@ -41,6 +44,7 @@ export const sendEmail = async ({ to, subject, text = '', reactElement }: ISendE
   });
 };
 
-export const generateRandomUuid = () => {
-  return Bun.randomUUIDv7();
-};
+export const generateRandomUuid = () => Bun.randomUUIDv7();
+
+export const setSqlNow = () => sql`NOW()`;
+export const setSqlNowByInterval = (seconds: number) => sql`NOW() + INTERVAL ${sql.raw(`${seconds} seconds`)}`;

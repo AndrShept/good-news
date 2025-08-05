@@ -45,10 +45,10 @@ function RouteComponent() {
     },
     resolver: zodResolver(heroNameSchema),
   });
-  const isLoading = form.formState.isSubmitting;
+  // const isLoading = form.formState.isSubmitting;
   const onSetAvatarImage = useCallback((image: string) => setAvatarImage(image), []);
-  const onSubmit = async (values: z.infer<typeof heroNameSchema>) => {
-    await mutation.mutateAsync(
+  const onSubmit = (values: z.infer<typeof heroNameSchema>) => {
+    mutation.mutate(
       {
         avatarImage: avatarImage,
         characterImage: '',
@@ -93,7 +93,7 @@ function RouteComponent() {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input disabled={isLoading} className="bg-secondary" placeholder="" {...field} />
+                      <Input disabled={mutation.isPending} className="bg-secondary" placeholder="" {...field} />
                     </FormControl>
                     <FormDescription>This is your public display name.</FormDescription>
                     <FormMessage />
@@ -108,8 +108,8 @@ function RouteComponent() {
                 reset={false}
                 baseStats={BASE_STATS}
               />
-              <Button className="w-full" type="submit" disabled={isLoading} variant={'default'}>
-                {isLoading ? 'Creating... ' : 'Create Hero'}
+              <Button className="w-full" type="submit" disabled={mutation.isPending} variant={'default'}>
+                {mutation.isPending ? 'Creating... ' : 'Create Hero'}
               </Button>
             </form>
           </Form>

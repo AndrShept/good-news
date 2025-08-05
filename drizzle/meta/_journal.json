@@ -190,6 +190,62 @@
       "when": 1753790196969,
       "tag": "0026_bent_electro",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1754380915567,
+      "tag": "0027_flashy_cerise",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1754381079924,
+      "tag": "0028_watery_odin",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1754382942323,
+      "tag": "0029_next_nehzno",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1754383004256,
+      "tag": "0030_peaceful_sally_floyd",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1754383033161,
+      "tag": "0031_kind_zzzax",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1754383941034,
+      "tag": "0032_lowly_invaders",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1754384142924,
+      "tag": "0033_safe_mindworm",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1754384664383,
+      "tag": "0034_shallow_switch",
+      "breakpoints": true
     }
   ]
 }
