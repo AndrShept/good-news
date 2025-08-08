@@ -13,6 +13,7 @@ import { Server } from 'socket.io';
 import type { Context } from './context';
 import { game } from './lib/game';
 import { heroOffline } from './lib/heroOffline';
+import { upstashRedis } from './lib/upstashRedis';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
@@ -69,6 +70,8 @@ const httpServer = serve({
   port: 3000,
 });
 
+upstashRedis();
+
 export const io = new Server(httpServer as HTTPServer, {
   cors: {
     credentials: true,
@@ -81,10 +84,10 @@ export const io = new Server(httpServer as HTTPServer, {
 //   token: process.env['UPSTASH_REDIS_REST_TOKEN'],
 // });
 
-
 io.on('connection', (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };
   const { heroId } = socket.handshake.query as { heroId: string };
+  socket.join(heroId);
   game({ socket });
   console.log('connected ' + username);
   socket.on('disconnect', () => {

@@ -21,6 +21,7 @@ import { commentTable } from '../server/db/schema/comments-schema';
 import type { equipmentTable, slotEnum } from '../server/db/schema/equipment-schema';
 import type { gameItemEnum, gameItemTable, rarityEnum, weaponHandEnum, weaponTypeEnum } from '../server/db/schema/game-item-schema';
 import { postTable } from '../server/db/schema/posts-schema';
+import type { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
 
 export type SuccessResponse<T = undefined> = {
   success: true;
@@ -141,11 +142,13 @@ export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
 export type LocationType = (typeof locationTypeEnum.enumValues)[number];
 export type BuildingType = (typeof buildingTypeEnum.enumValues)[number];
 export type ActionType = (typeof actionTypeEnum.enumValues)[number];
+export type StateType = (typeof stateTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
 export type Action = InferSelectModel<typeof actionTable>;
 export type Location = InferSelectModel<typeof locationTable>;
+export type State = InferSelectModel<typeof stateTable>;
 
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;
 export type Equipment = typeof equipmentTable.$inferSelect & {
@@ -162,6 +165,7 @@ export type Hero = InferSelectModel<typeof heroTable> & {
   group?: Group;
   action?: Action & { timeRemaining: number };
   location?: Location;
+  state?: State;
   equipments?: Equipment[];
 };
 export type Buff = typeof buffTable.$inferSelect & {

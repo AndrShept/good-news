@@ -12,3 +12,4 @@ export * from './buff-schema';
 export * from './group-schema';
 export * from './action-schema';
 export * from './location-schema';
+export * from './state-schema';

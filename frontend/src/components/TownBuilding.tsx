@@ -31,7 +31,7 @@ export const TownBuilding = ({ buildingType, className, ...props }: Props) => {
   return (
     <CustomTooltip>
       <CustomTooltip.Trigger>
-        <div onClick={() => mutate()} className={cn('w-50', className)} {...props}>
+        <div onClick={() => mutate(buildingType)} className={cn('w-50', className)} {...props}>
           <img
             className="size-full transition will-change-transform hover:drop-shadow-[0_0_5px_rgba(255,255,145,0.9)]"
             style={{

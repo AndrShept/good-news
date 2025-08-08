@@ -9,6 +9,7 @@ import { groupTable } from './group-schema';
 import { inventoryItemTable } from './inventory-item-schema';
 import { locationTable } from './location-schema';
 import { modifierTable } from './modifier-schema';
+import { stateTable } from './state-schema';
 
 export const heroTable = pgTable('hero', {
   id: uuid().primaryKey().notNull(),
@@ -47,6 +48,9 @@ export const heroTable = pgTable('hero', {
   locationId: uuid()
     .references(() => locationTable.id)
     .notNull(),
+  stateId: uuid()
+    .references(() => stateTable.id)
+    .notNull(),
   userId: text()
     .notNull()
     .references(() => userTable.id, {
@@ -84,6 +88,10 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
   location: one(locationTable, {
     fields: [heroTable.locationId],
     references: [locationTable.id],
+  }),
+  state: one(stateTable, {
+    fields: [heroTable.stateId],
+    references: [stateTable.id],
   }),
   equipments: many(equipmentTable),
   inventoryItem: many(inventoryItemTable),

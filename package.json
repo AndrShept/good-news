@@ -18,6 +18,7 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/nodemailer": "^6.4.17",
     "@upstash/redis": "^1.35.3",
+    "bullmq": "^5.56.9",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.44.2",
     "drizzle-zod": "^0.7.0",

@@ -1,21 +1,17 @@
-import { client, toastError } from '@/lib/utils';
+import { client } from '@/lib/utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { getHeroOptions } from '../api/get-hero';
 import { useHeroId } from './useHeroId';
-import { BuildingType } from '@/shared/types';
 
-export const useWalkTown = () => {
+export const useActionCancel = () => {
   const id = useHeroId();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (buildingType:BuildingType) =>
-      client.hero[':id'].action['walk-town'].$post({
+    mutationFn: () =>
+      client.hero[':id'].action.cancel.$post({
         param: {
           id,
-        },
-        json: {
-          buildingType,
         },
       }),
     onSuccess: async () => {

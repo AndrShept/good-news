@@ -22,6 +22,7 @@ import type { Context } from '../context';
 import { db } from '../db/db';
 import {
   actionTable,
+  buildingTypeEnum,
   equipmentTable,
   gameItemEnum,
   gameItemTable,
@@ -30,11 +31,13 @@ import {
   locationTable,
   modifierTable,
   slotEnum,
+  stateTable,
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
 import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/constants';
 import { restorePotion } from '../lib/restorePotion';
 import { sumModifier } from '../lib/sumModifier';
+import { actionQueue } from '../lib/upstashRedis';
 import { generateRandomUuid, setSqlNow, setSqlNowByInterval, verifyHeroOwnership } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
 
@@ -67,6 +70,7 @@ export const heroRouter = new Hono<Context>()
         with: {
           modifier: true,
           group: true,
+          state: true,
           action: {
             extras: {
               timeRemaining: sql<number>`EXTRACT(EPOCH FROM ${actionTable.completedAt} - NOW())::INT`.as('timeRemaining'),
@@ -117,7 +121,7 @@ export const heroRouter = new Hono<Context>()
         message: 'Hero already exists for this user.',
       });
     }
-    const newHero = await db.transaction(async (tx) => {
+    await db.transaction(async (tx) => {
       const [newModifier] = await tx
         .insert(modifierTable)
         .values({
@@ -132,6 +136,7 @@ export const heroRouter = new Hono<Context>()
         })
         .returning({ id: actionTable.id });
       const [newLocation] = await tx.insert(locationTable).values({}).returning({ id: locationTable.id });
+      const [newState] = await tx.insert(stateTable).values({}).returning({ id: stateTable.id });
       const [newHero] = await tx
         .insert(heroTable)
         .values({
@@ -143,6 +148,7 @@ export const heroRouter = new Hono<Context>()
           actionId: newAction.id,
           locationId: newLocation.id,
           modifierId: newModifier.id,
+          stateId: newState.id,
           freeStatPoints,
           maxHealth: heroStats.constitution * HP_MULTIPLIER_COST,
           maxMana: heroStats.intelligence * MANA_MULTIPLIER_INT,
@@ -1005,27 +1011,91 @@ export const heroRouter = new Hono<Context>()
       data: buffs,
     });
   })
-  .post('/:id/action/walk-town', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
-    const user = c.get('user');
-    const { id } = c.req.valid('param');
-    const hero = await db.query.heroTable.findFirst({
-      where: eq(heroTable.id, id),
-    });
-
-    if (!hero) {
-      throw new HTTPException(404, {
-        message: 'hero not found',
+  .post(
+    '/:id/action/walk-town',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+    zValidator(
+      'json',
+      z.object({
+        buildingType: z.enum(buildingTypeEnum.enumValues),
+      }),
+    ),
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const { buildingType } = c.req.valid('json');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
       });
-    }
-    verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-    await db.update(actionTable).set({
-      startedAt: setSqlNow(),
-      completedAt: setSqlNowByInterval(10),
-      type: 'WALK',
-    });
-    return c.json<SuccessResponse>({
-      message: 'action updated',
-      success: true,
-    });
-  });
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      await db.update(actionTable).set({
+        startedAt: setSqlNow(),
+        completedAt: setSqlNowByInterval(10),
+        type: 'WALK',
+      });
+
+      const jobId = hero.id;
+      await actionQueue.remove(jobId);
+      await actionQueue.add(
+        'walk:town',
+        {
+          actionId: hero.actionId,
+          locationId: hero.locationId,
+          type: 'IDLE',
+          buildingType,
+        },
+        {
+          delay: 10000,
+          jobId,
+          removeOnComplete: true,
+        },
+      );
+
+      return c.json<SuccessResponse>({
+        message: 'action updated',
+        success: true,
+      });
+    },
+  )
+  .post(
+    '/:id/action/cancel',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      await db.update(actionTable).set({
+        startedAt: setSqlNow(),
+        completedAt: setSqlNow(),
+        type: 'IDLE',
+      });
+
+      const jobId = hero.id;
+      await actionQueue.remove(jobId);
+
+      return c.json<SuccessResponse>({
+        message: 'action canceled',
+        success: true,
+      });
+    },
+  );
