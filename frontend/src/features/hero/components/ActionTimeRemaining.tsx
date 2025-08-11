@@ -1,5 +1,6 @@
 import { WalkIcon } from '@/components/game-icons/WalkIcon';
 import { Button } from '@/components/ui/button';
+import { formatDurationFromSeconds } from '@/lib/utils';
 import { useTime, useTransform } from 'motion/react';
 import * as m from 'motion/react-m';
 import { useEffect, useState } from 'react';
@@ -48,7 +49,7 @@ export const ActionTimeRemaining = () => {
             }}
           />
           <div className="absolute left-0 top-0 flex size-full items-center justify-center">
-            <p className="">{seconds}</p>
+            <p className="">{formatDurationFromSeconds(seconds)}</p>
           </div>
         </div>
         <Button variant="outline" size="sm" disabled={mutation.isPending} onClick={() => mutation.mutate()}>

@@ -1,5 +1,5 @@
 import { type ClassValue, clsx } from 'clsx';
-import { format } from 'date-fns';
+import { format, intervalToDuration } from 'date-fns';
 import { hc } from 'hono/client';
 import toast from 'react-hot-toast';
 import { twMerge } from 'tailwind-merge';
@@ -27,6 +27,24 @@ export const getTimeFns = (timestamp: number) => {
   const hours = date.getUTCHours();
 
   return hours > 0 ? format(date, 'HH:mm:ss') : format(date, 'mm:ss');
+};
+
+export const formatDurationFromSeconds = (seconds: number) => {
+  const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
+
+  const h = duration.hours ?? 0;
+  const m = duration.minutes ?? 0;
+  const s = duration.seconds ?? 0;
+
+  if (h > 0) {
+    return `${h}h ${m}m ${s}s`;
+  }
+
+  if (m > 0) {
+    return `${m}m ${s}s`;
+  }
+
+  return `${s}s`;
 };
 
 export const toastError = (msg = 'Something went wrong') => {

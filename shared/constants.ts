@@ -11,6 +11,7 @@ export const RESET_STATS_COST = 100
 
 export const BASE_HEALTH_REGEN_TIME = 10000;
 export const BASE_MANA_REGEN_TIME = 7000;
+export const BASE_WALK_TIME = 10000;
 export const HP_MULTIPLIER_COST = 10;
 export const MANA_MULTIPLIER_INT = 15;
 

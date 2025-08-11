@@ -13,7 +13,6 @@ import { Server } from 'socket.io';
 import type { Context } from './context';
 import { game } from './lib/game';
 import { heroOffline } from './lib/heroOffline';
-import { upstashRedis } from './lib/upstashRedis';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
@@ -21,6 +20,7 @@ import { groupRouter } from './routes/group-router';
 import { heroRouter } from './routes/hero-router';
 import { postRouter } from './routes/post-router';
 import { shopRouter } from './routes/shop-router';
+import { actionQueueListeners } from './queue/actionQueueListeners';
 
 const app = new Hono<Context>();
 
@@ -70,7 +70,7 @@ const httpServer = serve({
   port: 3000,
 });
 
-upstashRedis();
+actionQueueListeners();
 
 export const io = new Server(httpServer as HTTPServer, {
   cors: {
@@ -79,10 +79,6 @@ export const io = new Server(httpServer as HTTPServer, {
   },
 });
 
-// export const redis = new Redis({
-//   url: process.env['UPSTASH_REDIS_REST_URL'],
-//   token: process.env['UPSTASH_REDIS_REST_TOKEN'],
-// });
 
 io.on('connection', (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };

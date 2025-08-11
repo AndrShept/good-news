@@ -132,6 +132,11 @@ export type PaginatedResponse<T> = {
   data: T;
 } & Omit<SuccessResponse, 'data'>;
 
+export const jobName = {
+  'walk-town': 'WALK:TOWN',
+  'walk-map': 'WALK:MAP',
+} as const;
+
 export type GetPostsData = InferResponseType<typeof client.post.$get>;
 
 export type EquipmentSlotType = (typeof slotEnum.enumValues)[number];
@@ -143,10 +148,11 @@ export type LocationType = (typeof locationTypeEnum.enumValues)[number];
 export type BuildingType = (typeof buildingTypeEnum.enumValues)[number];
 export type ActionType = (typeof actionTypeEnum.enumValues)[number];
 export type StateType = (typeof stateTypeEnum.enumValues)[number];
+export type JobNameType = (typeof jobName)[keyof typeof jobName];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
-export type Action = InferSelectModel<typeof actionTable>;
+export type Action = InferSelectModel<typeof actionTable> & { timeRemaining: number };
 export type Location = InferSelectModel<typeof locationTable>;
 export type State = InferSelectModel<typeof stateTable>;
 
@@ -163,7 +169,7 @@ export type GameItem = InferSelectModel<typeof gameItemTable> & {
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier?: Modifier;
   group?: Group;
-  action?: Action & { timeRemaining: number };
+  action?: Action;
   location?: Location;
   state?: State;
   equipments?: Equipment[];
@@ -209,3 +215,12 @@ export const createHeroSchema = createInsertSchema(heroTable, {
   .extend({
     modifier: z.string().transform((val) => JSON.parse(val) as HeroStats),
   });
+
+export type WalkTownJobData = {
+  actionId: string;
+  locationId: string;
+  heroId: string;
+  type: 'IDLE';
+  buildingType: BuildingType;
+  jobName: JobNameType;
+};

@@ -5,5 +5,5 @@ export const socketEvents = {
   leaveRoom: () => `leave:room`,
   groupSysMessages: () => `group:sys-messages`,
   groupUpdated: () => `group:updated`,
-  actionComplete: () => `action:complete`,
+  actionWalkTownComplete: () => `action:walk-town-complete`,
 };

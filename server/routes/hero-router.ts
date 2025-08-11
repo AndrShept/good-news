@@ -1,4 +1,4 @@
-import { BASE_STATS, RESET_STATS_COST } from '@/shared/constants';
+import { BASE_STATS, BASE_WALK_TIME, RESET_STATS_COST } from '@/shared/constants';
 import {
   type Buff,
   type Equipment,
@@ -10,6 +10,7 @@ import {
   type SuccessResponse,
   type WeaponHandType,
   createHeroSchema,
+  jobName,
   statsSchema,
 } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
@@ -37,9 +38,9 @@ import { buffTable } from '../db/schema/buff-schema';
 import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/constants';
 import { restorePotion } from '../lib/restorePotion';
 import { sumModifier } from '../lib/sumModifier';
-import { actionQueue } from '../lib/upstashRedis';
 import { generateRandomUuid, setSqlNow, setSqlNowByInterval, verifyHeroOwnership } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
+import { actionQueue } from '../queue/actionQueue';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -1027,6 +1028,9 @@ export const heroRouter = new Hono<Context>()
       const { buildingType } = c.req.valid('json');
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
+        with: {
+          modifier: true,
+        },
       });
 
       if (!hero) {
@@ -1036,24 +1040,33 @@ export const heroRouter = new Hono<Context>()
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      await db.update(actionTable).set({
-        startedAt: setSqlNow(),
-        completedAt: setSqlNowByInterval(10),
-        type: 'WALK',
-      });
-
       const jobId = hero.id;
+      const MIN_WALK_TIME = 2;
+      const dexterityFactor = 100;
+
+      const delay = Math.max(BASE_WALK_TIME / (1 + hero.modifier.dexterity / dexterityFactor), MIN_WALK_TIME);
+      await db
+        .update(actionTable)
+        .set({
+          startedAt: new Date().toISOString(),
+          completedAt: new Date(Date.now() + delay).toISOString(),
+          type: 'WALK',
+        })
+        .where(eq(actionTable.id, hero.actionId));
+
       await actionQueue.remove(jobId);
       await actionQueue.add(
-        'walk:town',
+        jobName['walk-town'],
         {
           actionId: hero.actionId,
           locationId: hero.locationId,
+          heroId: hero.id,
           type: 'IDLE',
           buildingType,
+          jobName: jobName['walk-town'],
         },
         {
-          delay: 10000,
+          delay,
           jobId,
           removeOnComplete: true,
         },
@@ -1084,17 +1097,52 @@ export const heroRouter = new Hono<Context>()
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      await db.update(actionTable).set({
-        startedAt: setSqlNow(),
-        completedAt: setSqlNow(),
-        type: 'IDLE',
-      });
+      await db
+        .update(actionTable)
+        .set({
+          startedAt: new Date().toISOString(),
+          completedAt: new Date().toISOString(),
+          type: 'IDLE',
+        })
+        .where(eq(actionTable.id, hero.actionId));
 
       const jobId = hero.id;
       await actionQueue.remove(jobId);
 
       return c.json<SuccessResponse>({
         message: 'action canceled',
+        success: true,
+      });
+    },
+  )
+  .post(
+    '/:id/location/town-entry',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      await db
+        .update(locationTable)
+        .set({
+          buildingType: 'NONE',
+        })
+        .where(eq(locationTable.id, hero.locationId));
+
+      return c.json<SuccessResponse>({
+        message: 'location changed',
         success: true,
       });
     },

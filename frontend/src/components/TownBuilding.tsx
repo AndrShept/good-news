@@ -8,7 +8,14 @@ import { CustomTooltip } from './CustomTooltip';
 interface Props extends ComponentProps<'div'> {
   buildingType: BuildingType;
 }
-
+export const buildingName: Record<BuildingType, string> = {
+  'MAGIC-SHOP': 'Magic shop',
+  'MINE-ENTRANCE': 'Mine Entrance',
+  'TOWN-HALL': 'Town Hall',
+  SHOP: 'Shop',
+  TEMPLE: 'Temple',
+  NONE: '',
+};
 export const TownBuilding = ({ buildingType, className, ...props }: Props) => {
   const src: Record<BuildingType, string> = {
     'MAGIC-SHOP': '/sprites/buildings/magic-shop.png',
@@ -19,14 +26,6 @@ export const TownBuilding = ({ buildingType, className, ...props }: Props) => {
     NONE: '',
   };
 
-  const text: Record<BuildingType, string> = {
-    'MAGIC-SHOP': 'Magic shop',
-    'MINE-ENTRANCE': 'Mine Entrance',
-    'TOWN-HALL': 'Town Hall',
-    SHOP: 'Shop',
-    TEMPLE: 'Temple',
-    NONE: '',
-  };
   const { mutate } = useWalkTown();
   return (
     <CustomTooltip>
@@ -42,7 +41,7 @@ export const TownBuilding = ({ buildingType, className, ...props }: Props) => {
         </div>
       </CustomTooltip.Trigger>
       <CustomTooltip.Content className="bg-background/80 rounded-md border p-2.5 backdrop-blur-md">
-        {text[buildingType]}
+        {buildingName[buildingType]}
       </CustomTooltip.Content>
     </CustomTooltip>
   );

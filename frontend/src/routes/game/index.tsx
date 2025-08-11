@@ -1,5 +1,7 @@
 import { Spinner } from '@/components/Spinner';
 import { TownBuilding } from '@/components/TownBuilding';
+import { MagicShop } from '@/components/buildings/MagicShop';
+import { Temple } from '@/components/buildings/Temple';
 import { ActionTimeRemaining } from '@/features/hero/components/ActionTimeRemaining';
 import { Inventory } from '@/features/hero/components/Inventory';
 import { Modifiers } from '@/features/hero/components/Modifier';
@@ -36,6 +38,8 @@ function RouteComponent() {
   const location = useHero((state) => state?.data?.location);
   const isCharacter = state?.type === 'CHARACTER';
   const isTownEntry = location?.type === 'TOWN' && location.buildingType === 'NONE';
+  const isMagicShop = location?.type === 'TOWN' && location.buildingType === 'MAGIC-SHOP';
+  const isTemple = location?.type === 'TOWN' && location.buildingType === 'TEMPLE';
   return (
     <>
       {isTownEntry && (
@@ -45,6 +49,8 @@ function RouteComponent() {
         </div>
       )}
       <ActionTimeRemaining />
+      {isMagicShop && <MagicShop />}
+      {isTemple && <Temple />}
       {isCharacter && (
         <div className="flex gap-4">
           <Paperdoll
