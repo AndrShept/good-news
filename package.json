@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "scripts": {
-    "dev": "bun run --hot  server/index.ts",
+    "dev": "bun run server/index.ts",
     "start": "bun server/index.ts",
     "format:write": "prettier . --write",
     "db:studio": "drizzle-kit studio",

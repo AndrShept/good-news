@@ -14,13 +14,14 @@ import type { Context } from './context';
 import { game } from './lib/game';
 import { heroOffline } from './lib/heroOffline';
 import { sessionHandler } from './middleware/sessionHandler';
+import { actionQueueListeners } from './queue/actionQueueListeners';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
 import { groupRouter } from './routes/group-router';
 import { heroRouter } from './routes/hero-router';
+import { mapRouter } from './routes/map-router';
 import { postRouter } from './routes/post-router';
 import { shopRouter } from './routes/shop-router';
-import { actionQueueListeners } from './queue/actionQueueListeners';
 
 const app = new Hono<Context>();
 
@@ -35,7 +36,8 @@ const routes = app
   .route('/comment', commentRouter)
   .route('/hero', heroRouter)
   .route('/shop', shopRouter)
-  .route('/group', groupRouter);
+  .route('/group', groupRouter)
+  .route('/map', mapRouter);
 
 // app.onError((err, c) => {
 //   // Обробка помилки підключення до бази даних
@@ -78,7 +80,6 @@ export const io = new Server(httpServer as HTTPServer, {
     origin: process.env['BASE_URL_FRONT'],
   },
 });
-
 
 io.on('connection', (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };

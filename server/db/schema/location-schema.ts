@@ -4,7 +4,7 @@ import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzl
 import { heroTable } from './hero-schema';
 
 export const locationTypeEnum = pgEnum('location_type_enum', ['TOWN', 'MAP']);
-export const buildingTypeEnum = pgEnum('building', ['MAGIC-SHOP', 'MINE-ENTRANCE', 'NONE', 'SHOP', 'TEMPLE', 'TOWN-HALL']);
+export const buildingTypeEnum = pgEnum('building', ['MAGIC-SHOP', 'MINE-ENTRANCE', 'NONE', 'SHOP', 'TEMPLE', 'TOWN-HALL', 'LEAVE-TOWN']);
 
 export const locationTable = pgTable('location', {
   id: uuid().primaryKey().defaultRandom(),

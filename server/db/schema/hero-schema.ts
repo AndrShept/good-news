@@ -8,8 +8,10 @@ import { equipmentTable } from './equipment-schema';
 import { groupTable } from './group-schema';
 import { inventoryItemTable } from './inventory-item-schema';
 import { locationTable } from './location-schema';
+import { mapTable } from './map-schema';
 import { modifierTable } from './modifier-schema';
 import { stateTable } from './state-schema';
+import { tileTable } from './tile-schema';
 
 export const heroTable = pgTable('hero', {
   id: uuid().primaryKey().notNull(),
@@ -51,6 +53,10 @@ export const heroTable = pgTable('hero', {
   stateId: uuid()
     .references(() => stateTable.id)
     .notNull(),
+  mapId: uuid().references(() => mapTable.id, { onDelete: 'set null' }),
+
+  tileId: uuid().references(() => tileTable.id, { onDelete: 'set null' }),
+
   userId: text()
     .notNull()
     .references(() => userTable.id, {
@@ -92,6 +98,14 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
   state: one(stateTable, {
     fields: [heroTable.stateId],
     references: [stateTable.id],
+  }),
+  map: one(mapTable, {
+    fields: [heroTable.mapId],
+    references: [mapTable.id],
+  }),
+  tile: one(tileTable, {
+    fields: [heroTable.tileId],
+    references: [tileTable.id],
   }),
   equipments: many(equipmentTable),
   inventoryItem: many(inventoryItemTable),

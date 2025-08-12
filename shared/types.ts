@@ -13,7 +13,10 @@ import {
   inventoryItemTable,
   locationTable,
   locationTypeEnum,
+  mapNameTypeEnum,
+  mapTable,
   modifierTable,
+  pvpModeTypeEnum,
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { buffTable } from '../server/db/schema/buff-schema';
@@ -22,6 +25,7 @@ import type { equipmentTable, slotEnum } from '../server/db/schema/equipment-sch
 import type { gameItemEnum, gameItemTable, rarityEnum, weaponHandEnum, weaponTypeEnum } from '../server/db/schema/game-item-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
+import type { tileTable, tileTypeEnum } from '../server/db/schema/tile-schema';
 
 export type SuccessResponse<T = undefined> = {
   success: true;
@@ -149,12 +153,19 @@ export type BuildingType = (typeof buildingTypeEnum.enumValues)[number];
 export type ActionType = (typeof actionTypeEnum.enumValues)[number];
 export type StateType = (typeof stateTypeEnum.enumValues)[number];
 export type JobNameType = (typeof jobName)[keyof typeof jobName];
+export type TileType = (typeof tileTypeEnum.enumValues)[number];
+export type MapNameType = (typeof mapNameTypeEnum.enumValues)[number];
+export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
 export type Action = InferSelectModel<typeof actionTable> & { timeRemaining: number };
 export type Location = InferSelectModel<typeof locationTable>;
 export type State = InferSelectModel<typeof stateTable>;
+export type Tile = InferSelectModel<typeof tileTable>;
+export type Map = InferSelectModel<typeof mapTable> & {
+  tiles?: Tile[];
+};
 
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;
 export type Equipment = typeof equipmentTable.$inferSelect & {

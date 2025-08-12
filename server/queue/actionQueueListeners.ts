@@ -7,6 +7,10 @@ import { queueEvents } from './actionQueue';
 export const actionQueueListeners = () => {
   queueEvents.on('completed', async ({ jobId, returnvalue }) => {
     console.log('@@returnvalue@@@', returnvalue);
+    if (!returnvalue) {
+      console.error('returnvalue , not found');
+      return;
+    }
     const jobData = returnvalue as unknown as WalkTownJobData;
     io.to(jobData.heroId).emit(socketEvents.actionWalkTownComplete(), jobData);
   });

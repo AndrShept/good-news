@@ -1,4 +1,4 @@
-import { BASE_STATS, BASE_WALK_TIME, RESET_STATS_COST } from '@/shared/constants';
+import { BASE_STATS, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
 import {
   type Buff,
   type Equipment,
@@ -30,12 +30,13 @@ import {
   heroTable,
   inventoryItemTable,
   locationTable,
+  locationTypeEnum,
   modifierTable,
   slotEnum,
   stateTable,
+  stateTypeEnum,
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
-import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/constants';
 import { restorePotion } from '../lib/restorePotion';
 import { sumModifier } from '../lib/sumModifier';
 import { generateRandomUuid, setSqlNow, setSqlNowByInterval, verifyHeroOwnership } from '../lib/utils';
@@ -1138,6 +1139,88 @@ export const heroRouter = new Hono<Context>()
         .update(locationTable)
         .set({
           buildingType: 'NONE',
+        })
+        .where(eq(locationTable.id, hero.locationId));
+
+      return c.json<SuccessResponse>({
+        message: 'location changed',
+        success: true,
+      });
+    },
+  )
+  .put(
+    '/:id/state/change',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+    zValidator('json', z.object({ type: z.enum(stateTypeEnum.enumValues) })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const { type } = c.req.valid('json');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+        with: {
+          action: true,
+        },
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      if (hero.isInBattle) {
+        throw new HTTPException(403, {
+          message: 'Hero is currently in battle.',
+        });
+      }
+      if (hero.action.type !== 'IDLE') {
+        throw new HTTPException(403, {
+          message: 'Hero must be idle to perform this action.',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      await db
+        .update(stateTable)
+        .set({
+          type,
+        })
+        .where(eq(stateTable.id, hero.stateId));
+
+      return c.json<SuccessResponse>({
+        message: 'state changed',
+        success: true,
+      });
+    },
+  )
+  .put(
+    '/:id/location/change',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+    zValidator('json', z.object({ type: z.enum(locationTypeEnum.enumValues), buildingType: z.enum(buildingTypeEnum.enumValues) })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const { type, buildingType } = c.req.valid('json');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      await db
+        .update(locationTable)
+        .set({
+          type,
+          buildingType,
         })
         .where(eq(locationTable.id, hero.locationId));
 

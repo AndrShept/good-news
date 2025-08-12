@@ -1,16 +1,16 @@
 import { LogOutButton } from '@/components/LogOutButton';
 import { BackpackIcon } from '@/components/game-icons/BackpackIcon';
 import { GoldIcon } from '@/components/game-icons/GoldIcon';
-import { HeroIcon } from '@/components/game-icons/HeroIcon';
 import { LogoIcon } from '@/components/game-icons/LogoIcon';
 import { PremIcon } from '@/components/game-icons/PremIcon';
-import { ShopIcon } from '@/components/game-icons/ShopIcon';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { GroupMenuButton } from '@/features/group/components/GroupMenuButton';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useBackpack } from '@/store/useBackpack';
 import { Link } from '@tanstack/react-router';
 import { memo } from 'react';
+
+import { CharacterPaperdollButton } from './CharacterPaperdollButton';
 
 export const GameHeader = memo(() => {
   const { currentInventorySlots, goldCoins, maxInventorySlots, premiumCoins } = useHero((state) => ({
@@ -21,6 +21,7 @@ export const GameHeader = memo(() => {
   }));
   const isOpen = useBackpack((state) => state.isOpen);
   const onOpen = useBackpack((state) => state.onOpen);
+
   return (
     <header className="bg-background/80 backdrop-blur-xs sticky top-0 z-50 mb-3 flex items-center justify-between border-b px-4 py-2">
       <section>
@@ -29,21 +30,7 @@ export const GameHeader = memo(() => {
         </Link>
       </section>
       <section className="flex gap-0.5">
-        <Link
-          className={buttonVariants({ variant: 'outline', size: 'icon', className: 'cursor-default' })}
-          to="/game"
-          activeOptions={{ exact: true }}
-          activeProps={{ className: buttonVariants({ variant: 'default', size: 'icon' }) }}
-        >
-          <HeroIcon />
-        </Link>
-        <Link
-          className={buttonVariants({ variant: 'outline', size: 'icon', className: 'cursor-default' })}
-          to="/game/shop"
-          activeProps={{ className: buttonVariants({ variant: 'default', size: 'icon' }) }}
-        >
-          <ShopIcon />
-        </Link>
+        <CharacterPaperdollButton />
 
         <Button onClick={onOpen} className="" variant={isOpen ? 'default' : 'outline'} size="icon">
           <BackpackIcon />
@@ -61,7 +48,7 @@ export const GameHeader = memo(() => {
           <p>{premiumCoins}</p>
         </div>
         <div className="flex items-center">
-          <BackpackIcon className='size-7' />
+          <BackpackIcon className="size-7" />
           <p>{currentInventorySlots}</p>/<p>{maxInventorySlots}</p>
         </div>
       </section>

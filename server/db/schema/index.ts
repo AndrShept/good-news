@@ -13,3 +13,5 @@ export * from './group-schema';
 export * from './action-schema';
 export * from './location-schema';
 export * from './state-schema';
+export * from './tile-schema';
+export * from './map-schema';
