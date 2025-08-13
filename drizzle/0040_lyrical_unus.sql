@@ -1,0 +1,1 @@
+ALTER TABLE "tile" ADD COLUMN "z" integer NOT NULL;

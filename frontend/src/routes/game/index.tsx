@@ -2,10 +2,9 @@ import { Spinner } from '@/components/Spinner';
 import { TownBuilding } from '@/components/TownBuilding';
 import { MagicShop } from '@/components/buildings/MagicShop';
 import { Temple } from '@/components/buildings/Temple';
-import { ActionTimeRemaining } from '@/features/hero/components/ActionTimeRemaining';
 import { CharacterPaperdoll } from '@/features/hero/components/CharacterPaperdoll';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { Map } from '@/features/map/components/Map';
+import { Map } from '@/features/map/components/GameMap';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/game/')({
@@ -26,7 +25,7 @@ function RouteComponent() {
   const isTownEntry = location?.type === 'TOWN' && location.buildingType === 'NONE' && !isCharacter;
   const isMagicShop = location?.type === 'TOWN' && location.buildingType === 'MAGIC-SHOP' && !isCharacter;
   const isTemple = location?.type === 'TOWN' && location.buildingType === 'TEMPLE' && !isCharacter;
-  const isMap = location?.type === 'MAP' && location.buildingType === 'NONE';
+  const isMap = location?.type === 'MAP' && location.buildingType === 'NONE' && !isCharacter;
   return (
     <>
       {isTownEntry && (
@@ -36,7 +35,7 @@ function RouteComponent() {
           <TownBuilding buildingType="LEAVE-TOWN" />
         </div>
       )}
-      <ActionTimeRemaining />
+
       {isMagicShop && <MagicShop />}
       {isTemple && <Temple />}
       {isCharacter && <CharacterPaperdoll />}

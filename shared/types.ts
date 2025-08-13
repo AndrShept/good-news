@@ -26,6 +26,7 @@ import type { gameItemEnum, gameItemTable, rarityEnum, weaponHandEnum, weaponTyp
 import { postTable } from '../server/db/schema/posts-schema';
 import type { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
 import type { tileTable, tileTypeEnum } from '../server/db/schema/tile-schema';
+import type { townNameTypeEnum, townTable } from '../server/db/schema/town-schema';
 
 export type SuccessResponse<T = undefined> = {
   success: true;
@@ -155,6 +156,7 @@ export type StateType = (typeof stateTypeEnum.enumValues)[number];
 export type JobNameType = (typeof jobName)[keyof typeof jobName];
 export type TileType = (typeof tileTypeEnum.enumValues)[number];
 export type MapNameType = (typeof mapNameTypeEnum.enumValues)[number];
+export type TownNameType = (typeof townNameTypeEnum.enumValues)[number];
 export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
@@ -163,6 +165,7 @@ export type Action = InferSelectModel<typeof actionTable> & { timeRemaining: num
 export type Location = InferSelectModel<typeof locationTable>;
 export type State = InferSelectModel<typeof stateTable>;
 export type Tile = InferSelectModel<typeof tileTable>;
+export type Town = InferSelectModel<typeof townTable>;
 export type Map = InferSelectModel<typeof mapTable> & {
   tiles?: Tile[];
 };

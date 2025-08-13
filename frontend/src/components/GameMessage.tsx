@@ -15,7 +15,7 @@ export const GameMessage = memo(() => {
   }, [gameMessages]);
 
   return (
-    <section className="bg-background/80 backdrop-blur-xs sticky bottom-0 h-[250px]">
+    <section className="bg-background/80 backdrop-blur-xs h-[250px]">
       <ScrollArea className="h-full p-1">
         <ul ref={ref} className="flex flex-col pl-2 pt-1">
           {gameMessages.map((message) => (

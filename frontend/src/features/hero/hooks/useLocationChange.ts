@@ -10,7 +10,7 @@ export const useLocationChange = () => {
   const id = useHeroId();
 
   return useMutation({
-    mutationFn: ({ buildingType, type }: { buildingType?: BuildingType; type: LocationType }) =>
+    mutationFn: ({ buildingType, type }: { buildingType: BuildingType; type: LocationType }) =>
       client.hero[':id'].location.change.$put({
         param: {
           id,

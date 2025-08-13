@@ -3,8 +3,9 @@ import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzl
 
 import { heroTable } from './hero-schema';
 import { mapTable } from './map-schema';
+import { townTable } from './town-schema';
 
-export const tileTypeEnum = pgEnum('tile_type_enum', ['OBJECT', 'DECOR', 'GROUND']);
+export const tileTypeEnum = pgEnum('tile_type_enum', ['OBJECT', 'DECOR', 'GROUND', 'TOWN']);
 
 export const tileTable = pgTable('tile', {
   id: uuid().primaryKey().defaultRandom(),
@@ -12,12 +13,17 @@ export const tileTable = pgTable('tile', {
   type: tileTypeEnum().notNull(),
   x: integer().notNull(),
   y: integer().notNull(),
+  z: integer().notNull(),
   image: integer().notNull(),
   mapId: uuid()
     .references(() => mapTable.id, {
       onDelete: 'cascade',
     })
     .notNull(),
+  townId: uuid().references(() => townTable.id, {
+    onDelete: 'set null',
+  }),
+
   createdAt: timestamp({
     mode: 'string',
   })
@@ -30,5 +36,9 @@ export const tileTableRelations = relations(tileTable, ({ one, many }) => ({
   map: one(mapTable, {
     fields: [tileTable.mapId],
     references: [mapTable.id],
+  }),
+  town: one(townTable, {
+    fields: [tileTable.townId],
+    references: [townTable.id],
   }),
 }));

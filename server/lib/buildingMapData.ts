@@ -1,9 +1,11 @@
 import type { Layer, TileMap } from '@/shared/json-types';
-import type { MapNameType, Tile } from '@/shared/types';
+import type { MapNameType, Tile, TileType } from '@/shared/types';
+import { and, eq } from 'drizzle-orm';
 
 import { db } from '../db/db';
 import { mapTable, tileTable } from '../db/schema';
 import { generateRandomUuid } from './utils';
+import { town } from '../entities/town';
 
 export const getMap = (mapName: MapNameType) => {
   const map: Record<MapNameType, TileMap> = {
@@ -13,17 +15,16 @@ export const getMap = (mapName: MapNameType) => {
 };
 
 export const getLayerObject = (layer: Layer, tileWidth: number, tileHeight: number) => {
-  //   if (layer?.name === 'object') {
-  //     return layer.objects.map((object) => ({
-  //       ...object,
-  //       id: generateRandomUuid(),
-
-  //       gid: object.gid - 1,
-  //       x: object.x / object.width,
-  //       y: object.y / object.height - 1,
-  //       name: object.name,
-  //     }));
-  //   }
+  // if (layer?.name === 'TOWN') {
+  //   return layer.objects.map((object) => ({
+  //     ...object,
+  //     id: generateRandomUuid(),
+  //     type: layer.name,
+  //     image: object.gid - 1,
+  //     x: object.x / object.width,
+  //     y: object.y / object.height - 1,
+  //   }));
+  // }
 
   return layer.data
     .map((item, idx) => {
@@ -46,12 +47,21 @@ export const buildingMapData = async (mapName: MapNameType) => {
   const findObjects = map.layers.find((item) => item.name === 'OBJECT');
   const findDecor = map.layers.find((item) => item.name === 'DECOR');
   const findGround = map.layers.find((item) => item.name === 'GROUND');
+  const findTown = map.layers.find((item) => item.name === 'TOWN');
+
+  const zIndex: Record<TileType, number> = {
+    GROUND: 0,
+    OBJECT: 1,
+    DECOR: 5,
+    TOWN: 1,
+  };
 
   const dataObjects = findObjects && getLayerObject(findObjects, map.tilewidth, map.tileheight);
   const dataDecors = findDecor && getLayerObject(findDecor, map.tilewidth, map.tileheight);
   const dataGround = findGround && getLayerObject(findGround, map.tilewidth, map.tileheight);
+  const dataTown = findTown && getLayerObject(findTown, map.tilewidth, map.tileheight);
   console.time('create-map');
-  const mapTiles = dataGround;
+  const mapTiles = [...(dataGround ?? []), ...(dataDecors ?? []), ...(dataObjects ?? []), ...(dataTown ?? [])];
   if (!mapTiles) {
     console.error('map Tiles not found');
     return;
@@ -73,11 +83,19 @@ export const buildingMapData = async (mapName: MapNameType) => {
       type: t?.type ?? 'GROUND',
       x: t?.x ?? 0,
       y: t?.y ?? 0,
+      z: zIndex[t?.type ?? 'GROUND'],
       mapId: newMap.id,
       image: t?.image ?? 0,
     }));
     if (!tiles) return;
     const newTiles = await tx.insert(tileTable).values(tiles).returning();
+
+    await db
+      .update(tileTable)
+      .set({
+        townId: town.
+      })
+      .where(and(eq(tileTable.x, 3), eq(tileTable.y, 3)));
 
     return {
       ...newMap,

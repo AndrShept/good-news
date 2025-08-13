@@ -37,7 +37,7 @@ export const ActionTimeRemaining = () => {
 
   if (!seconds) return;
   return (
-    <section className="max-w-75 top-0 mx-auto my-2">
+    <section className="max-w-75 top-0 mx-auto my-2 w-full ">
       <div className="flex w-full items-center justify-center gap-1">
         <WalkIcon className="size-12 shrink-0" />
         <div className="border-background ring-accent relative flex h-8 w-full overflow-hidden rounded border-2 ring-1">

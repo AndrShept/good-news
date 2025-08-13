@@ -281,6 +281,20 @@
       "when": 1755007839581,
       "tag": "0039_nervous_kabuki",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1755083542274,
+      "tag": "0040_lyrical_unus",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1755095641631,
+      "tag": "0041_silly_bastion",
+      "breakpoints": true
     }
   ]
 }
