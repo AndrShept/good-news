@@ -33,13 +33,13 @@ export const mapRouter = new Hono<Context>().get(
       },
     });
     if (!map) {
-      map = (await buildingMapData(name) )
+      map = await buildingMapData(name);
     }
 
     return c.json<SuccessResponse<Map>>({
       message: 'map fetched!',
       success: true,
-      data: map,
+      data: map as Map,
     });
   },
 );

@@ -1,14 +1,31 @@
 import { WorldObject } from '@/shared/types';
 import React from 'react';
 
-type Props = WorldObject;
+import { useChangeMap } from '../hooks/useChangeMap';
+
+interface Props extends WorldObject {
+  tileId: string;
+}
 
 export const WorldObjectTile = (props: Props) => {
-  const { image } = props;
-
+  const { image, id, tileId } = props;
+  const { changeTile } = useChangeMap('SOLMERE');
   return (
     <>
-      <img onClick={() => console.log(image)} draggable={false} className="absolute left-0 top-0 z-10 size-full hover:border" src={image} />
+      <img
+        onClick={() =>
+          changeTile({
+            tileId,
+            params: {
+              worldObject: undefined,
+              worldObjectId: undefined,
+            },
+          })
+        }
+        draggable={false}
+        className="absolute left-0 top-0 z-10 size-full hover:border"
+        src={image}
+      />
     </>
   );
 };

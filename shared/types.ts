@@ -170,9 +170,12 @@ export type State = InferSelectModel<typeof stateTable>;
 
 export type WorldObject = typeof worldObjectTable.$inferSelect;
 export type Map = typeof mapTable.$inferSelect & {
-  tiles?: Tile[];
+  tiles?: Tile[] 
 };
 export type Tile = typeof tileTable.$inferSelect & {
+  worldObject?: WorldObject;
+};
+export type TileInsert = typeof tileTable.$inferInsert & {
   worldObject?: WorldObject;
 };
 

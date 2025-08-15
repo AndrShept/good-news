@@ -14,18 +14,23 @@ export const GameTile = memo(function GameTile({ x, y, z, id, image, type, tileH
   console.log('render tile');
   return (
     <div
-      //  onClick={() => changeTile({tileId: id , params: {image: 8}})}
-      onClick={() => removeTile({ tileId: id })}
+      // onClick={() => changeTile({ tileId: id, params: { image: 8 } })}
+      onClick={() =>
+        removeTile({
+          tileId: id,
+        })
+      }
       className="absolute"
       style={{
         left: `${x * tileWidth}px`,
         top: `${y * tileHeight}px`,
         height: `${tileHeight}px`,
         width: `${tileWidth}px`,
+        zIndex: z,
       }}
     >
       {<img draggable={false} className="size-full" src={`/sprites/map/solmer-image/${image.toString().padStart(3, '0')}.png`} />}
-      {worldObject && <WorldObjectTile {...worldObject} />}
+      {worldObject && <WorldObjectTile {...worldObject} tileId={id} />}
     </div>
   );
 });
