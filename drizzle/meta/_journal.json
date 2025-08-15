@@ -295,6 +295,20 @@
       "when": 1755095641631,
       "tag": "0041_silly_bastion",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1755162977528,
+      "tag": "0042_unknown_nextwave",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1755163329632,
+      "tag": "0043_futuristic_colonel_america",
+      "breakpoints": true
     }
   ]
 }

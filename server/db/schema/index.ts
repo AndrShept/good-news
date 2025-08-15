@@ -15,4 +15,4 @@ export * from './location-schema';
 export * from './state-schema';
 export * from './tile-schema';
 export * from './map-schema';
-export * from './town-schema';
+export * from './world-object-schema';

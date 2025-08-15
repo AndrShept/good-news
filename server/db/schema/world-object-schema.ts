@@ -4,13 +4,12 @@ import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzl
 import { buildingTypeEnum } from './location-schema';
 import { tileTable } from './tile-schema';
 
-export const townNameTypeEnum = pgEnum('town_name_type_enum', ['SOLMERE']);
-export const townTable = pgTable('town', {
+export const worldObjectNameEnum = pgEnum('worldObject_name_enum', ['SOLMERE']);
+export const worldObjectTypeEnum = pgEnum('worldObject_type_enum', ['TOWN', 'DUNGEON']);
+export const worldObjectTable = pgTable('world_object', {
   id: uuid().primaryKey().defaultRandom(),
-  buildingType: buildingTypeEnum()
-    .$defaultFn(() => 'NONE')
-    .notNull(),
-  name: townNameTypeEnum().notNull(),
+  type: worldObjectTypeEnum().notNull(),
+  name: worldObjectNameEnum().notNull(),
   image: text().notNull(),
   createdAt: timestamp({
     mode: 'string',
@@ -19,6 +18,6 @@ export const townTable = pgTable('town', {
     .notNull(),
 });
 
-export const townTableRelations = relations(townTable, ({ many }) => ({
+export const worldObjectTableRelations = relations(worldObjectTable, ({ many }) => ({
   tiles: many(tileTable),
 }));

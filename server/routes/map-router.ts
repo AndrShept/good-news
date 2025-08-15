@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import {  mapNameTypeEnum, mapTable } from '../db/schema';
+import { mapNameTypeEnum, mapTable, tileTable } from '../db/schema';
 import { buildingMapData } from '../lib/buildingMapData';
 import { loggedIn } from '../middleware/loggedIn';
 
@@ -25,11 +25,15 @@ export const mapRouter = new Hono<Context>().get(
     let map = await db.query.mapTable.findFirst({
       where: eq(mapTable.name, name),
       with: {
-        tiles: true,
+        tiles: {
+          with: {
+            worldObject: true,
+          },
+        },
       },
     });
     if (!map) {
-      map = await buildingMapData(name);
+      map = (await buildingMapData(name) )
     }
 
     return c.json<SuccessResponse<Map>>({

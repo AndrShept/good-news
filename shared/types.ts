@@ -17,6 +17,9 @@ import {
   mapTable,
   modifierTable,
   pvpModeTypeEnum,
+  worldObjectNameEnum,
+  worldObjectTable,
+  worldObjectTypeEnum,
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { buffTable } from '../server/db/schema/buff-schema';
@@ -26,7 +29,6 @@ import type { gameItemEnum, gameItemTable, rarityEnum, weaponHandEnum, weaponTyp
 import { postTable } from '../server/db/schema/posts-schema';
 import type { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
 import type { tileTable, tileTypeEnum } from '../server/db/schema/tile-schema';
-import type { townNameTypeEnum, townTable } from '../server/db/schema/town-schema';
 
 export type SuccessResponse<T = undefined> = {
   success: true;
@@ -156,18 +158,22 @@ export type StateType = (typeof stateTypeEnum.enumValues)[number];
 export type JobNameType = (typeof jobName)[keyof typeof jobName];
 export type TileType = (typeof tileTypeEnum.enumValues)[number];
 export type MapNameType = (typeof mapNameTypeEnum.enumValues)[number];
-export type TownNameType = (typeof townNameTypeEnum.enumValues)[number];
 export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
+export type WorldObjectName = (typeof worldObjectNameEnum.enumValues)[number];
+export type WorldObjectType = (typeof worldObjectTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
 export type Action = InferSelectModel<typeof actionTable> & { timeRemaining: number };
 export type Location = InferSelectModel<typeof locationTable>;
 export type State = InferSelectModel<typeof stateTable>;
-export type Tile = InferSelectModel<typeof tileTable>;
-export type Town = InferSelectModel<typeof townTable>;
-export type Map = InferSelectModel<typeof mapTable> & {
+
+export type WorldObject = typeof worldObjectTable.$inferSelect;
+export type Map = typeof mapTable.$inferSelect & {
   tiles?: Tile[];
+};
+export type Tile = typeof tileTable.$inferSelect & {
+  worldObject?: WorldObject;
 };
 
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;

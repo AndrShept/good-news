@@ -1,11 +1,11 @@
 import type { Layer, TileMap } from '@/shared/json-types';
-import type { MapNameType, Tile, TileType } from '@/shared/types';
+import type { MapNameType, Tile, TileType, WorldObject } from '@/shared/types';
 import { and, eq } from 'drizzle-orm';
 
 import { db } from '../db/db';
-import { mapTable, tileTable } from '../db/schema';
+import { mapTable, tileTable, worldObjectTable } from '../db/schema';
+import { worldObjectEntities } from '../entities/world-object';
 import { generateRandomUuid } from './utils';
-import { town } from '../entities/town';
 
 export const getMap = (mapName: MapNameType) => {
   const map: Record<MapNameType, TileMap> = {
@@ -47,21 +47,18 @@ export const buildingMapData = async (mapName: MapNameType) => {
   const findObjects = map.layers.find((item) => item.name === 'OBJECT');
   const findDecor = map.layers.find((item) => item.name === 'DECOR');
   const findGround = map.layers.find((item) => item.name === 'GROUND');
-  const findTown = map.layers.find((item) => item.name === 'TOWN');
 
   const zIndex: Record<TileType, number> = {
     GROUND: 0,
     OBJECT: 1,
     DECOR: 5,
-    TOWN: 1,
   };
 
   const dataObjects = findObjects && getLayerObject(findObjects, map.tilewidth, map.tileheight);
   const dataDecors = findDecor && getLayerObject(findDecor, map.tilewidth, map.tileheight);
   const dataGround = findGround && getLayerObject(findGround, map.tilewidth, map.tileheight);
-  const dataTown = findTown && getLayerObject(findTown, map.tilewidth, map.tileheight);
   console.time('create-map');
-  const mapTiles = [...(dataGround ?? []), ...(dataDecors ?? []), ...(dataObjects ?? []), ...(dataTown ?? [])];
+  const mapTiles = [...(dataGround ?? []), ...(dataDecors ?? []), ...(dataObjects ?? [])];
   if (!mapTiles) {
     console.error('map Tiles not found');
     return;
@@ -79,27 +76,47 @@ export const buildingMapData = async (mapName: MapNameType) => {
         tileWidth: map.tilewidth,
       })
       .returning();
-    const tiles = mapTiles.map((t) => ({
-      type: t?.type ?? 'GROUND',
-      x: t?.x ?? 0,
-      y: t?.y ?? 0,
-      z: zIndex[t?.type ?? 'GROUND'],
-      mapId: newMap.id,
-      image: t?.image ?? 0,
-    }));
-    if (!tiles) return;
-    const newTiles = await tx.insert(tileTable).values(tiles).returning();
 
-    await db
-      .update(tileTable)
-      .set({
-        townId: town.
+    const [solmerTown] = await tx
+      .insert(worldObjectTable)
+      .values({
+        ...worldObjectEntities.SOLMERE,
       })
-      .where(and(eq(tileTable.x, 3), eq(tileTable.y, 3)));
+      .returning();
+    const tiles: Tile[] = mapTiles.map((t) => {
+      if (t?.x === 3 && t?.y === 3) {
+        return {
+          id: generateRandomUuid(),
+          createdAt: new Date().toISOString(),
+          type: 'OBJECT' as TileType,
+          x: t?.x ?? 0,
+          y: t?.y ?? 0,
+          z: 1,
+          mapId: newMap.id,
+          image: t?.image ?? 0,
+          worldObjectId: solmerTown.id,
+          worldObject: solmerTown,
+        };
+      }
+      return {
+        id: generateRandomUuid(),
+        createdAt: new Date().toISOString(),
+        type: t?.type ?? 'GROUND',
+        x: t?.x ?? 0,
+        y: t?.y ?? 0,
+        z: zIndex[t?.type ?? 'GROUND'],
+        mapId: newMap.id,
+        image: t?.image ?? 0,
+        worldObjectId: null,
+        worldObject: undefined,
+      };
+    });
+    if (!tiles) return;
+      await  tx.insert(tileTable).values(tiles);
 
     return {
       ...newMap,
-      tiles: newTiles,
+      tiles
     };
   });
 
