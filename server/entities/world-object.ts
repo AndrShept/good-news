@@ -1,8 +1,8 @@
 import type { WorldObjectName } from '@/shared/types';
 
-import type { worldObject } from '../db/schema';
+import type { worldObjectTable } from '../db/schema';
 
-type WorldObject = typeof worldObject.$inferInsert;
+type WorldObject = typeof worldObjectTable.$inferInsert;
 
 export const worldObjectEntities: Record<WorldObjectName, WorldObject> = {
   SOLMERE: {

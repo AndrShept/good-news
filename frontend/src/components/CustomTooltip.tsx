@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import React, { ComponentProps, ReactNode, RefObject, createContext, useContext, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface Props {
   children: ReactNode;
@@ -67,7 +68,8 @@ const TooltipTrigger = ({ children }: { children: ReactNode }) => {
 const TooltipContent = ({ children, className, ...props }: TooltipContentProps) => {
   const { tooltipPos, showTooltip, tooltipRef } = useCustomTooltip();
   if (!showTooltip) return null;
-  return (
+
+  return createPortal(
     <div
       {...props}
       ref={tooltipRef}
@@ -75,7 +77,8 @@ const TooltipContent = ({ children, className, ...props }: TooltipContentProps) 
       style={{ top: tooltipPos.y, left: tooltipPos.x }}
     >
       {children}
-    </div>
+    </div>,
+    document.body,
   );
 };
 

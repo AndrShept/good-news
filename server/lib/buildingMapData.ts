@@ -80,7 +80,7 @@ export const buildingMapData = async (mapName: MapNameType) => {
     const objectsTiles = findObjects && getLayerObject({ layer: findObjects, mapId: newMap.id });
     const decorTiles = findDecor && getLayerObject({ layer: findDecor, mapId: newMap.id });
     const grounTiles = findGround && getLayerObject({ layer: findGround, mapId: newMap.id });
-    const tiles = [...(objectsTiles ?? []), ...(decorTiles ?? []), ...(grounTiles ?? [])];
+    const tiles = [...(grounTiles ?? []), ...(objectsTiles ?? []), ...(decorTiles ?? [])];
     await tx.insert(tileTable).values(tiles).returning();
     const [solmerTown] = await tx
       .insert(worldObjectTable)
@@ -97,7 +97,7 @@ export const buildingMapData = async (mapName: MapNameType) => {
     return newMap;
   });
 
-  let map = await db.query.mapTable.findFirst({
+  const map = await db.query.mapTable.findFirst({
     where: eq(mapTable.name, mapName),
     with: {
       tiles: {

@@ -8,22 +8,23 @@ interface Props extends WorldObject {
 }
 
 export const WorldObjectTile = (props: Props) => {
-  const { image, id, tileId } = props;
+  const { image, tileId, } = props;
   const { changeTile } = useChangeMap('SOLMERE');
   return (
     <>
       <img
-        onClick={() =>
-          changeTile({
-            tileId,
-            params: {
-              worldObject: undefined,
-              worldObjectId: undefined,
-            },
-          })
-        }
+        // onClick={() =>
+        //   changeTile({
+        //     tileId,
+        //     params: {
+        //       worldObject: undefined,
+        //       worldObjectId: undefined,
+        //     },
+        //   })
+        // }
         draggable={false}
-        className="absolute left-0 top-0 z-10 size-full hover:border"
+        className="absolute left-0 top-0 size-full hover:border"
+        style={{ imageRendering: 'pixelated' }}
         src={image}
       />
     </>
