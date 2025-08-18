@@ -7,6 +7,7 @@ import { useSetGameMessage } from '@/store/useGameMessages';
 import { ComponentProps } from 'react';
 
 import { CustomTooltip } from './CustomTooltip';
+import { useLeaveWorldObject } from '@/features/hero/hooks/useLeaveWorldObject';
 
 interface Props extends ComponentProps<'div'> {
   buildingType: BuildingType;
@@ -33,15 +34,15 @@ export const TownBuilding = ({ buildingType, className, ...props }: Props) => {
 
   const { mutate } = useWalkTown();
   const mutationLocation = useLocationChange();
+  const mutationLeaveTown = useLeaveWorldObject()
   const type = useHero((state) => state?.data?.action?.type);
   const setGameMessage = useSetGameMessage();
   const onClick = () => {
     if (type !== 'IDLE') return;
     if (buildingType === 'LEAVE-TOWN') {
-      mutationLocation.mutate({
-        type: 'MAP',
-        buildingType: 'NONE',
-      });
+    // mutationLeaveTown.mutate({
+    //   worldObjectId
+    // })
       setGameMessage({
         type: 'info',
         text: 'You leave a town',

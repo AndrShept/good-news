@@ -1,9 +1,9 @@
 import type { Layer, TileMap } from '@/shared/json-types';
-import type { Map, MapNameType, Tile, TileInsert, TileType, WorldObject } from '@/shared/types';
+import type { Map, MapNameType, Tile, TileType,  } from '@/shared/types';
 import { and, eq } from 'drizzle-orm';
 
 import { db } from '../db/db';
-import { mapTable, tileTable, worldObjectTable } from '../db/schema';
+import { mapTable, tileTable } from '../db/schema';
 import { worldObjectEntities } from '../entities/world-object';
 import { generateRandomUuid } from './utils';
 
@@ -48,8 +48,9 @@ export const getLayerObject = ({ layer, mapId }: Params): Tile[] => {
         z: zIndex[layer.name],
         id: generateRandomUuid(),
         createdAt: new Date().toISOString(),
-        worldObjectId: null,
-        worldObject: undefined,
+        town: undefined,
+        
+  
       };
     })
     .filter((tile) => !!tile);
@@ -82,18 +83,9 @@ export const buildingMapData = async (mapName: MapNameType) => {
     const grounTiles = findGround && getLayerObject({ layer: findGround, mapId: newMap.id });
     const tiles = [...(grounTiles ?? []), ...(objectsTiles ?? []), ...(decorTiles ?? [])];
     await tx.insert(tileTable).values(tiles).returning();
-    const [solmerTown] = await tx
-      .insert(worldObjectTable)
-      .values({
-        ...worldObjectEntities.SOLMERE,
-      })
-      .returning();
-    await tx
-      .update(tileTable)
-      .set({
-        worldObjectId: solmerTown.id,
-      })
-      .where(and(eq(tileTable.x, 3), eq(tileTable.y, 3)));
+
+
+
     return newMap;
   });
 
@@ -102,7 +94,7 @@ export const buildingMapData = async (mapName: MapNameType) => {
     with: {
       tiles: {
         with: {
-          worldObject: true,
+          heroes: true
         },
       },
     },

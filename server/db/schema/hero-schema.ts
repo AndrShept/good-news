@@ -53,7 +53,7 @@ export const heroTable = pgTable('hero', {
   stateId: uuid()
     .references(() => stateTable.id)
     .notNull(),
-  mapId: uuid().references(() => mapTable.id, { onDelete: 'set null' }),
+
 
   tileId: uuid().references(() => tileTable.id, { onDelete: 'set null' }),
 
@@ -99,10 +99,7 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
     fields: [heroTable.stateId],
     references: [stateTable.id],
   }),
-  map: one(mapTable, {
-    fields: [heroTable.mapId],
-    references: [mapTable.id],
-  }),
+
   tile: one(tileTable, {
     fields: [heroTable.tileId],
     references: [tileTable.id],

@@ -23,7 +23,7 @@ import type { Context } from '../context';
 import { db } from '../db/db';
 import {
   actionTable,
-  buildingTypeEnum,
+  buildingNameTypeEnum,
   equipmentTable,
   gameItemEnum,
   gameItemTable,
@@ -35,6 +35,8 @@ import {
   slotEnum,
   stateTable,
   stateTypeEnum,
+  tileTable,
+  townNameTypeEnum,
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
 import { restorePotion } from '../lib/restorePotion';
@@ -1020,7 +1022,7 @@ export const heroRouter = new Hono<Context>()
     zValidator(
       'json',
       z.object({
-        buildingType: z.enum(buildingTypeEnum.enumValues),
+        buildingType: z.enum(buildingNameTypeEnum.enumValues),
       }),
     ),
     async (c) => {
@@ -1148,6 +1150,87 @@ export const heroRouter = new Hono<Context>()
       });
     },
   )
+  .post(
+    '/:id/world-object/leave',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+    zValidator(
+      'json',
+      z.object({
+        worldObjectId: z.string(),
+        tileId: z.string(),
+      }),
+    ),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const { tileId, worldObjectId } = c.req.valid('json');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+      const worldObject = await db.query.worldObjectTable.findFirst({
+        where: eq(worldObjectTable.id, worldObjectId),
+      });
+      const tile = await db.query.tileTable.findFirst({
+        where: eq(tileTable.id, tileId),
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      if (!worldObject) {
+        throw new HTTPException(404, {
+          message: 'world object not found',
+        });
+      }
+      if (!tile) {
+        throw new HTTPException(404, {
+          message: 'tile not found',
+        });
+      }
+      if (tile.worldObjectId !== worldObjectId) {
+        throw new HTTPException(404, {
+          message: 'worldObject  not exist this tile',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      const findTargetTile = await db.query.tileTable.findFirst({
+        where: and(eq(tileTable.x, tile.x), eq(tileTable.y, tile.y - 1)),
+      });
+
+      if (!findTargetTile) {
+        throw new HTTPException(404, {
+          message: 'find tile not found',
+        });
+      }
+
+      await db.transaction(async (tx) => {
+        await tx
+          .update(locationTable)
+          .set({
+            buildingType: 'NONE',
+            name: 'SOLMERE',
+            type: 'MAP',
+          })
+          .where(eq(locationTable.id, hero.locationId));
+        await tx
+          .update(heroTable)
+          .set({
+            tileId: findTargetTile.id,
+          })
+          .where(eq(heroTable.id, id));
+      });
+
+      return c.json<SuccessResponse>({
+        message: 'success leave',
+        success: true,
+      });
+    },
+  )
   .put(
     '/:id/state/change',
     loggedIn,
@@ -1199,12 +1282,18 @@ export const heroRouter = new Hono<Context>()
     '/:id/location/change',
     loggedIn,
     zValidator('param', z.object({ id: z.string() })),
-    zValidator('json', z.object({ type: z.enum(locationTypeEnum.enumValues), buildingType: z.enum(buildingTypeEnum.enumValues) })),
+    zValidator(
+      'json',
+      z.object({
+        type: z.enum(locationTypeEnum.enumValues),
+        name: z.enum(townNameTypeEnum.enumValues),
+      }),
+    ),
 
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const { type, buildingType } = c.req.valid('json');
+      const { type, name } = c.req.valid('json');
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
       });
@@ -1220,7 +1309,6 @@ export const heroRouter = new Hono<Context>()
         .update(locationTable)
         .set({
           type,
-          buildingType,
         })
         .where(eq(locationTable.id, hero.locationId));
 

@@ -27,6 +27,5 @@ export const mapTable = pgTable('map', {
 });
 
 export const mapTableRelations = relations(mapTable, ({ many }) => ({
-  heroes: many(heroTable),
   tiles: many(tileTable),
 }));

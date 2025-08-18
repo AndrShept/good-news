@@ -7,7 +7,8 @@ import type { client } from '../frontend/src/lib/utils';
 import {
   actionTable,
   actionTypeEnum,
-  buildingTypeEnum,
+  buildingNameTypeEnum,
+  buildingTable,
   groupTable,
   heroTable,
   inventoryItemTable,
@@ -17,9 +18,9 @@ import {
   mapTable,
   modifierTable,
   pvpModeTypeEnum,
-  worldObjectNameEnum,
-  worldObjectTable,
-  worldObjectTypeEnum,
+  townNameTypeEnum,
+  townTable,
+
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { buffTable } from '../server/db/schema/buff-schema';
@@ -152,32 +153,31 @@ export type RarityType = (typeof rarityEnum.enumValues)[number];
 export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
 export type LocationType = (typeof locationTypeEnum.enumValues)[number];
-export type BuildingType = (typeof buildingTypeEnum.enumValues)[number];
 export type ActionType = (typeof actionTypeEnum.enumValues)[number];
 export type StateType = (typeof stateTypeEnum.enumValues)[number];
 export type JobNameType = (typeof jobName)[keyof typeof jobName];
 export type TileType = (typeof tileTypeEnum.enumValues)[number];
 export type MapNameType = (typeof mapNameTypeEnum.enumValues)[number];
 export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
-export type WorldObjectName = (typeof worldObjectNameEnum.enumValues)[number];
-export type WorldObjectType = (typeof worldObjectTypeEnum.enumValues)[number];
+export type TownNameType = (typeof townNameTypeEnum.enumValues)[number];
+export type buildingNameType = (typeof buildingNameTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
 export type Action = InferSelectModel<typeof actionTable> & { timeRemaining: number };
 export type Location = InferSelectModel<typeof locationTable>;
 export type State = InferSelectModel<typeof stateTable>;
+export type Town = InferSelectModel<typeof townTable>;
+export type Building = InferSelectModel<typeof buildingTable>;
 
-export type WorldObject = typeof worldObjectTable.$inferSelect;
 export type Map = typeof mapTable.$inferSelect & {
-  tiles?: Tile[] 
+  tiles?: Tile[];
 };
 export type Tile = typeof tileTable.$inferSelect & {
-  worldObject?: WorldObject;
+  town?: Town;
+  heroes?: Hero[];
 };
-export type TileInsert = typeof tileTable.$inferInsert & {
-  worldObject?: WorldObject;
-};
+
 
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;
 export type Equipment = typeof equipmentTable.$inferSelect & {
@@ -244,6 +244,6 @@ export type WalkTownJobData = {
   locationId: string;
   heroId: string;
   type: 'IDLE';
-  buildingType: BuildingType;
+  buildingType: buildingNameType;
   jobName: JobNameType;
 };

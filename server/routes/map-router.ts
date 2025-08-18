@@ -28,6 +28,7 @@ export const mapRouter = new Hono<Context>().get(
         tiles: {
           with: {
             worldObject: true,
+            heroes: true,
           },
         },
       },

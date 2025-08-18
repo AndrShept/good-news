@@ -3,7 +3,6 @@ import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzl
 
 import { heroTable } from './hero-schema';
 import { mapTable } from './map-schema';
-import { worldObjectTable } from './world-object-schema';
 
 export const tileTypeEnum = pgEnum('tile_type_enum', ['OBJECT', 'DECOR', 'GROUND']);
 
@@ -20,9 +19,7 @@ export const tileTable = pgTable('tile', {
       onDelete: 'cascade',
     })
     .notNull(),
-  worldObjectId: uuid().references(() => worldObjectTable.id, {
-    onDelete: 'set null',
-  }),
+
 
   createdAt: timestamp({
     mode: 'string',
@@ -37,8 +34,5 @@ export const tileTableRelations = relations(tileTable, ({ one, many }) => ({
     fields: [tileTable.mapId],
     references: [mapTable.id],
   }),
-  worldObject: one(worldObjectTable, {
-    fields: [tileTable.worldObjectId],
-    references: [worldObjectTable.id],
-  }),
+
 }));

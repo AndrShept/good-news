@@ -22,7 +22,7 @@ function RouteComponent() {
     location: state?.data?.location,
   }));
   const isCharacter = state?.type === 'CHARACTER';
-  const isTownEntry = location?.type === 'TOWN' && location.buildingType === 'NONE' && !isCharacter;
+  const isTownEntry = location?.type === 'TOWN' && location.name === 'SOLMERE' && location.buildingType === 'NONE' && !isCharacter;
   const isMagicShop = location?.type === 'TOWN' && location.buildingType === 'MAGIC-SHOP' && !isCharacter;
   const isTemple = location?.type === 'TOWN' && location.buildingType === 'TEMPLE' && !isCharacter;
   const isMap = location?.type === 'MAP' && location.buildingType === 'NONE' && !isCharacter;
