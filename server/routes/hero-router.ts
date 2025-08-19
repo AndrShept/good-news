@@ -1015,6 +1015,92 @@ export const heroRouter = new Hono<Context>()
       data: buffs,
     });
   })
+
+  .post(
+    '/:id/action/cancel',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      await db
+        .update(actionTable)
+        .set({
+          startedAt: new Date().toISOString(),
+          completedAt: new Date().toISOString(),
+          type: 'IDLE',
+        })
+        .where(eq(actionTable.id, hero.actionId));
+
+      const jobId = hero.id;
+      await actionQueue.remove(jobId);
+
+      return c.json<SuccessResponse>({
+        message: 'action canceled',
+        success: true,
+      });
+    },
+  )
+
+  .put(
+    '/:id/state/change',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+    zValidator('json', z.object({ type: z.enum(stateTypeEnum.enumValues) })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const { type } = c.req.valid('json');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+        with: {
+          action: true,
+        },
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      if (hero.isInBattle) {
+        throw new HTTPException(403, {
+          message: 'Hero is currently in battle.',
+        });
+      }
+      if (hero.action.type !== 'IDLE') {
+        throw new HTTPException(403, {
+          message: 'Hero must be idle to perform this action.',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      await db
+        .update(stateTable)
+        .set({
+          type,
+        })
+        .where(eq(stateTable.id, hero.stateId));
+
+      return c.json<SuccessResponse>({
+        message: 'state changed',
+        success: true,
+      });
+    },
+  )
   .post(
     '/:id/action/walk-town',
     loggedIn,
@@ -1082,204 +1168,7 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post(
-    '/:id/action/cancel',
-    loggedIn,
-    zValidator('param', z.object({ id: z.string() })),
-
-    async (c) => {
-      const user = c.get('user');
-      const { id } = c.req.valid('param');
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-      });
-
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      await db
-        .update(actionTable)
-        .set({
-          startedAt: new Date().toISOString(),
-          completedAt: new Date().toISOString(),
-          type: 'IDLE',
-        })
-        .where(eq(actionTable.id, hero.actionId));
-
-      const jobId = hero.id;
-      await actionQueue.remove(jobId);
-
-      return c.json<SuccessResponse>({
-        message: 'action canceled',
-        success: true,
-      });
-    },
-  )
-  .post(
-    '/:id/location/town-entry',
-    loggedIn,
-    zValidator('param', z.object({ id: z.string() })),
-
-    async (c) => {
-      const user = c.get('user');
-      const { id } = c.req.valid('param');
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-      });
-
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      await db
-        .update(locationTable)
-        .set({
-          buildingType: 'NONE',
-        })
-        .where(eq(locationTable.id, hero.locationId));
-
-      return c.json<SuccessResponse>({
-        message: 'location changed',
-        success: true,
-      });
-    },
-  )
-  .post(
-    '/:id/world-object/leave',
-    loggedIn,
-    zValidator('param', z.object({ id: z.string() })),
-    zValidator(
-      'json',
-      z.object({
-        worldObjectId: z.string(),
-        tileId: z.string(),
-      }),
-    ),
-
-    async (c) => {
-      const user = c.get('user');
-      const { id } = c.req.valid('param');
-      const { tileId, worldObjectId } = c.req.valid('json');
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-      });
-      const worldObject = await db.query.worldObjectTable.findFirst({
-        where: eq(worldObjectTable.id, worldObjectId),
-      });
-      const tile = await db.query.tileTable.findFirst({
-        where: eq(tileTable.id, tileId),
-      });
-
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
-      if (!worldObject) {
-        throw new HTTPException(404, {
-          message: 'world object not found',
-        });
-      }
-      if (!tile) {
-        throw new HTTPException(404, {
-          message: 'tile not found',
-        });
-      }
-      if (tile.worldObjectId !== worldObjectId) {
-        throw new HTTPException(404, {
-          message: 'worldObject  not exist this tile',
-        });
-      }
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      const findTargetTile = await db.query.tileTable.findFirst({
-        where: and(eq(tileTable.x, tile.x), eq(tileTable.y, tile.y - 1)),
-      });
-
-      if (!findTargetTile) {
-        throw new HTTPException(404, {
-          message: 'find tile not found',
-        });
-      }
-
-      await db.transaction(async (tx) => {
-        await tx
-          .update(locationTable)
-          .set({
-            buildingType: 'NONE',
-            name: 'SOLMERE',
-            type: 'MAP',
-          })
-          .where(eq(locationTable.id, hero.locationId));
-        await tx
-          .update(heroTable)
-          .set({
-            tileId: findTargetTile.id,
-          })
-          .where(eq(heroTable.id, id));
-      });
-
-      return c.json<SuccessResponse>({
-        message: 'success leave',
-        success: true,
-      });
-    },
-  )
-  .put(
-    '/:id/state/change',
-    loggedIn,
-    zValidator('param', z.object({ id: z.string() })),
-    zValidator('json', z.object({ type: z.enum(stateTypeEnum.enumValues) })),
-
-    async (c) => {
-      const user = c.get('user');
-      const { id } = c.req.valid('param');
-      const { type } = c.req.valid('json');
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-        with: {
-          action: true,
-        },
-      });
-
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
-      if (hero.isInBattle) {
-        throw new HTTPException(403, {
-          message: 'Hero is currently in battle.',
-        });
-      }
-      if (hero.action.type !== 'IDLE') {
-        throw new HTTPException(403, {
-          message: 'Hero must be idle to perform this action.',
-        });
-      }
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      await db
-        .update(stateTable)
-        .set({
-          type,
-        })
-        .where(eq(stateTable.id, hero.stateId));
-
-      return c.json<SuccessResponse>({
-        message: 'state changed',
-        success: true,
-      });
-    },
-  )
-  .put(
-    '/:id/location/change',
+    '/:id/action/leave-town',
     loggedIn,
     zValidator('param', z.object({ id: z.string() })),
     zValidator(
@@ -1304,13 +1193,6 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      await db
-        .update(locationTable)
-        .set({
-          type,
-        })
-        .where(eq(locationTable.id, hero.locationId));
 
       return c.json<SuccessResponse>({
         message: 'location changed',

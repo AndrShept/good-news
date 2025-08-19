@@ -20,7 +20,6 @@ import {
   pvpModeTypeEnum,
   townNameTypeEnum,
   townTable,
-
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { buffTable } from '../server/db/schema/buff-schema';
@@ -167,7 +166,9 @@ export type Group = InferSelectModel<typeof groupTable>;
 export type Action = InferSelectModel<typeof actionTable> & { timeRemaining: number };
 export type Location = InferSelectModel<typeof locationTable>;
 export type State = InferSelectModel<typeof stateTable>;
-export type Town = InferSelectModel<typeof townTable>;
+export type Town = InferSelectModel<typeof townTable> & {
+  buildings?: Building[];
+};
 export type Building = InferSelectModel<typeof buildingTable>;
 
 export type Map = typeof mapTable.$inferSelect & {
@@ -177,7 +178,6 @@ export type Tile = typeof tileTable.$inferSelect & {
   town?: Town;
   heroes?: Hero[];
 };
-
 
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;
 export type Equipment = typeof equipmentTable.$inferSelect & {

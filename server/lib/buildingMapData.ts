@@ -1,10 +1,9 @@
 import type { Layer, TileMap } from '@/shared/json-types';
-import type { Map, MapNameType, Tile, TileType,  } from '@/shared/types';
+import type { Map, MapNameType, Tile, TileType } from '@/shared/types';
 import { and, eq } from 'drizzle-orm';
 
 import { db } from '../db/db';
-import { mapTable, tileTable } from '../db/schema';
-import { worldObjectEntities } from '../entities/world-object';
+import { mapTable, tileTable, townTable } from '../db/schema';
 import { generateRandomUuid } from './utils';
 
 export const getMapJson = (mapName: MapNameType) => {
@@ -49,8 +48,7 @@ export const getLayerObject = ({ layer, mapId }: Params): Tile[] => {
         id: generateRandomUuid(),
         createdAt: new Date().toISOString(),
         town: undefined,
-        
-  
+        townId: null,
       };
     })
     .filter((tile) => !!tile);
@@ -82,23 +80,22 @@ export const buildingMapData = async (mapName: MapNameType) => {
     const decorTiles = findDecor && getLayerObject({ layer: findDecor, mapId: newMap.id });
     const grounTiles = findGround && getLayerObject({ layer: findGround, mapId: newMap.id });
     const tiles = [...(grounTiles ?? []), ...(objectsTiles ?? []), ...(decorTiles ?? [])];
-    await tx.insert(tileTable).values(tiles).returning();
-
-
+    await tx.insert(tileTable).values(tiles);
+    const town = await tx.query.townTable.findFirst({
+      where: eq(townTable.name, mapName),
+    });
+    if (!town) {
+      console.error('town not found');
+      return;
+    }
+    await tx
+      .update(tileTable)
+      .set({
+        townId: town.id,
+        type: 'OBJECT',
+      })
+      .where(and(eq(tileTable.x, 5), eq(tileTable.y, 5)));
 
     return newMap;
   });
-
-  const map = await db.query.mapTable.findFirst({
-    where: eq(mapTable.name, mapName),
-    with: {
-      tiles: {
-        with: {
-          heroes: true
-        },
-      },
-    },
-  });
-  console.timeEnd('create-map');
-  return map;
 };
