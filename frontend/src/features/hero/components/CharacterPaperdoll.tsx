@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { LucideStepBack } from 'lucide-react';
 
 import { useHero } from '../hooks/useHero';
-import { useStateChange } from '../hooks/useStateChange';
+import { useHeroSetState } from '../hooks/useHeroSetState';
 import { Inventory } from './Inventory';
 import { Modifiers } from './Modifier';
 import { Paperdoll } from './Paperdoll';
@@ -22,7 +22,7 @@ export const CharacterPaperdoll = () => {
       level: state?.data?.level ?? 0,
       equipments: state?.data?.equipments ?? [],
     }));
-  const { mutate, isPending } = useStateChange();
+  const { mutate, isPending } = useHeroSetState();
   return (
     <section className="flex flex-col gap-1">
       <Button variant="outline" disabled={isPending} onClick={() => mutate('IDLE')} className="ml-auto w-fit">

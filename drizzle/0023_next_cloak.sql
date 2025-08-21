@@ -1,1 +1,0 @@
-ALTER TABLE "group" ADD COLUMN "leader" text NOT NULL;

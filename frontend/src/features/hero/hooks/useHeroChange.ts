@@ -5,9 +5,9 @@ import { getHeroOptions } from '../api/get-hero';
 
 export type OmitDeepHero = Omit<Partial<Hero>, 'location' | 'state' | 'action' | 'group'> & {
   location?: Partial<Hero['location']>;
-  state?: Partial<Hero['state']>;
   action?: Partial<Hero['action']>;
   group?: Partial<Hero['group']>;
+  state?: Partial<Hero['state']>;
 };
 
 export const useHeroChange = () => {

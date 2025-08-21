@@ -3,21 +3,19 @@ import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzl
 
 import { heroTable } from './hero-schema';
 
-export const stateTypeEnum = pgEnum('state_type_enum', ['IDLE', 'CHARACTER', 'SKILLS']);
+export const stateTypeEnum = pgEnum('state_type_enum', ['CHARACTER', 'SKILLS', 'IDLE']);
 
 export const stateTable = pgTable('state', {
   id: uuid().primaryKey().defaultRandom(),
-  type: stateTypeEnum()
-    .$defaultFn(() => 'IDLE')
+  type: stateTypeEnum().notNull(),
+
+  createdAt: timestamp({
+    mode: 'string',
+  })
+    .defaultNow()
     .notNull(),
-  startedAt: timestamp('started_at', {
-    mode: 'string',
-  }).defaultNow(),
-  completedAt: timestamp('completed_at', {
-    mode: 'string',
-  }).notNull().defaultNow(),
 });
 
-export const stateTableRelations = relations(stateTable, ({ one, many }) => ({
+export const stateTableRelations = relations(stateTable, ({ many }) => ({
   heroes: many(heroTable),
 }));

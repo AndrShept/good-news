@@ -10,8 +10,8 @@ import { inventoryItemTable } from './inventory-item-schema';
 import { locationTable } from './location-schema';
 import { mapTable } from './map-schema';
 import { modifierTable } from './modifier-schema';
-import { stateTable } from './state-schema';
 import { tileTable } from './tile-schema';
+import { stateTable } from './state-schema';
 
 export const heroTable = pgTable('hero', {
   id: uuid().primaryKey().notNull(),
@@ -47,14 +47,12 @@ export const heroTable = pgTable('hero', {
   actionId: uuid()
     .references(() => actionTable.id)
     .notNull(),
-  locationId: uuid()
-    .references(() => locationTable.id)
-    .notNull(),
   stateId: uuid()
     .references(() => stateTable.id)
     .notNull(),
-
-
+  locationId: uuid()
+    .references(() => locationTable.id)
+    .notNull(),
   tileId: uuid().references(() => tileTable.id, { onDelete: 'set null' }),
 
   userId: text()
@@ -91,13 +89,13 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
     fields: [heroTable.actionId],
     references: [actionTable.id],
   }),
-  location: one(locationTable, {
-    fields: [heroTable.locationId],
-    references: [locationTable.id],
-  }),
   state: one(stateTable, {
     fields: [heroTable.stateId],
     references: [stateTable.id],
+  }),
+  location: one(locationTable, {
+    fields: [heroTable.locationId],
+    references: [locationTable.id],
   }),
 
   tile: one(tileTable, {

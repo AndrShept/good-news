@@ -1,4 +1,4 @@
-import { buildingName } from '@/components/TownBuilding';
+import { buildingName } from '@/features/town/components/TownBuilding';
 import { useSocket } from '@/components/providers/SocketProvider';
 import { socketEvents } from '@/shared/socket-events';
 import { WalkTownJobData } from '@/shared/types';

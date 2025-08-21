@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
-import { heroTable } from './hero-schema';
+import { locationTable } from './location-schema';
 import { tileTable } from './tile-schema';
 
 export const mapNameTypeEnum = pgEnum('map_name_type_enum', ['SOLMERE']);
@@ -28,4 +28,5 @@ export const mapTable = pgTable('map', {
 
 export const mapTableRelations = relations(mapTable, ({ many }) => ({
   tiles: many(tileTable),
+  locations: many(locationTable),
 }));

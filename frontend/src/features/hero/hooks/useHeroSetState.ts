@@ -5,13 +5,12 @@ import { useMutation } from '@tanstack/react-query';
 import { useHeroChange } from './useHeroChange';
 import { useHeroId } from './useHeroId';
 
-export const useStateChange = () => {
-  const { heroChange } = useHeroChange();
+export const useHeroSetState = () => {
   const id = useHeroId();
-
+  const { heroChange } = useHeroChange();
   return useMutation({
     mutationFn: (type: StateType) =>
-      client.hero[':id'].state.change.$put({
+      client.hero[':id'].state.$put({
         param: {
           id,
         },
@@ -19,7 +18,7 @@ export const useStateChange = () => {
           type,
         },
       }),
-    onSuccess: (_, type) => {
+    onSuccess: (_ , type) => {
       heroChange({
         state: {
           type,

@@ -1,1 +1,0 @@
-ALTER TYPE "public"."location_type_enum" ADD VALUE 'CITY';

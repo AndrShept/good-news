@@ -37,6 +37,7 @@ import {
   stateTypeEnum,
   tileTable,
   townNameTypeEnum,
+  townTable,
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
 import { restorePotion } from '../lib/restorePotion';
@@ -74,13 +75,18 @@ export const heroRouter = new Hono<Context>()
         with: {
           modifier: true,
           group: true,
-          state: true,
           action: {
             extras: {
               timeRemaining: sql<number>`EXTRACT(EPOCH FROM ${actionTable.completedAt} - NOW())::INT`.as('timeRemaining'),
             },
           },
-          location: true,
+          state: true,
+          location: {
+            with: {
+              map: true,
+              town: true,
+            },
+          },
           equipments: {
             with: {
               gameItem: {
@@ -137,10 +143,21 @@ export const heroRouter = new Hono<Context>()
         .insert(actionTable)
         .values({
           completedAt: setSqlNow(),
+          type: 'IDLE',
         })
         .returning({ id: actionTable.id });
-      const [newLocation] = await tx.insert(locationTable).values({}).returning({ id: locationTable.id });
-      const [newState] = await tx.insert(stateTable).values({}).returning({ id: stateTable.id });
+      const town = await tx.query.townTable.findFirst({
+        where: eq(townTable.name, 'SOLMERE'),
+      });
+      if (!town) {
+        throw new HTTPException(404, {
+          message: 'Town not found',
+        });
+      }
+
+      const [newLocation] = await tx.insert(locationTable).values({ type: 'TOWN', townId: town.id }).returning({ id: locationTable.id });
+      const [newState] = await tx.insert(stateTable).values({ type: 'IDLE' }).returning({ id: stateTable.id });
+
       const [newHero] = await tx
         .insert(heroTable)
         .values({
@@ -1054,53 +1071,6 @@ export const heroRouter = new Hono<Context>()
     },
   )
 
-  .put(
-    '/:id/state/change',
-    loggedIn,
-    zValidator('param', z.object({ id: z.string() })),
-    zValidator('json', z.object({ type: z.enum(stateTypeEnum.enumValues) })),
-
-    async (c) => {
-      const user = c.get('user');
-      const { id } = c.req.valid('param');
-      const { type } = c.req.valid('json');
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-        with: {
-          action: true,
-        },
-      });
-
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
-      if (hero.isInBattle) {
-        throw new HTTPException(403, {
-          message: 'Hero is currently in battle.',
-        });
-      }
-      if (hero.action.type !== 'IDLE') {
-        throw new HTTPException(403, {
-          message: 'Hero must be idle to perform this action.',
-        });
-      }
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      await db
-        .update(stateTable)
-        .set({
-          type,
-        })
-        .where(eq(stateTable.id, hero.stateId));
-
-      return c.json<SuccessResponse>({
-        message: 'state changed',
-        success: true,
-      });
-    },
-  )
   .post(
     '/:id/action/walk-town',
     loggedIn,
@@ -1196,6 +1166,53 @@ export const heroRouter = new Hono<Context>()
 
       return c.json<SuccessResponse>({
         message: 'location changed',
+        success: true,
+      });
+    },
+  )
+  .put(
+    '/:id/state',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+    zValidator('json', z.object({ type: z.enum(stateTypeEnum.enumValues) })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const { type } = c.req.valid('json');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+        with: {
+          action: true,
+        },
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      if (hero.action.type !== 'IDLE') {
+        throw new HTTPException(409, {
+          message: 'Your hero is busy now',
+        });
+      }
+      if (hero.isInBattle) {
+        throw new HTTPException(409, {
+          message: 'Action not allowed: hero now is battle',
+        });
+      }
+      await db
+        .update(stateTable)
+        .set({
+          type,
+        })
+        .where(eq(stateTable.id, hero.stateId));
+
+      return c.json<SuccessResponse>({
+        message: 'state changed',
         success: true,
       });
     },

@@ -2,6 +2,7 @@ import { relations } from 'drizzle-orm';
 import { boolean, integer, pgEnum, pgTable, primaryKey, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { buildingTable } from './building-schema';
+import { locationTable } from './location-schema';
 import { tileTable } from './tile-schema';
 
 export const townNameTypeEnum = pgEnum('town_name_type_enum', ['SOLMERE']);
@@ -40,7 +41,7 @@ export const townsToBuildingsTable = pgTable(
   (t) => [primaryKey({ columns: [t.buildingsId, t.townId] })],
 );
 
-export const townsToBuildingsTableRelations = relations(townsToBuildingsTable, ({ one }) => ({
+export const townsToBuildingsTableRelations = relations(townsToBuildingsTable, ({ one, many }) => ({
   town: one(townTable, {
     fields: [townsToBuildingsTable.townId],
     references: [townTable.id],
@@ -49,4 +50,5 @@ export const townsToBuildingsTableRelations = relations(townsToBuildingsTable, (
     fields: [townsToBuildingsTable.buildingsId],
     references: [buildingTable.id],
   }),
+  locations: many(locationTable),
 }));

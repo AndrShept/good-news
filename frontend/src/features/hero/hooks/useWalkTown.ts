@@ -3,13 +3,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { getHeroOptions } from '../api/get-hero';
 import { useHeroId } from './useHeroId';
-import { BuildingType } from '@/shared/types';
+import { buildingNameType } from '@/shared/types';
 
 export const useWalkTown = () => {
   const id = useHeroId();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (buildingType:BuildingType) =>
+    mutationFn: (buildingType:buildingNameType) =>
       client.hero[':id'].action['walk-town'].$post({
         param: {
           id,

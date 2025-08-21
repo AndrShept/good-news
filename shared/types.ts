@@ -20,6 +20,7 @@ import {
   pvpModeTypeEnum,
   townNameTypeEnum,
   townTable,
+  townsToBuildingsTable,
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { buffTable } from '../server/db/schema/buff-schema';
@@ -153,21 +154,27 @@ export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
 export type LocationType = (typeof locationTypeEnum.enumValues)[number];
 export type ActionType = (typeof actionTypeEnum.enumValues)[number];
-export type StateType = (typeof stateTypeEnum.enumValues)[number];
 export type JobNameType = (typeof jobName)[keyof typeof jobName];
 export type TileType = (typeof tileTypeEnum.enumValues)[number];
 export type MapNameType = (typeof mapNameTypeEnum.enumValues)[number];
 export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
 export type TownNameType = (typeof townNameTypeEnum.enumValues)[number];
+export type StateType = (typeof stateTypeEnum.enumValues)[number];
 export type buildingNameType = (typeof buildingNameTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
-export type Action = InferSelectModel<typeof actionTable> & { timeRemaining: number };
-export type Location = InferSelectModel<typeof locationTable>;
 export type State = InferSelectModel<typeof stateTable>;
+export type Action = InferSelectModel<typeof actionTable> & { timeRemaining: number };
+export type Location = InferSelectModel<typeof locationTable> & {
+  map?: Map;
+  town?: Town;
+};
+export type TownToBuildings = InferSelectModel<typeof townsToBuildingsTable> & {
+  building: Building;
+};
 export type Town = InferSelectModel<typeof townTable> & {
-  buildings?: Building[];
+  buildings?: TownToBuildings[];
 };
 export type Building = InferSelectModel<typeof buildingTable>;
 
