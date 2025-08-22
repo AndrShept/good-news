@@ -32,7 +32,7 @@ export const GameTile = memo(function GameTile(props: Props) {
     >
       <TileImg image={image} />
       {/* {worldObject && <WorldObjectTile {...worldObject} tileId={id} />} */}
-      {!!heroes?.length && <img className='absolute left-0 top-0 size-full bg-red-100 '/>}
+      {!!heroes?.length && <img className="absolute left-0 top-0 size-full bg-red-100" />}
     </div>
   );
 });

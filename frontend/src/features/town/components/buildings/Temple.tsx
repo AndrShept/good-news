@@ -1,6 +1,6 @@
 import React from 'react';
+import { BackToTownEntryButton } from '../BackToTownEntryButton';
 
-import { BackToTownEntryButton } from './BackToTownEntryButton';
 
 export const Temple = () => {
   return (

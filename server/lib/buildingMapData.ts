@@ -63,7 +63,7 @@ export const buildingMapData = async (mapName: MapNameType) => {
 
   console.time('create-map');
 
-  await db.transaction(async (tx) => {
+   await db.transaction(async (tx) => {
     const [newMap] = await tx
       .insert(mapTable)
       .values({

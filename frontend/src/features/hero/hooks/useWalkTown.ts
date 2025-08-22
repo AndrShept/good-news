@@ -9,13 +9,13 @@ export const useWalkTown = () => {
   const id = useHeroId();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (buildingType:buildingNameType) =>
+    mutationFn: (buildingName:buildingNameType) =>
       client.hero[':id'].action['walk-town'].$post({
         param: {
           id,
         },
         json: {
-          buildingType,
+          buildingName,
         },
       }),
     onSuccess: async () => {

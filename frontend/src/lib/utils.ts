@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { twMerge } from 'tailwind-merge';
 
 import type { ApiRoutes } from '../../../server';
+import { buildingNameType } from '@/shared/types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -60,3 +61,4 @@ export const getRarityColor = (data: string) => {
     'text-red-500 ': data === 'LEGENDARY',
   };
 };
+

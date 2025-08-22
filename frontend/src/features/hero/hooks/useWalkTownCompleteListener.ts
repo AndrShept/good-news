@@ -1,4 +1,3 @@
-import { buildingName } from '@/features/town/components/TownBuilding';
 import { useSocket } from '@/components/providers/SocketProvider';
 import { socketEvents } from '@/shared/socket-events';
 import { WalkTownJobData } from '@/shared/types';
@@ -6,6 +5,7 @@ import { useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect } from 'react';
 
 import { useHeroChange } from './useHeroChange';
+import { buildingName as building } from '@/features/town/components/TownBuilding';
 
 export const useWalkTownCompleteListener = () => {
   const { socket } = useSocket();
@@ -14,18 +14,18 @@ export const useWalkTownCompleteListener = () => {
 
   useEffect(() => {
     const listener = (jobData: WalkTownJobData) => {
-      const { buildingType } = jobData;
+      const { buildingName } = jobData;
       heroChange({
         action: {
           type: 'IDLE',
         },
         location: {
-          buildingType,
+          currentBuilding: buildingName,
         },
       });
       setGameMessage({
         type: 'success',
-        text: `You have entered the ${buildingName[buildingType]}.`,
+        text: `You have entered the ${building[buildingName]}.`,
       });
     };
 

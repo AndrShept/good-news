@@ -1,8 +1,6 @@
+import { TownIcon } from '@/components/game-icons/TownIcon';
+import { Button } from '@/components/ui/button';
 import { useBackTownEntry } from '@/features/hero/hooks/useBackTownEntry';
-import React from 'react';
-
-import { TownIcon } from '../game-icons/TownIcon';
-import { Button } from '../ui/button';
 
 export const BackToTownEntryButton = () => {
   const { mutate, isPending } = useBackTownEntry();

@@ -1,6 +1,5 @@
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useQuery } from '@tanstack/react-query';
-import React from 'react';
 
 import { getTownOptions } from '../api/get-map';
 import { TownBuilding } from './TownBuilding';
@@ -11,7 +10,6 @@ export const Town = () => {
 
   if (isLoading) return <div>LOADING MAP</div>;
   if (isError) return <p>{error.message}</p>;
-  console.log(town?.buildings)
   return (
     <section className="flex flex-col">
       <div className="mx-auto flex items-center gap-2">
@@ -20,7 +18,7 @@ export const Town = () => {
           {town?.name}
         </h1>
       </div>
-      <div>{town?.buildings?.map((building , idx) => <TownBuilding key={idx} {...building} />)}</div>
+      <ul className="flex gap-1">{town?.buildings?.map((building) => <TownBuilding key={building.buildingsId} {...building} />)}</ul>
     </section>
   );
 };

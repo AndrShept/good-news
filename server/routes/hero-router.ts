@@ -42,7 +42,7 @@ import {
 import { buffTable } from '../db/schema/buff-schema';
 import { restorePotion } from '../lib/restorePotion';
 import { sumModifier } from '../lib/sumModifier';
-import { generateRandomUuid, setSqlNow, setSqlNowByInterval, verifyHeroOwnership } from '../lib/utils';
+import { calculateWalkTime, generateRandomUuid, setSqlNow, setSqlNowByInterval, verifyHeroOwnership } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
 
@@ -1072,19 +1072,50 @@ export const heroRouter = new Hono<Context>()
   )
 
   .post(
+    '/:id/action/back-town-entry',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      await db
+        .update(locationTable)
+        .set({
+          currentBuilding: null,
+        })
+        .where(eq(locationTable.id, hero.locationId));
+
+      return c.json<SuccessResponse>({
+        message: 'action updated',
+        success: true,
+      });
+    },
+  )
+  .post(
     '/:id/action/walk-town',
     loggedIn,
     zValidator('param', z.object({ id: z.string() })),
     zValidator(
       'json',
       z.object({
-        buildingType: z.enum(buildingNameTypeEnum.enumValues),
+        buildingName: z.enum(buildingNameTypeEnum.enumValues),
       }),
     ),
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const { buildingType } = c.req.valid('json');
+      const { buildingName } = c.req.valid('json');
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
         with: {
@@ -1100,10 +1131,7 @@ export const heroRouter = new Hono<Context>()
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       const jobId = hero.id;
-      const MIN_WALK_TIME = 2;
-      const dexterityFactor = 100;
-
-      const delay = Math.max(BASE_WALK_TIME / (1 + hero.modifier.dexterity / dexterityFactor), MIN_WALK_TIME);
+      const delay = calculateWalkTime(hero.modifier.dexterity);
       await db
         .update(actionTable)
         .set({
@@ -1121,7 +1149,7 @@ export const heroRouter = new Hono<Context>()
           locationId: hero.locationId,
           heroId: hero.id,
           type: 'IDLE',
-          buildingType,
+          buildingName,
           jobName: jobName['walk-town'],
         },
         {

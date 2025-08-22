@@ -27,20 +27,17 @@ export const mapRouter = new Hono<Context>().get(
       with: {
         tiles: {
           with: {
-            worldObject: true,
             heroes: true,
           },
         },
       },
     });
-    if (!map) {
-      map = await buildingMapData(name);
-    }
+  
 
     return c.json<SuccessResponse<Map>>({
       message: 'map fetched!',
       success: true,
-      data: map as Map,
+      data: map,
     });
   },
 );

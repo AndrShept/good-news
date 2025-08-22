@@ -1,8 +1,8 @@
 import { getShopItemsOptions } from '@/features/shop/api/get-shop-items';
 import { useQuery } from '@tanstack/react-query';
 
-import { GameItemCardShowInfo } from '../GameItemCardShowInfo';
-import { BackToTownEntryButton } from './BackToTownEntryButton';
+import { GameItemCardShowInfo } from '../../../../components/GameItemCardShowInfo';
+import { BackToTownEntryButton } from '../BackToTownEntryButton';
 
 export const MagicShop = () => {
   const { data: shopItems, isLoading } = useQuery(getShopItemsOptions());

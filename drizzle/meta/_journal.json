@@ -22,6 +22,13 @@
       "when": 1755775893342,
       "tag": "0002_powerful_doctor_octopus",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1755855953621,
+      "tag": "0003_empty_vanisher",
+      "breakpoints": true
     }
   ]
 }

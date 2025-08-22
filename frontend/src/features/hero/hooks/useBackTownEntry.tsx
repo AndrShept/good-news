@@ -1,21 +1,25 @@
 import { client } from '@/lib/utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { getHeroOptions } from '../api/get-hero';
+import { useHeroChange } from './useHeroChange';
 import { useHeroId } from './useHeroId';
 
 export const useBackTownEntry = () => {
   const id = useHeroId();
-  const queryClient = useQueryClient();
+  const { heroChange } = useHeroChange();
   return useMutation({
     mutationFn: () =>
-      client.hero[':id'].location['town-entry'].$post({
+      client.hero[':id'].action['back-town-entry'].$post({
         param: {
           id,
         },
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: getHeroOptions().queryKey });
+      heroChange({
+        location: {
+          currentBuilding: null,
+        },
+      });
     },
   });
 };

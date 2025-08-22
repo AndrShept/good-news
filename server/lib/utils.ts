@@ -1,3 +1,4 @@
+import { BASE_WALK_TIME } from '@/shared/constants';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
 import { sql } from 'drizzle-orm';
@@ -59,11 +60,18 @@ export const verifyHeroOwnership = ({ heroUserId, userId }: { heroUserId: string
   }
 };
 
-
 export const getRandomValue = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
 export const rand = (num: number) => {
   return Math.floor(Math.random() * num);
+};
+
+export const calculateWalkTime = (dexterity: number) => {
+  const MIN_WALK_TIME = 2;
+  const dexterityFactor = 100;
+
+  const delay = Math.max(BASE_WALK_TIME / (1 + dexterity / dexterityFactor), MIN_WALK_TIME);
+  return delay;
 };

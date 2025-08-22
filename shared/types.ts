@@ -251,6 +251,6 @@ export type WalkTownJobData = {
   locationId: string;
   heroId: string;
   type: 'IDLE';
-  buildingType: buildingNameType;
+  buildingName: buildingNameType;
   jobName: JobNameType;
 };
