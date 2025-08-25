@@ -2,11 +2,11 @@ import { client } from '@/lib/utils';
 import { MapNameType } from '@/shared/types';
 import { queryOptions } from '@tanstack/react-query';
 
-export const getMap = async (name: MapNameType) => {
+export const getMap = async (id: string) => {
   try {
-    const res = await client.map[':name'].$get({
+    const res = await client.map[':id'].$get({
       param: {
-        name,
+        id,
       },
     });
     const data = await res.json();
@@ -19,10 +19,10 @@ export const getMap = async (name: MapNameType) => {
   }
 };
 
-export const getMapOptions = (mapName: MapNameType) =>
+export const getMapOptions = (mapId: string) =>
   queryOptions({
-    queryKey: ['map', mapName],
-    queryFn: () => getMap(mapName),
-
+    queryKey: ['map', mapId],
+    queryFn: () => getMap(mapId),
+    enabled: !!mapId,
     staleTime: 0,
   });

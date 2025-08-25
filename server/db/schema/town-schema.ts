@@ -50,5 +50,4 @@ export const townsToBuildingsTableRelations = relations(townsToBuildingsTable, (
     fields: [townsToBuildingsTable.buildingsId],
     references: [buildingTable.id],
   }),
-  locations: many(locationTable),
 }));

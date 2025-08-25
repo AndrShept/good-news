@@ -3,13 +3,13 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { getMapOptions } from '../api/get-map';
 
-export const useChangeMap = (mapName: MapNameType) => {
+export const useChangeMap = (mapId: string) => {
   const queryClient = useQueryClient();
 
   const changeMap = ({ params }: { params: Partial<Map> }) => {
     queryClient.setQueriesData<Map>(
       {
-        queryKey: getMapOptions(mapName).queryKey,
+        queryKey: getMapOptions(mapId).queryKey,
       },
       (oldData) => {
         if (!oldData) return;
@@ -21,7 +21,7 @@ export const useChangeMap = (mapName: MapNameType) => {
   const changeTile = ({ params, tileId }: { params: Partial<Tile>; tileId: string }) => {
     queryClient.setQueriesData<Map>(
       {
-        queryKey: getMapOptions(mapName).queryKey,
+        queryKey: getMapOptions(mapId).queryKey,
       },
       (oldData) => {
         if (!oldData || !oldData.tiles) return;
@@ -32,7 +32,7 @@ export const useChangeMap = (mapName: MapNameType) => {
   const removeTile = ({ tileId }: { tileId: string }) => {
     queryClient.setQueriesData<Map>(
       {
-        queryKey: getMapOptions(mapName).queryKey,
+        queryKey: getMapOptions(mapId).queryKey,
       },
       (oldData) => {
         if (!oldData || !oldData.tiles) return;

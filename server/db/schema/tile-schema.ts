@@ -41,8 +41,5 @@ export const tileTableRelations = relations(tileTable, ({ one, many }) => ({
     fields: [tileTable.townId],
     references: [townTable.id],
   }),
-  tile: one(mapTable, {
-    fields: [tileTable.mapId],
-    references: [mapTable.id],
-  }),
+
 }));

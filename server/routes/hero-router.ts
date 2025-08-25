@@ -1120,12 +1120,18 @@ export const heroRouter = new Hono<Context>()
         where: eq(heroTable.id, id),
         with: {
           modifier: true,
+          location: true,
         },
       });
 
       if (!hero) {
         throw new HTTPException(404, {
           message: 'hero not found',
+        });
+      }
+      if (!hero.location.townId) {
+        throw new HTTPException(403, {
+          message: 'Missing townId: hero is not assigned to a town',
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
@@ -1160,7 +1166,7 @@ export const heroRouter = new Hono<Context>()
       );
 
       return c.json<SuccessResponse>({
-        message: 'action updated',
+        message: 'action start',
         success: true,
       });
     },
@@ -1169,20 +1175,17 @@ export const heroRouter = new Hono<Context>()
     '/:id/action/leave-town',
     loggedIn,
     zValidator('param', z.object({ id: z.string() })),
-    zValidator(
-      'json',
-      z.object({
-        type: z.enum(locationTypeEnum.enumValues),
-        name: z.enum(townNameTypeEnum.enumValues),
-      }),
-    ),
 
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const { type, name } = c.req.valid('json');
+
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
+        with: {
+          location: true,
+          action: true,
+        },
       });
 
       if (!hero) {
@@ -1191,6 +1194,48 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      if (hero.action.type !== 'IDLE') {
+        throw new HTTPException(409, {
+          message: 'Hero is currently busy with another action',
+        });
+      }
+      if (!hero.location.townId) {
+        throw new HTTPException(403, {
+          message: 'Missing townId: hero is not assigned to a town',
+        });
+      }
+      const town = await db.query.townTable.findFirst({
+        where: eq(townTable.id, hero.location.townId),
+      });
+      if (!town) {
+        throw new HTTPException(404, {
+          message: 'town not found',
+        });
+      }
+      const townTile = await db.query.tileTable.findFirst({
+        where: eq(tileTable.townId, town.id),
+      });
+      if (!townTile) {
+        throw new HTTPException(404, {
+          message: 'town tile not found',
+        });
+      }
+
+      await db
+        .update(locationTable)
+        .set({
+          townId: null,
+          mapId: townTile.mapId,
+          type: 'MAP',
+        })
+        .where(eq(locationTable.id, hero.locationId));
+      await db
+        .update(heroTable)
+        .set({
+          tileId: townTile.id,
+        })
+        .where(eq(heroTable.id, id));
 
       return c.json<SuccessResponse>({
         message: 'location changed',

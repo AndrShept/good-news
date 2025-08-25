@@ -10,17 +10,25 @@ interface Props extends Tile {
   tileHeight: number;
 }
 export const GameTile = memo(function GameTile(props: Props) {
-  const { x, y, z, id, image, type, tileHeight, tileWidth, heroes } = props;
-  const { removeTile } = useChangeMap('SOLMERE');
-  const { changeTile } = useChangeMap('SOLMERE');
+  const { x, y, z, id, mapId, image, type, tileHeight, tileWidth, heroes } = props;
+  const { removeTile } = useChangeMap(mapId);
+  const { changeTile } = useChangeMap(mapId);
   console.log('render tile');
   return (
     <div
-      // onClick={() =>
-      //   removeTile({
+      onClick={() => {
+        removeTile({
+          tileId: id,
+        });
+      }}
+      // onClick={() => {
+      //   changeTile({
       //     tileId: id,
-      //   })
-      // }
+      //     params: {
+      //       image: 35,
+      //     },
+      //   });
+      // }}
       className={cn('absolute')}
       style={{
         left: `${x * tileWidth}px`,
