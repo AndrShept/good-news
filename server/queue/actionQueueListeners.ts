@@ -1,5 +1,5 @@
 import { socketEvents } from '@/shared/socket-events';
-import type { WalkTownJobData } from '@/shared/types';
+import type { JobNameType, WalkMapJobData, WalkTownJobData } from '@/shared/types';
 
 import { io } from '..';
 import { queueEvents } from './actionQueue';
@@ -11,8 +11,15 @@ export const actionQueueListeners = () => {
       console.error('returnvalue , not found');
       return;
     }
-    const jobData = returnvalue as unknown as WalkTownJobData;
-    io.to(jobData.heroId).emit(socketEvents.actionWalkTownComplete(), jobData);
+    const value = returnvalue as unknown as { jobName: JobNameType };
+    if (value.jobName === 'WALK:TOWN') {
+      const jobData = returnvalue as unknown as WalkTownJobData;
+      io.to(jobData.heroId).emit(socketEvents.actionWalkTownComplete(), jobData);
+    }
+    if (value.jobName === 'WALK:MAP') {
+       const jobData = returnvalue as unknown as WalkMapJobData;
+      console.log('JOBBJOBOJBOJB', jobData);
+    }
   });
 
   queueEvents.on('failed', ({ jobId, failedReason }: { jobId: string; failedReason: string }) => {

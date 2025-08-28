@@ -26,16 +26,17 @@ export const mapRouter = new Hono<Context>().get(
       with: {
         tiles: {
           with: {
-            heroes: true,
-          },
-        },
+            town: true,
+            heroes: true
+          }
+        }
       },
     });
 
     return c.json<SuccessResponse<Map>>({
       message: 'map fetched!',
       success: true,
-      data: map,
+      data: map as Map,
     });
   },
 );

@@ -199,6 +199,7 @@ export type GameItem = InferSelectModel<typeof gameItemTable> & {
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier?: Modifier;
   group?: Group;
+  tile?: Tile;
   action?: Action;
   location?: Location;
   state?: State;
@@ -253,4 +254,12 @@ export type WalkTownJobData = {
   type: 'IDLE';
   buildingName: buildingNameType;
   jobName: JobNameType;
+};
+export type WalkMapJobData = {
+  actionId: string;
+  locationId: string;
+  heroId: string;
+  type: 'IDLE';
+  jobName: JobNameType;
+  tileId: string
 };

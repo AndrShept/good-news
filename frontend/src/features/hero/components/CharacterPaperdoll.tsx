@@ -8,9 +8,10 @@ import { Modifiers } from './Modifier';
 import { Paperdoll } from './Paperdoll';
 
 export const CharacterPaperdoll = () => {
-  const { avatarImage, currentExperience, currentHealth, equipments, id, level, maxExperience, maxHealth, maxMana, name, currentMana } =
+  const { avatarImage, currentExperience, currentHealth, equipments, id, level, maxExperience, maxHealth, maxMana, name, currentMana,characterImage } =
     useHero((state) => ({
       avatarImage: state?.data?.avatarImage ?? '',
+      characterImage: state?.data?.characterImage ?? '',
       name: state?.data?.name ?? '',
       id: state?.data?.id ?? '',
       currentExperience: state?.data?.currentExperience ?? 0,
@@ -32,6 +33,7 @@ export const CharacterPaperdoll = () => {
       <div className="flex gap-4">
         <Paperdoll
           avatarImage={avatarImage}
+          characterImage={characterImage}
           currentExperience={currentExperience}
           currentHealth={currentHealth}
           currentMana={currentMana}

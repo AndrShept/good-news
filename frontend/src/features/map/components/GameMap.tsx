@@ -9,6 +9,7 @@ export const GameMap = () => {
   const mapId = useHero((state) => state?.data?.location?.mapId ?? '');
   const { data: map, isLoading, isError, error } = useQuery(getMapOptions(mapId));
   const [zoom, setZoom] = useState(1);
+
   if (isLoading) return <p>LOADING MAP...</p>;
   if (isError) return <p>{error.message}</p>;
   return (

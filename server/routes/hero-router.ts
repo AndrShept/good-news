@@ -75,6 +75,7 @@ export const heroRouter = new Hono<Context>()
         with: {
           modifier: true,
           group: true,
+          tile: true,
           action: {
             extras: {
               timeRemaining: sql<number>`EXTRACT(EPOCH FROM ${actionTable.completedAt} - NOW())::INT`.as('timeRemaining'),
@@ -154,6 +155,7 @@ export const heroRouter = new Hono<Context>()
           message: 'Town not found',
         });
       }
+      const characterImage = '/sprites/new/newb-mage.webp';
 
       const [newLocation] = await tx.insert(locationTable).values({ type: 'TOWN', townId: town.id }).returning({ id: locationTable.id });
       const [newState] = await tx.insert(stateTable).values({ type: 'IDLE' }).returning({ id: stateTable.id });
@@ -163,7 +165,7 @@ export const heroRouter = new Hono<Context>()
         .values({
           id: generateRandomUuid(),
           avatarImage,
-          characterImage: '',
+          characterImage,
           name,
           userId,
           actionId: newAction.id,
@@ -1167,6 +1169,89 @@ export const heroRouter = new Hono<Context>()
 
       return c.json<SuccessResponse>({
         message: 'action start',
+        success: true,
+      });
+    },
+  )
+  .post(
+    '/:id/action/walk-map',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+    zValidator(
+      'json',
+      z.object({
+        tileId: z.string(),
+      }),
+    ),
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const { tileId } = c.req.valid('json');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+        with: {
+          modifier: true,
+          location: true,
+        },
+      });
+      const tile = await db.query.tileTable.findFirst({
+        where: eq(tileTable.id, tileId),
+      });
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      if (!tile) {
+        throw new HTTPException(404, {
+          message: 'tile not found',
+        });
+      }
+      if (tile.type === 'OBJECT') {
+        throw new HTTPException(409, {
+          message: 'tile type object',
+        });
+      }
+      if (hero.location.mapId !== tile.mapId) {
+        throw new HTTPException(409, {
+          message: 'Movement error: hero mapId does not match tile mapId',
+        });
+      }
+
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      const jobId = hero.id;
+      const delay = calculateWalkTime(hero.modifier.dexterity);
+      await db
+        .update(actionTable)
+        .set({
+          startedAt: new Date().toISOString(),
+          completedAt: new Date(Date.now() + delay).toISOString(),
+          type: 'WALK',
+        })
+        .where(eq(actionTable.id, hero.actionId));
+
+      await actionQueue.remove(jobId);
+      const job = jobName['walk-map'];
+      await actionQueue.add(
+        job,
+        {
+          actionId: hero.actionId,
+          locationId: hero.locationId,
+          heroId: hero.id,
+          tileId,
+          type: 'IDLE',
+          jobName: job,
+        },
+        {
+          delay,
+          jobId,
+          removeOnComplete: true,
+        },
+      );
+
+      return c.json<SuccessResponse>({
+        message: 'walking start',
         success: true,
       });
     },

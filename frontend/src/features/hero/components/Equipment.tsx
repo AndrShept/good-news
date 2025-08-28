@@ -1,12 +1,13 @@
 import { GameItemCard } from '@/components/GameItemCard';
 import { cn } from '@/lib/utils';
 import { Equipment, EquipmentSlotType } from '@/shared/types';
+import { memo } from 'react';
 
 import { CharacterSprite } from './CharacterSprite';
-import { memo } from 'react';
 
 interface Props {
   equipments: Equipment[];
+  characterImage: string;
 }
 
 interface EquipmentImage {
@@ -68,17 +69,16 @@ const BASE_EQUIPMENTS_IMAGE: EquipmentImage[] = [
   },
 ];
 
-export const Equipments = memo(({ equipments }: Props) => {
+export const Equipments = memo(({ equipments, characterImage }: Props) => {
   const equipmentBySlot = equipments.reduce(
     (acc, equip) => {
       acc[equip.slot] = equip;
       return acc;
     },
     {} as Record<EquipmentSlotType, Equipment>,
-    
   );
   return (
-    <div className="flex mx-auto">
+    <div className="mx-auto flex">
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(0, 5).map((equipment) => (
           <li className="size-12 border" key={equipment.id}>
@@ -97,7 +97,7 @@ export const Equipments = memo(({ equipments }: Props) => {
           </li>
         ))}
       </ul>
-      <CharacterSprite src={'/sprites/new/newb-mage.webp'} />
+      <CharacterSprite src={characterImage} />
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(5, 10).map((equipment) => (
           <li className="size-12 border" key={equipment.id}>
@@ -118,4 +118,4 @@ export const Equipments = memo(({ equipments }: Props) => {
       </ul>
     </div>
   );
-})
+});
