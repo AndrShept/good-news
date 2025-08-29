@@ -247,6 +247,8 @@ export const createHeroSchema = createInsertSchema(heroTable, {
     modifier: z.string().transform((val) => JSON.parse(val) as HeroStats),
   });
 
+export type ActionJobData = WalkTownJobData | WalkMapJobData;
+
 export type WalkTownJobData = {
   actionId: string;
   locationId: string;
@@ -261,5 +263,7 @@ export type WalkMapJobData = {
   heroId: string;
   type: 'IDLE';
   jobName: JobNameType;
-  tileId: string
+  mapId: string;
+  tileId: string;
+  tile: Tile;
 };

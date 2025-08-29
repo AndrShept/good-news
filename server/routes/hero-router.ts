@@ -8,6 +8,7 @@ import {
   type Hero,
   type InventoryItem,
   type SuccessResponse,
+  type WalkMapJobData,
   type WeaponHandType,
   createHeroSchema,
   jobName,
@@ -1240,8 +1241,10 @@ export const heroRouter = new Hono<Context>()
           locationId: hero.locationId,
           heroId: hero.id,
           tileId,
+          mapId: hero.location.mapId,
           type: 'IDLE',
           jobName: job,
+          tile,
         },
         {
           delay,

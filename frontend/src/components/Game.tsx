@@ -2,6 +2,7 @@ import { GroupInvitationModal } from '@/features/group/components/GroupInvitatio
 import { ActionTimeRemaining } from '@/features/hero/components/ActionTimeRemaining';
 import { GameHeader } from '@/features/hero/components/GameHeader';
 import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
+import { useWalkMapCompleteListener } from '@/features/hero/hooks/useWalkMapCompleteListener';
 import { useWalkTownCompleteListener } from '@/features/hero/hooks/useWalkTownCompleteListener';
 import { Outlet } from '@tanstack/react-router';
 
@@ -10,6 +11,7 @@ import { GameMessage } from './GameMessage';
 export const Game = () => {
   useRegeneration();
   useWalkTownCompleteListener();
+  useWalkMapCompleteListener();
 
   return (
     <section className="flex flex-col">

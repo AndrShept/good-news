@@ -6,4 +6,5 @@ export const socketEvents = {
   groupSysMessages: () => `group:sys-messages`,
   groupUpdated: () => `group:updated`,
   actionWalkTownComplete: () => `action:walk-town-complete`,
+  actionWalkMapComplete: () => `action:walk-map-complete`,
 };

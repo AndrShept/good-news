@@ -1,4 +1,4 @@
-import { useHero } from '@/features/hero/hooks/useHero';
+import { useHero, useHeroTile } from '@/features/hero/hooks/useHero';
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 
@@ -9,6 +9,8 @@ export const GameMap = () => {
   const mapId = useHero((state) => state?.data?.location?.mapId ?? '');
   const { data: map, isLoading, isError, error } = useQuery(getMapOptions(mapId));
   const [zoom, setZoom] = useState(1);
+
+  const heroPos = useHeroTile();
 
   if (isLoading) return <p>LOADING MAP...</p>;
   if (isError) return <p>{error.message}</p>;
@@ -27,7 +29,14 @@ export const GameMap = () => {
         className="relative mx-auto"
       >
         {map?.tiles?.map((tile) => (
-          <GameTile key={tile.id} {...tile} tileHeight={map.tileHeight * zoom} tileWidth={map.tileWidth * zoom} />
+          <GameTile
+            key={tile.id}
+            {...tile}
+            posX={heroPos?.x}
+            posY={heroPos?.y}
+            tileHeight={map.tileHeight * zoom}
+            tileWidth={map.tileWidth * zoom}
+          />
         ))}
       </div>
     </section>

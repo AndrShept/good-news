@@ -1,37 +1,37 @@
 import { useSocket } from '@/components/providers/SocketProvider';
-import { buildingName as building } from '@/features/town/components/TownBuilding';
 import { socketEvents } from '@/shared/socket-events';
-import { WalkTownJobData } from '@/shared/types';
+import { WalkMapJobData } from '@/shared/types';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect } from 'react';
 
 import { useHeroChange } from './useHeroChange';
 
-export const useWalkTownCompleteListener = () => {
+export const useWalkMapCompleteListener = () => {
   const { socket } = useSocket();
   const setGameMessage = useSetGameMessage();
   const { heroChange } = useHeroChange();
 
   useEffect(() => {
-    const listener = (jobData: WalkTownJobData) => {
-      const { buildingName } = jobData;
+    const listener = (jobData: WalkMapJobData) => {
+      const { tile, tileId } = jobData;
+      console.log(jobData);
       heroChange({
         action: {
           type: 'IDLE',
         },
-        location: {
-          currentBuilding: buildingName,
-        },
+        tile,
+        tileId,
       });
       setGameMessage({
         type: 'success',
-        text: `You have entered the ${building[buildingName]}.`,
+        text: `You have entered tile.`,
       });
     };
 
-    socket.on(socketEvents.actionWalkTownComplete(), listener);
+    socket.on(socketEvents.actionWalkMapComplete(), listener);
+
     return () => {
-      socket.off(socketEvents.actionWalkTownComplete(), listener);
+      socket.off(socketEvents.actionWalkMapComplete(), listener);
     };
   }, [socket]);
 };

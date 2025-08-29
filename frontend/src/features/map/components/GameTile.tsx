@@ -1,7 +1,8 @@
-import { useHero } from '@/features/hero/hooks/useHero';
+import { useHero, useHeroTile } from '@/features/hero/hooks/useHero';
+import { useWalkOnMap } from '@/features/hero/hooks/useWalkOnMap';
 import { cn } from '@/lib/utils';
 import { Tile } from '@/shared/types';
-import { memo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 
 import { useChangeMap } from '../hooks/useChangeMap';
 import { HeroTile } from './HeroTile';
@@ -12,19 +13,25 @@ import { TownTile } from './TownTile';
 interface Props extends Tile {
   tileWidth: number;
   tileHeight: number;
+  posX: number;
+  posY: number;
 }
 export const GameTile = memo(function GameTile(props: Props) {
-  const { x, y, z, id, mapId, image, type, tileHeight, tileWidth, heroes, town } = props;
+  const { x, y, z, id, mapId, image, type, tileHeight, tileWidth, heroes, town, posX, posY } = props;
   const { removeTile } = useChangeMap(mapId);
   const { changeTile } = useChangeMap(mapId);
-  const hero = useHero((state) => ({
-    tile: state?.data?.tile,
-  }));
-  const isMovable =
-    Math.abs((hero?.tile?.x ?? 0) - x) <= 1 && Math.abs((hero?.tile?.y ?? 0) - y) <= 1 && !(hero?.tile?.x === x && hero?.tile?.y === y);
+
+  const isMovable = Math.abs(posX - x) <= 1 && Math.abs(posY - y) <= 1 && !(posX === x && posY === y);
+
+  const { mutate } = useWalkOnMap();
+  const onMove = () => {
+    console.log(id);
+    mutate(id);
+  };
   console.log('render tile');
   return (
     <div
+      onClick={onMove}
       // onClick={() => {
       //   removeTile({
       //     tileId: id,

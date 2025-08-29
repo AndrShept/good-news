@@ -18,7 +18,7 @@ export const actionQueueListeners = () => {
     }
     if (value.jobName === 'WALK:MAP') {
        const jobData = returnvalue as unknown as WalkMapJobData;
-      console.log('JOBBJOBOJBOJB', jobData);
+        io.to(jobData.heroId).emit(socketEvents.actionWalkMapComplete(), jobData);
     }
   });
 
