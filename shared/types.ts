@@ -258,12 +258,10 @@ export type WalkTownJobData = {
   jobName: JobNameType;
 };
 export type WalkMapJobData = {
-  actionId: string;
-  locationId: string;
-  heroId: string;
   type: 'IDLE';
   jobName: JobNameType;
-  mapId: string;
-  tileId: string;
+  targetTileId: string;
+  currentTileId: string;
+  hero: Hero;
   tile: Tile;
 };

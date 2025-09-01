@@ -17,12 +17,12 @@ export const actionQueueListeners = () => {
       io.to(jobData.heroId).emit(socketEvents.actionWalkTownComplete(), jobData);
     }
     if (value.jobName === 'WALK:MAP') {
-       const jobData = returnvalue as unknown as WalkMapJobData;
-        io.to(jobData.heroId).emit(socketEvents.actionWalkMapComplete(), jobData);
+      const jobData = returnvalue as unknown as WalkMapJobData;
+      io.to(jobData.hero.id).emit(socketEvents.actionWalkMapComplete(), jobData);
     }
   });
 
   queueEvents.on('failed', ({ jobId, failedReason }: { jobId: string; failedReason: string }) => {
-    console.error('error painting', failedReason);
+    console.error('actionQueueListeners queueEvents ERROR ', failedReason);
   });
 };

@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { mapNameTypeEnum, mapTable, tileTable } from '../db/schema';
+import { heroTable, mapNameTypeEnum, mapTable, tileTable } from '../db/schema';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const mapRouter = new Hono<Context>().get(
@@ -27,9 +27,11 @@ export const mapRouter = new Hono<Context>().get(
         tiles: {
           with: {
             town: true,
-            heroes: true
-          }
-        }
+            heroes: {
+              where: eq(heroTable.isOnline, true),
+            },
+          },
+        },
       },
     });
 

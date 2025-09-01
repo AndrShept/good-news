@@ -92,7 +92,6 @@ export const buildingMapData = async (mapName: MapNameType) => {
       .update(tileTable)
       .set({
         townId: town.id,
-        type: 'OBJECT',
       })
       .where(and(eq(tileTable.x, 5), eq(tileTable.y, 5)));
 

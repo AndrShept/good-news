@@ -1,7 +1,4 @@
-import { changeHeroOnlineStatus } from '@/features/hero/api/change-status';
-import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
-import { client } from '@/lib/utils';
-import React, { PropsWithChildren, createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { PropsWithChildren, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Socket, io } from 'socket.io-client';
 
 interface ISocketContext {
@@ -43,12 +40,6 @@ export const SocketProvider = ({
     }
     function onConnect() {
       setIsConnected(true);
-      changeHeroOnlineStatus({
-        heroId,
-        status: {
-          isOnline: true,
-        },
-      });
     }
 
     async function onDisconnect() {

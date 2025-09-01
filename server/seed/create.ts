@@ -20,7 +20,7 @@ const createBuildingsOnTOwn = async () => {
   const buildingOnTown = Object.values(townEntities)
     .flatMap((item) => {
       if (!!item.buildings?.length) {
-        const obj = item.buildings.map((b) => ({ townId: item.id, buildingsId: b.id }));
+        const obj = item.buildings.map((b) => ({ townId: item.id, buildingsId: b.buildingsId }));
         return obj;
       }
     })

@@ -1,4 +1,4 @@
-import { useHero, useHeroTile } from '@/features/hero/hooks/useHero';
+import { useHero } from '@/features/hero/hooks/useHero';
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 
@@ -9,8 +9,10 @@ export const GameMap = () => {
   const mapId = useHero((state) => state?.data?.location?.mapId ?? '');
   const { data: map, isLoading, isError, error } = useQuery(getMapOptions(mapId));
   const [zoom, setZoom] = useState(1);
-
-  const heroPos = useHeroTile();
+  const hero = useHero((state) => ({
+    posX: state?.data?.tile?.x ?? 0,
+    posY: state?.data?.tile?.y ?? 0,
+  }));
 
   if (isLoading) return <p>LOADING MAP...</p>;
   if (isError) return <p>{error.message}</p>;
@@ -28,16 +30,22 @@ export const GameMap = () => {
         }}
         className="relative mx-auto"
       >
-        {map?.tiles?.map((tile) => (
-          <GameTile
-            key={tile.id}
-            {...tile}
-            posX={heroPos?.x}
-            posY={heroPos?.y}
-            tileHeight={map.tileHeight * zoom}
-            tileWidth={map.tileWidth * zoom}
-          />
-        ))}
+        {map?.tiles?.map((tile) => {
+          const hasObject = map?.tiles?.some((t) => t.x === tile.x && t.y === tile.y && t.type === 'OBJECT');
+
+          return (
+            <GameTile
+              hasObject={hasObject}
+              key={tile.id}
+              {...tile}
+              isMovable={
+                Math.abs(hero.posX - tile.x) <= 1 && Math.abs(hero.posY - tile.y) <= 1 && !(hero.posX === tile.x && hero.posY === tile.y)
+              }
+              tileHeight={map.tileHeight * zoom}
+              tileWidth={map.tileWidth * zoom}
+            />
+          );
+        })}
       </div>
     </section>
   );

@@ -13,6 +13,7 @@ import { Server } from 'socket.io';
 import type { Context } from './context';
 import { game } from './lib/game';
 import { heroOffline } from './lib/heroOffline';
+import { heroOnline } from './lib/heroOnline';
 import { sessionHandler } from './middleware/sessionHandler';
 import { actionQueueListeners } from './queue/actionQueueListeners';
 import { authRouter } from './routes/auth-router';
@@ -83,7 +84,7 @@ export const io = new Server(httpServer as HTTPServer, {
   },
 });
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };
   const { heroId } = socket.handshake.query as { heroId: string };
   socket.join(heroId);

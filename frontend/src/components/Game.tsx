@@ -20,7 +20,7 @@ export const Game = () => {
         <div className="mx-auto min-h-[calc(100vh-315px)] w-full flex-1 p-3">
           <Outlet />
         </div>
-        <div className="sticky bottom-0">
+        <div className="sticky bottom-0 z-10">
           <ActionTimeRemaining />
           <GameMessage />
         </div>

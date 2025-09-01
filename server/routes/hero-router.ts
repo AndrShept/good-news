@@ -1193,11 +1193,13 @@ export const heroRouter = new Hono<Context>()
         with: {
           modifier: true,
           location: true,
+          tile: true,
         },
       });
       const tile = await db.query.tileTable.findFirst({
         where: eq(tileTable.id, tileId),
       });
+
       if (!hero) {
         throw new HTTPException(404, {
           message: 'hero not found',
@@ -1208,6 +1210,7 @@ export const heroRouter = new Hono<Context>()
           message: 'tile not found',
         });
       }
+
       if (tile.type === 'OBJECT') {
         throw new HTTPException(409, {
           message: 'tile type object',
@@ -1218,7 +1221,18 @@ export const heroRouter = new Hono<Context>()
           message: 'Movement error: hero mapId does not match tile mapId',
         });
       }
-
+      if (!hero.tile) {
+        throw new HTTPException(409, {
+          message: ' Hero is not on the world map. ',
+        });
+      }
+      const isMovable =
+        Math.abs(hero.tile.x - tile.x) <= 1 && Math.abs(hero.tile.y - tile.y) <= 1 && !(hero.tile.x === tile.x && hero.tile.y === tile.y);
+      if (!isMovable) {
+        throw new HTTPException(409, {
+          message: ' Hero can only move to an adjacent tile. ',
+        });
+      }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       const jobId = hero.id;
@@ -1237,14 +1251,20 @@ export const heroRouter = new Hono<Context>()
       await actionQueue.add(
         job,
         {
-          actionId: hero.actionId,
-          locationId: hero.locationId,
-          heroId: hero.id,
-          tileId,
-          mapId: hero.location.mapId,
+          currentTileId: hero.tile.id,
+          targetTileId: tileId,
           type: 'IDLE',
           jobName: job,
           tile,
+          hero: {
+            id: hero.id,
+            name: hero.name,
+            avatarImage: hero.avatarImage,
+            characterImage: hero.characterImage,
+            level: hero.level,
+            actionId: hero.actionId,
+            locationId: hero.locationId,
+          } as Hero,
         },
         {
           delay,
