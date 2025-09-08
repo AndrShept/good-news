@@ -1,4 +1,4 @@
-import { useWalkOnMap } from '@/features/hero/hooks/useWalkOnMap';
+import { useHeroRef } from '@/features/hero/hooks/useHero';
 import { cn } from '@/lib/utils';
 import { Tile } from '@/shared/types';
 import { memo } from 'react';
@@ -17,25 +17,9 @@ interface Props extends Tile {
 }
 export const GameTile = memo(function GameTile(props: Props) {
   const { x, y, z, id, mapId, image, type, tileHeight, tileWidth, heroes, town, isMovable, hasObject } = props;
-  const { removeTile } = useChangeMap(mapId);
-  const { changeTile } = useChangeMap(mapId);
-
   console.log('render tile');
   return (
     <div
-      // onClick={() => {
-      //   removeTile({
-      //     tileId: id,
-      //   });
-      // }}
-      // onClick={() => {
-      //   changeTile({
-      //     tileId: id,
-      //     params: {
-      //      heroes: undefined
-      //     },
-      //   });
-      // }}
       className={cn('absolute')}
       style={{
         left: `${x * tileWidth}px`,
@@ -45,7 +29,7 @@ export const GameTile = memo(function GameTile(props: Props) {
         zIndex: z,
       }}
     >
-      <TileImg image={image} />
+      <TileImg image={`/sprites/map/solmer-image/${image.toString().padStart(3, '0')}.png`} />
       {isMovable && !hasObject && <MovableTile tileId={id} />}
       {town && <TownTile image={town.image} />}
       {!!heroes && heroes.map((hero) => <HeroTile key={hero.id} characterImage={hero.characterImage} />)}

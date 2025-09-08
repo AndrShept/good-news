@@ -1247,14 +1247,13 @@ export const heroRouter = new Hono<Context>()
         .where(eq(actionTable.id, hero.actionId));
 
       await actionQueue.remove(jobId);
-      const job = jobName['walk-map'];
       await actionQueue.add(
-        job,
+        jobName['walk-map'],
         {
           currentTileId: hero.tile.id,
           targetTileId: tileId,
           type: 'IDLE',
-          jobName: job,
+          jobName: jobName['walk-map'],
           tile,
           hero: {
             id: hero.id,

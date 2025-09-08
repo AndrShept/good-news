@@ -1,4 +1,5 @@
 import { GroupInvitationModal } from '@/features/group/components/GroupInvitationModal';
+import { useGroupListener } from '@/features/group/hooks/useGroupListener';
 import { ActionTimeRemaining } from '@/features/hero/components/ActionTimeRemaining';
 import { GameHeader } from '@/features/hero/components/GameHeader';
 import { useRegeneration } from '@/features/hero/hooks/useRegeneration';

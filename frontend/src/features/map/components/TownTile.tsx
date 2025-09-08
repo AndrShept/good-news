@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { TileImg } from './TileImg';
+
 interface Props {
   image: string;
 }
@@ -7,7 +9,7 @@ interface Props {
 export const TownTile = ({ image }: Props) => {
   return (
     <>
-      <img style={{ imageRendering: 'pixelated' }} src={image} className="absolute left-0 top-0 " />
+      <TileImg image={image} className="absolute left-0 top-0" />
     </>
   );
 };

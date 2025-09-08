@@ -23,6 +23,7 @@ import { heroRouter } from './routes/hero-router';
 import { mapRouter } from './routes/map-router';
 import { postRouter } from './routes/post-router';
 import { shopRouter } from './routes/shop-router';
+import { tileRouter } from './routes/tile-router';
 import { townRouter } from './routes/town-router';
 
 const app = new Hono<Context>();
@@ -40,7 +41,8 @@ const routes = app
   .route('/shop', shopRouter)
   .route('/group', groupRouter)
   .route('/map', mapRouter)
-  .route('/town', townRouter);
+  .route('/town', townRouter)
+  .route('/tile', tileRouter);
 
 // app.onError((err, c) => {
 //   // Обробка помилки підключення до бази даних

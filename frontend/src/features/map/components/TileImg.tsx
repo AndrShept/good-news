@@ -1,18 +1,20 @@
-import React from 'react';
+import { cn } from '@/lib/utils';
+import React, { ComponentProps } from 'react';
 
-interface Props {
-  image: number;
+interface Props extends ComponentProps<'img'> {
+  image: string;
+  isPixelate?: boolean;
 }
 
-export const TileImg = ({ image }: Props) => {
+export const TileImg = ({ image, isPixelate = true, className, ...props }: Props) => {
   return (
     <>
-      {' '}
       <img
         draggable={false}
-        style={{ imageRendering: 'pixelated' }}
-        className=" size-full"
-        src={`/sprites/map/solmer-image/${image.toString().padStart(3, '0')}.png`}
+        style={isPixelate ? { imageRendering: 'pixelated' } : undefined}
+        className={cn('size-full', className)}
+        src={image}
+        alt="tile-image"
       />
     </>
   );
