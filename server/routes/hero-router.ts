@@ -1,4 +1,5 @@
 import { BASE_STATS, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
+import type { SocketEnterTownResponse, SocketLeaveTownResponse } from '@/shared/socket-data-types';
 import {
   type Buff,
   type Equipment,
@@ -8,6 +9,7 @@ import {
   type Hero,
   type InventoryItem,
   type SuccessResponse,
+  type Town,
   type WalkMapJobData,
   type WeaponHandType,
   createHeroSchema,
@@ -20,6 +22,8 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
+import { io } from '..';
+import { socketEvents } from '../../shared/socket-events';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import {
@@ -1279,6 +1283,93 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post(
+    '/:id/action/enter-town',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+    zValidator('json', z.object({ tileId: z.string() })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const { tileId } = c.req.valid('json');
+
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+        with: {
+          location: true,
+          action: true,
+          tile: true,
+        },
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      if (hero.action.type !== 'IDLE') {
+        throw new HTTPException(409, {
+          message: 'Hero is currently busy with another action',
+        });
+      }
+
+      const tile = await db.query.tileTable.findFirst({
+        where: eq(tileTable.id, tileId),
+        with: {
+          town: true,
+        },
+      });
+      if (!tile) {
+        throw new HTTPException(404, {
+          message: ' tile not found',
+        });
+      }
+      if (!tile.townId || !tile.town) {
+        throw new HTTPException(404, {
+          message: 'town id not found',
+        });
+      }
+      if (hero.tileId !== tileId) {
+        throw new HTTPException(409, {
+          message: 'hero not exist a town tile',
+        });
+      }
+
+      await db
+        .update(locationTable)
+        .set({
+          townId: tile.townId,
+          mapId: null,
+          type: 'TOWN',
+        })
+        .where(eq(locationTable.id, hero.locationId));
+      await db
+        .update(heroTable)
+        .set({
+          tileId: null,
+        })
+        .where(eq(heroTable.id, id));
+      const socketData: SocketEnterTownResponse = {
+        townId: tile.townId,
+        heroId: hero.id,
+        tileId: tile.id,
+      };
+      io.to(hero.location.mapId!).emit(socketEvents.enterTown(), socketData);
+
+      return c.json<SuccessResponse<SocketEnterTownResponse>>({
+        message: 'enter town success',
+        success: true,
+        data: {
+          townId: tile.townId,
+          heroId: hero.id,
+          tileId: tile.id,
+        },
+      });
+    },
+  )
+  .post(
     '/:id/action/leave-town',
     loggedIn,
     zValidator('param', z.object({ id: z.string() })),
@@ -1320,32 +1411,51 @@ export const heroRouter = new Hono<Context>()
           message: 'town not found',
         });
       }
-      const townTile = await db.query.tileTable.findFirst({
+      const tile = await db.query.tileTable.findFirst({
         where: eq(tileTable.townId, town.id),
       });
-      if (!townTile) {
+      if (!tile) {
         throw new HTTPException(404, {
-          message: 'town tile not found',
+          message: 'tile not found',
         });
       }
 
-      await db
-        .update(locationTable)
-        .set({
-          townId: null,
-          mapId: townTile.mapId,
-          type: 'MAP',
-        })
-        .where(eq(locationTable.id, hero.locationId));
-      await db
-        .update(heroTable)
-        .set({
-          tileId: townTile.id,
-        })
-        .where(eq(heroTable.id, id));
+      await db.transaction(async (tx) => {
+        await tx
+          .update(locationTable)
+          .set({
+            townId: null,
+            mapId: tile.mapId,
+            type: 'MAP',
+          })
+          .where(eq(locationTable.id, hero.locationId));
+        await tx
+          .update(heroTable)
+          .set({
+            tileId: tile.id,
+          })
+          .where(eq(heroTable.id, id));
+      });
+      const socketData: SocketLeaveTownResponse = {
+        heroId: hero.id,
+        mapId: tile.mapId,
+        tileId: tile.id,
+        hero: {
+          id: hero.id,
+          name: hero.name,
+          avatarImage: hero.avatarImage,
+          characterImage: hero.characterImage,
+          level: hero.level,
+          actionId: hero.actionId,
+          locationId: hero.locationId,
+        } as Hero,
+      };
+
+      io.to(town.id).emit(socketEvents.leaveTown(), socketData);
+      io.to(tile.mapId).emit(socketEvents.leaveTown(), socketData);
 
       return c.json<SuccessResponse>({
-        message: 'location changed',
+        message: 'leave town success ',
         success: true,
       });
     },

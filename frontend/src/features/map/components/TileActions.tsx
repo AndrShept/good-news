@@ -1,17 +1,14 @@
-import { TownIcon } from '@/components/game-icons/TownIcon';
-import { Button } from '@/components/ui/button';
-import React from 'react';
+import { EnterTownButton } from './EnterTownButton';
 
 type Props = {
   isTown: boolean;
+  tileId: string;
 };
 
-export const TileActions = ({ isTown }: Props) => {
+export const TileActions = ({ isTown, tileId }: Props) => {
   return (
     <section className="mt-auto flex flex-wrap">
-      <Button  disabled={!isTown}>
-        <TownIcon /> Enter Town
-      </Button>
+      <EnterTownButton isTown={isTown} tileId={tileId} />
     </section>
   );
 };

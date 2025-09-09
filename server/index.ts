@@ -91,11 +91,11 @@ io.on('connection', async (socket) => {
   const { heroId } = socket.handshake.query as { heroId: string };
   socket.join(heroId);
   game({ socket });
-  console.log('connected ' + username);
+  console.info('connected ' + username);
   socket.on('disconnect', () => {
-    console.log('disconnect ' + username);
+    console.info('disconnect ' + username);
     heroOffline(heroId);
   });
 });
 
-console.log('Server Running on port 🚀', process.env['PORT'] || 3000);
+console.info('Server Running on port 🚀', process.env['PORT'] || 3000);

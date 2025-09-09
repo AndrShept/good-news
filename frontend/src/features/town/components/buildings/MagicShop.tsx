@@ -6,7 +6,6 @@ import { BackToTownEntryButton } from '../BackToTownEntryButton';
 
 export const MagicShop = () => {
   const { data: shopItems, isLoading } = useQuery(getShopItemsOptions());
-  console.log('MAGIC SHOp');
   if (isLoading) return <p>Shop Loading...</p>;
   return (
     <section className="flex flex-col items-center gap-2">

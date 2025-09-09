@@ -1,9 +1,8 @@
-import { useHeroRef } from '@/features/hero/hooks/useHero';
+
 import { cn } from '@/lib/utils';
 import { Tile } from '@/shared/types';
 import { memo } from 'react';
 
-import { useChangeMap } from '../hooks/useChangeMap';
 import { HeroTile } from './HeroTile';
 import { MovableTile } from './MovableTile';
 import { TileImg } from './TileImg';

@@ -7,4 +7,6 @@ export const socketEvents = {
   groupUpdated: () => `group:updated`,
   actionWalkTownComplete: () => `action:walk-town-complete`,
   actionWalkMapComplete: () => `action:walk-map-complete`,
+  enterTown: () => `action:enter-town`,
+  leaveTown: () => `action:leave-town`,
 };

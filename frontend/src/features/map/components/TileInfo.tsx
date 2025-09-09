@@ -1,21 +1,30 @@
-import { useHero } from '@/features/hero/hooks/useHero';
-import { useQuery } from '@tanstack/react-query';
-import React from 'react';
+import { memo } from 'react';
 
-import { getTileOptions } from '../api/get-tile';
+import { useMap } from '../hooks/useMap';
 import { TileActions } from './TileActions';
+import { TileImg } from './TileImg';
 import { TileInfoTown } from './TileInfoTown';
 
-export const TileInfo = () => {
-  const tileId = useHero((state) => state?.data?.tileId ?? '');
-  const { data: tile, isLoading } = useQuery(getTileOptions(tileId));
-  const isTown = !!tile?.townId;
+type Props = {
+  tileId: string;
+  mapId: string;
+};
 
-  if (isLoading) return <div>loading tile ...</div>;
+export const TileInfo = memo(({ mapId, tileId }: Props) => {
+  const tile = useMap({ mapId, select: (state) => state?.tiles?.find((t) => t.id === tileId) });
+  const isTown = !!tile?.townId;
+  const isTIle = !!tile?.id && !isTown;
+  console.log('TILE-INFO RENDER');
+
   return (
-    <section className="flex flex-1 flex-col items-center p-2 gap-2">
+    <section className="flex flex-col items-center gap-2 p-2">
+      {isTIle && (
+        <div className="w-full max-w-[300px]">
+          <TileImg image={`/sprites/map/solmer-image/${tile.image.toString().padStart(3, '0')}.png`} />
+        </div>
+      )}
       {isTown && <TileInfoTown {...tile.town!} />}
-      <TileActions isTown={isTown} />
+      <TileActions isTown={isTown} tileId={tileId} />
     </section>
   );
-};
+});

@@ -2,13 +2,12 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroChange } from '@/features/hero/hooks/useHeroChange';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { SocketEnterTownResponse } from '@/shared/socket-data-types';
+import { useChangeMap } from '@/features/map/hooks/useChangeMap';
+import { SocketEnterTownResponse, SocketLeaveTownResponse } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { IGameMessage, useGameMessages } from '@/store/useGameMessages';
 import { RefObject, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
-
-import { useChangeMap } from './useChangeMap';
 
 type TJoinRoomParams = {
   socket: Socket;
@@ -43,55 +42,41 @@ const joinRoom = ({ socket, id, joinMessage, leaveMessage, prevRefId, setGameMes
   }
 };
 
-export const useMapListener = () => {
+export const useTownListener = () => {
   const setGameMessage = useGameMessages((state) => state.setGameMessage);
-  const mapId = useHero((state) => state?.data?.location?.mapId ?? '');
+  const townId = useHero((state) => state?.data?.location?.townId ?? '');
   const id = useHeroId();
   const { socket } = useSocket();
   const { heroChange } = useHeroChange();
-  const { filterHeroes ,addHeroes} = useChangeMap(mapId);
-  const prevMapIdRef = useRef<string | null>(null);
+  const prevTownIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     joinRoom({
-      id: mapId,
-      prevRefId: prevMapIdRef,
+      id: townId,
+      prevRefId: prevTownIdRef,
       socket,
       setGameMessage,
-      joinMessage: 'join map room',
-      leaveMessage: 'leave map room',
+      joinMessage: 'join town room',
+      leaveMessage: 'leave town room',
     });
-  }, [mapId, socket]);
+  }, [townId, socket]);
   useEffect(() => {
-    const listener = (data: SocketEnterTownResponse) => {
+    const listener = (data: SocketLeaveTownResponse) => {
       if (data.heroId === id) {
         heroChange({
           location: {
-            mapId: null,
-            map: undefined,
-            townId: data.townId,
+            mapId: data.mapId,
+            townId: null,
+            town: undefined,
           },
-          tile: undefined,
-          tileId: null,
+          tileId: data.tileId,
         });
       }
-      filterHeroes({ heroId: data.heroId, tileId: data.tileId });
-    };
-    socket.on(socketEvents.enterTown(), listener);
-
-    return () => {
-      socket.off(socketEvents.enterTown(), listener);
-    };
-  }, [socket]);
-  useEffect(() => {
-    const listener = (data: SocketEnterTownResponse) => {
- 
-      addHeroes({tileId : data.tileId, hero})
     };
     socket.on(socketEvents.leaveTown(), listener);
 
     return () => {
-      socket.off(socketEvents.enterTown(), listener);
+      socket.off(socketEvents.leaveTown(), listener);
     };
   }, [socket]);
 };

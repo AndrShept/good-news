@@ -21,7 +21,6 @@ export const useWalkMapCompleteListener = () => {
   useEffect(() => {
     const listener = (jobData: WalkMapJobData) => {
       const { tile, targetTileId, currentTileId, hero } = jobData;
-      console.log(jobData);
       if (id === hero.id) {
         heroChange({
           action: {
@@ -30,14 +29,13 @@ export const useWalkMapCompleteListener = () => {
           tile,
           tileId: targetTileId,
         });
+        setGameMessage({
+          type: 'success',
+          text: `You have entered tile.`,
+        });
       }
-
       filterHeroes({ tileId: currentTileId, heroId: hero.id });
       addHeroes({ tileId: targetTileId, hero });
-      setGameMessage({
-        type: 'success',
-        text: `You have entered tile.`,
-      });
     };
 
     socket.on(socketEvents.actionWalkMapComplete(), listener);

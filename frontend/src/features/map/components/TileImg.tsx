@@ -8,7 +8,7 @@ interface Props extends ComponentProps<'img'> {
 
 export const TileImg = ({ image, isPixelate = true, className, ...props }: Props) => {
   return (
-    <>
+   
       <img
         draggable={false}
         style={isPixelate ? { imageRendering: 'pixelated' } : undefined}
@@ -16,6 +16,6 @@ export const TileImg = ({ image, isPixelate = true, className, ...props }: Props
         src={image}
         alt="tile-image"
       />
-    </>
+   
   );
 };

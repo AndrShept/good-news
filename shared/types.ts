@@ -211,7 +211,8 @@ export type Buff = typeof buffTable.$inferSelect & {
 
 //API RESPONSE
 export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>;
-export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
+export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];
+export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>
 
 export const statsSchema = createSelectSchema(modifierTable, {
   strength: z.number({ coerce: true }),

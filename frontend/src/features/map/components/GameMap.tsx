@@ -7,18 +7,19 @@ import { GameTile } from './GameTile';
 import { TileInfo } from './TileInfo';
 
 export const GameMap = () => {
-  const mapId = useHero((state) => state?.data?.location?.mapId ?? '');
-  const { data: map, isLoading, isError, error } = useQuery(getMapOptions(mapId));
   const [zoom, setZoom] = useState(1);
   const hero = useHero((state) => ({
     posX: state?.data?.tile?.x ?? 0,
     posY: state?.data?.tile?.y ?? 0,
+    tileId: state?.data?.tileId ?? '',
+    mapId: state?.data?.location?.mapId ?? '',
   }));
+  const { data: map, isLoading, isError, error } = useQuery(getMapOptions(hero.mapId));
 
   if (isLoading) return <p>LOADING MAP...</p>;
   if (isError) return <p>{error.message}</p>;
   return (
-    <section className="flex">
+    <section className="flex justify-center gap-2">
       <div>
         <div className="mb-2 flex gap-2">
           <button onClick={() => setZoom((z) => z * 1.2)}>+</button>
@@ -50,7 +51,7 @@ export const GameMap = () => {
           })}
         </div>
       </div>
-      <TileInfo />
+      <TileInfo mapId={hero.mapId} tileId={hero.tileId} />
     </section>
   );
 };

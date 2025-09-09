@@ -6,9 +6,7 @@ import { Spinner } from '../Spinner';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { data, isLoading } = useQuery(getUserQueryOptions());
-  console.log('AUTH RENDER');
   if (isLoading) {
-    console.log('QQQQQQQQQQQQQQQQQQQ');
     return (
       <div className="flex h-screen">
         <Spinner />

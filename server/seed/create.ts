@@ -44,7 +44,7 @@ const go = async () => {
   await createBuildingsOnTOwn();
   await buildingMapData(townEntities.SOLMERE.name);
   console.timeEnd('create');
-  console.log('COMPLETE!');
+  console.info('COMPLETE!');
   return;
 };
 go();
