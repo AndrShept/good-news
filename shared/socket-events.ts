@@ -1,12 +1,12 @@
 export const socketEvents = {
   groupInvite: () => 'group:invite',
   groupInvited: (toHeroId: string) => `group:invited-${toHeroId}`,
+  groupUpdated: () => `group:updated`,
+  groupSysMessages: () => `group:sys-messages`,
   joinRoom: () => `join:room`,
   leaveRoom: () => `leave:room`,
-  groupSysMessages: () => `group:sys-messages`,
-  groupUpdated: () => `group:updated`,
   actionWalkTownComplete: () => `action:walk-town-complete`,
   actionWalkMapComplete: () => `action:walk-map-complete`,
-  enterTown: () => `action:enter-town`,
-  leaveTown: () => `action:leave-town`,
+  mapUpdate: () => `update:map`,
+  townUpdate: () => `update:town`,
 };

@@ -1,5 +1,5 @@
 import { BASE_STATS, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
-import type { SocketEnterTownResponse, SocketLeaveTownResponse } from '@/shared/socket-data-types';
+import type { MapUpdateEvent, TownUpdateEvent } from '@/shared/socket-data-types';
 import {
   type Buff,
   type Equipment,
@@ -1351,21 +1351,21 @@ export const heroRouter = new Hono<Context>()
           tileId: null,
         })
         .where(eq(heroTable.id, id));
-      const socketData: SocketEnterTownResponse = {
-        townId: tile.townId,
-        heroId: hero.id,
-        tileId: tile.id,
-      };
-      io.to(hero.location.mapId!).emit(socketEvents.enterTown(), socketData);
-
-      return c.json<SuccessResponse<SocketEnterTownResponse>>({
-        message: 'enter town success',
-        success: true,
-        data: {
+      const socketData: MapUpdateEvent = {
+        type: 'HERO_ENTER_TOWN',
+        payload: {
           townId: tile.townId,
+          town: tile.town,
           heroId: hero.id,
           tileId: tile.id,
+          hero: hero as Hero,
         },
+      };
+      io.to(hero.location.mapId!).emit(socketEvents.mapUpdate(), socketData);
+
+      return c.json<SuccessResponse>({
+        message: 'enter town success',
+        success: true,
       });
     },
   )
@@ -1436,23 +1436,35 @@ export const heroRouter = new Hono<Context>()
           })
           .where(eq(heroTable.id, id));
       });
-      const socketData: SocketLeaveTownResponse = {
-        heroId: hero.id,
-        mapId: tile.mapId,
-        tileId: tile.id,
-        hero: {
-          id: hero.id,
-          name: hero.name,
-          avatarImage: hero.avatarImage,
-          characterImage: hero.characterImage,
-          level: hero.level,
-          actionId: hero.actionId,
-          locationId: hero.locationId,
-        } as Hero,
+      const socketMapData: MapUpdateEvent = {
+        type: 'HERO_LEAVE_TOWN',
+        payload: {
+          heroId: hero.id,
+          mapId: tile.mapId,
+          tileId: tile.id,
+          hero: {
+            id: hero.id,
+            name: hero.name,
+            avatarImage: hero.avatarImage,
+            characterImage: hero.characterImage,
+            level: hero.level,
+            actionId: hero.actionId,
+            locationId: hero.locationId,
+          } as Hero,
+        },
+      };
+      const socketTownData: TownUpdateEvent = {
+        type: 'HERO_LEAVE_TOWN',
+        payload: {
+          heroId: hero.id,
+          mapId: tile.mapId,
+          tileId: tile.id,
+          tile,
+        },
       };
 
-      io.to(town.id).emit(socketEvents.leaveTown(), socketData);
-      io.to(tile.mapId).emit(socketEvents.leaveTown(), socketData);
+      io.to(town.id).emit(socketEvents.townUpdate(), socketTownData);
+      io.to(tile.mapId).emit(socketEvents.mapUpdate(), socketMapData);
 
       return c.json<SuccessResponse>({
         message: 'leave town success ',

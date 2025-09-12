@@ -2,45 +2,12 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroChange } from '@/features/hero/hooks/useHeroChange';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { useChangeMap } from '@/features/map/hooks/useChangeMap';
-import { SocketEnterTownResponse, SocketLeaveTownResponse } from '@/shared/socket-data-types';
+import { buildingName as building } from '@/features/town/components/TownBuilding';
+import { joinRoomClient } from '@/lib/utils';
+import { TownUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import { IGameMessage, useGameMessages } from '@/store/useGameMessages';
-import { RefObject, useEffect, useRef } from 'react';
-import { Socket } from 'socket.io-client';
-
-type TJoinRoomParams = {
-  socket: Socket;
-  id: string;
-  joinMessage?: string;
-  leaveMessage?: string;
-  prevRefId: RefObject<string | null>;
-  setGameMessage: (message: IGameMessage) => void;
-};
-
-const joinRoom = ({ socket, id, joinMessage, leaveMessage, prevRefId, setGameMessage }: TJoinRoomParams) => {
-  if (id) {
-    socket.emit(socketEvents.joinRoom(), id, (cb: { accept: boolean }) => {
-      if (cb.accept && joinMessage) {
-        setGameMessage({
-          text: `${joinMessage} ${id}`,
-          type: 'info',
-        });
-      }
-    });
-    prevRefId.current = id;
-  }
-  if (prevRefId.current && !id) {
-    socket.emit(socketEvents.leaveRoom(), prevRefId.current, (cb: { accept: boolean }) => {
-      if (cb.accept && leaveMessage) {
-        setGameMessage({
-          text: `${leaveMessage} ${prevRefId.current}`,
-          type: 'error',
-        });
-      }
-    });
-  }
-};
+import { useGameMessages } from '@/store/useGameMessages';
+import { useEffect, useRef } from 'react';
 
 export const useTownListener = () => {
   const setGameMessage = useGameMessages((state) => state.setGameMessage);
@@ -51,7 +18,7 @@ export const useTownListener = () => {
   const prevTownIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    joinRoom({
+    joinRoomClient({
       id: townId,
       prevRefId: prevTownIdRef,
       socket,
@@ -61,22 +28,44 @@ export const useTownListener = () => {
     });
   }, [townId, socket]);
   useEffect(() => {
-    const listener = (data: SocketLeaveTownResponse) => {
-      if (data.heroId === id) {
-        heroChange({
-          location: {
-            mapId: data.mapId,
-            townId: null,
-            town: undefined,
-          },
-          tileId: data.tileId,
-        });
+    const listener = (data: TownUpdateEvent) => {
+      switch (data.type) {
+        case 'HERO_LEAVE_TOWN':
+          if (data.payload.heroId === id) {
+            heroChange({
+              location: {
+                mapId: data.payload.mapId,
+                townId: null,
+                town: undefined,
+                currentBuilding: undefined,
+                type: 'MAP',
+              },
+              tile: data.payload.tile,
+              tileId: data.payload.tileId,
+            });
+          }
+
+          break;
+        case 'WALK_TOWN':
+          heroChange({
+            action: {
+              type: 'IDLE',
+            },
+            location: {
+              currentBuilding: data.payload.buildingName,
+            },
+          });
+          setGameMessage({
+            type: 'success',
+            text: `You have entered the ${building[data.payload.buildingName]}.`,
+          });
+          break;
       }
     };
-    socket.on(socketEvents.leaveTown(), listener);
+    socket.on(socketEvents.townUpdate(), listener);
 
     return () => {
-      socket.off(socketEvents.leaveTown(), listener);
+      socket.off(socketEvents.townUpdate(), listener);
     };
   }, [socket]);
 };

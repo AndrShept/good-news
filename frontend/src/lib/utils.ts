@@ -1,3 +1,4 @@
+import { buildingNameType } from '@/shared/types';
 import { type ClassValue, clsx } from 'clsx';
 import { format, intervalToDuration } from 'date-fns';
 import { hc } from 'hono/client';
@@ -5,7 +6,10 @@ import toast from 'react-hot-toast';
 import { twMerge } from 'tailwind-merge';
 
 import type { ApiRoutes } from '../../../server';
-import { buildingNameType } from '@/shared/types';
+import { socketEvents } from '@/shared/socket-events';
+import { Socket } from 'socket.io-client';
+import { RefObject } from 'react';
+import { IGameMessage } from '@/store/useGameMessages';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -18,6 +22,17 @@ export const client = hc<ApiRoutes>('/', {
       credentials: 'include',
     }),
 }).api;
+
+type TJoinRoomParams = {
+  socket: Socket;
+  id: string;
+  joinMessage?: string;
+  leaveMessage?: string;
+  prevRefId: RefObject<string | null>;
+  setGameMessage: (message: IGameMessage) => void;
+};
+
+
 
 export const getFormatDateTime = (time: string | undefined) => {
   if (!time) return;
@@ -62,3 +77,26 @@ export const getRarityColor = (data: string) => {
   };
 };
 
+export const joinRoomClient = ({ socket, id, joinMessage, leaveMessage, prevRefId, setGameMessage }: TJoinRoomParams) => {
+  if (id) {
+    socket.emit(socketEvents.joinRoom(), id, (cb: { accept: boolean }) => {
+      if (cb.accept && joinMessage) {
+        setGameMessage({
+          text: `${joinMessage} ${id}`,
+          type: 'info',
+        });
+      }
+    });
+    prevRefId.current = id;
+  }
+  if (prevRefId.current && !id) {
+    socket.emit(socketEvents.leaveRoom(), prevRefId.current, (cb: { accept: boolean }) => {
+      if (cb.accept && leaveMessage) {
+        setGameMessage({
+          text: `${leaveMessage} ${prevRefId.current}`,
+          type: 'error',
+        });
+      }
+    });
+  }
+};
