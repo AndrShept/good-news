@@ -7,10 +7,7 @@ interface Props {
 
 export const MovableTile = ({ tileId }: Props) => {
   const { mutate, isPending } = useWalkOnMap();
-  const type = useHero((state) => state?.data?.action?.type);
   const onMove = () => {
-    if (type !== 'IDLE') return;
-
     mutate(tileId);
   };
   return (

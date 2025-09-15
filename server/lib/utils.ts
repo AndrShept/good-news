@@ -1,4 +1,5 @@
 import { BASE_WALK_TIME } from '@/shared/constants';
+import type { Map, Tile } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
 import { sql } from 'drizzle-orm';
@@ -75,3 +76,19 @@ export const calculateWalkTime = (dexterity: number) => {
   const delay = Math.max(BASE_WALK_TIME / (1 + dexterity / dexterityFactor), MIN_WALK_TIME);
   return delay;
 };
+
+export function buildGrid(map: Map): (Tile | null)[][] | undefined {
+  if (!map.tiles?.length) return;
+
+  const grid: (Tile | null)[][] = Array.from({ length: map.height }, () =>
+    Array.from({ length: map.width }, () => null)
+  );
+
+  for (const tile of map.tiles) {
+    if (tile.y < map.height && tile.x < map.width) {
+      grid[tile.y][tile.x] = tile;
+    }
+  }
+
+  return grid;
+}

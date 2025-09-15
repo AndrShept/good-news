@@ -24,5 +24,5 @@ export const getMapOptions = (mapId: string) =>
     queryKey: ['map', mapId],
     queryFn: () => getMap(mapId),
     enabled: !!mapId,
-    staleTime: 0,
+    staleTime: Infinity,
   });

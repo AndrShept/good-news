@@ -8,10 +8,12 @@ import { TileInfoTown } from './TileInfoTown';
 type Props = {
   tileId: string;
   mapId: string;
+  posX: number;
+  posY: number;
 };
 
-export const TileInfo = memo(({ mapId, tileId }: Props) => {
-  const tile = useMap({ mapId, select: (state) => state?.tiles?.find((t) => t.id === tileId) });
+export const TileInfo = memo(({ mapId, tileId, posX, posY }: Props) => {
+  const tile = useMap({ mapId, select: (state) => state?.tilesGrid![posY][posX] });
   const isTown = !!tile?.townId;
   const isTIle = !!tile?.id && !isTown;
   console.log('TILE-INFO RENDER');

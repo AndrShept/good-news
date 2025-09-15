@@ -2,12 +2,15 @@ import type { Map, SuccessResponse } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { asc, desc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { heroTable, mapNameTypeEnum, mapTable, tileTable } from '../db/schema';
+import { buildGrid } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
+import { buildingMapData } from '../lib/buildingMapData';
 
 export const mapRouter = new Hono<Context>().get(
   '/:id',
@@ -34,11 +37,13 @@ export const mapRouter = new Hono<Context>().get(
         },
       },
     });
+    console.log('GET MAP')
 
+    const tilesGrid = buildGrid(map as Map);
     return c.json<SuccessResponse<Map>>({
       message: 'map fetched!',
       success: true,
-      data: map as Map,
+      data: { ...map, tiles: undefined, tilesGrid } as Map,
     });
   },
 );

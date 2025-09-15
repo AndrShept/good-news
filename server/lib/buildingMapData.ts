@@ -63,7 +63,7 @@ export const buildingMapData = async (mapName: MapNameType) => {
 
   console.time('create-map');
 
-   await db.transaction(async (tx) => {
+  const map = await db.transaction(async (tx) => {
     const [newMap] = await tx
       .insert(mapTable)
       .values({
@@ -78,16 +78,25 @@ export const buildingMapData = async (mapName: MapNameType) => {
 
     const objectsTiles = findObjects && getLayerObject({ layer: findObjects, mapId: newMap.id });
     const decorTiles = findDecor && getLayerObject({ layer: findDecor, mapId: newMap.id });
-    const grounTiles = findGround && getLayerObject({ layer: findGround, mapId: newMap.id });
-    const tiles = [...(grounTiles ?? []), ...(objectsTiles ?? []), ...(decorTiles ?? [])];
-    await tx.insert(tileTable).values(tiles);
+    const groundTiles = findGround && getLayerObject({ layer: findGround, mapId: newMap.id });
+
+    const tiles = [...(groundTiles ?? []), ...(objectsTiles ?? []), ...(decorTiles ?? [])];
+
+    const chunkSize = 500;
+    for (let i = 0; i < tiles.length; i += chunkSize) {
+      const chunk = tiles.slice(i, i + chunkSize);
+      await tx.insert(tileTable).values(chunk);
+    }
+
     const town = await tx.query.townTable.findFirst({
       where: eq(townTable.name, mapName),
     });
+
     if (!town) {
       console.error('town not found');
       return;
     }
+
     await tx
       .update(tileTable)
       .set({
@@ -97,4 +106,8 @@ export const buildingMapData = async (mapName: MapNameType) => {
 
     return newMap;
   });
+
+  console.timeEnd('create-map');
+  return map;
 };
+

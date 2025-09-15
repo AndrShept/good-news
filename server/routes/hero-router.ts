@@ -1,4 +1,5 @@
 import { BASE_STATS, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
+import { type WalkMapJob, type WalkTownJob, jobName } from '@/shared/job-types';
 import type { MapUpdateEvent, TownUpdateEvent } from '@/shared/socket-data-types';
 import {
   type Buff,
@@ -10,10 +11,8 @@ import {
   type InventoryItem,
   type SuccessResponse,
   type Town,
-  type WalkMapJobData,
   type WeaponHandType,
   createHeroSchema,
-  jobName,
   statsSchema,
 } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
@@ -1153,24 +1152,22 @@ export const heroRouter = new Hono<Context>()
           type: 'WALK',
         })
         .where(eq(actionTable.id, hero.actionId));
-
-      await actionQueue.remove(jobId);
-      await actionQueue.add(
-        jobName['walk-town'],
-        {
+      const jobData: WalkTownJob = {
+        jobName: 'WALK_TOWN',
+        payload: {
           actionId: hero.actionId,
           locationId: hero.locationId,
           heroId: hero.id,
           type: 'IDLE',
           buildingName,
-          jobName: jobName['walk-town'],
         },
-        {
-          delay,
-          jobId,
-          removeOnComplete: true,
-        },
-      );
+      };
+      await actionQueue.remove(jobId);
+      await actionQueue.add(jobName['walk-town'], jobData, {
+        delay,
+        jobId,
+        removeOnComplete: true,
+      });
 
       return c.json<SuccessResponse>({
         message: 'action start',
@@ -1249,15 +1246,12 @@ export const heroRouter = new Hono<Context>()
           type: 'WALK',
         })
         .where(eq(actionTable.id, hero.actionId));
-
-      await actionQueue.remove(jobId);
-      await actionQueue.add(
-        jobName['walk-map'],
-        {
+      const jobData: WalkMapJob = {
+        jobName: 'WALK_MAP',
+        payload: {
           currentTileId: hero.tile.id,
           targetTileId: tileId,
           type: 'IDLE',
-          jobName: jobName['walk-map'],
           tile,
           hero: {
             id: hero.id,
@@ -1269,12 +1263,13 @@ export const heroRouter = new Hono<Context>()
             locationId: hero.locationId,
           } as Hero,
         },
-        {
-          delay,
-          jobId,
-          removeOnComplete: true,
-        },
-      );
+      };
+      await actionQueue.remove(jobId);
+      await actionQueue.add(jobName['walk-map'], jobData, {
+        delay,
+        jobId,
+        removeOnComplete: true,
+      });
 
       return c.json<SuccessResponse>({
         message: 'walking start',

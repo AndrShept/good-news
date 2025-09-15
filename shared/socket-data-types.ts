@@ -1,5 +1,6 @@
 import type { GameMessageType, IGameMessage } from '../frontend/src/store/useGameMessages';
-import type { Hero, Tile, Town, WalkMapJobData, WalkTownJobData } from './types';
+import type { WalkMapJob, WalkTownJob } from './job-types';
+import type { Hero, Tile, Town } from './types';
 
 export type SocketGroupResponse = {
   message: string;
@@ -9,14 +10,13 @@ export type SocketGroupResponse = {
   updateType: 'leave' | 'kick' | 'remove' | 'new-member';
 };
 
-
 export type MapUpdateEvent =
   | {
       type: 'HERO_ENTER_TOWN';
       payload: {
         heroId: string;
         townId: string;
-        town: Town
+        town: Town;
         tileId: string;
         hero: Hero;
       };
@@ -27,7 +27,7 @@ export type MapUpdateEvent =
     }
   | {
       type: 'WALK_MAP';
-      payload: WalkMapJobData;
+      payload: WalkMapJob['payload'];
     };
 
 export type TownUpdateEvent =
@@ -46,5 +46,5 @@ export type TownUpdateEvent =
     }
   | {
       type: 'WALK_TOWN';
-      payload: WalkTownJobData;
+      payload: WalkTownJob['payload'];
     };

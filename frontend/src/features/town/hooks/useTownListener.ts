@@ -44,7 +44,7 @@ export const useTownListener = () => {
               tileId: data.payload.tileId,
             });
           }
-
+            //filter heroes arr
           break;
         case 'WALK_TOWN':
           heroChange({
@@ -60,6 +60,7 @@ export const useTownListener = () => {
             text: `You have entered the ${building[data.payload.buildingName]}.`,
           });
           break;
+  
       }
     };
     socket.on(socketEvents.townUpdate(), listener);

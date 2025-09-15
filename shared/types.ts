@@ -140,11 +140,6 @@ export type PaginatedResponse<T> = {
   data: T;
 } & Omit<SuccessResponse, 'data'>;
 
-export const jobName = {
-  'walk-town': 'WALK:TOWN',
-  'walk-map': 'WALK:MAP',
-} as const;
-
 export type GetPostsData = InferResponseType<typeof client.post.$get>;
 
 export type EquipmentSlotType = (typeof slotEnum.enumValues)[number];
@@ -154,7 +149,6 @@ export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
 export type LocationType = (typeof locationTypeEnum.enumValues)[number];
 export type ActionType = (typeof actionTypeEnum.enumValues)[number];
-export type JobNameType = (typeof jobName)[keyof typeof jobName];
 export type TileType = (typeof tileTypeEnum.enumValues)[number];
 export type MapNameType = (typeof mapNameTypeEnum.enumValues)[number];
 export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
@@ -180,12 +174,13 @@ export type Building = InferSelectModel<typeof buildingTable>;
 
 export type Map = typeof mapTable.$inferSelect & {
   tiles?: Tile[];
+  tilesGrid?: TilesGrid;
 };
 export type Tile = typeof tileTable.$inferSelect & {
   town?: Town;
   heroes?: Hero[];
 };
-
+export type TilesGrid = (Tile | null)[][];
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;
 export type Equipment = typeof equipmentTable.$inferSelect & {
   gameItem?: GameItem;
@@ -212,7 +207,7 @@ export type Buff = typeof buffTable.$inferSelect & {
 //API RESPONSE
 export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>;
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];
-export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>
+export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
 
 export const statsSchema = createSelectSchema(modifierTable, {
   strength: z.number({ coerce: true }),
@@ -247,23 +242,3 @@ export const createHeroSchema = createInsertSchema(heroTable, {
   .extend({
     modifier: z.string().transform((val) => JSON.parse(val) as HeroStats),
   });
-  
-
-export type ActionJobData = WalkTownJobData | WalkMapJobData;
-
-export type WalkTownJobData = {
-  actionId: string;
-  locationId: string;
-  heroId: string;
-  type: 'IDLE';
-  buildingName: buildingNameType;
-  jobName: JobNameType;
-};
-export type WalkMapJobData = {
-  type: 'IDLE';
-  jobName: JobNameType;
-  targetTileId: string;
-  currentTileId: string;
-  hero: Hero;
-  tile: Tile;
-};

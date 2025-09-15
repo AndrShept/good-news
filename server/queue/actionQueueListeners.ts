@@ -1,6 +1,6 @@
+import type { ActionJobEvent } from '@/shared/job-types';
 import type { MapUpdateEvent, TownUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import type { JobNameType, WalkMapJobData, WalkTownJobData } from '@/shared/types';
 
 import { io } from '..';
 import { queueEvents } from './actionQueue';
@@ -11,26 +11,34 @@ export const actionQueueListeners = () => {
       console.error('returnvalue , not found');
       return;
     }
-    const value = returnvalue as unknown as { jobName: JobNameType };
-    if (value.jobName === 'WALK:TOWN') {
-      const jobData = returnvalue as unknown as WalkTownJobData;
-      const socketData: TownUpdateEvent = {
-        payload: jobData,
-        type: 'WALK_TOWN',
-      };
-      io.to(jobData.heroId).emit(socketEvents.townUpdate(), socketData);
-    }
-    if (value.jobName === 'WALK:MAP') {
-      const jobData = returnvalue as unknown as WalkMapJobData;
-      const socketData: MapUpdateEvent = {
-        payload: jobData,
-        type: 'WALK_MAP',
-      };
-      io.to(jobData.tile.mapId).emit(socketEvents.mapUpdate(), socketData);
+    const jobData = returnvalue as unknown as ActionJobEvent;
+
+    switch (jobData.jobName) {
+      case 'WALK_TOWN': {
+        const socketData: TownUpdateEvent = {
+          payload: jobData.payload,
+          type: 'WALK_TOWN',
+        };
+        io.to(jobData.payload.heroId).emit(socketEvents.townUpdate(), socketData);
+        break;
+      }
+      case 'WALK_MAP': {
+        const socketData: MapUpdateEvent = {
+          payload: jobData.payload,
+          type: 'WALK_MAP',
+        };
+        io.to(jobData.payload.tile.mapId).emit(socketEvents.mapUpdate(), socketData);
+        break;
+      }
     }
   });
 
   queueEvents.on('failed', ({ jobId, failedReason }: { jobId: string; failedReason: string }) => {
     console.error('actionQueueListeners queueEvents ERROR ', failedReason);
+  });
+
+  queueEvents.on('progress', ({ jobId, data }) => {
+    console.log('data', data);
+    console.log('jobId', jobId);
   });
 };
