@@ -1,3 +1,4 @@
+import { TPosition } from '@/shared/socket-data-types';
 import { Hero, Map, MapNameType, Tile } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -41,49 +42,49 @@ export const useChangeMap = (mapId: string) => {
     );
   };
 
-  const filterHeroes = ({ tileId, heroId }: { tileId: string; heroId: string }) => {
+  const filterHeroes = ({ pos, heroId }: { pos: TPosition; heroId: string }) => {
     queryClient.setQueriesData<Map>(
       {
         queryKey: getMapOptions(mapId).queryKey,
       },
       (oldData) => {
-        if (!oldData || !oldData.tiles) return;
+        if (!oldData || !oldData.tilesGrid) return;
+
+        const { x, y } = pos;
+        const oldTile = oldData.tilesGrid[y][x];
+        if (!oldTile) return;
+        const newTile = { ...oldTile, heroes: oldTile.heroes?.filter((h) => h.id !== heroId) };
+        const newGrid = [...oldData.tilesGrid];
+        newGrid[y] = [...newGrid[y]];
+        newGrid[y][x] = newTile;
         return {
           ...oldData,
-          tiles: oldData.tiles.map((tile) =>
-            tile.id === tileId
-              ? {
-                  ...tile,
-
-                  heroes: tile?.heroes?.filter((h) => h.id !== heroId) ?? [],
-                }
-              : tile,
-          ),
+          tilesGrid: newGrid,
         };
       },
     );
   };
-  const addHeroes = ({ tileId, hero }: { tileId: string; hero: Hero }) => {
-    queryClient.setQueriesData<Map>(
-      {
-        queryKey: getMapOptions(mapId).queryKey,
-      },
-      (oldData) => {
-        if (!oldData || !oldData.tiles) return;
-        return {
-          ...oldData,
-          tiles: oldData.tiles.map((tile) =>
-            tile.id === tileId
-              ? {
-                  ...tile,
+  const addHeroes = ({ pos, hero }: { pos: TPosition; hero: Hero }) => {
+    queryClient.setQueriesData<Map>({ queryKey: getMapOptions(mapId).queryKey }, (oldData) => {
+      if (!oldData || !oldData.tilesGrid) return;
 
-                  heroes: [...(tile?.heroes ?? []), hero],
-                }
-              : tile,
-          ),
-        };
-      },
-    );
+      const { x, y } = pos;
+
+      const oldTile = oldData.tilesGrid[y][x];
+      if (!oldTile) return;
+      const newTile = {
+        ...oldTile,
+        heroes: [...(oldTile.heroes ?? []), hero],
+      };
+      const newTilesGrid = [...oldData.tilesGrid];
+      newTilesGrid[y] = [...newTilesGrid[y]];
+      newTilesGrid[y][x] = newTile;
+
+      return {
+        ...oldData,
+        tilesGrid: newTilesGrid,
+      };
+    });
   };
 
   return {

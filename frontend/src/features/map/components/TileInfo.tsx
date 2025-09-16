@@ -1,3 +1,4 @@
+import { HeroAvatar } from '@/components/HeroAvatar';
 import { memo } from 'react';
 
 import { useMap } from '../hooks/useMap';
@@ -20,6 +21,12 @@ export const TileInfo = memo(({ mapId, tileId, posX, posY }: Props) => {
 
   return (
     <section className="flex flex-col items-center gap-2 p-2">
+      {tile?.heroes.map((item) => (
+        <div>
+          <HeroAvatar src={item.avatarImage} />
+          <p>{item.name}</p>
+        </div>
+      ))}
       {isTIle && (
         <div className="w-full max-w-[300px]">
           <TileImg image={`/sprites/map/solmer-image/${tile.image.toString().padStart(3, '0')}.png`} />

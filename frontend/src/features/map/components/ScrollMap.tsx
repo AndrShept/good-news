@@ -1,30 +1,34 @@
 import { Button } from '@/components/ui/button';
 import { Virtualizer } from '@tanstack/react-virtual';
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 
 interface Props {
   colVirtualizer: Virtualizer<HTMLDivElement, Element>;
   rowVirtualizer: Virtualizer<HTMLDivElement, Element>;
   posX: number;
   posY: number;
+  parentRef: React.RefObject<HTMLDivElement | null>;
+  tileHeight: number;
+  tileWidth: number;
 }
 
-export const ScrollMap = ({ colVirtualizer, rowVirtualizer, posX, posY }: Props) => {
+export const ScrollMap = ({ colVirtualizer, rowVirtualizer, posX, posY, parentRef, tileHeight, tileWidth }: Props) => {
   const scrollToHero = (heroX: number, heroY: number) => {
     rowVirtualizer.scrollToIndex(heroY, {
       align: 'center',
-      behavior: 'smooth',
+      behavior: 'auto',
     });
 
     colVirtualizer.scrollToIndex(heroX, {
       align: 'center',
-      behavior: 'smooth',
+      behavior: 'auto',
     });
   };
 
   useEffect(() => {
     scrollToHero(posX, posY);
   }, [posX, posY]);
+
   return (
     <div className="mx-auto">
       <Button onClick={() => scrollToHero(posX, posY)}>To Hero</Button>

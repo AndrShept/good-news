@@ -19,10 +19,11 @@ export const getMap = async (id: string) => {
   }
 };
 
-export const getMapOptions = (mapId: string) =>
+export const getMapOptions = (mapId: string, townId?: string) =>
   queryOptions({
     queryKey: ['map', mapId],
     queryFn: () => getMap(mapId),
     enabled: !!mapId,
-    staleTime: Infinity,
+    staleTime: townId ? Infinity : 0 ,
+    refetchOnWindowFocus: false
   });

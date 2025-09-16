@@ -1,3 +1,4 @@
+import type { TPosition } from './socket-data-types';
 import type { Hero, Tile, buildingNameType } from './types';
 
 export const jobName = {
@@ -23,6 +24,8 @@ export type WalkMapJob = {
   jobName: 'WALK_MAP';
   payload: {
     type: 'IDLE';
+    targetTilePos: TPosition;
+    currentTilePos: TPosition;
     targetTileId: string;
     currentTileId: string;
     hero: Hero;

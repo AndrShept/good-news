@@ -46,10 +46,11 @@ export const useMapListener = () => {
               tileId: null,
             });
           }
-          filterHeroes({ heroId: data.payload.heroId, tileId: data.payload.tileId });
+          filterHeroes({ heroId: data.payload.heroId, pos: data.payload.pos });
           break;
         case 'HERO_LEAVE_TOWN':
-          addHeroes({ hero: data.payload.hero, tileId: data.payload.tileId });
+          addHeroes({ hero: data.payload.hero, pos: data.payload.pos });
+          console.log('TYT');
           break;
 
         case 'WALK_MAP':
@@ -66,8 +67,8 @@ export const useMapListener = () => {
               text: `You have entered tile.`,
             });
           }
-          filterHeroes({ tileId: data.payload.currentTileId, heroId: data.payload.hero.id });
-          addHeroes({ tileId: data.payload.targetTileId, hero: data.payload.hero });
+          filterHeroes({ pos: { ...data.payload.currentTilePos }, heroId: data.payload.hero.id });
+          addHeroes({ pos: { ...data.payload.targetTilePos }, hero: data.payload.hero });
           break;
       }
     };

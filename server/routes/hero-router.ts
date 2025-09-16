@@ -1249,6 +1249,8 @@ export const heroRouter = new Hono<Context>()
       const jobData: WalkMapJob = {
         jobName: 'WALK_MAP',
         payload: {
+          currentTilePos: { x: hero.tile.x, y: hero.tile.y },
+          targetTilePos: { x: tile.x, y: tile.y },
           currentTileId: hero.tile.id,
           targetTileId: tileId,
           type: 'IDLE',
@@ -1353,6 +1355,10 @@ export const heroRouter = new Hono<Context>()
           town: tile.town,
           heroId: hero.id,
           tileId: tile.id,
+          pos: {
+            x: tile.x,
+            y: tile.y,
+          },
           hero: hero as Hero,
         },
       };
@@ -1437,6 +1443,11 @@ export const heroRouter = new Hono<Context>()
           heroId: hero.id,
           mapId: tile.mapId,
           tileId: tile.id,
+          pos: {
+            x: tile.x,
+            y: tile.y,
+          },
+
           hero: {
             id: hero.id,
             name: hero.name,

@@ -9,7 +9,7 @@ type TUseMap<T = ApiMapResponse> = {
 };
 
 export const useMap = <T = ApiMapResponse | undefined>({ mapId, select }: TUseMap<T>): T | undefined => {
-  const { data: map } = useQuery({ ...getMapOptions(mapId), select });
+  const { data: map } = useQuery({ ...getMapOptions(mapId), staleTime: Infinity, select });
 
   return map;
 };
