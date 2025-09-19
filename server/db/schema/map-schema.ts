@@ -13,6 +13,7 @@ export const mapTable = pgTable('map', {
   height: integer().notNull(),
   tileHeight: integer().notNull(),
   tileWidth: integer().notNull(),
+  image: text().notNull(),
   name: mapNameTypeEnum()
     .$defaultFn(() => 'SOLMERE')
     .notNull(),

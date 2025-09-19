@@ -204,6 +204,11 @@ export type Buff = typeof buffTable.$inferSelect & {
   modifier?: Modifier;
 };
 
+export type IPosition = {
+  x: number;
+  y: number;
+};
+
 //API RESPONSE
 export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>;
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];

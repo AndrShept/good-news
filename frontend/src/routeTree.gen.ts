@@ -21,6 +21,7 @@ import { Route as homeIndexImport } from './routes/(home)/index'
 import { Route as AuthSignUpImport } from './routes/auth/sign-up'
 import { Route as AuthSignInImport } from './routes/auth/sign-in'
 import { Route as AuthConfirmEmailImport } from './routes/auth/confirm-email'
+import { Route as homeTestRouteImport } from './routes/(home)/test/route'
 import { Route as GameShopIndexImport } from './routes/game/shop/index'
 import { Route as homePostIndexImport } from './routes/(home)/post/index'
 import { Route as homePostPostIdImport } from './routes/(home)/post/$postId'
@@ -86,6 +87,12 @@ const AuthConfirmEmailRoute = AuthConfirmEmailImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any)
 
+const homeTestRouteRoute = homeTestRouteImport.update({
+  id: '/test',
+  path: '/test',
+  getParentRoute: () => homeRouteRoute,
+} as any)
+
 const GameShopIndexRoute = GameShopIndexImport.update({
   id: '/shop/',
   path: '/shop/',
@@ -128,6 +135,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/game'
       preLoaderRoute: typeof GameRouteImport
       parentRoute: typeof rootRoute
+    }
+    '/(home)/test': {
+      id: '/(home)/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof homeTestRouteImport
+      parentRoute: typeof homeRouteImport
     }
     '/auth/confirm-email': {
       id: '/auth/confirm-email'
@@ -205,12 +219,14 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface homeRouteRouteChildren {
+  homeTestRouteRoute: typeof homeTestRouteRoute
   homeIndexRoute: typeof homeIndexRoute
   homePostPostIdRoute: typeof homePostPostIdRoute
   homePostIndexRoute: typeof homePostIndexRoute
 }
 
 const homeRouteRouteChildren: homeRouteRouteChildren = {
+  homeTestRouteRoute: homeTestRouteRoute,
   homeIndexRoute: homeIndexRoute,
   homePostPostIdRoute: homePostPostIdRoute,
   homePostIndexRoute: homePostIndexRoute,
@@ -256,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/': typeof homeIndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/game': typeof GameRouteRouteWithChildren
+  '/test': typeof homeTestRouteRoute
   '/auth/confirm-email': typeof AuthConfirmEmailRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -268,6 +285,7 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
+  '/test': typeof homeTestRouteRoute
   '/auth/confirm-email': typeof AuthConfirmEmailRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -285,6 +303,7 @@ export interface FileRoutesById {
   '/(home)': typeof homeRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
   '/game': typeof GameRouteRouteWithChildren
+  '/(home)/test': typeof homeTestRouteRoute
   '/auth/confirm-email': typeof AuthConfirmEmailRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -303,6 +322,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/game'
+    | '/test'
     | '/auth/confirm-email'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -314,6 +334,7 @@ export interface FileRouteTypes {
     | '/game/shop'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/test'
     | '/auth/confirm-email'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -329,6 +350,7 @@ export interface FileRouteTypes {
     | '/(home)'
     | '/auth'
     | '/game'
+    | '/(home)/test'
     | '/auth/confirm-email'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -375,6 +397,7 @@ export const routeTree = rootRoute
     "/(home)": {
       "filePath": "(home)/route.tsx",
       "children": [
+        "/(home)/test",
         "/(home)/",
         "/(home)/post/$postId",
         "/(home)/post/"
@@ -395,6 +418,10 @@ export const routeTree = rootRoute
         "/game/",
         "/game/shop/"
       ]
+    },
+    "/(home)/test": {
+      "filePath": "(home)/test/route.tsx",
+      "parent": "/(home)"
     },
     "/auth/confirm-email": {
       "filePath": "auth/confirm-email.tsx",

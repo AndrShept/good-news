@@ -29,6 +29,13 @@
       "when": 1755855953621,
       "tag": "0003_empty_vanisher",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1758284055512,
+      "tag": "0004_zippy_wildside",
+      "breakpoints": true
     }
   ]
 }

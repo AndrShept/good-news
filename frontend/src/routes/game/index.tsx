@@ -1,7 +1,7 @@
 import { Spinner } from '@/components/Spinner';
 import { CharacterPaperdoll } from '@/features/hero/components/CharacterPaperdoll';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { GameMap } from '@/features/map/components/GameMap';
+import { NewGameMap } from '@/features/map/components/NewGameMap';
 import { Town } from '@/features/town/components/Town';
 import { MagicShop } from '@/features/town/components/buildings/MagicShop';
 import { Temple } from '@/features/town/components/buildings/Temple';
@@ -26,14 +26,14 @@ function RouteComponent() {
   const isTown = !!location?.townId && !isCharacter && !location.currentBuilding;
   const isMagicShop = !!location?.townId && !isCharacter && location.currentBuilding === 'MAGIC-SHOP';
   const isTemple = !!location?.townId && !isCharacter && location.currentBuilding === 'TEMPLE';
-  const isMap = !isCharacter && !!location?.mapId 
+  const isMap = !isCharacter && !!location?.mapId;
   return (
     <>
       {isCharacter && <CharacterPaperdoll />}
       {isTown && <Town />}
       {isMagicShop && <MagicShop />}
       {isTemple && <Temple />}
-      {isMap && <GameMap />}
+      {isMap && <NewGameMap />}
     </>
   );
 }

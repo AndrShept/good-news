@@ -1,11 +1,8 @@
 import type { GameMessageType, IGameMessage } from '../frontend/src/store/useGameMessages';
 import type { WalkMapJob, WalkTownJob } from './job-types';
-import type { Hero, Tile, Town } from './types';
+import type { Hero, IPosition, Tile, Town } from './types';
 
-export type TPosition = {
-  x: number;
-  y: number;
-};
+
 
 export type SocketGroupResponse = {
   message: string;
@@ -24,12 +21,12 @@ export type MapUpdateEvent =
         town: Town;
         tileId: string;
         hero: Hero;
-        pos: TPosition;
+        pos: IPosition;
       };
     }
   | {
       type: 'HERO_LEAVE_TOWN';
-      payload: { heroId: string; mapId: string; tileId: string; hero: Hero; pos: TPosition };
+      payload: { heroId: string; mapId: string; tileId: string; hero: Hero; pos: IPosition };
     }
   | {
       type: 'WALK_MAP';

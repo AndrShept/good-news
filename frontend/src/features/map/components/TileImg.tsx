@@ -5,17 +5,20 @@ interface Props extends ComponentProps<'img'> {
   image: string;
   isPixelate?: boolean;
 }
-
 export const TileImg = ({ image, isPixelate = true, className, ...props }: Props) => {
   return (
-   
-      <img
-        draggable={false}
-        style={isPixelate ? { imageRendering: 'pixelated' } : undefined}
-        className={cn('size-full', className)}
-        src={image}
-        alt="tile-image"
-      />
-   
+    <img
+      draggable={false}
+      style={{
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        MozUserSelect: 'none',
+        msUserSelect: 'none',
+        imageRendering: isPixelate ? 'pixelated' : 'auto',
+      }}
+      className={cn('size-full', className)}
+      src={image}
+      alt="tile-image"
+    />
   );
 };

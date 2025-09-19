@@ -21,7 +21,7 @@ export const TileInfo = memo(({ mapId, tileId, posX, posY }: Props) => {
 
   return (
     <section className="flex flex-col items-center gap-2 p-2">
-      {tile?.heroes.map((item) => (
+      {tile?.heroes?.map((item) => (
         <div>
           <HeroAvatar src={item.avatarImage} />
           <p>{item.name}</p>

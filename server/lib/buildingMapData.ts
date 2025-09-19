@@ -6,9 +6,17 @@ import { db } from '../db/db';
 import { mapTable, tileTable, townTable } from '../db/schema';
 import { generateRandomUuid } from './utils';
 
+interface MapLoadInfo {
+  jsonUrl: TileMap;
+  imageUrl: string;
+}
+
 export const getMapJson = (mapName: MapNameType) => {
-  const map: Record<MapNameType, TileMap> = {
-    SOLMERE: require('../json/solmer.json'),
+  const map: Record<MapNameType, MapLoadInfo> = {
+    SOLMERE: {
+      jsonUrl: require('../json/solmer.json'),
+      imageUrl: '/sprites/map/solmer.png',
+    },
   };
   return map[mapName];
 };
@@ -22,6 +30,7 @@ const zIndex: Record<TileType, number> = {
   GROUND: 0,
   OBJECT: 1,
   DECOR: 5,
+  WATER: 5,
 };
 
 export const getLayerObject = ({ layer, mapId }: Params): Tile[] => {
@@ -57,9 +66,10 @@ export const getLayerObject = ({ layer, mapId }: Params): Tile[] => {
 
 export const buildingMapData = async (mapName: MapNameType) => {
   const mapJson = getMapJson(mapName);
-  const findObjects = mapJson.layers.find((item) => item.name === 'OBJECT');
-  const findDecor = mapJson.layers.find((item) => item.name === 'DECOR');
-  const findGround = mapJson.layers.find((item) => item.name === 'GROUND');
+  const findObjects = mapJson.jsonUrl.layers.find((item) => item.name === 'OBJECT');
+  const findWaters = mapJson.jsonUrl.layers.find((item) => item.name === 'WATER');
+  const findDecor = mapJson.jsonUrl.layers.find((item) => item.name === 'DECOR');
+  const findGround = mapJson.jsonUrl.layers.find((item) => item.name === 'GROUND');
 
   console.time('create-map');
 
@@ -69,25 +79,27 @@ export const buildingMapData = async (mapName: MapNameType) => {
       .values({
         pvpMode: 'PVE',
         name: mapName,
-        height: mapJson.height * mapJson.tileheight,
-        width: mapJson.width * mapJson.tilewidth,
-        tileHeight: mapJson.tileheight,
-        tileWidth: mapJson.tilewidth,
+        image: mapJson.imageUrl,
+        height: mapJson.jsonUrl.height,
+        width: mapJson.jsonUrl.width,
+        tileHeight: mapJson.jsonUrl.tileheight,
+        tileWidth: mapJson.jsonUrl.tilewidth,
       })
       .returning();
 
     const objectsTiles = findObjects && getLayerObject({ layer: findObjects, mapId: newMap.id });
     const decorTiles = findDecor && getLayerObject({ layer: findDecor, mapId: newMap.id });
     const groundTiles = findGround && getLayerObject({ layer: findGround, mapId: newMap.id });
+    const waterTiles = findWaters && getLayerObject({ layer: findWaters, mapId: newMap.id });
 
-    const tiles = [...(groundTiles ?? []), ...(objectsTiles ?? []), ...(decorTiles ?? [])];
+    const tiles = [...(groundTiles ?? []), ...(objectsTiles ?? []), ...(decorTiles ?? []), ...(waterTiles ?? [])];
 
-    const chunkSize = 500;
-    for (let i = 0; i < tiles.length; i += chunkSize) {
-      const chunk = tiles.slice(i, i + chunkSize);
-      await tx.insert(tileTable).values(chunk);
-    }
-
+    // const chunkSize = 500;
+    // for (let i = 0; i < tiles.length; i += chunkSize) {
+    //   const chunk = tiles.slice(i, i + chunkSize);
+    //   await tx.insert(tileTable).values(chunk);
+    // }
+    await tx.insert(tileTable).values(tiles);
     const town = await tx.query.townTable.findFirst({
       where: eq(townTable.name, mapName),
     });
@@ -110,4 +122,3 @@ export const buildingMapData = async (mapName: MapNameType) => {
   console.timeEnd('create-map');
   return map;
 };
-

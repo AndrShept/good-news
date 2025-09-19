@@ -5,7 +5,7 @@ import { heroTable } from './hero-schema';
 import { mapTable } from './map-schema';
 import { townTable } from './town-schema';
 
-export const tileTypeEnum = pgEnum('tile_type_enum', ['OBJECT', 'DECOR', 'GROUND']);
+export const tileTypeEnum = pgEnum('tile_type_enum', ['OBJECT', 'DECOR', 'GROUND' , 'WATER']);
 
 export const tileTable = pgTable('tile', {
   id: uuid().primaryKey().defaultRandom(),
