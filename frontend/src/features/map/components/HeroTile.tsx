@@ -3,7 +3,7 @@ import React from 'react';
 import { TileImg } from './TileImg';
 
 interface Props {
-  characterImage: string;
+  characterImage: string ;
 }
 
 export const HeroTile = ({ characterImage }: Props) => {

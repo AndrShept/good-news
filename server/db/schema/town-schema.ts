@@ -19,9 +19,10 @@ export const townTable = pgTable('town', {
     .notNull(),
 });
 
-export const townTableRelations = relations(townTable, ({ many }) => ({
+export const townTableRelations = relations(townTable, ({ many, one }) => ({
   buildings: many(townsToBuildingsTable),
-  tiles: many(tileTable),
+  tile: one(tileTable),
+  locations : many(locationTable)
 }));
 
 export const townsToBuildingsTable = pgTable(

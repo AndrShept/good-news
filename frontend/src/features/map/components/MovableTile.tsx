@@ -12,7 +12,7 @@ export const MovableTile = ({ tileId }: Props) => {
   };
   return (
     <>
-      <button disabled={isPending} onClick={onMove} className="z-4 absolute left-0 top-0 size-full bg-black/50 hover:cursor-pointer" />
+      <button disabled={isPending} onClick={onMove} className="z-4 absolute left-0 top-0 size-full bg-black/50 hover:cursor-pointer hover:border" />
     </>
   );
 };

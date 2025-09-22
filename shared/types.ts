@@ -13,7 +13,6 @@ import {
   heroTable,
   inventoryItemTable,
   locationTable,
-  locationTypeEnum,
   mapNameTypeEnum,
   mapTable,
   modifierTable,
@@ -147,7 +146,6 @@ export type GameItemType = (typeof gameItemEnum.enumValues)[number];
 export type RarityType = (typeof rarityEnum.enumValues)[number];
 export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
-export type LocationType = (typeof locationTypeEnum.enumValues)[number];
 export type ActionType = (typeof actionTypeEnum.enumValues)[number];
 export type TileType = (typeof tileTypeEnum.enumValues)[number];
 export type MapNameType = (typeof mapNameTypeEnum.enumValues)[number];
@@ -163,6 +161,8 @@ export type Action = InferSelectModel<typeof actionTable> & { timeRemaining: num
 export type Location = InferSelectModel<typeof locationTable> & {
   map?: Map;
   town?: Town;
+  tile?: Tile;
+  hero?: Hero
 };
 export type TownToBuildings = InferSelectModel<typeof townsToBuildingsTable> & {
   building: Building;
@@ -177,8 +177,9 @@ export type Map = typeof mapTable.$inferSelect & {
   tilesGrid?: TilesGrid;
 };
 export type Tile = typeof tileTable.$inferSelect & {
+  map?: Map;
   town?: Town;
-  heroes?: Hero[];
+  location?: Location;
 };
 export type TilesGrid = (Tile | null)[][];
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;
@@ -194,7 +195,6 @@ export type GameItem = InferSelectModel<typeof gameItemTable> & {
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier?: Modifier;
   group?: Group;
-  tile?: Tile;
   action?: Action;
   location?: Location;
   state?: State;

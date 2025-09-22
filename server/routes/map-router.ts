@@ -8,9 +8,9 @@ import { z } from 'zod';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { heroTable, mapNameTypeEnum, mapTable, tileTable } from '../db/schema';
+import { buildingMapData } from '../lib/buildingMapData';
 import { buildGrid } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
-import { buildingMapData } from '../lib/buildingMapData';
 
 export const mapRouter = new Hono<Context>().get(
   '/:id',
@@ -30,14 +30,16 @@ export const mapRouter = new Hono<Context>().get(
         tiles: {
           with: {
             town: true,
-            heroes: {
-              where: eq(heroTable.isOnline, true),
+            location: {
+              with: {
+                hero: true,
+              },
             },
           },
         },
       },
     });
-    console.log('GET MAP')
+    console.log('GET MAP');
 
     const tilesGrid = buildGrid(map as Map);
     return c.json<SuccessResponse<Map>>({

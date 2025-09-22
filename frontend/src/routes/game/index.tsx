@@ -26,7 +26,8 @@ function RouteComponent() {
   const isTown = !!location?.townId && !isCharacter && !location.currentBuilding;
   const isMagicShop = !!location?.townId && !isCharacter && location.currentBuilding === 'MAGIC-SHOP';
   const isTemple = !!location?.townId && !isCharacter && location.currentBuilding === 'TEMPLE';
-  const isMap = !isCharacter && !!location?.mapId;
+  const isMap = !isCharacter && !!location?.tile?.mapId
+
   return (
     <>
       {isCharacter && <CharacterPaperdoll />}

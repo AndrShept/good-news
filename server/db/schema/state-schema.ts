@@ -8,6 +8,9 @@ export const stateTypeEnum = pgEnum('state_type_enum', ['CHARACTER', 'SKILLS', '
 export const stateTable = pgTable('state', {
   id: uuid().primaryKey().defaultRandom(),
   type: stateTypeEnum().notNull(),
+  heroId: uuid().references(() => heroTable.id, {
+    onDelete: 'cascade',
+  }).notNull(),
 
   createdAt: timestamp({
     mode: 'string',
@@ -16,6 +19,9 @@ export const stateTable = pgTable('state', {
     .notNull(),
 });
 
-export const stateTableRelations = relations(stateTable, ({ many }) => ({
-  heroes: many(heroTable),
+export const stateTableRelations = relations(stateTable, ({ one }) => ({
+  hero: one(heroTable, {
+    fields: [stateTable.heroId],
+    references: [heroTable.id],
+  }),
 }));

@@ -6,6 +6,7 @@ interface Props extends ComponentProps<'img'> {
   isPixelate?: boolean;
 }
 export const TileImg = ({ image, isPixelate = true, className, ...props }: Props) => {
+  console.log('@@@@' , image)
   return (
     <img
       draggable={false}

@@ -1,9 +1,9 @@
 import { relations } from 'drizzle-orm';
 import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
+import { buffTable } from './buff-schema';
 import { gameItemTable } from './game-item-schema';
 import { heroTable } from './hero-schema';
-import { buffTable } from './buff-schema';
 
 export const modifierTable = pgTable('modifier', {
   id: uuid().primaryKey().notNull(),
@@ -36,7 +36,11 @@ export const modifierTable = pgTable('modifier', {
   meleeDamage: integer().default(0).notNull(),
   meleeDamageCritPower: integer().default(0).notNull(),
   meleeDamageCritChance: integer().default(0).notNull(),
-
+  heroId: uuid()
+    .references(() => heroTable.id, {
+      onDelete: 'cascade',
+    })
+    .notNull(),
   createdAt: timestamp('created_at', {
     withTimezone: true,
     mode: 'string',
@@ -48,8 +52,12 @@ export const modifierTable = pgTable('modifier', {
   }),
 });
 
-export const modifierRelations = relations(modifierTable, ({ many }) => ({
+export const modifierRelations = relations(modifierTable, ({ many, one }) => ({
+  hero: one(heroTable, {
+    fields: [modifierTable.heroId],
+    references: [heroTable.id],
+  }),
   gameItems: many(gameItemTable),
-  heroes: many(heroTable),
+
   buffs: many(buffTable),
 }));

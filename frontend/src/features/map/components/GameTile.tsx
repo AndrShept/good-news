@@ -11,14 +11,14 @@ interface Props extends Tile {
   isMovable: boolean;
 }
 export const GameTile = memo(function GameTile(props: Props) {
-  const { id, image, heroes, town, isMovable } = props;
+  const { id, image, town, townId, isMovable, type, location } = props;
   console.log('render tile');
   return (
     <div className="size-full">
       <TileImg image={`/sprites/map/solmer-image/${image.toString().padStart(3, '0')}.png`} />
       {isMovable && <MovableTile tileId={id} />}
       {town && <TownTile image={town.image} />}
-      {!!heroes && heroes.map((hero) => <HeroTile key={hero.id} characterImage={hero.characterImage} />)}
+      {type === 'HERO' && <HeroTile characterImage={location!.hero!.characterImage!} />}
     </div>
   );
 });

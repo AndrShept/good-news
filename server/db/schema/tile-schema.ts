@@ -2,10 +2,11 @@ import { relations } from 'drizzle-orm';
 import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { heroTable } from './hero-schema';
+import { locationTable } from './location-schema';
 import { mapTable } from './map-schema';
 import { townTable } from './town-schema';
 
-export const tileTypeEnum = pgEnum('tile_type_enum', ['OBJECT', 'DECOR', 'GROUND' , 'WATER']);
+export const tileTypeEnum = pgEnum('tile_type_enum', ['OBJECT', 'WATER', 'HERO', 'TOWN']);
 
 export const tileTable = pgTable('tile', {
   id: uuid().primaryKey().defaultRandom(),
@@ -14,14 +15,14 @@ export const tileTable = pgTable('tile', {
   x: integer().notNull(),
   y: integer().notNull(),
   z: integer().notNull(),
-  image: integer().notNull(),
+  image: text().notNull(),
   mapId: uuid()
     .references(() => mapTable.id, {
       onDelete: 'cascade',
     })
     .notNull(),
   townId: uuid().references(() => townTable.id, {
-    onDelete: 'set null',
+    onDelete: 'cascade',
   }),
 
   createdAt: timestamp({
@@ -31,8 +32,7 @@ export const tileTable = pgTable('tile', {
     .notNull(),
 });
 
-export const tileTableRelations = relations(tileTable, ({ one, many }) => ({
-  heroes: many(heroTable),
+export const tileTableRelations = relations(tileTable, ({ one }) => ({
   map: one(mapTable, {
     fields: [tileTable.mapId],
     references: [mapTable.id],
@@ -41,5 +41,5 @@ export const tileTableRelations = relations(tileTable, ({ one, many }) => ({
     fields: [tileTable.townId],
     references: [townTable.id],
   }),
-
+  location: one(locationTable),
 }));

@@ -7,13 +7,14 @@ import { useDragOnMap } from '../hooks/useDragOnMap';
 import { useScaleMap } from '../hooks/useScaleMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
 import { GameTile } from './GameTile';
+import { HeroTile } from './HeroTile';
 
 export const NewGameMap = () => {
   const hero = useHero((state) => ({
-    posX: state?.data?.tile?.x ?? 0,
-    posY: state?.data?.tile?.y ?? 0,
-    tileId: state?.data?.tileId ?? '',
-    mapId: state?.data?.location?.mapId ?? '',
+    posX: state?.data?.location?.tile?.x ?? 0,
+    posY: state?.data?.location?.tile?.y ?? 0,
+    tileId: state?.data?.location?.tileId ?? '',
+    mapId: state?.data?.location?.tile?.mapId ?? '',
     townId: state?.data?.location?.townId ?? '',
   }));
   const { data: map, isLoading, isError, error } = useQuery(getMapOptions(hero.mapId, hero.townId));
@@ -51,7 +52,7 @@ export const NewGameMap = () => {
       onClick={() => {
         if (hoverIndex !== null && !isDragging) {
           const x = hoverIndex % MAP_WIDTH;
-          const y = Math.floor(hoverIndex / MAP_WIDTH);
+          const y = Math.floor(hoverIndex / MAP_HEIGHT);
         }
       }}
     >

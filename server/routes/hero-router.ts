@@ -34,7 +34,6 @@ import {
   heroTable,
   inventoryItemTable,
   locationTable,
-  locationTypeEnum,
   modifierTable,
   slotEnum,
   stateTable,
@@ -79,7 +78,6 @@ export const heroRouter = new Hono<Context>()
         with: {
           modifier: true,
           group: true,
-          tile: true,
           action: {
             extras: {
               timeRemaining: sql<number>`EXTRACT(EPOCH FROM ${actionTable.completedAt} - NOW())::INT`.as('timeRemaining'),
@@ -88,8 +86,8 @@ export const heroRouter = new Hono<Context>()
           state: true,
           location: {
             with: {
-              map: true,
               town: true,
+              tile: true,
             },
           },
           equipments: {
@@ -137,20 +135,6 @@ export const heroRouter = new Hono<Context>()
       });
     }
     await db.transaction(async (tx) => {
-      const [newModifier] = await tx
-        .insert(modifierTable)
-        .values({
-          id: generateRandomUuid(),
-          ...heroStats,
-        })
-        .returning({ id: modifierTable.id });
-      const [newAction] = await tx
-        .insert(actionTable)
-        .values({
-          completedAt: setSqlNow(),
-          type: 'IDLE',
-        })
-        .returning({ id: actionTable.id });
       const town = await tx.query.townTable.findFirst({
         where: eq(townTable.name, 'SOLMERE'),
       });
@@ -161,9 +145,6 @@ export const heroRouter = new Hono<Context>()
       }
       const characterImage = '/sprites/new/newb-mage.webp';
 
-      const [newLocation] = await tx.insert(locationTable).values({ type: 'TOWN', townId: town.id }).returning({ id: locationTable.id });
-      const [newState] = await tx.insert(stateTable).values({ type: 'IDLE' }).returning({ id: stateTable.id });
-
       const [newHero] = await tx
         .insert(heroTable)
         .values({
@@ -172,15 +153,24 @@ export const heroRouter = new Hono<Context>()
           characterImage,
           name,
           userId,
-          actionId: newAction.id,
-          locationId: newLocation.id,
-          modifierId: newModifier.id,
-          stateId: newState.id,
           freeStatPoints,
           maxHealth: heroStats.constitution * HP_MULTIPLIER_COST,
           maxMana: heroStats.intelligence * MANA_MULTIPLIER_INT,
         })
         .returning();
+      await tx.insert(modifierTable).values({
+        id: generateRandomUuid(),
+        heroId: newHero.id,
+        ...heroStats,
+      });
+      await tx.insert(locationTable).values({ townId: town.id, heroId: newHero.id });
+      await tx.insert(actionTable).values({
+        completedAt: setSqlNow(),
+        type: 'IDLE',
+        heroId: newHero.id,
+      });
+
+      await tx.insert(stateTable).values({ type: 'IDLE', heroId: newHero.id });
       return newHero;
     });
 
@@ -200,19 +190,20 @@ export const heroRouter = new Hono<Context>()
       const userId = c.get('user')?.id as string;
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
-        with: { modifier: true },
+        with: { modifier: { columns: { id: true } } },
       });
 
       if (!hero) {
         throw new HTTPException(404, { message: 'Hero not found' });
       }
+      if (!hero.modifier?.id) {
+        throw new HTTPException(404, { message: 'modifier id  not found' });
+      }
 
       if (hero.userId !== userId) {
         throw new HTTPException(403, { message: 'Access denied' });
       }
-      if (!hero.modifierId) {
-        throw new HTTPException(404, { message: 'modifier_Id not found' });
-      }
+
       if (hero.goldCoins < RESET_STATS_COST) {
         return c.json<ErrorResponse>(
           {
@@ -240,7 +231,7 @@ export const heroRouter = new Hono<Context>()
           .set({
             ...BASE_STATS,
           })
-          .where(eq(modifierTable.id, hero.modifierId!));
+          .where(eq(modifierTable.id, hero.modifier!.id));
       });
 
       return c.json<SuccessResponse>({ message: 'Hero stats have been reset successfully.', success: true });
@@ -270,10 +261,16 @@ export const heroRouter = new Hono<Context>()
 
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
+        with: { modifier: { columns: { id: true } } },
       });
       if (!hero) {
         throw new HTTPException(404, {
           message: 'Hero not found',
+        });
+      }
+      if (!hero.modifier?.id) {
+        throw new HTTPException(404, {
+          message: 'modifier id not found',
         });
       }
       if (hero.userId !== userId) {
@@ -294,7 +291,7 @@ export const heroRouter = new Hono<Context>()
           .set({
             ...newStats,
           })
-          .where(eq(modifierTable.id, hero.modifierId ?? ''));
+          .where(eq(modifierTable.id, hero.modifier!.id));
       });
       return c.json<SuccessResponse>({ success: true, message: 'Stats have been successfully updated.' }, 200);
     },
@@ -1049,11 +1046,19 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
+        with: {
+          action: { columns: { id: true } },
+        },
       });
 
       if (!hero) {
         throw new HTTPException(404, {
           message: 'hero not found',
+        });
+      }
+      if (!hero.action?.id) {
+        throw new HTTPException(404, {
+          message: 'action id not found',
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
@@ -1065,7 +1070,7 @@ export const heroRouter = new Hono<Context>()
           completedAt: new Date().toISOString(),
           type: 'IDLE',
         })
-        .where(eq(actionTable.id, hero.actionId));
+        .where(eq(actionTable.id, hero.action.id));
 
       const jobId = hero.id;
       await actionQueue.remove(jobId);
@@ -1087,11 +1092,17 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
+        with: { location: { columns: { id: true } } },
       });
 
       if (!hero) {
         throw new HTTPException(404, {
           message: 'hero not found',
+        });
+      }
+      if (!hero.location?.id) {
+        throw new HTTPException(404, {
+          message: 'location id not found',
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
@@ -1100,7 +1111,7 @@ export const heroRouter = new Hono<Context>()
         .set({
           currentBuilding: null,
         })
-        .where(eq(locationTable.id, hero.locationId));
+        .where(eq(locationTable.id, hero.location.id));
 
       return c.json<SuccessResponse>({
         message: 'action updated',
@@ -1125,8 +1136,9 @@ export const heroRouter = new Hono<Context>()
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
         with: {
-          modifier: true,
-          location: true,
+          modifier: { columns: { dexterity: true } },
+          location: { with: { town: true }, columns: { id: true } },
+          action: { columns: { id: true } },
         },
       });
 
@@ -1135,7 +1147,22 @@ export const heroRouter = new Hono<Context>()
           message: 'hero not found',
         });
       }
-      if (!hero.location.townId) {
+      if (!hero.modifier?.dexterity) {
+        throw new HTTPException(404, {
+          message: 'modifier dexterity not found',
+        });
+      }
+      if (!hero.action?.id) {
+        throw new HTTPException(404, {
+          message: 'action id not found',
+        });
+      }
+      if (!hero.location?.id) {
+        throw new HTTPException(404, {
+          message: 'location id not found',
+        });
+      }
+      if (!hero.location?.town?.id) {
         throw new HTTPException(403, {
           message: 'Missing townId: hero is not assigned to a town',
         });
@@ -1151,12 +1178,12 @@ export const heroRouter = new Hono<Context>()
           completedAt: new Date(Date.now() + delay).toISOString(),
           type: 'WALK',
         })
-        .where(eq(actionTable.id, hero.actionId));
+        .where(eq(actionTable.id, hero.action.id));
       const jobData: WalkTownJob = {
         jobName: 'WALK_TOWN',
         payload: {
-          actionId: hero.actionId,
-          locationId: hero.locationId,
+          actionId: hero.action.id,
+          locationId: hero.location.id,
           heroId: hero.id,
           type: 'IDLE',
           buildingName,
@@ -1394,22 +1421,35 @@ export const heroRouter = new Hono<Context>()
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      if (hero.action.type !== 'IDLE') {
+      if (hero.action?.type !== 'IDLE') {
         throw new HTTPException(409, {
           message: 'Hero is currently busy with another action',
         });
       }
-      if (!hero.location.townId) {
+      if (!hero.location?.townId) {
         throw new HTTPException(403, {
           message: 'Missing townId: hero is not assigned to a town',
         });
       }
       const town = await db.query.townTable.findFirst({
         where: eq(townTable.id, hero.location.townId),
+        with: {
+          tile: true,
+        },
       });
       if (!town) {
         throw new HTTPException(404, {
           message: 'town not found',
+        });
+      }
+      if (!town.tile?.mapId) {
+        throw new HTTPException(404, {
+          message: 'town map Id not found',
+        });
+      }
+      if (!town.tile) {
+        throw new HTTPException(404, {
+          message: 'town tile  not found',
         });
       }
       const tile = await db.query.tileTable.findFirst({
@@ -1421,51 +1461,51 @@ export const heroRouter = new Hono<Context>()
         });
       }
 
-      await db.transaction(async (tx) => {
+      const newTile = await db.transaction(async (tx) => {
+        const [newTile] = await tx
+          .insert(tileTable)
+          .values({
+            image: hero.characterImage,
+            mapId: town.tile!.mapId,
+            type: 'HERO',
+            x: town.tile!.x,
+            y: town.tile!.y,
+            z: 5,
+          })
+          .returning({ id: tileTable.id });
         await tx
           .update(locationTable)
           .set({
             townId: null,
-            mapId: tile.mapId,
-            type: 'MAP',
+            tileId: newTile.id,
           })
-          .where(eq(locationTable.id, hero.locationId));
-        await tx
-          .update(heroTable)
-          .set({
-            tileId: tile.id,
-          })
-          .where(eq(heroTable.id, id));
+          .where(eq(locationTable.id, hero.location!.id));
+
+        return newTile;
       });
+
+      const heroTile = await db.query.tileTable.findFirst({
+        where: eq(tileTable.id, newTile.id),
+        with: {
+          location: true,
+        },
+      });
+      if (!heroTile) {
+        throw new HTTPException(404, {
+          message: 'hero tile not found',
+        });
+      }
+
       const socketMapData: MapUpdateEvent = {
         type: 'HERO_LEAVE_TOWN',
-        payload: {
-          heroId: hero.id,
-          mapId: tile.mapId,
-          tileId: tile.id,
-          pos: {
-            x: tile.x,
-            y: tile.y,
-          },
-
-          hero: {
-            id: hero.id,
-            name: hero.name,
-            avatarImage: hero.avatarImage,
-            characterImage: hero.characterImage,
-            level: hero.level,
-            actionId: hero.actionId,
-            locationId: hero.locationId,
-          } as Hero,
-        },
+        payload: heroTile,
       };
       const socketTownData: TownUpdateEvent = {
         type: 'HERO_LEAVE_TOWN',
         payload: {
           heroId: hero.id,
           mapId: tile.mapId,
-          tileId: tile.id,
-          tile,
+ 
         },
       };
 
@@ -1492,12 +1532,23 @@ export const heroRouter = new Hono<Context>()
         where: eq(heroTable.id, id),
         with: {
           action: true,
+          state: { columns: { id: true } },
         },
       });
 
       if (!hero) {
         throw new HTTPException(404, {
           message: 'hero not found',
+        });
+      }
+      if (!hero.action) {
+        throw new HTTPException(404, {
+          message: 'hero action not found',
+        });
+      }
+      if (!hero.state?.id) {
+        throw new HTTPException(404, {
+          message: 'state id not found',
         });
       }
 
@@ -1517,7 +1568,7 @@ export const heroRouter = new Hono<Context>()
         .set({
           type,
         })
-        .where(eq(stateTable.id, hero.stateId));
+        .where(eq(stateTable.id, hero.state.id));
 
       return c.json<SuccessResponse>({
         message: 'state changed',

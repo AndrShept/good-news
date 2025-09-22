@@ -8,7 +8,6 @@ export type OmitDeepHero = Omit<Partial<Hero>, 'location' | 'state' | 'action' |
   action?: Partial<Hero['action']>;
   group?: Partial<Hero['group']>;
   state?: Partial<Hero['state']>;
-  tile?: Partial<Hero['tile']>;
 };
 
 export const useHeroChange = () => {
@@ -27,7 +26,6 @@ export const useHeroChange = () => {
           state: { ...oldData.data.state, ...data.state },
           location: { ...oldData.data.location, ...data.location },
           group: { ...oldData.data.group, ...data.group },
-          tile: { ...oldData.data.tile, ...data.tile },
         },
       } as ApiHeroResponse;
     });

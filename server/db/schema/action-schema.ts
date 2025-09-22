@@ -10,6 +10,9 @@ export const actionTable = pgTable('action', {
   type: actionTypeEnum()
     .$defaultFn(() => 'IDLE')
     .notNull(),
+  heroId: uuid().references(() => heroTable.id, {
+    onDelete: 'cascade',
+  }).notNull(),
   startedAt: timestamp('started_at', {
     mode: 'string',
   }).defaultNow(),
@@ -18,6 +21,9 @@ export const actionTable = pgTable('action', {
   }).notNull(),
 });
 
-export const actionTableRelations = relations(actionTable, ({ one, many }) => ({
-  heroes: many(heroTable),
+export const actionTableRelations = relations(actionTable, ({ one }) => ({
+  hero: one(heroTable, {
+    fields: [actionTable.heroId],
+    references: [heroTable.id],
+  }),
 }));

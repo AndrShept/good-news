@@ -3,35 +3,37 @@ import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzl
 
 import { buildingNameTypeEnum } from './building-schema';
 import { heroTable } from './hero-schema';
-import { mapTable } from './map-schema';
+import { tileTable } from './tile-schema';
 import { townTable } from './town-schema';
-
-export const locationTypeEnum = pgEnum('location_type_enum', ['TOWN', 'MAP', 'DUNGEON']);
 
 export const locationTable = pgTable('location', {
   id: uuid().primaryKey().defaultRandom(),
-  type: locationTypeEnum().notNull(),
-  mapId: uuid().references(() => mapTable.id, {
-    onDelete: 'set null',
-  }),
+
   townId: uuid().references(() => townTable.id, {
     onDelete: 'set null',
   }),
+  heroId: uuid().references(() => heroTable.id, {
+    onDelete: 'cascade',
+  }),
+  tileId: uuid().references(() => tileTable.id, { onDelete: 'set null' }),
   currentBuilding: buildingNameTypeEnum(),
-
   createdAt: timestamp({
     mode: 'string',
   }).defaultNow(),
 });
 
-export const locationTableRelations = relations(locationTable, ({ one, many }) => ({
-  heroes: many(heroTable),
-  map: one(mapTable, {
-    fields: [locationTable.mapId],
-    references: [mapTable.id],
+export const locationTableRelations = relations(locationTable, ({ one }) => ({
+  hero: one(heroTable, {
+    fields: [locationTable.heroId],
+    references: [heroTable.id],
   }),
+
   town: one(townTable, {
     fields: [locationTable.townId],
     references: [townTable.id],
+  }),
+  tile: one(tileTable, {
+    fields: [locationTable.tileId],
+    references: [tileTable.id],
   }),
 }));

@@ -34,17 +34,14 @@ export const useTownListener = () => {
           if (data.payload.heroId === id) {
             heroChange({
               location: {
-                mapId: data.payload.mapId,
+                tile: { mapId: data.payload.mapId },
                 townId: null,
                 town: undefined,
                 currentBuilding: undefined,
-                type: 'MAP',
               },
-              tile: data.payload.tile,
-              tileId: data.payload.tileId,
             });
           }
-            //filter heroes arr
+          //filter heroes arr
           break;
         case 'WALK_TOWN':
           heroChange({
@@ -60,7 +57,6 @@ export const useTownListener = () => {
             text: `You have entered the ${building[data.payload.buildingName]}.`,
           });
           break;
-  
       }
     };
     socket.on(socketEvents.townUpdate(), listener);

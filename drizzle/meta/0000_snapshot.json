@@ -1,5 +1,5 @@
 {
-  "id": "109b4c93-5bc1-4c91-9a0f-5c7888abfb09",
+  "id": "765d246b-3c1b-416a-a6de-69a52a76b420",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -318,32 +318,8 @@
           "notNull": true,
           "default": 100
         },
-        "modifierId": {
-          "name": "modifierId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
         "groupId": {
           "name": "groupId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "actionId": {
-          "name": "actionId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "locationId": {
-          "name": "locationId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "tileId": {
-          "name": "tileId",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
@@ -370,64 +346,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "hero_modifierId_modifier_id_fk": {
-          "name": "hero_modifierId_modifier_id_fk",
-          "tableFrom": "hero",
-          "tableTo": "modifier",
-          "columnsFrom": [
-            "modifierId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "hero_groupId_group_id_fk": {
           "name": "hero_groupId_group_id_fk",
           "tableFrom": "hero",
           "tableTo": "group",
           "columnsFrom": [
             "groupId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        },
-        "hero_actionId_action_id_fk": {
-          "name": "hero_actionId_action_id_fk",
-          "tableFrom": "hero",
-          "tableTo": "action",
-          "columnsFrom": [
-            "actionId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "hero_locationId_location_id_fk": {
-          "name": "hero_locationId_location_id_fk",
-          "tableFrom": "hero",
-          "tableTo": "location",
-          "columnsFrom": [
-            "locationId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "hero_tileId_tile_id_fk": {
-          "name": "hero_tileId_tile_id_fk",
-          "tableFrom": "hero",
-          "tableTo": "tile",
-          "columnsFrom": [
-            "tileId"
           ],
           "columnsTo": [
             "id"
@@ -627,6 +551,12 @@
           "notNull": true,
           "default": 0
         },
+        "heroId": {
+          "name": "heroId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -642,7 +572,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "modifier_heroId_hero_id_fk": {
+          "name": "modifier_heroId_hero_id_fk",
+          "tableFrom": "modifier",
+          "tableTo": "hero",
+          "columnsFrom": [
+            "heroId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1283,6 +1227,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "heroId": {
+          "name": "heroId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
         "started_at": {
           "name": "started_at",
           "type": "timestamp",
@@ -1298,7 +1248,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "action_heroId_hero_id_fk": {
+          "name": "action_heroId_hero_id_fk",
+          "tableFrom": "action",
+          "tableTo": "hero",
+          "columnsFrom": [
+            "heroId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1329,9 +1293,28 @@
           "primaryKey": false,
           "notNull": false
         },
+        "tileId": {
+          "name": "tileId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "townId": {
           "name": "townId",
           "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "heroId": {
+          "name": "heroId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentBuilding": {
+          "name": "currentBuilding",
+          "type": "building_name_type_enum",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -1358,6 +1341,19 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
+        "location_tileId_tile_id_fk": {
+          "name": "location_tileId_tile_id_fk",
+          "tableFrom": "location",
+          "tableTo": "tile",
+          "columnsFrom": [
+            "tileId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
         "location_townId_town_id_fk": {
           "name": "location_townId_town_id_fk",
           "tableFrom": "location",
@@ -1369,6 +1365,73 @@
             "id"
           ],
           "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "location_heroId_hero_id_fk": {
+          "name": "location_heroId_hero_id_fk",
+          "tableFrom": "location",
+          "tableTo": "hero",
+          "columnsFrom": [
+            "heroId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.state": {
+      "name": "state",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "type": {
+          "name": "type",
+          "type": "state_type_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "heroId": {
+          "name": "heroId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "state_heroId_hero_id_fk": {
+          "name": "state_heroId_hero_id_fk",
+          "tableFrom": "state",
+          "tableTo": "hero",
+          "columnsFrom": [
+            "heroId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -1465,7 +1528,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -1507,6 +1570,12 @@
         "tileWidth": {
           "name": "tileWidth",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -1759,9 +1828,7 @@
       "values": [
         "WALK",
         "CRAFT",
-        "IDLE",
-        "CHARACTER",
-        "SKILLS"
+        "IDLE"
       ]
     },
     "public.location_type_enum": {
@@ -1773,13 +1840,23 @@
         "DUNGEON"
       ]
     },
+    "public.state_type_enum": {
+      "name": "state_type_enum",
+      "schema": "public",
+      "values": [
+        "CHARACTER",
+        "SKILLS",
+        "IDLE"
+      ]
+    },
     "public.tile_type_enum": {
       "name": "tile_type_enum",
       "schema": "public",
       "values": [
         "OBJECT",
-        "DECOR",
-        "GROUND"
+        "WATER",
+        "HERO",
+        "TOWN"
       ]
     },
     "public.map_name_type_enum": {

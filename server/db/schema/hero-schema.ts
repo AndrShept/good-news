@@ -10,8 +10,8 @@ import { inventoryItemTable } from './inventory-item-schema';
 import { locationTable } from './location-schema';
 import { mapTable } from './map-schema';
 import { modifierTable } from './modifier-schema';
-import { tileTable } from './tile-schema';
 import { stateTable } from './state-schema';
+import { tileTable } from './tile-schema';
 
 export const heroTable = pgTable('hero', {
   id: uuid().primaryKey().notNull(),
@@ -38,22 +38,9 @@ export const heroTable = pgTable('hero', {
   currentExperience: integer().default(0).notNull(),
   maxExperience: integer().default(100).notNull(),
 
-  modifierId: uuid()
-    .references(() => modifierTable.id)
-    .notNull(),
   groupId: uuid().references(() => groupTable.id, {
     onDelete: 'set null',
   }),
-  actionId: uuid()
-    .references(() => actionTable.id)
-    .notNull(),
-  stateId: uuid()
-    .references(() => stateTable.id)
-    .notNull(),
-  locationId: uuid()
-    .references(() => locationTable.id)
-    .notNull(),
-  tileId: uuid().references(() => tileTable.id, { onDelete: 'set null' }),
 
   userId: text()
     .notNull()
@@ -73,34 +60,17 @@ export const heroTable = pgTable('hero', {
 });
 
 export const heroRelations = relations(heroTable, ({ one, many }) => ({
-  modifier: one(modifierTable, {
-    fields: [heroTable.modifierId],
-    references: [modifierTable.id],
-  }),
-  group: one(groupTable, {
+  modifier: one(modifierTable),
+  action: one(actionTable),
+  state: one(stateTable),
+  location: one(locationTable),
+    group: one(groupTable, {
     fields: [heroTable.groupId],
     references: [groupTable.id],
   }),
   user: one(userTable, {
     fields: [heroTable.userId],
     references: [userTable.id],
-  }),
-  action: one(actionTable, {
-    fields: [heroTable.actionId],
-    references: [actionTable.id],
-  }),
-  state: one(stateTable, {
-    fields: [heroTable.stateId],
-    references: [stateTable.id],
-  }),
-  location: one(locationTable, {
-    fields: [heroTable.locationId],
-    references: [locationTable.id],
-  }),
-
-  tile: one(tileTable, {
-    fields: [heroTable.tileId],
-    references: [tileTable.id],
   }),
   equipments: many(equipmentTable),
   inventoryItem: many(inventoryItemTable),
