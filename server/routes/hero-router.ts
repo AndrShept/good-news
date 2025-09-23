@@ -1209,23 +1209,29 @@ export const heroRouter = new Hono<Context>()
     zValidator(
       'json',
       z.object({
-        tileId: z.string(),
+        x: z.number(),
+        y: z.number(),
       }),
     ),
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const { tileId } = c.req.valid('json');
+      const targetPos = c.req.valid('json');
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
         with: {
-          modifier: true,
-          location: true,
-          tile: true,
+          modifier: {
+            columns: {
+              dexterity: true,
+            },
+          },
+          location: {
+            with: {
+              tile: true,
+            },
+          },
+          action: { columns: { id: true } },
         },
-      });
-      const tile = await db.query.tileTable.findFirst({
-        where: eq(tileTable.id, tileId),
       });
 
       if (!hero) {
@@ -1233,29 +1239,32 @@ export const heroRouter = new Hono<Context>()
           message: 'hero not found',
         });
       }
-      if (!tile) {
+      if (!hero.action) {
         throw new HTTPException(404, {
-          message: 'tile not found',
+          message: 'hero action not found',
         });
       }
 
-      if (tile.type === 'OBJECT') {
+      const tile = await db.query.tileTable.findFirst({
+        where: and(eq(tileTable.x, targetPos.x), eq(tileTable.y, targetPos.y), eq(tileTable.mapId, hero.location?.tile?.mapId ?? '')),
+      });
+
+      if (tile?.type === 'OBJECT' || tile?.type === 'WATER') {
         throw new HTTPException(409, {
-          message: 'tile type object',
+          message: 'tile block type object or water',
         });
       }
-      if (hero.location.mapId !== tile.mapId) {
-        throw new HTTPException(409, {
-          message: 'Movement error: hero mapId does not match tile mapId',
-        });
-      }
-      if (!hero.tile) {
+    
+
+      if (!hero.location?.tile) {
         throw new HTTPException(409, {
           message: ' Hero is not on the world map. ',
         });
       }
       const isMovable =
-        Math.abs(hero.tile.x - tile.x) <= 1 && Math.abs(hero.tile.y - tile.y) <= 1 && !(hero.tile.x === tile.x && hero.tile.y === tile.y);
+        Math.abs(hero.location.tile.x - targetPos.x) <= 1 &&
+        Math.abs(hero.location.tile.y - targetPos.y) <= 1 &&
+        !(hero.location.tile.x === targetPos.x && hero.location.tile.y === targetPos.y);
       if (!isMovable) {
         throw new HTTPException(409, {
           message: ' Hero can only move to an adjacent tile. ',
@@ -1264,7 +1273,7 @@ export const heroRouter = new Hono<Context>()
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       const jobId = hero.id;
-      const delay = calculateWalkTime(hero.modifier.dexterity);
+      const delay = calculateWalkTime(hero.modifier?.dexterity ?? 10);
       await db
         .update(actionTable)
         .set({
@@ -1272,25 +1281,15 @@ export const heroRouter = new Hono<Context>()
           completedAt: new Date(Date.now() + delay).toISOString(),
           type: 'WALK',
         })
-        .where(eq(actionTable.id, hero.actionId));
+        .where(eq(actionTable.id, hero.action?.id!));
       const jobData: WalkMapJob = {
         jobName: 'WALK_MAP',
         payload: {
-          currentTilePos: { x: hero.tile.x, y: hero.tile.y },
-          targetTilePos: { x: tile.x, y: tile.y },
-          currentTileId: hero.tile.id,
-          targetTileId: tileId,
-          type: 'IDLE',
-          tile,
-          hero: {
-            id: hero.id,
-            name: hero.name,
-            avatarImage: hero.avatarImage,
-            characterImage: hero.characterImage,
-            level: hero.level,
-            actionId: hero.actionId,
-            locationId: hero.locationId,
-          } as Hero,
+          heroId: hero.id,
+          tileId: hero.location.tile.id,
+          actionId: hero.action.id,
+          newPosition: targetPos,
+          mapId: hero.location.tile.mapId,
         },
       };
       await actionQueue.remove(jobId);
@@ -1505,7 +1504,6 @@ export const heroRouter = new Hono<Context>()
         payload: {
           heroId: hero.id,
           mapId: tile.mapId,
- 
         },
       };
 

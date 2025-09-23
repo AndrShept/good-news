@@ -27,7 +27,7 @@ export const actionQueueListeners = () => {
           payload: jobData.payload,
           type: 'WALK_MAP',
         };
-        io.to(jobData.payload.tile.mapId).emit(socketEvents.mapUpdate(), socketData);
+        io.to(jobData.payload.mapId).emit(socketEvents.mapUpdate(), socketData);
         break;
       }
     }

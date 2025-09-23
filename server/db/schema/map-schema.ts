@@ -29,5 +29,4 @@ export const mapTable = pgTable('map', {
 
 export const mapTableRelations = relations(mapTable, ({ many }) => ({
   tiles: many(tileTable),
-  locations: many(locationTable),
 }));

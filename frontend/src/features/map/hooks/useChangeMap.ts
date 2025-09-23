@@ -1,5 +1,4 @@
-import { TPosition } from '@/shared/socket-data-types';
-import { Hero, Map, MapNameType, Tile } from '@/shared/types';
+import { Hero, IPosition, Map, MapNameType, Tile } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { getMapOptions } from '../api/get-map';
@@ -19,14 +18,40 @@ export const useChangeMap = (mapId: string) => {
     );
   };
 
-  const changeTile = ({ params, tileId }: { params: Partial<Tile>; tileId: string }) => {
+  const changeTile = ({ params }: { params: Partial<Tile> }) => {
     queryClient.setQueriesData<Map>(
       {
         queryKey: getMapOptions(mapId).queryKey,
       },
       (oldData) => {
-        if (!oldData || !oldData.tiles) return;
-        return { ...oldData, tiles: oldData.tiles.map((tile) => (tile.id === tileId ? { ...tile, ...params } : tile)) };
+        if (!oldData) return;
+        return {
+          ...oldData,
+          ...params,
+        };
+      },
+    );
+  };
+  const changeTilePos = (tileId: string, position: IPosition) => {
+    queryClient.setQueriesData<Map>(
+      {
+        queryKey: getMapOptions(mapId).queryKey,
+      },
+      (oldData) => {
+        if (!oldData || !oldData.tilesGrid) return oldData;
+        return {
+          ...oldData,
+          tilesGrid: oldData.tilesGrid.map((row) =>
+            row.map((tile) => {
+              if (!tile) return null;
+              if (tile.id === tileId) {
+                console.log('GOGOG', tileId);
+                return { ...tile, x: position.x, y: position.y};
+              }
+              return tile;
+            }),
+          ),
+        };
       },
     );
   };
@@ -42,7 +67,7 @@ export const useChangeMap = (mapId: string) => {
     );
   };
 
-  const filterHeroes = ({ pos, heroId }: { pos: TPosition; heroId: string }) => {
+  const filterHeroes = ({ pos, heroId }: { pos: IPosition; heroId: string }) => {
     queryClient.setQueriesData<Map>(
       {
         queryKey: getMapOptions(mapId).queryKey,
@@ -92,6 +117,7 @@ export const useChangeMap = (mapId: string) => {
     changeTile,
     removeTile,
     filterHeroes,
+    changeTilePos,
     addHeroes,
   };
 };

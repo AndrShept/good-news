@@ -8,6 +8,7 @@ import { useScaleMap } from '../hooks/useScaleMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
 import { GameTile } from './GameTile';
 import { HeroTile } from './HeroTile';
+import { MovableTile } from './MovableTile';
 
 export const NewGameMap = () => {
   const hero = useHero((state) => ({
@@ -38,7 +39,7 @@ export const NewGameMap = () => {
   if (isLoading) return <p>LOADING MAP...</p>;
   if (isError) return <p>{error.message}</p>;
   if (!map) return <p>NO MAP FOUND</p>;
-  console.log(map.image);
+  console.log('MAP PAGE RENDER');
   return (
     <section
       ref={containerRef}
@@ -49,12 +50,7 @@ export const NewGameMap = () => {
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       onWheel={handleWheel}
-      onClick={() => {
-        if (hoverIndex !== null && !isDragging) {
-          const x = hoverIndex % MAP_WIDTH;
-          const y = Math.floor(hoverIndex / MAP_HEIGHT);
-        }
-      }}
+   
     >
       <ul
         className="relative origin-top-left"
@@ -68,13 +64,11 @@ export const NewGameMap = () => {
       >
         {map.tilesGrid?.map((col, y) =>
           col.map((tile, x) => {
-            if (!tile) return;
-
             const isMovable = Math.abs(x - hero.posX) <= 1 && Math.abs(y - hero.posY) <= 1 && !(x === hero.posX && y === hero.posY);
-
+            const isBlocked = tile?.type === 'OBJECT' || tile?.type === 'WATER';
             return (
               <div
-                key={tile.id}
+                key={`${x}${y}`}
                 style={{
                   position: 'absolute',
                   left: x * TILE_SIZE,
@@ -83,7 +77,8 @@ export const NewGameMap = () => {
                   height: TILE_SIZE,
                 }}
               >
-                <GameTile {...tile} isMovable={isMovable} />
+                {isMovable && (!tile || !isBlocked) && <MovableTile tilePosition={{ x, y }} />}
+                {tile && <GameTile {...tile} />}
               </div>
             );
           }),
