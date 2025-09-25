@@ -37,8 +37,10 @@ export const NewGameMap = () => {
     TILE_SIZE,
   });
   const { movedTiles } = useHeroActions();
-
   const { handleMouseDown, handleMouseUp } = useDragOnMap({ setIsDragging, setStart });
+
+
+
   if (isLoading) return <p>LOADING MAP...</p>;
   if (isError) return <p>{error.message}</p>;
   if (!map) return <p>NO MAP FOUND</p>;
@@ -65,9 +67,7 @@ export const NewGameMap = () => {
       >
         {map.tiles?.map((tile) => (
           <div
-            onMouseDown={(e) => e.stopPropagation()}
-            onMouseUp={(e) => e.stopPropagation()}
-            onClick={() => removeTile({ tileId: tile.id })}
+            // onClick={() => removeTile({ tileId: tile.id })}
             key={tile.id}
             style={{
               position: 'absolute',

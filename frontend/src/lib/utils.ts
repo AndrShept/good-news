@@ -62,7 +62,7 @@ export const formatDurationFromSeconds = (seconds: number) => {
 };
 
 export const toastError = (msg = 'Something went wrong') => {
-  toast.error(msg);
+   toast.error(msg);
 };
 
 export const getRarityColor = (data: string) => {

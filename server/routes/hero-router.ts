@@ -45,7 +45,7 @@ import {
 import { buffTable } from '../db/schema/buff-schema';
 import { restorePotion } from '../lib/restorePotion';
 import { sumModifier } from '../lib/sumModifier';
-import { calculateWalkTime, generateRandomUuid, setSqlNow, setSqlNowByInterval, verifyHeroOwnership } from '../lib/utils';
+import { calculateWalkTime, generateRandomUuid, getTileExists, setSqlNow, setSqlNowByInterval, verifyHeroOwnership } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
 
@@ -1227,7 +1227,11 @@ export const heroRouter = new Hono<Context>()
           },
           location: {
             with: {
-              tile: true,
+              tile: {
+                with: {
+                  map: true,
+                },
+              },
             },
           },
           action: { columns: { id: true } },
@@ -1254,8 +1258,15 @@ export const heroRouter = new Hono<Context>()
           message: 'tile block type object or water',
         });
       }
-    
 
+      const MAP_WIDTH = hero.location?.tile?.map.width ?? 0;
+      const tileIndex = targetPos.y * MAP_WIDTH + targetPos.x;
+      const tileExistMap = getTileExists(hero.location?.tile?.mapId ?? '', tileIndex);
+      if (!tileExistMap) {
+        throw new HTTPException(403, {
+          message: `Tile at position (${targetPos.x}, ${targetPos.y}) does not exist on the map`,
+        });
+      }
       if (!hero.location?.tile) {
         throw new HTTPException(409, {
           message: ' Hero is not on the world map. ',

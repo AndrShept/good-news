@@ -35,6 +35,7 @@ const queryClient = new QueryClient({
     mutations: {
       onError: () => {
         toastError();
+
       },
     },
   },

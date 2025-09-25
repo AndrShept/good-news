@@ -4,21 +4,24 @@ import { and, eq } from 'drizzle-orm';
 
 import { db } from '../db/db';
 import { mapTable, tileTable, townTable } from '../db/schema';
+import { townEntities } from '../entities/towns';
 import { generateRandomUuid } from './utils';
 
 interface MapLoadInfo {
   jsonUrl: TileMap;
   imageUrl: string;
+  name: MapNameType;
 }
 
-export const getMapJson = (mapName: MapNameType) => {
-  const map: Record<MapNameType, MapLoadInfo> = {
-    SOLMERE: {
+export const getMapJson = (mapId: string) => {
+  const map: Record<string, MapLoadInfo> = {
+    '01998100-a29d-7b0f-abad-edd4ef317472': {
+      name: 'SOLMERE',
       jsonUrl: require('../json/solmer.json'),
       imageUrl: '/sprites/map/solmer.png',
     },
   };
-  return map[mapName];
+  return map[mapId];
 };
 
 interface Params {
@@ -29,26 +32,17 @@ interface Params {
 const zIndex: Record<TileType, number> = {
   GROUND: 0,
   OBJECT: 1,
-  DECOR: 5,
-  WATER: 5,
+  WATER: 1,
+  HERO: 5,
+  TOWN: 1,
 };
 
 export const getLayerObject = ({ layer, mapId }: Params): Tile[] => {
-  // if (layer?.name === 'TOWN') {
-  //   return layer.objects.map((object) => ({
-  //     ...object,
-  //     id: generateRandomUuid(),
-  //     type: layer.name,
-  //     image: object.gid - 1,
-  //     x: object.x / object.width,
-  //     y: object.y / object.height - 1,
-  //   }));
-  // }
   const tiles = layer.data
     .map((item, idx): Tile | null => {
       if (item === 0) return null;
       return {
-        image: item - 1,
+        image: (item - 1).toString(),
         type: layer.name,
         x: idx % layer.width,
         y: Math.floor(idx / layer.height),
@@ -64,12 +58,10 @@ export const getLayerObject = ({ layer, mapId }: Params): Tile[] => {
   return tiles;
 };
 
-export const buildingMapData = async (mapName: MapNameType) => {
-  const mapJson = getMapJson(mapName);
+export const buildingMapData = async (mapId: string) => {
+  const mapJson = getMapJson(mapId);
   const findObjects = mapJson.jsonUrl.layers.find((item) => item.name === 'OBJECT');
   const findWaters = mapJson.jsonUrl.layers.find((item) => item.name === 'WATER');
-  const findDecor = mapJson.jsonUrl.layers.find((item) => item.name === 'DECOR');
-  const findGround = mapJson.jsonUrl.layers.find((item) => item.name === 'GROUND');
 
   console.time('create-map');
 
@@ -77,8 +69,9 @@ export const buildingMapData = async (mapName: MapNameType) => {
     const [newMap] = await tx
       .insert(mapTable)
       .values({
+        id: '01998100-a29d-7b0f-abad-edd4ef317472',
         pvpMode: 'PVE',
-        name: mapName,
+        name: mapJson.name,
         image: mapJson.imageUrl,
         height: mapJson.jsonUrl.height,
         width: mapJson.jsonUrl.width,
@@ -88,33 +81,20 @@ export const buildingMapData = async (mapName: MapNameType) => {
       .returning();
 
     const objectsTiles = findObjects && getLayerObject({ layer: findObjects, mapId: newMap.id });
-    const decorTiles = findDecor && getLayerObject({ layer: findDecor, mapId: newMap.id });
-    const groundTiles = findGround && getLayerObject({ layer: findGround, mapId: newMap.id });
     const waterTiles = findWaters && getLayerObject({ layer: findWaters, mapId: newMap.id });
 
-    const tiles = [...(groundTiles ?? []), ...(objectsTiles ?? []), ...(decorTiles ?? []), ...(waterTiles ?? [])];
+    const tiles = [...(objectsTiles ?? []), ...(waterTiles ?? [])];
 
-    // const chunkSize = 500;
-    // for (let i = 0; i < tiles.length; i += chunkSize) {
-    //   const chunk = tiles.slice(i, i + chunkSize);
-    //   await tx.insert(tileTable).values(chunk);
-    // }
     await tx.insert(tileTable).values(tiles);
-    const town = await tx.query.townTable.findFirst({
-      where: eq(townTable.name, mapName),
+    await tx.insert(tileTable).values({
+      mapId,
+      type: 'TOWN',
+      x: 5,
+      y: 7,
+      z: 1,
+      townId: townEntities.SOLMERE.id,
+      image: townEntities.SOLMERE.image,
     });
-
-    if (!town) {
-      console.error('town not found');
-      return;
-    }
-
-    await tx
-      .update(tileTable)
-      .set({
-        townId: town.id,
-      })
-      .where(and(eq(tileTable.x, 5), eq(tileTable.y, 5)));
 
     return newMap;
   });

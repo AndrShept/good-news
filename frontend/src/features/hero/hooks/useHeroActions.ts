@@ -13,7 +13,7 @@ export const useHeroActions = () => {
   }));
   const map = useMap({ mapId: hero.mapId });
   const tilesByPos = useMemo(() => {
-    if (!map || !map.tiles?.length) return {};
+    if (!map?.tiles?.length) return {};
 
     return map.tiles.reduce(
       (acc, tile) => {
@@ -35,7 +35,7 @@ export const useHeroActions = () => {
 
 
   useLayoutEffect(() => {
-    const around = getTilesAroundHero({ x: hero.x, y: hero.y }, 1).filter(
+    const around = getTilesAroundHero({ x: hero.x, y: hero.y }, 2).filter(
       (pos) => tilesByPos[`${pos.x}-${pos.y}`]?.type !== 'WATER' && tilesByPos[`${pos.x}-${pos.y}`]?.type !== 'OBJECT',
     );
     setMovedTiles(around);

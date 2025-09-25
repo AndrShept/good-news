@@ -7,6 +7,8 @@ import { HTTPException } from 'hono/http-exception';
 import nodemailer from 'nodemailer';
 import z from 'zod';
 
+import { getMapJson } from './buildingMapData';
+
 const schema = z.object({
   DATABASE_URL: z.string(),
   BREVO_USERNAME: z.string(),
@@ -80,9 +82,7 @@ export const calculateWalkTime = (dexterity: number) => {
 export function buildGrid(map: Map): (Tile | null)[][] | undefined {
   if (!map.tiles?.length) return;
 
-  const grid: (Tile | null)[][] = Array.from({ length: map.height }, () =>
-    Array.from({ length: map.width }, () => null)
-  );
+  const grid: (Tile | null)[][] = Array.from({ length: map.height }, () => Array.from({ length: map.width }, () => null));
 
   for (const tile of map.tiles) {
     if (tile.y < map.height && tile.x < map.width) {
@@ -92,3 +92,9 @@ export function buildGrid(map: Map): (Tile | null)[][] | undefined {
 
   return grid;
 }
+
+export const getTileExists = (mapId: string, index: number) => {
+  const map = getMapJson(mapId);
+  const tiles = map.jsonUrl.layers.find((l) => l.name === 'GROUND');
+  return tiles?.data[index];
+};

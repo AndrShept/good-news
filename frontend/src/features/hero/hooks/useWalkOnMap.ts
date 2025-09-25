@@ -1,9 +1,10 @@
-import { client } from '@/lib/utils';
+import { client, toastError } from '@/lib/utils';
 import { IPosition } from '@/shared/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { getHeroOptions } from '../api/get-hero';
 import { useHeroId } from './useHeroId';
+import toast from 'react-hot-toast';
 
 export const useWalkOnMap = () => {
   const id = useHeroId();
@@ -19,5 +20,6 @@ export const useWalkOnMap = () => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: getHeroOptions().queryKey });
     },
+
   });
 };

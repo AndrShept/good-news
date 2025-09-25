@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useState } from 'react';
 
 export const useScaleMap = (containerRef: RefObject<HTMLDivElement | null>) => {
   const [scale, setScale] = useState(1);
@@ -8,9 +8,9 @@ export const useScaleMap = (containerRef: RefObject<HTMLDivElement | null>) => {
     if (!el) return;
 
     const handleWheel = (event: WheelEvent) => {
-      event.preventDefault();
+      event.preventDefault(); // блок скролу
       const delta = event.deltaY > 0 ? -0.1 : 0.1;
-      setScale((prev) => Math.max(0.5, Math.min(2, prev + delta)));
+      setScale((prev) => Math.max(1, Math.min(2, prev + delta)));
     };
 
     el.addEventListener('wheel', handleWheel, { passive: false });
@@ -18,7 +18,7 @@ export const useScaleMap = (containerRef: RefObject<HTMLDivElement | null>) => {
     return () => {
       el.removeEventListener('wheel', handleWheel);
     };
-  }, [containerRef]);
+  }, [containerRef.current]); 
 
   return { scale };
 };
