@@ -1,15 +1,15 @@
-import { buildingNameType } from '@/shared/types';
+import { socketEvents } from '@/shared/socket-events';
+import { buildingNameType, IPosition } from '@/shared/types';
+import { IGameMessage } from '@/store/useGameMessages';
 import { type ClassValue, clsx } from 'clsx';
 import { format, intervalToDuration } from 'date-fns';
 import { hc } from 'hono/client';
+import { RefObject } from 'react';
 import toast from 'react-hot-toast';
+import { Socket } from 'socket.io-client';
 import { twMerge } from 'tailwind-merge';
 
 import type { ApiRoutes } from '../../../server';
-import { socketEvents } from '@/shared/socket-events';
-import { Socket } from 'socket.io-client';
-import { RefObject } from 'react';
-import { IGameMessage } from '@/store/useGameMessages';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -31,8 +31,6 @@ type TJoinRoomParams = {
   prevRefId: RefObject<string | null>;
   setGameMessage: (message: IGameMessage) => void;
 };
-
-
 
 export const getFormatDateTime = (time: string | undefined) => {
   if (!time) return;
@@ -99,4 +97,15 @@ export const joinRoomClient = ({ socket, id, joinMessage, leaveMessage, prevRefI
       }
     });
   }
+};
+
+export const getTilesAroundHero = (pos: IPosition, radius = 1) => {
+  const tiles: IPosition[] = [];
+  for (let dx = -radius; dx <= radius; dx++) {
+    for (let dy = -radius; dy <= radius; dy++) {
+      if (dx === 0 && dy === 0) continue;
+      tiles.push({ x: pos.x + dx, y: pos.y + dy });
+    }
+  }
+  return tiles;
 };

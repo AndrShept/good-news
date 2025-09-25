@@ -15,7 +15,7 @@ export const useMapListener = () => {
   const mapId = useHero((state) => state?.data?.location?.tile?.mapId ?? '');
   const id = useHeroId();
   const { socket } = useSocket();
-  const { heroChange } = useHeroChange();
+  const { heroChangePos, heroChange } = useHeroChange();
   const { changeTilePos } = useChangeMap(mapId);
   const prevMapIdRef = useRef<string | null>(null);
 
@@ -28,7 +28,7 @@ export const useMapListener = () => {
       joinMessage: 'join map room',
       leaveMessage: 'leave map room',
     });
-  }, [mapId, socket]);
+  }, [mapId, setGameMessage, socket]);
   useEffect(() => {
     const listener = (data: MapUpdateEvent) => {
       switch (data.type) {
@@ -43,6 +43,8 @@ export const useMapListener = () => {
               type: 'success',
               text: `You have entered tile.`,
             });
+            heroChangePos(data.payload.newPosition);
+            heroChange({ action: { type: 'IDLE' } });
           }
           changeTilePos(data.payload.tileId, { ...data.payload.newPosition });
           break;
@@ -53,5 +55,5 @@ export const useMapListener = () => {
     return () => {
       socket.off(socketEvents.mapUpdate(), listener);
     };
-  }, [socket]);
+  }, [changeTilePos, heroChange, heroChangePos, id, setGameMessage, socket]);
 };

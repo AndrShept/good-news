@@ -174,7 +174,6 @@ export type Building = InferSelectModel<typeof buildingTable>;
 
 export type Map = typeof mapTable.$inferSelect & {
   tiles?: Tile[];
-  tilesGrid?: TilesGrid;
 };
 export type Tile = typeof tileTable.$inferSelect & {
   map?: Map;

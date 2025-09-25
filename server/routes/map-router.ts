@@ -41,11 +41,11 @@ export const mapRouter = new Hono<Context>().get(
     });
     console.log('GET MAP');
 
-    const tilesGrid = buildGrid(map as Map);
+    // const tilesGrid = buildGrid(map as Map);
     return c.json<SuccessResponse<Map>>({
       message: 'map fetched!',
       success: true,
-      data: { ...map, tiles: undefined, tilesGrid } as Map,
+      data: map as Map,
     });
   },
 );
