@@ -13,10 +13,10 @@ import { MovableTile } from './MovableTile';
 
 export const NewGameMap = () => {
   const hero = useHero((state) => ({
-    x: state?.data?.location?.tile?.x ?? 0,
-    y: state?.data?.location?.tile?.y ?? 0,
-    tileId: state?.data?.location?.tileId ?? '',
-    mapId: state?.data?.location?.tile?.mapId ?? '',
+    x: state?.data?.location?.x ?? 0,
+    y: state?.data?.location?.y ?? 0,
+    tileId: state?.data?.location?.tile?.id ?? '',
+    mapId: state?.data?.location?.mapId ?? '',
     townId: state?.data?.location?.townId ?? '',
   }));
   const { data: map, isLoading, isError, error } = useQuery(getMapOptions(hero.mapId));

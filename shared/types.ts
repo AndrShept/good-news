@@ -29,6 +29,7 @@ import type { gameItemEnum, gameItemTable, rarityEnum, weaponHandEnum, weaponTyp
 import { postTable } from '../server/db/schema/posts-schema';
 import type { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
 import type { tileTable, tileTypeEnum } from '../server/db/schema/tile-schema';
+import type { Layer } from './json-types';
 
 export type SuccessResponse<T = undefined> = {
   success: true;
@@ -161,7 +162,6 @@ export type Action = InferSelectModel<typeof actionTable> & { timeRemaining: num
 export type Location = InferSelectModel<typeof locationTable> & {
   map?: Map;
   town?: Town;
-  tile?: Tile;
   hero?: Hero;
 };
 export type TownToBuildings = InferSelectModel<typeof townsToBuildingsTable> & {
@@ -173,7 +173,9 @@ export type Town = InferSelectModel<typeof townTable> & {
 export type Building = InferSelectModel<typeof buildingTable>;
 
 export type Map = typeof mapTable.$inferSelect & {
-  tiles?: Tile[];
+  heroesLocation?: Location[];
+  towns?: Town[];
+  layers?: Layer[];
 };
 export type Tile = typeof tileTable.$inferSelect & {
   map?: Map;

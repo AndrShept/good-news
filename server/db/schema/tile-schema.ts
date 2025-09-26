@@ -12,18 +12,7 @@ export const tileTable = pgTable('tile', {
   id: uuid().primaryKey().defaultRandom(),
 
   type: tileTypeEnum().notNull(),
-  x: integer().notNull(),
-  y: integer().notNull(),
-  z: integer().notNull(),
-  image: text().notNull(),
-  mapId: uuid()
-    .references(() => mapTable.id, {
-      onDelete: 'cascade',
-    })
-    .notNull(),
-  townId: uuid().references(() => townTable.id, {
-    onDelete: 'cascade',
-  }),
+
 
   createdAt: timestamp({
     mode: 'string',
@@ -33,13 +22,5 @@ export const tileTable = pgTable('tile', {
 });
 
 export const tileTableRelations = relations(tileTable, ({ one }) => ({
-  map: one(mapTable, {
-    fields: [tileTable.mapId],
-    references: [mapTable.id],
-  }),
-  town: one(townTable, {
-    fields: [tileTable.townId],
-    references: [townTable.id],
-  }),
-  location: one(locationTable),
+
 }));

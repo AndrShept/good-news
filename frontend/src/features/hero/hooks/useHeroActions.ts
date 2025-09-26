@@ -7,9 +7,9 @@ import { useHero } from './useHero';
 
 export const useHeroActions = () => {
   const hero = useHero((state) => ({
-    mapId: state?.data?.location?.tile?.mapId ?? '',
-    x: state?.data?.location?.tile?.x ?? 0,
-    y: state?.data?.location?.tile?.y ?? 0,
+    mapId: state?.data?.location?.mapId ?? '',
+    x: state?.data?.location?.x ?? 0,
+    y: state?.data?.location?.y ?? 0,
   }));
   const map = useMap({ mapId: hero.mapId });
   const tilesByPos = useMemo(() => {
@@ -33,11 +33,8 @@ export const useHeroActions = () => {
     });
   }, [hero.x, hero.y, tilesByPos]);
 
-
   useLayoutEffect(() => {
-    const around = getTilesAroundHero({ x: hero.x, y: hero.y }, 1).filter(
-      (pos) => tilesByPos[`${pos.x}-${pos.y}`]?.type !== 'WATER' && tilesByPos[`${pos.x}-${pos.y}`]?.type !== 'OBJECT',
-    );
+    const around = getTilesAroundHero({ x: hero.x, y: hero.y }, 1);
     setMovedTiles(around);
   }, [hero.x, hero.y, tilesByPos]);
 

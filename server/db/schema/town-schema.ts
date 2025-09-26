@@ -3,7 +3,6 @@ import { boolean, integer, pgEnum, pgTable, primaryKey, text, timestamp, uuid } 
 
 import { buildingTable } from './building-schema';
 import { locationTable } from './location-schema';
-import { tileTable } from './tile-schema';
 
 export const townNameTypeEnum = pgEnum('town_name_type_enum', ['SOLMERE']);
 
@@ -21,8 +20,7 @@ export const townTable = pgTable('town', {
 
 export const townTableRelations = relations(townTable, ({ many, one }) => ({
   buildings: many(townsToBuildingsTable),
-  tile: one(tileTable),
-  locations : many(locationTable)
+  heroesLocation: many(locationTable),
 }));
 
 export const townsToBuildingsTable = pgTable(

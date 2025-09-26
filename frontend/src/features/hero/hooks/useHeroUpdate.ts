@@ -1,4 +1,4 @@
-import { ApiHeroResponse, Hero, Tile } from '@/shared/types';
+import { ApiHeroResponse, Hero } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
@@ -28,10 +28,6 @@ export const useHeroUpdate = () => {
             location: {
               ...oldData.data.location,
               ...data.location,
-              tile: {
-                ...oldData.data.location?.tile,
-                ...data.location?.tile,
-              },
             },
             group: { ...oldData.data.group, ...data.group },
           },
@@ -41,24 +37,5 @@ export const useHeroUpdate = () => {
     [queryClient],
   );
 
-  const updateHeroTile = useCallback(
-    (data: Partial<Tile>) => {
-      queryClient.setQueriesData<ApiHeroResponse>({ queryKey: getHeroOptions().queryKey }, (oldData) => {
-        if (!oldData?.data) return;
-        return {
-          ...oldData,
-          data: {
-            ...oldData.data,
-            location: {
-              ...oldData.data.location,
-              tile: { ...oldData.data.location?.tile, ...data },
-            },
-          },
-        } as ApiHeroResponse;
-      });
-    },
-    [queryClient],
-  );
-
-  return { updateHero, updateHeroTile };
+  return { updateHero };
 };

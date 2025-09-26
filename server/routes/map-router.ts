@@ -8,8 +8,7 @@ import { z } from 'zod';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { heroTable, mapNameTypeEnum, mapTable, tileTable } from '../db/schema';
-import { buildingMapData } from '../lib/buildingMapData';
-import { buildGrid } from '../lib/utils';
+import { buildingMapData, getMapJson } from '../lib/buildingMapData';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const mapRouter = new Hono<Context>().get(
@@ -24,28 +23,22 @@ export const mapRouter = new Hono<Context>().get(
 
   async (c) => {
     const { id } = c.req.valid('param');
+    const userId = c.get('user')?.id as string;
+
     let map = await db.query.mapTable.findFirst({
       where: eq(mapTable.id, id),
       with: {
-        tiles: {
-          with: {
-            town: true,
-            location: {
-              with: {
-                hero: true,
-              },
-            },
-          },
-        },
+        heroesLocation: { with: { hero: true } },
+        towns: true,
       },
     });
     console.log('GET MAP');
+    const mapJson = getMapJson(map?.id ?? '');
 
-    // const tilesGrid = buildGrid(map as Map);
     return c.json<SuccessResponse<Map>>({
       message: 'map fetched!',
       success: true,
-      data: map as Map,
+      data: { ...map, layers: mapJson.jsonUrl.layers } as Map,
     });
   },
 );

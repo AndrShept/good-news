@@ -1,5 +1,5 @@
 import { BASE_WALK_TIME } from '@/shared/constants';
-import type { Map, Tile } from '@/shared/types';
+import type { Map, Tile, TileType } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
 import { sql } from 'drizzle-orm';
@@ -93,8 +93,8 @@ export function buildGrid(map: Map): (Tile | null)[][] | undefined {
   return grid;
 }
 
-export const getTileExists = (mapId: string, index: number) => {
+export const getTileExists = (mapId: string, index: number, tileType: TileType) => {
   const map = getMapJson(mapId);
-  const tiles = map.jsonUrl.layers.find((l) => l.name === 'GROUND');
+  const tiles = map.jsonUrl.layers.find((l) => l.name === tileType);
   return tiles?.data[index];
 };

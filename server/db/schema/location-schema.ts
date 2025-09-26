@@ -3,7 +3,7 @@ import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzl
 
 import { buildingNameTypeEnum } from './building-schema';
 import { heroTable } from './hero-schema';
-import { tileTable } from './tile-schema';
+import { mapTable } from './map-schema';
 import { townTable } from './town-schema';
 
 export const locationTable = pgTable('location', {
@@ -12,10 +12,17 @@ export const locationTable = pgTable('location', {
   townId: uuid().references(() => townTable.id, {
     onDelete: 'set null',
   }),
-  heroId: uuid().references(() => heroTable.id, {
+  mapId: uuid().references(() => mapTable.id, {
     onDelete: 'cascade',
   }),
-  tileId: uuid().references(() => tileTable.id, { onDelete: 'set null' }),
+  heroId: uuid()
+    .references(() => heroTable.id, {
+      onDelete: 'cascade',
+    })
+    .notNull(),
+
+  x: integer().default(0),
+  y: integer().default(0),
   currentBuilding: buildingNameTypeEnum(),
   createdAt: timestamp({
     mode: 'string',
@@ -32,8 +39,8 @@ export const locationTableRelations = relations(locationTable, ({ one }) => ({
     fields: [locationTable.townId],
     references: [townTable.id],
   }),
-  tile: one(tileTable, {
-    fields: [locationTable.tileId],
-    references: [tileTable.id],
+  map: one(mapTable, {
+    fields: [locationTable.mapId],
+    references: [mapTable.id],
   }),
 }));

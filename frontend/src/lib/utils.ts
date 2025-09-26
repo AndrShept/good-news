@@ -1,5 +1,6 @@
+import { Layer } from '@/shared/json-types';
 import { socketEvents } from '@/shared/socket-events';
-import { buildingNameType, IPosition } from '@/shared/types';
+import { IPosition, TileType } from '@/shared/types';
 import { IGameMessage } from '@/store/useGameMessages';
 import { type ClassValue, clsx } from 'clsx';
 import { format, intervalToDuration } from 'date-fns';
@@ -62,7 +63,7 @@ export const formatDurationFromSeconds = (seconds: number) => {
 };
 
 export const toastError = (msg = 'Something went wrong') => {
-   toast.error(msg);
+  toast.error(msg);
 };
 
 export const getRarityColor = (data: string) => {
@@ -108,4 +109,15 @@ export const getTilesAroundHero = (pos: IPosition, radius = 1) => {
     }
   }
   return tiles;
+};
+
+interface IGetTileExists {
+  index: number;
+  tileType: TileType;
+  layers: Layer[];
+}
+
+export const getTileExists = ({ index, layers, tileType }: IGetTileExists) => {
+  const tiles = layers.find((l) => l.name === tileType);
+  return tiles?.data[index];
 };

@@ -23,9 +23,8 @@ export type WalkMapJob = {
   jobName: 'WALK_MAP';
   payload: {
     heroId: string;
-    tileId: string;
     actionId: string;
-    newPosition : IPosition
-    mapId: string
+    newPosition: IPosition;
+    mapId: string;
   };
 };

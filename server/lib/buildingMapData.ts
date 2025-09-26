@@ -3,7 +3,7 @@ import type { Map, MapNameType, Tile, TileType } from '@/shared/types';
 import { and, eq } from 'drizzle-orm';
 
 import { db } from '../db/db';
-import { mapTable, tileTable, townTable } from '../db/schema';
+import { mapTable, townTable } from '../db/schema';
 import { townEntities } from '../entities/towns';
 import { generateRandomUuid } from './utils';
 
@@ -29,39 +29,31 @@ interface Params {
   mapId: string;
 }
 
-const zIndex: Record<TileType, number> = {
-  GROUND: 0,
-  OBJECT: 1,
-  WATER: 1,
-  HERO: 5,
-  TOWN: 1,
-};
-
-export const getLayerObject = ({ layer, mapId }: Params): Tile[] => {
-  const tiles = layer.data
-    .map((item, idx): Tile | null => {
-      if (item === 0) return null;
-      return {
-        image: (item - 1).toString(),
-        type: layer.name,
-        x: idx % layer.width,
-        y: Math.floor(idx / layer.height),
-        mapId,
-        z: zIndex[layer.name],
-        id: generateRandomUuid(),
-        createdAt: new Date().toISOString(),
-        town: undefined,
-        townId: null,
-      };
-    })
-    .filter((tile) => !!tile);
-  return tiles;
-};
+// export const getLayerObject = ({ layer, mapId }: Params): Tile[] => {
+//   const tiles = layer.data
+//     .map((item, idx): Tile | null => {
+//       if (item === 0) return null;
+//       return {
+//         image: (item - 1).toString(),
+//         type: layer.name,
+//         x: idx % layer.width,
+//         y: Math.floor(idx / layer.height),
+//         mapId,
+//         z: zIndex[layer.name],
+//         id: generateRandomUuid(),
+//         createdAt: new Date().toISOString(),
+//         town: undefined,
+//         townId: null,
+//       };
+//     })
+//     .filter((tile) => !!tile);
+//   return tiles;
+// };
 
 export const buildingMapData = async (mapId: string) => {
   const mapJson = getMapJson(mapId);
-  const findObjects = mapJson.jsonUrl.layers.find((item) => item.name === 'OBJECT');
-  const findWaters = mapJson.jsonUrl.layers.find((item) => item.name === 'WATER');
+  // const findObjects = mapJson.jsonUrl.layers.find((item) => item.name === 'OBJECT');
+  // const findWaters = mapJson.jsonUrl.layers.find((item) => item.name === 'WATER');
 
   console.time('create-map');
 
@@ -80,21 +72,19 @@ export const buildingMapData = async (mapId: string) => {
       })
       .returning();
 
-    const objectsTiles = findObjects && getLayerObject({ layer: findObjects, mapId: newMap.id });
-    const waterTiles = findWaters && getLayerObject({ layer: findWaters, mapId: newMap.id });
+    // const objectsTiles = findObjects && getLayerObject({ layer: findObjects, mapId: newMap.id });
+    // const waterTiles = findWaters && getLayerObject({ layer: findWaters, mapId: newMap.id });
 
-    const tiles = [...(objectsTiles ?? []), ...(waterTiles ?? [])];
+    // const tiles = [...(objectsTiles ?? []), ...(waterTiles ?? [])];
 
-    await tx.insert(tileTable).values(tiles);
-    await tx.insert(tileTable).values({
-      mapId,
-      type: 'TOWN',
-      x: 5,
-      y: 7,
-      z: 1,
-      townId: townEntities.SOLMERE.id,
-      image: townEntities.SOLMERE.image,
-    });
+    // await tx.insert(tileTable).values(tiles);
+    // await tx.insert(tileTable).values({
+    //   mapId,
+    //   type: 'TOWN',
+    //   x: 5,
+    //   y: 7,
+    //   townId: townEntities.SOLMERE.id,
+    // });
 
     return newMap;
   });

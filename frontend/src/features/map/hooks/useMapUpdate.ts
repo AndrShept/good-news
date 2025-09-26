@@ -1,4 +1,4 @@
-import { IPosition, Map, MapNameType, Tile } from '@/shared/types';
+import { IPosition, Location, Map, MapNameType, Tile } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
@@ -17,33 +17,36 @@ export const useMapUpdate = (mapId: string) => {
     [mapId, queryClient],
   );
 
-  const updateMapTilePos = useCallback(
-    (tileId: string, position: IPosition) => {
+  const updateMapHeroes = useCallback(
+    (heroId: string, position: IPosition) => {
       queryClient.setQueriesData<Map>({ queryKey: getMapOptions(mapId).queryKey }, (oldData) => {
-        if (!oldData?.tiles) return;
+        if (!oldData?.heroesLocation) return;
         return {
           ...oldData,
-          tiles: oldData.tiles.map((tile) => (tile.id === tileId ? { ...tile, x: position.x, y: position.y } : tile)),
+          heroesLocation: oldData.heroesLocation.map((location) => (location.heroId === heroId ? { ...location, ...position } : location)),
+        };
+      });
+    },
+    [mapId, queryClient],
+  );
+  const deleteMapHeroes = useCallback(
+    (heroId: string) => {
+      queryClient.setQueriesData<Map>({ queryKey: getMapOptions(mapId).queryKey }, (oldData) => {
+        if (!oldData?.heroesLocation) return;
+        return {
+          ...oldData,
+          heroesLocation: oldData.heroesLocation.filter((location) => location.heroId !== heroId),
         };
       });
     },
     [mapId, queryClient],
   );
 
-  const removeMapTile = useCallback(
-    ({ tileId }: { tileId: string }) => {
+  const addMapHeroes = useCallback(
+    (heroLocation: Location) => {
       queryClient.setQueriesData<Map>({ queryKey: getMapOptions(mapId).queryKey }, (oldData) => {
-        if (!oldData?.tiles) return;
-        return { ...oldData, tiles: oldData.tiles.filter((tile) => tile.id !== tileId) };
-      });
-    },
-    [mapId, queryClient],
-  );
-  const addMapTile = useCallback(
-    (newTile: Tile) => {
-      queryClient.setQueriesData<Map>({ queryKey: getMapOptions(mapId).queryKey }, (oldData) => {
-        if (!oldData?.tiles) return;
-        return { ...oldData, tiles: [...oldData.tiles, newTile] };
+        if (!oldData?.heroesLocation) return;
+        return { ...oldData, heroesLocation: [...oldData.heroesLocation, heroLocation] };
       });
     },
     [mapId, queryClient],
@@ -51,8 +54,8 @@ export const useMapUpdate = (mapId: string) => {
 
   return {
     updateMap,
-    removeMapTile,
-    updateMapTilePos,
-    addMapTile,
+    updateMapHeroes,
+    deleteMapHeroes,
+    addMapHeroes,
   };
 };

@@ -12,10 +12,10 @@ import { useMapUpdate } from './useMapUpdate';
 
 export const useMapListener = () => {
   const setGameMessage = useGameMessages((state) => state.setGameMessage);
-  const mapId = useHero((state) => state?.data?.location?.tile?.mapId ?? '');
+  const mapId = useHero((state) => state?.data?.location?.mapId ?? '');
   const id = useHeroId();
   const { socket } = useSocket();
-  const { updateHero, updateHeroTile } = useHeroUpdate();
+  const { updateHero } = useHeroUpdate();
   const { updateMapTilePos } = useMapUpdate(mapId);
   const prevMapIdRef = useRef<string | null>(null);
 
@@ -43,7 +43,6 @@ export const useMapListener = () => {
               type: 'success',
               text: `You have entered tile.`,
             });
-            updateHeroTile({ ...data.payload.newPosition });
             updateHero({ action: { type: 'IDLE' } });
           }
           updateMapTilePos(data.payload.tileId, { ...data.payload.newPosition });

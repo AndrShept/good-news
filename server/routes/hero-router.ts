@@ -1226,15 +1226,7 @@ export const heroRouter = new Hono<Context>()
               dexterity: true,
             },
           },
-          location: {
-            with: {
-              tile: {
-                with: {
-                  map: true,
-                },
-              },
-            },
-          },
+          location: { with: { map: true } },
           action: { columns: { id: true } },
         },
       });
@@ -1249,40 +1241,41 @@ export const heroRouter = new Hono<Context>()
           message: 'hero action not found',
         });
       }
-
-      const tile = await db.query.tileTable.findFirst({
-        where: and(eq(tileTable.x, targetPos.x), eq(tileTable.y, targetPos.y), eq(tileTable.mapId, hero.location?.tile?.mapId ?? '')),
-      });
-
-      if (tile?.type === 'OBJECT' || tile?.type === 'WATER') {
-        throw new HTTPException(409, {
-          message: 'tile block type object or water',
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      const MAP_WIDTH = hero.location?.map?.width ?? 0;
+      const tileIndex = targetPos.y * MAP_WIDTH + targetPos.x;
+      const tileExistMap = getTileExists(hero.location?.mapId ?? '', tileIndex, 'GROUND');
+      const waterTile = getTileExists(hero.location?.mapId ?? '', tileIndex, 'WATER');
+      const objectTile = getTileExists(hero.location?.mapId ?? '', tileIndex, 'OBJECT');
+      if (waterTile) {
+        throw new HTTPException(403, {
+          message: `Movement blocked: tile at (${targetPos.x}, ${targetPos.y}) is WATER.`,
         });
       }
-
-      const MAP_WIDTH = hero.location?.tile?.map.width ?? 0;
-      const tileIndex = targetPos.y * MAP_WIDTH + targetPos.x;
-      const tileExistMap = getTileExists(hero.location?.tile?.mapId ?? '', tileIndex);
+      if (objectTile) {
+        throw new HTTPException(403, {
+          message: `Movement blocked: tile at (${targetPos.x}, ${targetPos.y}) is OBJECT.`,
+        });
+      }
       if (!tileExistMap) {
         throw new HTTPException(403, {
           message: `Tile at position (${targetPos.x}, ${targetPos.y}) does not exist on the map`,
         });
       }
-      if (!hero.location?.tile) {
+      if (!hero.location) {
         throw new HTTPException(409, {
           message: ' Hero is not on the world map. ',
         });
       }
       const isMovable =
-        Math.abs(hero.location.tile.x - targetPos.x) <= 1 &&
-        Math.abs(hero.location.tile.y - targetPos.y) <= 1 &&
-        !(hero.location.tile.x === targetPos.x && hero.location.tile.y === targetPos.y);
+        Math.abs(hero.location?.x! - targetPos.x) <= 1 &&
+        Math.abs(hero.location?.y! - targetPos.y) <= 1 &&
+        !(hero.location.x === targetPos.x && hero.location.y === targetPos.y);
       if (!isMovable) {
         throw new HTTPException(409, {
           message: ' Hero can only move to an adjacent tile. ',
         });
       }
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       const jobId = hero.id;
       const delay = calculateWalkTime(hero.modifier?.dexterity ?? 10);
@@ -1298,10 +1291,9 @@ export const heroRouter = new Hono<Context>()
         jobName: 'WALK_MAP',
         payload: {
           heroId: hero.id,
-          tileId: hero.location.tile.id,
           actionId: hero.action.id,
           newPosition: targetPos,
-          mapId: hero.location.tile.mapId,
+          mapId: hero.location.mapId ?? '',
         },
       };
       await actionQueue.remove(jobId);
