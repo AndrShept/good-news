@@ -1,17 +1,21 @@
 import { client } from '@/lib/utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { StateType } from '@/shared/types';
+import { useMutation } from '@tanstack/react-query';
 
 import { useHeroId } from './useHeroId';
 import { useHeroUpdate } from './useHeroUpdate';
 
-export const useBackTownEntry = () => {
+export const useHeroStateMutation = () => {
   const id = useHeroId();
   const { updateHero } = useHeroUpdate();
   return useMutation({
-    mutationFn: async () => {
-      const res = await client.hero[':id'].action['back-town-entry'].$post({
+    mutationFn: async (type: StateType) => {
+      const res = await client.hero[':id'].state.$put({
         param: {
           id,
+        },
+        json: {
+          type,
         },
       });
       const data = await res.json();
@@ -21,10 +25,10 @@ export const useBackTownEntry = () => {
       return data;
     },
 
-    onSuccess: async () => {
+    onSuccess: (_, type) => {
       updateHero({
-        location: {
-          currentBuilding: null,
+        state: {
+          type,
         },
       });
     },

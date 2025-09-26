@@ -4,10 +4,10 @@ import { useCallback } from 'react';
 
 import { getMapOptions } from '../api/get-map';
 
-export const useChangeMap = (mapId: string) => {
+export const useMapUpdate = (mapId: string) => {
   const queryClient = useQueryClient();
 
-  const changeMap = useCallback(
+  const updateMap = useCallback(
     ({ params }: { params: Partial<Map> }) => {
       queryClient.setQueriesData<Map>({ queryKey: getMapOptions(mapId).queryKey }, (oldData) => {
         if (!oldData) return;
@@ -17,7 +17,7 @@ export const useChangeMap = (mapId: string) => {
     [mapId, queryClient],
   );
 
-  const changeTilePos = useCallback(
+  const updateMapTilePos = useCallback(
     (tileId: string, position: IPosition) => {
       queryClient.setQueriesData<Map>({ queryKey: getMapOptions(mapId).queryKey }, (oldData) => {
         if (!oldData?.tiles) return;
@@ -30,7 +30,7 @@ export const useChangeMap = (mapId: string) => {
     [mapId, queryClient],
   );
 
-  const removeTile = useCallback(
+  const removeMapTile = useCallback(
     ({ tileId }: { tileId: string }) => {
       queryClient.setQueriesData<Map>({ queryKey: getMapOptions(mapId).queryKey }, (oldData) => {
         if (!oldData?.tiles) return;
@@ -39,7 +39,7 @@ export const useChangeMap = (mapId: string) => {
     },
     [mapId, queryClient],
   );
-  const addTile = useCallback(
+  const addMapTile = useCallback(
     (newTile: Tile) => {
       queryClient.setQueriesData<Map>({ queryKey: getMapOptions(mapId).queryKey }, (oldData) => {
         if (!oldData?.tiles) return;
@@ -50,9 +50,9 @@ export const useChangeMap = (mapId: string) => {
   );
 
   return {
-    changeMap,
-    removeTile,
-    changeTilePos,
-    addTile,
+    updateMap,
+    removeMapTile,
+    updateMapTilePos,
+    addMapTile,
   };
 };

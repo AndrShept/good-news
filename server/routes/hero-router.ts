@@ -10,6 +10,7 @@ import {
   type Hero,
   type InventoryItem,
   type SuccessResponse,
+  type Tile,
   type Town,
   type WeaponHandType,
   createHeroSchema,
@@ -1330,9 +1331,8 @@ export const heroRouter = new Hono<Context>()
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
         with: {
-          location: true,
+          location: { with: { tile: true } },
           action: true,
-          tile: true,
         },
       });
 
@@ -1343,7 +1343,7 @@ export const heroRouter = new Hono<Context>()
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      if (hero.action.type !== 'IDLE') {
+      if (hero.action?.type !== 'IDLE') {
         throw new HTTPException(409, {
           message: 'Hero is currently busy with another action',
         });
@@ -1365,26 +1365,24 @@ export const heroRouter = new Hono<Context>()
           message: 'town id not found',
         });
       }
-      if (hero.tileId !== tileId) {
-        throw new HTTPException(409, {
-          message: 'hero not exist a town tile',
+      if (!hero.location?.tileId) {
+        throw new HTTPException(404, {
+          message: 'hero location tileId  not found',
+        });
+      }
+      if (!hero.location?.tile) {
+        throw new HTTPException(404, {
+          message: 'hero tile  not found',
         });
       }
 
-      await db
-        .update(locationTable)
-        .set({
+      await db.transaction(async (tx) => {
+        await tx.update(locationTable).set({
           townId: tile.townId,
-          mapId: null,
-          type: 'TOWN',
-        })
-        .where(eq(locationTable.id, hero.locationId));
-      await db
-        .update(heroTable)
-        .set({
-          tileId: null,
-        })
-        .where(eq(heroTable.id, id));
+        });
+        await tx.delete(tileTable).where(eq(tileTable.id, hero.location?.tileId!));
+      });
+
       const socketData: MapUpdateEvent = {
         type: 'HERO_ENTER_TOWN',
         payload: {
@@ -1399,7 +1397,7 @@ export const heroRouter = new Hono<Context>()
           hero: hero as Hero,
         },
       };
-      io.to(hero.location.mapId!).emit(socketEvents.mapUpdate(), socketData);
+      io.to(hero.location.tile?.mapId!).emit(socketEvents.mapUpdate(), socketData);
 
       return c.json<SuccessResponse>({
         message: 'enter town success',
@@ -1508,7 +1506,7 @@ export const heroRouter = new Hono<Context>()
 
       const socketMapData: MapUpdateEvent = {
         type: 'HERO_LEAVE_TOWN',
-        payload: heroTile,
+        payload: heroTile as Tile,
       };
       const socketTownData: TownUpdateEvent = {
         type: 'HERO_LEAVE_TOWN',

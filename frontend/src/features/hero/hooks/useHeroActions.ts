@@ -35,7 +35,7 @@ export const useHeroActions = () => {
 
 
   useLayoutEffect(() => {
-    const around = getTilesAroundHero({ x: hero.x, y: hero.y }, 2).filter(
+    const around = getTilesAroundHero({ x: hero.x, y: hero.y }, 1).filter(
       (pos) => tilesByPos[`${pos.x}-${pos.y}`]?.type !== 'WATER' && tilesByPos[`${pos.x}-${pos.y}`]?.type !== 'OBJECT',
     );
     setMovedTiles(around);

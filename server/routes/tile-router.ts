@@ -24,9 +24,8 @@ export const tileRouter = new Hono<Context>().get(
     const tile = await db.query.tileTable.findFirst({
       where: eq(tileTable.id, id),
       with: {
-        heroes: true,
         town: true,
-      }
+      },
     });
 
     return c.json<SuccessResponse<typeof tile>>({

@@ -13,9 +13,7 @@ export const useDrinkPotion = () => {
   const heroId = useHero((state) => state?.data?.id ?? '');
   return useMutation({
     mutationFn: drinkPotion,
-    onError: () => {
-      toastError();
-    },
+
     async onSuccess(data) {
       if (data.success) {
         await queryClient.invalidateQueries({

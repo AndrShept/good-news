@@ -1,4 +1,4 @@
-import { ApiHeroResponse, Hero, IPosition } from '@/shared/types';
+import { ApiHeroResponse, Hero, Tile } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
@@ -11,10 +11,10 @@ export type OmitDeepHero = Omit<Partial<Hero>, 'location' | 'state' | 'action' |
   state?: Partial<Hero['state']>;
 };
 
-export const useHeroChange = () => {
+export const useHeroUpdate = () => {
   const queryClient = useQueryClient();
 
-  const heroChange = useCallback(
+  const updateHero = useCallback(
     (data: OmitDeepHero) => {
       queryClient.setQueriesData<ApiHeroResponse>({ queryKey: getHeroOptions().queryKey }, (oldData) => {
         if (!oldData?.data) return;
@@ -25,7 +25,14 @@ export const useHeroChange = () => {
             ...data,
             action: { ...oldData.data.action, ...data.action },
             state: { ...oldData.data.state, ...data.state },
-            location: { ...oldData.data.location, ...data.location },
+            location: {
+              ...oldData.data.location,
+              ...data.location,
+              tile: {
+                ...oldData.data.location?.tile,
+                ...data.location?.tile,
+              },
+            },
             group: { ...oldData.data.group, ...data.group },
           },
         } as ApiHeroResponse;
@@ -34,8 +41,8 @@ export const useHeroChange = () => {
     [queryClient],
   );
 
-  const heroChangePos = useCallback(
-    (pos: IPosition) => {
+  const updateHeroTile = useCallback(
+    (data: Partial<Tile>) => {
       queryClient.setQueriesData<ApiHeroResponse>({ queryKey: getHeroOptions().queryKey }, (oldData) => {
         if (!oldData?.data) return;
         return {
@@ -44,7 +51,7 @@ export const useHeroChange = () => {
             ...oldData.data,
             location: {
               ...oldData.data.location,
-              tile: { ...oldData.data.location?.tile, ...pos },
+              tile: { ...oldData.data.location?.tile, ...data },
             },
           },
         } as ApiHeroResponse;
@@ -53,5 +60,5 @@ export const useHeroChange = () => {
     [queryClient],
   );
 
-  return { heroChange, heroChangePos };
+  return { updateHero, updateHeroTile };
 };

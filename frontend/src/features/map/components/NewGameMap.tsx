@@ -4,8 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 
 import { getMapOptions } from '../api/get-map';
-import { useChangeMap } from '../hooks/useChangeMap';
 import { useDragOnMap } from '../hooks/useDragOnMap';
+import { useMapUpdate } from '../hooks/useMapUpdate';
 import { useScaleMap } from '../hooks/useScaleMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
 import { GameTile } from './GameTile';
@@ -25,7 +25,7 @@ export const NewGameMap = () => {
   const MAP_WIDTH = map?.width ?? 0;
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const { removeTile } = useChangeMap(hero.mapId);
+  const { removeMapTile } = useMapUpdate(hero.mapId);
   const { scale } = useScaleMap(containerRef);
   const [isDragging, setIsDragging] = useState(false);
   const { handleMouseMove, hoverIndex, setStart } = useSetHoverIndex({
@@ -38,8 +38,6 @@ export const NewGameMap = () => {
   });
   const { movedTiles } = useHeroActions();
   const { handleMouseDown, handleMouseUp } = useDragOnMap({ setIsDragging, setStart });
-
-
 
   if (isLoading) return <p>LOADING MAP...</p>;
   if (isError) return <p>{error.message}</p>;
@@ -67,7 +65,7 @@ export const NewGameMap = () => {
       >
         {map.tiles?.map((tile) => (
           <div
-            // onClick={() => removeTile({ tileId: tile.id })}
+            // onClick={() => removeMapTile({ tileId: tile.id })}
             key={tile.id}
             style={{
               position: 'absolute',

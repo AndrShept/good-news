@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useTransition } from 'react';
 
 import { useHero } from '../hooks/useHero';
-import { useHeroSetState } from '../hooks/useHeroSetState';
+import { useHeroStateMutation } from '../hooks/useHeroStateMutation';
 
 export const CharacterPaperdollButton = () => {
   const { action, state } = useHero((state) => ({
@@ -11,7 +11,7 @@ export const CharacterPaperdollButton = () => {
     state: state?.data?.state,
   }));
   const [isPending, startTransition] = useTransition();
-  const { mutate } = useHeroSetState();
+  const { mutate } = useHeroStateMutation();
 
   return (
     <Button

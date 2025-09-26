@@ -28,6 +28,7 @@ export const ModifierInfoCard = ({ modifier }: Props) => {
       spellDamageCritPower: 'spell damage CP',
       restoreHealth: 'health',
       restoreMana: 'mana',
+      
     };
     return variants[modifier];
   };

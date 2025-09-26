@@ -1,22 +1,22 @@
 import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { useHeroChange } from '@/features/hero/hooks/useHeroChange';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
+import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
 import { joinRoomClient } from '@/lib/utils';
 import { MapUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useGameMessages } from '@/store/useGameMessages';
 import { useEffect, useRef } from 'react';
 
-import { useChangeMap } from './useChangeMap';
+import { useMapUpdate } from './useMapUpdate';
 
 export const useMapListener = () => {
   const setGameMessage = useGameMessages((state) => state.setGameMessage);
   const mapId = useHero((state) => state?.data?.location?.tile?.mapId ?? '');
   const id = useHeroId();
   const { socket } = useSocket();
-  const { heroChangePos, heroChange } = useHeroChange();
-  const { changeTilePos } = useChangeMap(mapId);
+  const { updateHero, updateHeroTile } = useHeroUpdate();
+  const { updateMapTilePos } = useMapUpdate(mapId);
   const prevMapIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -43,10 +43,10 @@ export const useMapListener = () => {
               type: 'success',
               text: `You have entered tile.`,
             });
-            heroChangePos(data.payload.newPosition);
-            heroChange({ action: { type: 'IDLE' } });
+            updateHeroTile({ ...data.payload.newPosition });
+            updateHero({ action: { type: 'IDLE' } });
           }
-          changeTilePos(data.payload.tileId, { ...data.payload.newPosition });
+          updateMapTilePos(data.payload.tileId, { ...data.payload.newPosition });
           break;
       }
     };
@@ -55,5 +55,5 @@ export const useMapListener = () => {
     return () => {
       socket.off(socketEvents.mapUpdate(), listener);
     };
-  }, [changeTilePos, heroChange, heroChangePos, id, setGameMessage, socket]);
+  }, [id, setGameMessage, socket, updateHero, updateHeroTile, updateMapTilePos]);
 };

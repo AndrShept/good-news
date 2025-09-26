@@ -1,7 +1,7 @@
 import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { useHeroChange } from '@/features/hero/hooks/useHeroChange';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
+import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
 import { buildingName as building } from '@/features/town/components/TownBuilding';
 import { joinRoomClient } from '@/lib/utils';
 import { TownUpdateEvent } from '@/shared/socket-data-types';
@@ -14,7 +14,7 @@ export const useTownListener = () => {
   const townId = useHero((state) => state?.data?.location?.townId ?? '');
   const id = useHeroId();
   const { socket } = useSocket();
-  const { heroChange } = useHeroChange();
+  const { updateHero, updateHeroTile } = useHeroUpdate();
   const prevTownIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -26,25 +26,27 @@ export const useTownListener = () => {
       joinMessage: 'join town room',
       leaveMessage: 'leave town room',
     });
-  }, [townId, socket]);
+  }, [townId, socket, setGameMessage]);
   useEffect(() => {
     const listener = (data: TownUpdateEvent) => {
       switch (data.type) {
         case 'HERO_LEAVE_TOWN':
           if (data.payload.heroId === id) {
-            heroChange({
+            updateHero({
               location: {
-                tile: { mapId: data.payload.mapId },
                 townId: null,
                 town: undefined,
                 currentBuilding: undefined,
               },
             });
+            updateHeroTile({
+              mapId: data.payload.mapId,
+            });
           }
           //filter heroes arr
           break;
         case 'WALK_TOWN':
-          heroChange({
+          updateHero({
             action: {
               type: 'IDLE',
             },
@@ -64,5 +66,5 @@ export const useTownListener = () => {
     return () => {
       socket.off(socketEvents.townUpdate(), listener);
     };
-  }, [socket]);
+  }, [id, setGameMessage, socket, updateHero, updateHeroTile]);
 };

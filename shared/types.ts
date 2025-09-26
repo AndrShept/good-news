@@ -162,7 +162,7 @@ export type Location = InferSelectModel<typeof locationTable> & {
   map?: Map;
   town?: Town;
   tile?: Tile;
-  hero?: Hero
+  hero?: Hero;
 };
 export type TownToBuildings = InferSelectModel<typeof townsToBuildingsTable> & {
   building: Building;
@@ -181,7 +181,7 @@ export type Tile = typeof tileTable.$inferSelect & {
   location?: Location;
 };
 export type TilesGrid = (Tile | null)[][];
-export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt'>;
+export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'heroId'>;
 export type Equipment = typeof equipmentTable.$inferSelect & {
   gameItem?: GameItem;
 };

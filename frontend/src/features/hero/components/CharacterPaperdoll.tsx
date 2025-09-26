@@ -2,28 +2,40 @@ import { Button } from '@/components/ui/button';
 import { LucideStepBack } from 'lucide-react';
 
 import { useHero } from '../hooks/useHero';
-import { useHeroSetState } from '../hooks/useHeroSetState';
+import { useHeroStateMutation } from '../hooks/useHeroStateMutation';
 import { Inventory } from './Inventory';
 import { Modifiers } from './Modifier';
 import { Paperdoll } from './Paperdoll';
 
 export const CharacterPaperdoll = () => {
-  const { avatarImage, currentExperience, currentHealth, equipments, id, level, maxExperience, maxHealth, maxMana, name, currentMana,characterImage } =
-    useHero((state) => ({
-      avatarImage: state?.data?.avatarImage ?? '',
-      characterImage: state?.data?.characterImage ?? '',
-      name: state?.data?.name ?? '',
-      id: state?.data?.id ?? '',
-      currentExperience: state?.data?.currentExperience ?? 0,
-      maxExperience: state?.data?.maxExperience ?? 0,
-      currentHealth: state?.data?.currentHealth ?? 0,
-      currentMana: state?.data?.currentMana ?? 0,
-      maxHealth: state?.data?.maxHealth ?? 0,
-      maxMana: state?.data?.maxMana ?? 0,
-      level: state?.data?.level ?? 0,
-      equipments: state?.data?.equipments ?? [],
-    }));
-  const { mutate, isPending } = useHeroSetState();
+  const {
+    avatarImage,
+    currentExperience,
+    currentHealth,
+    equipments,
+    id,
+    level,
+    maxExperience,
+    maxHealth,
+    maxMana,
+    name,
+    currentMana,
+    characterImage,
+  } = useHero((state) => ({
+    avatarImage: state?.data?.avatarImage ?? '',
+    characterImage: state?.data?.characterImage ?? '',
+    name: state?.data?.name ?? '',
+    id: state?.data?.id ?? '',
+    currentExperience: state?.data?.currentExperience ?? 0,
+    maxExperience: state?.data?.maxExperience ?? 0,
+    currentHealth: state?.data?.currentHealth ?? 0,
+    currentMana: state?.data?.currentMana ?? 0,
+    maxHealth: state?.data?.maxHealth ?? 0,
+    maxMana: state?.data?.maxMana ?? 0,
+    level: state?.data?.level ?? 0,
+    equipments: state?.data?.equipments ?? [],
+  }));
+  const { mutate, isPending } = useHeroStateMutation();
   return (
     <section className="flex flex-col gap-1">
       <Button variant="outline" disabled={isPending} onClick={() => mutate('IDLE')} className="ml-auto w-fit">
