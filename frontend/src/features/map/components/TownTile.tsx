@@ -1,15 +1,23 @@
-import React from 'react';
+import { Town } from '@/shared/types';
 
 import { TileImg } from './TileImg';
 
-interface Props {
-  image: string;
+interface Props extends Town {
+  TILE_SIZE: number;
 }
 
-export const TownTile = ({ image }: Props) => {
+export const TownTile = ({ TILE_SIZE, image, x, y }: Props) => {
   return (
-    <>
-      <TileImg image={image} className="absolute left-0 top-0" />
-    </>
+    <div
+      style={{
+        position: 'absolute',
+        left: x * TILE_SIZE,
+        top: y * TILE_SIZE,
+        width: TILE_SIZE,
+        height: TILE_SIZE,
+      }}
+    >
+      <TileImg image={image} />
+    </div>
   );
 };

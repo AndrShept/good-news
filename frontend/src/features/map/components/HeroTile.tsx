@@ -1,15 +1,25 @@
+import { Location } from '@/shared/types';
 import React from 'react';
 
 import { TileImg } from './TileImg';
 
-interface Props {
-  characterImage: string ;
+interface Props extends Location {
+  TILE_SIZE: number;
 }
 
-export const HeroTile = ({ characterImage }: Props) => {
+export const HeroTile = ({ x, y, hero, TILE_SIZE }: Props) => {
   return (
-    <>
-      <TileImg image={characterImage} className="absolute left-0 top-0 z-5" />
-    </>
+    <div
+      // onClick={() => removeMapTile({ tileId: tile.id })}
+      style={{
+        position: 'absolute',
+        left: x * TILE_SIZE,
+        top: y * TILE_SIZE,
+        width: TILE_SIZE,
+        height: TILE_SIZE,
+      }}
+    >
+      <TileImg image={hero?.characterImage ?? ''} />
+    </div>
   );
 };

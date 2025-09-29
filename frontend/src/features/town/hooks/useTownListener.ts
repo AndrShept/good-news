@@ -14,7 +14,7 @@ export const useTownListener = () => {
   const townId = useHero((state) => state?.data?.location?.townId ?? '');
   const id = useHeroId();
   const { socket } = useSocket();
-  const { updateHero, updateHeroTile } = useHeroUpdate();
+  const { updateHero } = useHeroUpdate();
   const prevTownIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -39,11 +39,9 @@ export const useTownListener = () => {
                 currentBuilding: undefined,
               },
             });
-            updateHeroTile({
-              mapId: data.payload.mapId,
-            });
+     
           }
-          //filter heroes arr
+
           break;
         case 'WALK_TOWN':
           updateHero({
@@ -66,5 +64,5 @@ export const useTownListener = () => {
     return () => {
       socket.off(socketEvents.townUpdate(), listener);
     };
-  }, [id, setGameMessage, socket, updateHero, updateHeroTile]);
+  }, [id, setGameMessage, socket, updateHero]);
 };

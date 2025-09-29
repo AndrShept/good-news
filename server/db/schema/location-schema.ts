@@ -21,8 +21,8 @@ export const locationTable = pgTable('location', {
     })
     .notNull(),
 
-  x: integer().default(0),
-  y: integer().default(0),
+  x: integer().default(0).notNull(),
+  y: integer().default(0).notNull(),
   currentBuilding: buildingNameTypeEnum(),
   createdAt: timestamp({
     mode: 'string',

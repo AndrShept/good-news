@@ -5,18 +5,18 @@ import { potionEntities } from '../entities/potions';
 import { townEntities } from '../entities/towns';
 import { buildingMapData } from '../lib/buildingMapData';
 
-const createTowns = async () => {
+export const createTowns = async () => {
   const towns = Object.values(townEntities).map((item) => ({ ...item, buildings: null }));
   await db.insert(townTable).values(towns);
 };
 
-const createBuildings = async () => {
+export const createBuildings = async () => {
   const buildings = Object.values(buildingEntities);
 
   await db.insert(buildingTable).values(buildings);
 };
 
-const createBuildingsOnTOwn = async () => {
+export const createBuildingsOnTOwn = async () => {
   const buildingOnTown = Object.values(townEntities)
     .flatMap((item) => {
       if (!!item.buildings?.length) {

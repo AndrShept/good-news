@@ -88,7 +88,6 @@ export const heroRouter = new Hono<Context>()
           location: {
             with: {
               town: true,
-              tile: true,
             },
           },
           equipments: {
@@ -1433,83 +1432,39 @@ export const heroRouter = new Hono<Context>()
       }
       const town = await db.query.townTable.findFirst({
         where: eq(townTable.id, hero.location.townId),
-        with: {
-          tile: true,
-        },
       });
       if (!town) {
         throw new HTTPException(404, {
           message: 'town not found',
         });
       }
-      if (!town.tile?.mapId) {
-        throw new HTTPException(404, {
-          message: 'town map Id not found',
-        });
-      }
-      if (!town.tile) {
-        throw new HTTPException(404, {
-          message: 'town tile  not found',
-        });
-      }
-      const tile = await db.query.tileTable.findFirst({
-        where: eq(tileTable.townId, town.id),
-      });
-      if (!tile) {
-        throw new HTTPException(404, {
-          message: 'tile not found',
-        });
-      }
 
-      const newTile = await db.transaction(async (tx) => {
-        const [newTile] = await tx
-          .insert(tileTable)
-          .values({
-            image: hero.characterImage,
-            mapId: town.tile!.mapId,
-            type: 'HERO',
-            x: town.tile!.x,
-            y: town.tile!.y,
-            z: 5,
-          })
-          .returning({ id: tileTable.id });
+      await db.transaction(async (tx) => {
         await tx
           .update(locationTable)
           .set({
-            townId: null,
-            tileId: newTile.id,
+            mapId: town.mapId,
+            x: town.x,
+            y: town.y,
+            townId: null
           })
-          .where(eq(locationTable.id, hero.location!.id));
-
-        return newTile;
+          .where(eq(locationTable.heroId, hero.id));
       });
 
-      const heroTile = await db.query.tileTable.findFirst({
-        where: eq(tileTable.id, newTile.id),
-        with: {
-          location: true,
-        },
-      });
-      if (!heroTile) {
-        throw new HTTPException(404, {
-          message: 'hero tile not found',
-        });
-      }
+      // const socketMapData: MapUpdateEvent = {
+      //   type: 'HERO_LEAVE_TOWN',
+      //   payload: heroTile as Tile,
+      // };
+      // const socketTownData: TownUpdateEvent = {
+      //   type: 'HERO_LEAVE_TOWN',
+      //   payload: {
+      //     heroId: hero.id,
+      //     mapId: tile.mapId,
+      //   },
+      // };
 
-      const socketMapData: MapUpdateEvent = {
-        type: 'HERO_LEAVE_TOWN',
-        payload: heroTile as Tile,
-      };
-      const socketTownData: TownUpdateEvent = {
-        type: 'HERO_LEAVE_TOWN',
-        payload: {
-          heroId: hero.id,
-          mapId: tile.mapId,
-        },
-      };
-
-      io.to(town.id).emit(socketEvents.townUpdate(), socketTownData);
-      io.to(tile.mapId).emit(socketEvents.mapUpdate(), socketMapData);
+      // io.to(town.id).emit(socketEvents.townUpdate(), socketTownData);
+      // io.to(tile.mapId).emit(socketEvents.mapUpdate(), socketMapData);
 
       return c.json<SuccessResponse>({
         message: 'leave town success ',

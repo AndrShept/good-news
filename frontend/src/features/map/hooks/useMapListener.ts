@@ -7,8 +7,8 @@ import { MapUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useGameMessages } from '@/store/useGameMessages';
 import { useEffect, useRef } from 'react';
+import { useMapHeroesUpdate } from './useMapHeroesUpdate';
 
-import { useMapUpdate } from './useMapUpdate';
 
 export const useMapListener = () => {
   const setGameMessage = useGameMessages((state) => state.setGameMessage);
@@ -16,7 +16,7 @@ export const useMapListener = () => {
   const id = useHeroId();
   const { socket } = useSocket();
   const { updateHero } = useHeroUpdate();
-  const { updateMapTilePos } = useMapUpdate(mapId);
+  const { updateHeroesPos } = useMapHeroesUpdate(mapId);
   const prevMapIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export const useMapListener = () => {
             });
             updateHero({ action: { type: 'IDLE' } });
           }
-          updateMapTilePos(data.payload.tileId, { ...data.payload.newPosition });
+          updateHeroesPos(data.payload.heroId, { ...data.payload.newPosition });
           break;
       }
     };
@@ -54,5 +54,5 @@ export const useMapListener = () => {
     return () => {
       socket.off(socketEvents.mapUpdate(), listener);
     };
-  }, [id, setGameMessage, socket, updateHero, updateHeroTile, updateMapTilePos]);
+  }, [id, setGameMessage, socket, updateHero, updateHeroesPos]);
 };

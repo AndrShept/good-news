@@ -173,7 +173,6 @@ export type Town = InferSelectModel<typeof townTable> & {
 export type Building = InferSelectModel<typeof buildingTable>;
 
 export type Map = typeof mapTable.$inferSelect & {
-  heroesLocation?: Location[];
   towns?: Town[];
   layers?: Layer[];
 };

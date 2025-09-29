@@ -1,31 +1,35 @@
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroActions } from '@/features/hero/hooks/useHeroActions';
-import { useQuery } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 
 import { getMapOptions } from '../api/get-map';
+import { getMapHeroesLocation, getMapHeroesLocationOptions } from '../api/get-map-heroes';
 import { useDragOnMap } from '../hooks/useDragOnMap';
-import { useMapUpdate } from '../hooks/useMapUpdate';
 import { useScaleMap } from '../hooks/useScaleMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
 import { GameTile } from './GameTile';
+import { HeroTile } from './HeroTile';
 import { MovableTile } from './MovableTile';
+import { TownTile } from './TownTile';
 
 export const NewGameMap = () => {
   const hero = useHero((state) => ({
     x: state?.data?.location?.x ?? 0,
     y: state?.data?.location?.y ?? 0,
-    tileId: state?.data?.location?.tile?.id ?? '',
     mapId: state?.data?.location?.mapId ?? '',
     townId: state?.data?.location?.townId ?? '',
   }));
-  const { data: map, isLoading, isError, error } = useQuery(getMapOptions(hero.mapId));
+
+  const result = useQueries({ queries: [getMapOptions(hero.mapId), getMapHeroesLocationOptions(hero.mapId)] });
+  const map = result[0].data;
+  const heroesLocation = result[1].data;
+  const isLoading = result.some((r) => r.isLoading);
   const TILE_SIZE = map?.tileWidth ?? 32;
   const MAP_HEIGHT = map?.height ?? 0;
   const MAP_WIDTH = map?.width ?? 0;
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const { removeMapTile } = useMapUpdate(hero.mapId);
   const { scale } = useScaleMap(containerRef);
   const [isDragging, setIsDragging] = useState(false);
   const { handleMouseMove, hoverIndex, setStart } = useSetHoverIndex({
@@ -40,8 +44,7 @@ export const NewGameMap = () => {
   const { handleMouseDown, handleMouseUp } = useDragOnMap({ setIsDragging, setStart });
 
   if (isLoading) return <p>LOADING MAP...</p>;
-  if (isError) return <p>{error.message}</p>;
-  if (!map) return <p>NO MAP FOUND</p>;
+
   console.log('MAP PAGE RENDER');
   return (
     <section
@@ -59,26 +62,15 @@ export const NewGameMap = () => {
           imageRendering: 'pixelated',
           width: MAP_WIDTH * TILE_SIZE,
           height: MAP_HEIGHT * TILE_SIZE,
-          backgroundImage: `url(${map.image})`,
+          backgroundImage: `url(${map?.image})`,
           transform: `scale(${scale})`,
         }}
       >
-        {map.tiles?.map((tile) => (
-          <div
-            // onClick={() => removeMapTile({ tileId: tile.id })}
-            key={tile.id}
-            style={{
-              position: 'absolute',
-              left: tile.x * TILE_SIZE,
-              top: tile.y * TILE_SIZE,
-              width: TILE_SIZE,
-              height: TILE_SIZE,
-            }}
-          >
-            <GameTile {...tile} />
-          </div>
-        ))}
-        {movedTiles?.map((position, idx) => <MovableTile key={idx} TILE_SIZE={TILE_SIZE} {...position} />)}
+        {map?.towns?.map((town) => <TownTile key={town.id} {...town} TILE_SIZE={TILE_SIZE} />)}
+        {heroesLocation?.map((location) => {
+          return <HeroTile key={location.id} {...location} TILE_SIZE={TILE_SIZE} />;
+        })}
+        {movedTiles?.map((position) => <MovableTile key={`${position.x}-${position.y}`} TILE_SIZE={TILE_SIZE} {...position} />)}
         {/* {hoverIndex !== null && !isDragging && (
           <div
             style={{
