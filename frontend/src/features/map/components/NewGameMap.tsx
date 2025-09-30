@@ -1,14 +1,14 @@
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroActions } from '@/features/hero/hooks/useHeroActions';
-import { useQueries, useQuery } from '@tanstack/react-query';
+import { useQueries } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 
 import { getMapOptions } from '../api/get-map';
-import { getMapHeroesLocation, getMapHeroesLocationOptions } from '../api/get-map-heroes';
+import { getMapHeroesLocationOptions } from '../api/get-map-heroes';
 import { useDragOnMap } from '../hooks/useDragOnMap';
 import { useScaleMap } from '../hooks/useScaleMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
-import { GameTile } from './GameTile';
+import { HeroActionsBar } from './HeroActionsBar';
 import { HeroTile } from './HeroTile';
 import { MovableTile } from './MovableTile';
 import { TownTile } from './TownTile';
@@ -40,38 +40,39 @@ export const NewGameMap = () => {
     scale,
     TILE_SIZE,
   });
-  const { movedTiles } = useHeroActions();
+  const { movedTiles, isHeroOnTownTile, heroesAtHeroPos } = useHeroActions();
   const { handleMouseDown, handleMouseUp } = useDragOnMap({ setIsDragging, setStart });
 
   if (isLoading) return <p>LOADING MAP...</p>;
 
   console.log('MAP PAGE RENDER');
   return (
-    <section
-      ref={containerRef}
-      className="relative mx-auto aspect-video h-[500px] overflow-hidden rounded border"
-      style={{ cursor: isDragging ? 'grabbing' : 'default' }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseUp}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-    >
-      <ul
-        className="relative origin-top-left"
-        style={{
-          imageRendering: 'pixelated',
-          width: MAP_WIDTH * TILE_SIZE,
-          height: MAP_HEIGHT * TILE_SIZE,
-          backgroundImage: `url(${map?.image})`,
-          transform: `scale(${scale})`,
-        }}
+    <section>
+      <div
+        ref={containerRef}
+        className="relative mx-auto aspect-video h-[500px] overflow-hidden rounded border"
+        style={{ cursor: isDragging ? 'grabbing' : 'default' }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseUp}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
       >
-        {map?.towns?.map((town) => <TownTile key={town.id} {...town} TILE_SIZE={TILE_SIZE} />)}
-        {heroesLocation?.map((location) => {
-          return <HeroTile key={location.id} {...location} TILE_SIZE={TILE_SIZE} />;
-        })}
-        {movedTiles?.map((position) => <MovableTile key={`${position.x}-${position.y}`} TILE_SIZE={TILE_SIZE} {...position} />)}
-        {/* {hoverIndex !== null && !isDragging && (
+        <ul
+          className="relative origin-top-left"
+          style={{
+            imageRendering: 'pixelated',
+            width: MAP_WIDTH * TILE_SIZE,
+            height: MAP_HEIGHT * TILE_SIZE,
+            backgroundImage: `url(${map?.image})`,
+            transform: `scale(${scale})`,
+          }}
+        >
+          {map?.towns?.map((town) => <TownTile key={town.id} {...town} TILE_SIZE={TILE_SIZE} />)}
+          {heroesLocation?.map((location) => {
+            return <HeroTile key={location.id} {...location} TILE_SIZE={TILE_SIZE} />;
+          })}
+          {movedTiles?.map((position) => <MovableTile key={`${position.x}-${position.y}`} TILE_SIZE={TILE_SIZE} {...position} />)}
+          {/* {hoverIndex !== null && !isDragging && (
           <div
             style={{
               position: 'absolute',
@@ -84,7 +85,9 @@ export const NewGameMap = () => {
             }}
           />
         )} */}
-      </ul>
+        </ul>
+      </div>
+      <HeroActionsBar isHeroOnTownTile={isHeroOnTownTile} heroesAtHeroPos={heroesAtHeroPos} />
     </section>
   );
 };

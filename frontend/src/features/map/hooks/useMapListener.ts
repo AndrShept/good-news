@@ -7,8 +7,8 @@ import { MapUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useGameMessages } from '@/store/useGameMessages';
 import { useEffect, useRef } from 'react';
-import { useMapHeroesUpdate } from './useMapHeroesUpdate';
 
+import { useMapHeroesUpdate } from './useMapHeroesUpdate';
 
 export const useMapListener = () => {
   const setGameMessage = useGameMessages((state) => state.setGameMessage);
@@ -16,7 +16,7 @@ export const useMapListener = () => {
   const id = useHeroId();
   const { socket } = useSocket();
   const { updateHero } = useHeroUpdate();
-  const { updateHeroesPos } = useMapHeroesUpdate(mapId);
+  const { updateHeroesPos, deleteHeroes, addHeroes } = useMapHeroesUpdate(mapId);
   const prevMapIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -33,8 +33,19 @@ export const useMapListener = () => {
     const listener = (data: MapUpdateEvent) => {
       switch (data.type) {
         case 'HERO_ENTER_TOWN':
+          if (id === data.payload.heroId) {
+            setGameMessage({
+              type: 'success',
+              text: `You have entered a town.`,
+            });
+            updateHero({ action: { type: 'IDLE' }, location: { mapId: null, townId: data.payload.townId } });
+          }
+          deleteHeroes(data.payload.heroId);
           break;
         case 'HERO_LEAVE_TOWN':
+          if (id === data.payload.heroId) {
+          }
+          addHeroes(data.payload.location);
           break;
 
         case 'WALK_MAP':
@@ -43,7 +54,7 @@ export const useMapListener = () => {
               type: 'success',
               text: `You have entered tile.`,
             });
-            updateHero({ action: { type: 'IDLE' } });
+            updateHero({ action: { type: 'IDLE' }, location: { ...data.payload.newPosition } });
           }
           updateHeroesPos(data.payload.heroId, { ...data.payload.newPosition });
           break;
@@ -54,5 +65,5 @@ export const useMapListener = () => {
     return () => {
       socket.off(socketEvents.mapUpdate(), listener);
     };
-  }, [id, setGameMessage, socket, updateHero, updateHeroesPos]);
+  }, [addHeroes, deleteHeroes, id, setGameMessage, socket, updateHero, updateHeroesPos]);
 };

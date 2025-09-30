@@ -32,14 +32,11 @@ export const useTownListener = () => {
       switch (data.type) {
         case 'HERO_LEAVE_TOWN':
           if (data.payload.heroId === id) {
-            updateHero({
-              location: {
-                townId: null,
-                town: undefined,
-                currentBuilding: undefined,
-              },
+            setGameMessage({
+              type: 'success',
+              text: `You have leave a town.`,
             });
-     
+            updateHero({ action: { type: 'IDLE' }, location: { mapId: data.payload.mapId, townId: null } });
           }
 
           break;

@@ -38,11 +38,11 @@ const createPotions = async () => {
 const go = async () => {
   console.time('create');
 
-  await createBuildings();
-  await createTowns();
+  // await createBuildings();
+  // await createTowns();
   await createPotions();
-  await createBuildingsOnTOwn();
-  await buildingMapData(townEntities.SOLMERE.name);
+  // await createBuildingsOnTOwn();
+  // await buildingMapData(townEntities.SOLMERE.name);
   console.timeEnd('create');
   console.info('COMPLETE!');
   return;

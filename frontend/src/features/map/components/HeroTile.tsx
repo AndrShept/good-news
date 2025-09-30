@@ -1,5 +1,5 @@
 import { Location } from '@/shared/types';
-import React from 'react';
+import React, { memo } from 'react';
 
 import { TileImg } from './TileImg';
 
@@ -7,10 +7,9 @@ interface Props extends Location {
   TILE_SIZE: number;
 }
 
-export const HeroTile = ({ x, y, hero, TILE_SIZE }: Props) => {
+export const HeroTile = memo(function HeroTile({ x, y, hero, TILE_SIZE }: Props) {
   return (
     <div
-      // onClick={() => removeMapTile({ tileId: tile.id })}
       style={{
         position: 'absolute',
         left: x * TILE_SIZE,
@@ -22,4 +21,4 @@ export const HeroTile = ({ x, y, hero, TILE_SIZE }: Props) => {
       <TileImg image={hero?.characterImage ?? ''} />
     </div>
   );
-};
+});

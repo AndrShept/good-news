@@ -4,24 +4,11 @@ import { useHeroId } from '@/features/hero/hooks/useHeroId';
 
 import { useEnterTown } from '../hooks/useEnterTown';
 
-type Props = {
-  isTown: boolean;
-  tileId: string;
-};
-
-export const EnterTownButton = ({ isTown, tileId }: Props) => {
+export const EnterTownButton = () => {
   const id = useHeroId();
   const { mutate, isPending } = useEnterTown();
   return (
-    <Button
-      onClick={() =>
-        mutate({
-          id,
-          tileId,
-        })
-      }
-      disabled={!isTown || isPending}
-    >
+    <Button onClick={() => mutate(id)} disabled={isPending}>
       <TownIcon /> Enter Town
     </Button>
   );
