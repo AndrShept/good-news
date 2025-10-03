@@ -1,5 +1,5 @@
-import type { ActionJobEvent } from '@/shared/job-types';
-import type { MapUpdateEvent, TownUpdateEvent } from '@/shared/socket-data-types';
+import type { ActionJobEvent, HeroOfflineJob } from '@/shared/job-types';
+import type { HeroOfflineData, MapUpdateEvent, TownUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 
 import { io } from '..';
@@ -28,6 +28,20 @@ export const actionQueueListeners = () => {
           type: 'WALK_MAP',
         };
         io.to(jobData.payload.mapId).emit(socketEvents.mapUpdate(), socketData);
+        break;
+      }
+      case 'HERO_OFFLINE': {
+        const socketData: HeroOfflineData = {
+          payload: jobData.payload,
+          type: 'HERO_OFFLINE',
+        };
+        if (jobData.payload.mapId) {
+          io.to(jobData.payload.mapId).emit(socketEvents.mapUpdate(), socketData);
+        }
+        if (jobData.payload.townId) {
+          io.to(jobData.payload.townId).emit(socketEvents.mapUpdate(), socketData);
+        }
+
         break;
       }
     }

@@ -4,12 +4,17 @@ import { useHeroId } from '@/features/hero/hooks/useHeroId';
 
 import { useEnterTown } from '../hooks/useEnterTown';
 
-export const EnterTownButton = () => {
+interface Props {
+  disabled: boolean;
+}
+
+export const EnterTownButton = ({ disabled }: Props) => {
   const id = useHeroId();
   const { mutate, isPending } = useEnterTown();
   return (
-    <Button onClick={() => mutate(id)} disabled={isPending}>
-      <TownIcon /> Enter Town
+    <Button variant={'secondary'} onClick={() => mutate(id)} disabled={isPending || disabled}>
+      <TownIcon />
+      <p className="truncate">Enter Town</p>
     </Button>
   );
 };

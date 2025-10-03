@@ -79,22 +79,12 @@ export const calculateWalkTime = (dexterity: number) => {
   return delay;
 };
 
-export function buildGrid(map: Map): (Tile | null)[][] | undefined {
-  if (!map.tiles?.length) return;
-
-  const grid: (Tile | null)[][] = Array.from({ length: map.height }, () => Array.from({ length: map.width }, () => null));
-
-  for (const tile of map.tiles) {
-    if (tile.y < map.height && tile.x < map.width) {
-      grid[tile.y][tile.x] = tile;
-    }
-  }
-
-  return grid;
-}
-
 export const getTileExists = (mapId: string, index: number, tileType: TileType) => {
   const map = getMapJson(mapId);
   const tiles = map.jsonUrl.layers.find((l) => l.name === tileType);
   return tiles?.data[index];
+};
+
+export const jobQueueId = {
+  offline: (heroId: string) => `offline-${heroId}`,
 };

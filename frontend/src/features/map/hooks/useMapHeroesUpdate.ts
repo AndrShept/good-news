@@ -14,7 +14,7 @@ export const useMapHeroesUpdate = (mapId: string) => {
         return oldData.map((location) => (location.heroId === heroId ? { ...location, ...position } : location));
       });
     },
-    [mapId, queryClient],
+    [mapId],
   );
   const deleteHeroes = useCallback(
     (heroId: string) => {
@@ -24,7 +24,7 @@ export const useMapHeroesUpdate = (mapId: string) => {
         return oldData.filter((location) => location.heroId !== heroId);
       });
     },
-    [mapId, queryClient],
+    [mapId],
   );
 
   const addHeroes = useCallback(
@@ -34,7 +34,7 @@ export const useMapHeroesUpdate = (mapId: string) => {
         return [...oldData, heroLocation];
       });
     },
-    [mapId, queryClient],
+    [mapId],
   );
 
   return {

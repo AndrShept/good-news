@@ -45,3 +45,8 @@ export type TownUpdateEvent =
       type: 'WALK_TOWN';
       payload: WalkTownJob['payload'];
     };
+
+export type HeroOfflineData = {
+  type: 'HERO_OFFLINE';
+  payload: { heroId: string; townId?: string; mapId?: string };
+};

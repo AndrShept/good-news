@@ -10,6 +10,7 @@ import { useScaleMap } from '../hooks/useScaleMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
 import { HeroActionsBar } from './HeroActionsBar';
 import { HeroTile } from './HeroTile';
+import { LocationHeroes } from './LocationHeroes';
 import { MovableTile } from './MovableTile';
 import { TownTile } from './TownTile';
 
@@ -19,6 +20,7 @@ export const NewGameMap = () => {
     y: state?.data?.location?.y ?? 0,
     mapId: state?.data?.location?.mapId ?? '',
     townId: state?.data?.location?.townId ?? '',
+    actionType: state?.data?.action?.type ?? 'IDLE',
   }));
 
   const result = useQueries({ queries: [getMapOptions(hero.mapId), getMapHeroesLocationOptions(hero.mapId)] });
@@ -40,39 +42,45 @@ export const NewGameMap = () => {
     scale,
     TILE_SIZE,
   });
-  const { movedTiles, isHeroOnTownTile, heroesAtHeroPos } = useHeroActions();
+  const { movedTiles, isHeroOnTownTile, heroesAtHeroPos, canFish } = useHeroActions();
   const { handleMouseDown, handleMouseUp } = useDragOnMap({ setIsDragging, setStart });
 
   if (isLoading) return <p>LOADING MAP...</p>;
 
   console.log('MAP PAGE RENDER');
   return (
-    <section>
-      <div
-        ref={containerRef}
-        className="relative mx-auto aspect-video h-[500px] overflow-hidden rounded border"
-        style={{ cursor: isDragging ? 'grabbing' : 'default' }}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseUp}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-      >
-        <ul
-          className="relative origin-top-left"
-          style={{
-            imageRendering: 'pixelated',
-            width: MAP_WIDTH * TILE_SIZE,
-            height: MAP_HEIGHT * TILE_SIZE,
-            backgroundImage: `url(${map?.image})`,
-            transform: `scale(${scale})`,
-          }}
+    <section className="flex gap-2">
+      <div className="mx-auto flex gap-2">
+        <div className="flex w-[120px] flex-col gap-2">
+          <HeroActionsBar canFish={canFish} isHeroOnTownTile={isHeroOnTownTile} heroActionType={hero.actionType} />
+          <LocationHeroes locationHeroes={heroesAtHeroPos} />
+        </div>
+
+        <div
+          ref={containerRef}
+          className="relative aspect-video h-[500px] overflow-hidden rounded border"
+          style={{ cursor: isDragging ? 'grabbing' : 'default' }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseUp}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
         >
-          {map?.towns?.map((town) => <TownTile key={town.id} {...town} TILE_SIZE={TILE_SIZE} />)}
-          {heroesLocation?.map((location) => {
-            return <HeroTile key={location.id} {...location} TILE_SIZE={TILE_SIZE} />;
-          })}
-          {movedTiles?.map((position) => <MovableTile key={`${position.x}-${position.y}`} TILE_SIZE={TILE_SIZE} {...position} />)}
-          {/* {hoverIndex !== null && !isDragging && (
+          <ul
+            className="relative origin-top-left"
+            style={{
+              imageRendering: 'pixelated',
+              width: MAP_WIDTH * TILE_SIZE,
+              height: MAP_HEIGHT * TILE_SIZE,
+              backgroundImage: `url(${map?.image})`,
+              transform: `scale(${scale})`,
+            }}
+          >
+            {map?.towns?.map((town) => <TownTile key={town.id} {...town} TILE_SIZE={TILE_SIZE} />)}
+            {heroesLocation?.map((location) => {
+              return <HeroTile key={location.id} {...location} TILE_SIZE={TILE_SIZE} />;
+            })}
+            {movedTiles?.map((position) => <MovableTile key={`${position.x}-${position.y}`} TILE_SIZE={TILE_SIZE} {...position} />)}
+            {/* {hoverIndex !== null && !isDragging && (
           <div
             style={{
               position: 'absolute',
@@ -85,9 +93,9 @@ export const NewGameMap = () => {
             }}
           />
         )} */}
-        </ul>
+          </ul>
+        </div>
       </div>
-      <HeroActionsBar isHeroOnTownTile={isHeroOnTownTile} heroesAtHeroPos={heroesAtHeroPos} />
     </section>
   );
 };

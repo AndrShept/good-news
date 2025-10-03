@@ -14,12 +14,14 @@ export const useHeroActions = () => {
     y: state?.data?.location?.y ?? 0,
   }));
   const map = useMap({ mapId: hero.mapId });
+
   const { data: heroesAtHeroPos } = useQuery({
     ...getMapHeroesLocationOptions(hero.mapId),
     select: (data) => data?.filter((l) => l.x === hero.x && l.y === hero.y),
   });
 
   const MAP_WIDTH = map?.width ?? 0;
+
   const layersByName = useMemo(() => {
     if (!map?.layers) return {};
     return map.layers.reduce<Record<string, (typeof map.layers)[number]>>((acc, layer) => {
@@ -27,12 +29,15 @@ export const useHeroActions = () => {
       return acc;
     }, {});
   }, [map?.layers]);
+
   const [movedTiles, setMovedTiles] = useState<null | IPosition[]>(null);
+
   const isHeroOnTownTile = useMemo(() => {
     return map?.towns?.some((town) => {
       return town.x === hero.x && town.y === hero.y;
     });
   }, [hero.x, hero.y, map?.towns]);
+
   const canFish = useMemo(() => {
     const around = getTilesAroundHero({ x: hero.x, y: hero.y }, 1);
     const water = layersByName['WATER']?.data;

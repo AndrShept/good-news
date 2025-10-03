@@ -46,7 +46,15 @@ import {
 import { buffTable } from '../db/schema/buff-schema';
 import { restorePotion } from '../lib/restorePotion';
 import { sumModifier } from '../lib/sumModifier';
-import { calculateWalkTime, generateRandomUuid, getTileExists, setSqlNow, setSqlNowByInterval, verifyHeroOwnership } from '../lib/utils';
+import {
+  calculateWalkTime,
+  generateRandomUuid,
+  getTileExists,
+  jobQueueId,
+  setSqlNow,
+  setSqlNowByInterval,
+  verifyHeroOwnership,
+} from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
 
@@ -330,7 +338,8 @@ export const heroRouter = new Hono<Context>()
           message: 'access denied',
         });
       }
-
+      const jobId = jobQueueId.offline(hero.id);
+      await actionQueue.remove(jobId);
       await db
         .update(heroTable)
         .set({

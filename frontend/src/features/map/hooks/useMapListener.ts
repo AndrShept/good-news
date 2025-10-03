@@ -3,7 +3,7 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
 import { joinRoomClient } from '@/lib/utils';
-import { MapUpdateEvent } from '@/shared/socket-data-types';
+import { HeroOfflineData, MapUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useGameMessages } from '@/store/useGameMessages';
 import { useEffect, useRef } from 'react';
@@ -30,7 +30,7 @@ export const useMapListener = () => {
     });
   }, [mapId, setGameMessage, socket]);
   useEffect(() => {
-    const listener = (data: MapUpdateEvent) => {
+    const listener = (data: MapUpdateEvent | HeroOfflineData) => {
       switch (data.type) {
         case 'HERO_ENTER_TOWN':
           if (id === data.payload.heroId) {
@@ -44,12 +44,14 @@ export const useMapListener = () => {
           break;
         case 'HERO_LEAVE_TOWN':
           if (id === data.payload.heroId) {
+            console.log('');
           }
           addHeroes(data.payload.location);
           break;
 
         case 'WALK_MAP':
           if (id === data.payload.heroId) {
+            console.log('DIXS');
             setGameMessage({
               type: 'success',
               text: `You have entered tile.`,
@@ -57,6 +59,9 @@ export const useMapListener = () => {
             updateHero({ action: { type: 'IDLE' }, location: { ...data.payload.newPosition } });
           }
           updateHeroesPos(data.payload.heroId, { ...data.payload.newPosition });
+          break;
+        case 'HERO_OFFLINE':
+          deleteHeroes(data.payload.heroId);
           break;
       }
     };
