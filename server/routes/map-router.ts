@@ -1,3 +1,5 @@
+import type { MapUpdateEvent } from '@/shared/socket-data-types';
+import { socketEvents } from '@/shared/socket-events';
 import type { Location, Map, SuccessResponse } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq } from 'drizzle-orm';
@@ -5,6 +7,7 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
+import { io } from '..';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { heroTable, locationTable, mapNameTypeEnum, mapTable, tileTable } from '../db/schema';
@@ -34,9 +37,10 @@ export const mapRouter = new Hono<Context>()
           message: 'map not found',
         });
       }
-      console.log('GET MAP');
+
       const mapJson = getMapJson(map.id);
 
+      console.log('GET MAP');
       return c.json<SuccessResponse<Map>>({
         message: 'map fetched!',
         success: true,

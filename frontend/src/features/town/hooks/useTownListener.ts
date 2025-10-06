@@ -4,10 +4,12 @@ import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
 import { buildingName as building } from '@/features/town/components/TownBuilding';
 import { joinRoomClient } from '@/lib/utils';
-import { TownUpdateEvent } from '@/shared/socket-data-types';
+import { HeroOfflineData, HeroOnlineData, TownUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useGameMessages } from '@/store/useGameMessages';
 import { useEffect, useRef } from 'react';
+
+import { useTownHeroesUpdate } from './useTownHeroesUpdate';
 
 export const useTownListener = () => {
   const setGameMessage = useGameMessages((state) => state.setGameMessage);
@@ -15,6 +17,7 @@ export const useTownListener = () => {
   const id = useHeroId();
   const { socket } = useSocket();
   const { updateHero } = useHeroUpdate();
+  const { addHeroes, deleteHeroes } = useTownHeroesUpdate(townId);
   const prevTownIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -28,7 +31,7 @@ export const useTownListener = () => {
     });
   }, [townId, socket, setGameMessage]);
   useEffect(() => {
-    const listener = (data: TownUpdateEvent) => {
+    const listener = (data: TownUpdateEvent | HeroOfflineData | HeroOnlineData) => {
       switch (data.type) {
         case 'HERO_LEAVE_TOWN':
           if (data.payload.heroId === id) {
@@ -38,7 +41,7 @@ export const useTownListener = () => {
             });
             updateHero({ action: { type: 'IDLE' }, location: { mapId: data.payload.mapId, townId: null } });
           }
-
+          deleteHeroes(data.payload.heroId);
           break;
         case 'WALK_TOWN':
           updateHero({
@@ -54,6 +57,15 @@ export const useTownListener = () => {
             text: `You have entered the ${building[data.payload.buildingName]}.`,
           });
           break;
+        case 'HERO_ENTER_TOWN':
+          addHeroes(data.payload);
+          break;
+        case 'HERO_OFFLINE':
+          deleteHeroes(data.payload.heroId);
+          break;
+        case 'HERO_ONLINE':
+          addHeroes(data.payload);
+          break;
       }
     };
     socket.on(socketEvents.townUpdate(), listener);
@@ -61,5 +73,5 @@ export const useTownListener = () => {
     return () => {
       socket.off(socketEvents.townUpdate(), listener);
     };
-  }, [id, setGameMessage, socket, updateHero]);
+  }, [addHeroes, deleteHeroes, id, setGameMessage, socket, updateHero]);
 };

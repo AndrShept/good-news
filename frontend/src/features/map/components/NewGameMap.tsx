@@ -50,8 +50,8 @@ export const NewGameMap = () => {
   console.log('MAP PAGE RENDER');
   return (
     <section className="flex gap-2">
-      <div className="mx-auto flex gap-2">
-        <div className="flex w-[120px] flex-col gap-2">
+      <div className="mx-auto flex gap-2 w-full">
+        <div className="flex max-w-[200px] flex-col gap-2">
           <HeroActionsBar canFish={canFish} isHeroOnTownTile={isHeroOnTownTile} heroActionType={hero.actionType} />
           <LocationHeroes locationHeroes={heroesAtHeroPos} />
         </div>

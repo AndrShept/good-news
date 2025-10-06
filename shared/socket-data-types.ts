@@ -30,12 +30,7 @@ export type MapUpdateEvent =
 export type TownUpdateEvent =
   | {
       type: 'HERO_ENTER_TOWN';
-      payload: {
-        heroId: string;
-        townId: string;
-        tileId: string;
-        hero: Hero;
-      };
+      payload: Location;
     }
   | {
       type: 'HERO_LEAVE_TOWN';
@@ -49,4 +44,8 @@ export type TownUpdateEvent =
 export type HeroOfflineData = {
   type: 'HERO_OFFLINE';
   payload: { heroId: string; townId?: string; mapId?: string };
+};
+export type HeroOnlineData = {
+  type: 'HERO_ONLINE';
+  payload: Location;
 };

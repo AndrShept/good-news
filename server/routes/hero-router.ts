@@ -1,6 +1,6 @@
 import { BASE_STATS, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
 import { type WalkMapJob, type WalkTownJob, jobName } from '@/shared/job-types';
-import type { MapUpdateEvent, TownUpdateEvent } from '@/shared/socket-data-types';
+import type { HeroOnlineData, MapUpdateEvent, TownUpdateEvent } from '@/shared/socket-data-types';
 import {
   type Buff,
   type Equipment,
@@ -340,12 +340,35 @@ export const heroRouter = new Hono<Context>()
       }
       const jobId = jobQueueId.offline(hero.id);
       await actionQueue.remove(jobId);
+
+      const location = await db.query.locationTable.findFirst({
+        where: eq(locationTable.heroId, hero.id),
+        with: { hero: true },
+      });
+      if (!location) {
+        throw new HTTPException(404, {
+          message: 'location not found',
+        });
+      }
+      const socketData: HeroOnlineData = {
+        type: 'HERO_ONLINE',
+        payload: location,
+      };
+
       await db
         .update(heroTable)
         .set({
           isOnline,
         })
         .where(eq(heroTable.id, id));
+
+      if (location.mapId) {
+        io.to(location.mapId).emit(socketEvents.mapUpdate(), socketData);
+      }
+      if (location.townId) {
+        io.to(location.townId).emit(socketEvents.townUpdate(), socketData);
+      }
+
       return c.json<SuccessResponse>({ success: true, message: 'hero status change' }, 200);
     },
   )
@@ -1372,14 +1395,19 @@ export const heroRouter = new Hono<Context>()
           .where(eq(locationTable.heroId, hero.id));
       });
 
-      const socketData: MapUpdateEvent = {
+      const socketMapData: MapUpdateEvent = {
         type: 'HERO_ENTER_TOWN',
         payload: {
           townId: town.id,
           heroId: hero.id,
         },
       };
-      io.to(hero.location.mapId!).emit(socketEvents.mapUpdate(), socketData);
+      const socketTownData: TownUpdateEvent = {
+        type: 'HERO_ENTER_TOWN',
+        payload: { ...hero.location, hero: hero as Hero },
+      };
+      io.to(hero.location.mapId!).emit(socketEvents.mapUpdate(), socketMapData);
+      io.to(town.id).emit(socketEvents.townUpdate(), socketTownData);
 
       return c.json<SuccessResponse>({
         message: 'enter town success',

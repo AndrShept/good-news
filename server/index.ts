@@ -13,7 +13,6 @@ import { Server } from 'socket.io';
 import type { Context } from './context';
 import { game } from './lib/game';
 import { heroOffline } from './lib/heroOffline';
-import { heroOnline } from './lib/heroOnline';
 import { sessionHandler } from './middleware/sessionHandler';
 import { actionQueueListeners } from './queue/actionQueueListeners';
 import { authRouter } from './routes/auth-router';

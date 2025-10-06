@@ -39,7 +39,7 @@ export const actionQueueListeners = () => {
           io.to(jobData.payload.mapId).emit(socketEvents.mapUpdate(), socketData);
         }
         if (jobData.payload.townId) {
-          io.to(jobData.payload.townId).emit(socketEvents.mapUpdate(), socketData);
+          io.to(jobData.payload.townId).emit(socketEvents.townUpdate(), socketData);
         }
 
         break;

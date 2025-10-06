@@ -1,6 +1,6 @@
-import { IPosition, Location} from '@/shared/types';
-import { useQueryClient } from '@tanstack/react-query';
-import { useCallback } from 'react';
+import { IPosition, Location } from '@/shared/types';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useMemo } from 'react';
 
 import { getMapHeroesLocationOptions } from '../api/get-map-heroes';
 
@@ -31,6 +31,8 @@ export const useMapHeroesUpdate = (mapId: string) => {
     (heroLocation: Location) => {
       queryClient.setQueriesData<Location[]>({ queryKey: getMapHeroesLocationOptions(mapId).queryKey }, (oldData) => {
         if (!oldData) return;
+        if (oldData.some((location) => location.id === heroLocation.id)) return;
+
         return [...oldData, heroLocation];
       });
     },

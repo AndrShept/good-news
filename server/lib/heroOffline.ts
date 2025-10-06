@@ -31,7 +31,7 @@ export const heroOffline = async (heroId: string) => {
   };
   await actionQueue.remove(jobId);
   await actionQueue.add(jobName['hero-offline'], jobData, {
-    delay: 30_000,
+    delay: 10_000,
     jobId,
     removeOnComplete: true,
   });
