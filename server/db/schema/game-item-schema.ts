@@ -33,26 +33,15 @@ export const gameItemTable = pgTable('game_item', {
   price: integer().default(0).notNull(),
   duration: integer().default(0).notNull(),
 
-  modifierId: uuid()
-    .notNull()
-    .references(() => modifierTable.id, {
-      onDelete: 'cascade',
-    }),
-
   createdAt: timestamp('created_at', {
     withTimezone: true,
     mode: 'string',
   })
     .notNull()
     .defaultNow(),
-  updatedAt: timestamp('updated_at', {
-    mode: 'string',
-  }),
+
 });
 
 export const gameItemRelations = relations(gameItemTable, ({ one }) => ({
-  modifier: one(modifierTable, {
-    fields: [gameItemTable.modifierId],
-    references: [modifierTable.id],
-  }),
+  modifier: one(modifierTable),
 }));

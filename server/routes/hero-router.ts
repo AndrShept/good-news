@@ -6,12 +6,11 @@ import {
   type Equipment,
   type EquipmentSlotType,
   type ErrorResponse,
+  type GameItem,
   type GameItemType,
   type Hero,
   type InventoryItem,
   type SuccessResponse,
-  type Tile,
-  type Town,
   type WeaponHandType,
   createHeroSchema,
   statsSchema,
@@ -44,6 +43,7 @@ import {
   townTable,
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
+import { heroOnline } from '../lib/heroOnline';
 import { restorePotion } from '../lib/restorePotion';
 import { sumModifier } from '../lib/sumModifier';
 import {
@@ -65,7 +65,6 @@ export const heroRouter = new Hono<Context>()
 
     async (c) => {
       const id = c.get('user')?.id as string;
-
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.userId, id),
       });
@@ -74,14 +73,20 @@ export const heroRouter = new Hono<Context>()
           message: 'hero not found',
         });
       }
-      const inventoryCount = await db.$count(inventoryItemTable, eq(inventoryItemTable.inventoryHeroId, hero.id));
-      await db
-        .update(heroTable)
-        .set({
-          currentInventorySlots: inventoryCount,
-        })
-        .where(eq(heroTable.id, hero.id));
-      await db.delete(buffTable).where(and(eq(buffTable.heroId, hero.id), lte(buffTable.completedAt, new Date().toISOString())));
+      if (hero.userId !== id) {
+        throw new HTTPException(403, {
+          message: 'access denied',
+        });
+      }
+      // const inventoryCount = await db.$count(inventoryItemTable, eq(inventoryItemTable.heroId, hero.id));
+      // await db
+      //   .update(heroTable)
+      //   .set({
+      //     currentInventorySlots: inventoryCount,
+      //   })
+      //   .where(eq(heroTable.id, hero.id));
+      // await db.delete(buffTable).where(and(eq(buffTable.heroId, hero.id), lte(buffTable.completedAt, new Date().toISOString())));
+
       const updatedHero = await db.query.heroTable.findFirst({
         where: eq(heroTable.userId, id),
         with: {
@@ -109,6 +114,8 @@ export const heroRouter = new Hono<Context>()
           },
         },
       });
+
+      await heroOnline(hero.id);
 
       return c.json<SuccessResponse<Hero>>({
         success: true,
@@ -304,74 +311,6 @@ export const heroRouter = new Hono<Context>()
       return c.json<SuccessResponse>({ success: true, message: 'Stats have been successfully updated.' }, 200);
     },
   )
-  .put(
-    '/:id/status',
-    loggedIn,
-    zValidator(
-      'param',
-      z.object({
-        id: z.string(),
-      }),
-    ),
-    zValidator(
-      'json',
-      z.object({
-        isOnline: z.boolean(),
-      }),
-    ),
-
-    async (c) => {
-      const userId = c.get('user')?.id as string;
-      const { id } = c.req.valid('param');
-      const { isOnline } = c.req.valid('json');
-
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-      });
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'Hero not found',
-        });
-      }
-      if (hero.userId !== userId) {
-        throw new HTTPException(403, {
-          message: 'access denied',
-        });
-      }
-      const jobId = jobQueueId.offline(hero.id);
-      await actionQueue.remove(jobId);
-
-      const location = await db.query.locationTable.findFirst({
-        where: eq(locationTable.heroId, hero.id),
-        with: { hero: true },
-      });
-      if (!location) {
-        throw new HTTPException(404, {
-          message: 'location not found',
-        });
-      }
-      const socketData: HeroOnlineData = {
-        type: 'HERO_ONLINE',
-        payload: location,
-      };
-
-      await db
-        .update(heroTable)
-        .set({
-          isOnline,
-        })
-        .where(eq(heroTable.id, id));
-
-      if (location.mapId) {
-        io.to(location.mapId).emit(socketEvents.mapUpdate(), socketData);
-      }
-      if (location.townId) {
-        io.to(location.townId).emit(socketEvents.townUpdate(), socketData);
-      }
-
-      return c.json<SuccessResponse>({ success: true, message: 'hero status change' }, 200);
-    },
-  )
   .get(
     '/:id/inventories',
     loggedIn,
@@ -399,7 +338,7 @@ export const heroRouter = new Hono<Context>()
       }
 
       const inventories = await db.query.inventoryItemTable.findMany({
-        where: eq(inventoryItemTable.inventoryHeroId, id),
+        where: eq(inventoryItemTable.heroId, id),
         with: {
           gameItem: { with: { modifier: true } },
         },
@@ -409,7 +348,7 @@ export const heroRouter = new Hono<Context>()
       return c.json<SuccessResponse<InventoryItem[]>>({
         message: 'inventories fetched !',
         success: true,
-        data: inventories,
+        data: inventories as InventoryItem[],
       });
     },
   )
@@ -501,7 +440,7 @@ export const heroRouter = new Hono<Context>()
           {
             success: true,
             message: 'You success buy item',
-            data: inventoryItem,
+            data: inventoryItem as InventoryItem,
           },
           200,
         );
@@ -525,7 +464,7 @@ export const heroRouter = new Hono<Context>()
           .values({
             id: generateRandomUuid(),
             gameItemId: itemId,
-            inventoryHeroId: id,
+            heroId: id,
           })
           .returning();
       });
@@ -534,7 +473,7 @@ export const heroRouter = new Hono<Context>()
         {
           success: true,
           message: 'You success buy item',
-          data: { ...newInventoryItem, gameItem },
+          data: { ...newInventoryItem, gameItem: gameItem as GameItem },
         },
         201,
       );
@@ -787,7 +726,7 @@ export const heroRouter = new Hono<Context>()
           .where(eq(heroTable.id, hero.id));
         await tx.insert(inventoryItemTable).values({
           id: generateRandomUuid(),
-          inventoryHeroId: hero.id,
+          heroId: hero.id,
           gameItemId: equipmentItem.gameItemId,
         });
       });
@@ -915,8 +854,8 @@ export const heroRouter = new Hono<Context>()
           message: 'This item not a potion',
         });
       }
-      const isHealthPotion = inventoryItemPotion.gameItem.modifier.restoreHealth && !inventoryItemPotion.gameItem.modifier.restoreMana;
-      const isManaPotion = inventoryItemPotion.gameItem.modifier.restoreMana && !inventoryItemPotion.gameItem.modifier.restoreHealth;
+      const isHealthPotion = inventoryItemPotion?.gameItem?.modifier?.restoreHealth && !inventoryItemPotion.gameItem.modifier.restoreMana;
+      const isManaPotion = inventoryItemPotion?.gameItem?.modifier?.restoreMana && !inventoryItemPotion.gameItem.modifier.restoreHealth;
 
       const isBuffPotion = inventoryItemPotion.gameItem.duration > 0;
       const isFullHealth = hero.currentHealth >= hero.maxHealth;
@@ -937,8 +876,8 @@ export const heroRouter = new Hono<Context>()
           currentMana: hero.currentMana,
           maxHealth: hero.maxHealth,
           maxMana: hero.maxMana,
-          restoreHealth: inventoryItemPotion.gameItem.modifier.restoreHealth,
-          restoreMana: inventoryItemPotion.gameItem.modifier.restoreMana,
+          restoreHealth: inventoryItemPotion?.gameItem?.modifier?.restoreHealth ?? 0,
+          restoreMana: inventoryItemPotion?.gameItem?.modifier?.restoreMana ?? 0,
           heroId: id,
           itemId,
           potionQuantity: inventoryItemPotion.quantity,
@@ -946,7 +885,7 @@ export const heroRouter = new Hono<Context>()
         return c.json<SuccessResponse<InventoryItem>>({
           success: true,
           message: `You success use potion`,
-          data: inventoryItemPotion,
+          data: inventoryItemPotion as InventoryItem,
         });
       }
       if (isManaPotion) {
@@ -965,8 +904,8 @@ export const heroRouter = new Hono<Context>()
           currentMana: hero.currentMana,
           maxHealth: hero.maxHealth,
           maxMana: hero.maxMana,
-          restoreHealth: inventoryItemPotion.gameItem.modifier.restoreHealth,
-          restoreMana: inventoryItemPotion.gameItem.modifier.restoreMana,
+          restoreHealth: inventoryItemPotion?.gameItem?.modifier?.restoreHealth ?? 0,
+          restoreMana: inventoryItemPotion?.gameItem?.modifier?.restoreMana ?? 0,
           heroId: id,
           itemId,
           potionQuantity: inventoryItemPotion.quantity,
@@ -983,25 +922,26 @@ export const heroRouter = new Hono<Context>()
         }
         await db.transaction(async (tx) => {
           const completedAt = new Date(Date.now() + inventoryItemPotion.gameItem.duration).toISOString();
-          const [modifier] = await tx
-            .insert(modifierTable)
-            .values({
-              ...inventoryItemPotion.gameItem.modifier,
-              id: generateRandomUuid(),
-              createdAt: new Date().toISOString(),
-            })
-            .returning();
 
-          await tx.insert(buffTable).values({
+          const [newBuff] = await tx
+            .insert(buffTable)
+            .values({
+              id: generateRandomUuid(),
+              name: inventoryItemPotion.gameItem.name,
+              image: inventoryItemPotion.gameItem.image,
+              duration: inventoryItemPotion.gameItem.duration,
+              type: 'POTION',
+              heroId: id,
+              completedAt,
+            })
+            .returning({ id: buffTable.id });
+          await tx.insert(modifierTable).values({
+            ...inventoryItemPotion.gameItem.modifier,
             id: generateRandomUuid(),
-            name: inventoryItemPotion.gameItem.name,
-            image: inventoryItemPotion.gameItem.image,
-            duration: inventoryItemPotion.gameItem.duration,
-            type: 'POTION',
-            modifierId: modifier.id,
-            heroId: id,
-            completedAt,
+            createdAt: new Date().toISOString(),
+            buffId: newBuff.id,
           });
+
           if (inventoryItemPotion.quantity > 1) {
             await tx
               .update(inventoryItemTable)
@@ -1017,7 +957,7 @@ export const heroRouter = new Hono<Context>()
         return c.json<SuccessResponse<InventoryItem>>({
           success: true,
           message: `You success use potion`,
-          data: inventoryItemPotion,
+          data: inventoryItemPotion as InventoryItem,
         });
       }
       await restorePotion({
@@ -1025,8 +965,8 @@ export const heroRouter = new Hono<Context>()
         currentMana: hero.currentMana,
         maxHealth: hero.maxHealth,
         maxMana: hero.maxMana,
-        restoreHealth: inventoryItemPotion.gameItem.modifier.restoreHealth,
-        restoreMana: inventoryItemPotion.gameItem.modifier.restoreMana,
+        restoreHealth: inventoryItemPotion?.gameItem?.modifier?.restoreHealth ?? 0,
+        restoreMana: inventoryItemPotion?.gameItem?.modifier?.restoreMana ?? 0,
         heroId: id,
         itemId,
         potionQuantity: inventoryItemPotion.quantity,
@@ -1034,7 +974,7 @@ export const heroRouter = new Hono<Context>()
       return c.json<SuccessResponse<InventoryItem>>({
         success: true,
         message: `You success use potion`,
-        data: inventoryItemPotion,
+        data: inventoryItemPotion as InventoryItem,
       });
     },
   )
@@ -1064,7 +1004,7 @@ export const heroRouter = new Hono<Context>()
     return c.json<SuccessResponse<Buff[]>>({
       message: 'buffs fetched!',
       success: true,
-      data: buffs,
+      data: buffs as Buff[],
     });
   })
 

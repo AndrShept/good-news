@@ -36,28 +36,36 @@ export const modifierTable = pgTable('modifier', {
   meleeDamage: integer().default(0).notNull(),
   meleeDamageCritPower: integer().default(0).notNull(),
   meleeDamageCritChance: integer().default(0).notNull(),
-  heroId: uuid()
-    .references(() => heroTable.id, {
-      onDelete: 'cascade',
-    })
-    .notNull(),
+  heroId: uuid().references(() => heroTable.id, {
+    onDelete: 'cascade',
+  }),
+  gameItemId: uuid().references(() => gameItemTable.id, {
+    onDelete: 'cascade',
+  }),
+  buffId: uuid().references(() => buffTable.id, {
+    onDelete: 'cascade',
+  }),
+
   createdAt: timestamp('created_at', {
     withTimezone: true,
     mode: 'string',
   })
     .notNull()
     .defaultNow(),
-  updatedAt: timestamp('updated_at', {
-    mode: 'string',
-  }),
 });
 
-export const modifierRelations = relations(modifierTable, ({ many, one }) => ({
+export const modifierRelations = relations(modifierTable, ({ one }) => ({
   hero: one(heroTable, {
     fields: [modifierTable.heroId],
     references: [heroTable.id],
   }),
-  gameItems: many(gameItemTable),
+  gameItems: one(gameItemTable, {
+    fields: [modifierTable.gameItemId],
+    references: [gameItemTable.id],
+  }),
 
-  buffs: many(buffTable),
+  buffs: one(buffTable, {
+    fields: [modifierTable.buffId],
+    references: [buffTable.id],
+  }),
 }));

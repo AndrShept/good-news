@@ -18,11 +18,6 @@ export const buffTable = pgTable('buff', {
     .references(() => heroTable.id, {
       onDelete: 'cascade',
     }),
-  modifierId: uuid()
-    .notNull()
-    .references(() => modifierTable.id, {
-      onDelete: 'cascade',
-    }),
   completedAt: timestamp(' completed_at', {
     withTimezone: true,
     mode: 'string',
@@ -39,10 +34,7 @@ export const buffTable = pgTable('buff', {
 });
 
 export const buffRelations = relations(buffTable, ({ one }) => ({
-  modifier: one(modifierTable, {
-    fields: [buffTable.modifierId],
-    references: [modifierTable.id],
-  }),
+  modifier: one(modifierTable),
     hero: one(heroTable, {
     fields: [buffTable.heroId],
     references: [heroTable.id],
