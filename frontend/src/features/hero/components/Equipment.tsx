@@ -1,4 +1,3 @@
-import { GameItemCard } from '@/components/GameItemCard';
 import { cn } from '@/lib/utils';
 import { Equipment, EquipmentSlotType } from '@/shared/types';
 import { memo } from 'react';
@@ -83,7 +82,8 @@ export const Equipments = memo(({ equipments, characterImage }: Props) => {
         {BASE_EQUIPMENTS_IMAGE.slice(0, 5).map((equipment) => (
           <li className="size-12 border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
-              <GameItemCard item={equipmentBySlot[equipment.slot]} />
+              // <GameItemCard item={equipmentBySlot[equipment.slot]} />
+              <div>S</div>
             ) : (
               <img
                 style={{ imageRendering: 'pixelated' }}
@@ -102,7 +102,8 @@ export const Equipments = memo(({ equipments, characterImage }: Props) => {
         {BASE_EQUIPMENTS_IMAGE.slice(5, 10).map((equipment) => (
           <li className="size-12 border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
-              <GameItemCard item={equipmentBySlot[equipment.slot]} />
+              // <GameItemCard item={equipmentBySlot[equipment.slot]} />
+              <div>s</div>
             ) : (
               <img
                 style={{ imageRendering: 'pixelated' }}

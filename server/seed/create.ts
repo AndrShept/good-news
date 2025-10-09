@@ -1,5 +1,5 @@
 import { db } from '../db/db';
-import { buildingTable, gameItemTable, modifierTable, townTable, townsToBuildingsTable } from '../db/schema';
+import { buildingTable, gameItemTable, modifierTable, potionTable, townTable, townsToBuildingsTable } from '../db/schema';
 import { buildingEntities } from '../entities/buildings';
 import { potionEntities } from '../entities/potions';
 import { townEntities } from '../entities/towns';
@@ -28,11 +28,18 @@ export const createBuildingsOnTOwn = async () => {
 
   await db.insert(townsToBuildingsTable).values(buildingOnTown);
 };
-const createPotions = async () => {
-  const modifiers = Object.values(potionEntities).map((item) => item.modifier!);
-  const potions = Object.values(potionEntities).map((item) => ({ ...item, modifier: null }));
-  await db.insert(modifierTable).values(modifiers);
-  await db.insert(gameItemTable).values(potions);
+export const createPotions = async () => {
+  const potions = Object.values(potionEntities);
+  for (const potion of potions) {
+    const [newPotion] = await db.insert(gameItemTable).values(potion).returning({ id: gameItemTable.id });
+    await db.insert(potionTable).values({
+      type: potion.potion.type,
+      gameItemId: newPotion.id,
+      potionEffect: potion.potion.potionEffect,
+      restore: potion.potion.restore
+
+    });
+  }
 };
 
 const go = async () => {

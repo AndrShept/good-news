@@ -7,49 +7,38 @@ import { GameItemCardPopupMenu } from './GameItemCardPopupMenu';
 import { GameItemCardShowInfo } from './GameItemCardShowInfo';
 
 interface Props {
-  item: GameItem | InventoryItem | Equipment | undefined;
+  image: string;
+  quantity: number;
 }
 
-export const GameItemCard = memo(function GameItemCard({ item }: Props) {
+export const GameItemCard = memo(function GameItemCard({ image, quantity }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const isGameItem = !(item && 'inventoryHeroId' in item) || (item && 'equipmentHeroId' in item);
-  const inventoryItem = item && 'inventoryHeroId' in item ? item : (undefined as InventoryItem | undefined);
-  const equipmentItem = item && 'equipmentHeroId' in item ? item : (undefined as Equipment | undefined);
-  const gameItem = isGameItem ? undefined : (item as unknown as GameItem | undefined);
 
   return (
     <article className="hover:border-primary/20 group relative size-12 border">
-      {item && (
-        <>
-          <Popover open={isOpen} onOpenChange={setIsOpen}>
-            <PopoverTrigger className="size-full">
-              <CustomTooltip>
-                <CustomTooltip.Trigger>
-                  <img
-                    style={{ imageRendering: 'pixelated' }}
-                    className="size-full object-contain opacity-85 group-hover:opacity-100"
-                    src={inventoryItem?.gameItem?.image || equipmentItem?.gameItem?.image || gameItem?.image}
-                    alt="inventory-image"
-                  />
-                  {inventoryItem && inventoryItem.quantity > 1 && (
-                    <div className="absolute bottom-1 right-0 size-3 cursor-default rounded-full text-center text-[11px] font-semibold">
-                      {inventoryItem.quantity}
-                    </div>
-                  )}
-                </CustomTooltip.Trigger>
-                <CustomTooltip.Content>
-                  {!isOpen && (
-                    <GameItemCardShowInfo gameItem={(inventoryItem && inventoryItem.gameItem) || gameItem || equipmentItem?.gameItem} />
-                  )}
-                </CustomTooltip.Content>
-              </CustomTooltip>
-            </PopoverTrigger>
-            <PopoverContent className="w-fit p-0">
-              <GameItemCardPopupMenu onClose={() => setIsOpen(false)} item={inventoryItem || gameItem || equipmentItem} />
-            </PopoverContent>
-          </Popover>
-        </>
-      )}
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger>
+          <CustomTooltip>
+            <CustomTooltip.Trigger>
+              <img
+                style={{ imageRendering: 'pixelated' }}
+                className="size-full object-contain opacity-85 group-hover:opacity-100"
+                src={image}
+                alt="inventory-image"
+              />
+              {quantity > 1 && (
+                <div className="absolute bottom-1 right-0 size-3 cursor-default rounded-full text-center text-[11px] font-semibold">
+                  {quantity}
+                </div>
+              )}
+            </CustomTooltip.Trigger>
+            <CustomTooltip.Content>{!isOpen && <GameItemCardShowInfo />}</CustomTooltip.Content>
+          </CustomTooltip>
+        </PopoverTrigger>
+        <PopoverContent className="w-fit p-0">
+          {/* <GameItemCardPopupMenu onClose={() => setIsOpen(false)} item={inventoryItem || gameItem || equipmentItem} /> */}
+        </PopoverContent>
+      </Popover>
     </article>
   );
 });

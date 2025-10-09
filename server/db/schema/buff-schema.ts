@@ -1,41 +1,38 @@
+import type { OmitModifier } from '@/shared/types';
 import { relations } from 'drizzle-orm';
-import { integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { heroTable } from './hero-schema';
-import { modifierTable } from './modifier-schema';
 
-export const buffType = pgEnum('buff_type_enum', ['SPELL', 'POTION']);
+export const buffTypeEnum = pgEnum('buff_type_enum', ['POSITIVE', 'NEGATIVE']);
 
 export const buffTable = pgTable('buff', {
-  id: uuid().primaryKey().notNull(),
-
+  id: uuid().primaryKey().defaultRandom().notNull(),
   name: text().notNull(),
   image: text().notNull(),
-  duration: integer().default(0).notNull(),
-  type: buffType().notNull(),
+  duration: integer().notNull(),
+  type: buffTypeEnum().notNull(),
+  modifier: jsonb('modifier').$type<Partial<OmitModifier>>().notNull(),
   heroId: uuid()
-    .notNull()
     .references(() => heroTable.id, {
       onDelete: 'cascade',
-    }),
-  completedAt: timestamp(' completed_at', {
-    withTimezone: true,
-    mode: 'string',
-  }).notNull(),
+    })
+    .notNull(),
+
   createdAt: timestamp('created_at', {
     withTimezone: true,
     mode: 'string',
   })
     .notNull()
     .defaultNow(),
-  updatedAt: timestamp('updated_at', {
+  completedAt: timestamp('completed_at', {
+    withTimezone: true,
     mode: 'string',
-  }),
+  }).notNull(),
 });
 
 export const buffRelations = relations(buffTable, ({ one }) => ({
-  modifier: one(modifierTable),
-    hero: one(heroTable, {
+  hero: one(heroTable, {
     fields: [buffTable.heroId],
     references: [heroTable.id],
   }),

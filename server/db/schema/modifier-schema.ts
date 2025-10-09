@@ -1,8 +1,6 @@
 import { relations } from 'drizzle-orm';
 import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
-import { buffTable } from './buff-schema';
-import { gameItemTable } from './game-item-schema';
 import { heroTable } from './hero-schema';
 
 export const modifierTable = pgTable('modifier', {
@@ -20,31 +18,29 @@ export const modifierTable = pgTable('modifier', {
   maxHealth: integer().default(0).notNull(),
   maxMana: integer().default(0).notNull(),
 
-  manaRegeneration: integer().default(0).notNull(),
-  healthRegeneration: integer().default(0).notNull(),
+  manaRegen: integer().default(0).notNull(),
+  healthRegen: integer().default(0).notNull(),
   restoreHealth: integer().default(0).notNull(),
   restoreMana: integer().default(0).notNull(),
 
-  armor: integer().default(0).notNull(),
-  magicResistances: integer().default(0).notNull(),
+  defense: integer().default(0).notNull(),
+  magicResistance: integer().default(0).notNull(),
   evasion: integer().default(0).notNull(),
 
   spellDamage: integer().default(0).notNull(),
-  spellDamageCritPower: integer().default(0).notNull(),
-  spellDamageCritChance: integer().default(0).notNull(),
+  spellCritPower: integer().default(0).notNull(),
+  spellCritChance: integer().default(0).notNull(),
+  spellHitChance: integer().default(0).notNull(),
 
-  meleeDamage: integer().default(0).notNull(),
-  meleeDamageCritPower: integer().default(0).notNull(),
-  meleeDamageCritChance: integer().default(0).notNull(),
+  physDamage: integer().default(0).notNull(),
+  physCritPower: integer().default(0).notNull(),
+  physCritChance: integer().default(0).notNull(),
+  physHitChance: integer().default(0).notNull(),
+  
   heroId: uuid().references(() => heroTable.id, {
     onDelete: 'cascade',
   }),
-  gameItemId: uuid().references(() => gameItemTable.id, {
-    onDelete: 'cascade',
-  }),
-  buffId: uuid().references(() => buffTable.id, {
-    onDelete: 'cascade',
-  }),
+
 
   createdAt: timestamp('created_at', {
     withTimezone: true,
@@ -59,13 +55,5 @@ export const modifierRelations = relations(modifierTable, ({ one }) => ({
     fields: [modifierTable.heroId],
     references: [heroTable.id],
   }),
-  gameItems: one(gameItemTable, {
-    fields: [modifierTable.gameItemId],
-    references: [gameItemTable.id],
-  }),
 
-  buffs: one(buffTable, {
-    fields: [modifierTable.buffId],
-    references: [buffTable.id],
-  }),
 }));

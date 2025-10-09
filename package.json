@@ -1,5 +1,6 @@
 {
-  "name": "backend",
+  "name": "magic-world",
+  "version": "0.2",
   "scripts": {
     "dev": "bun run --hot server/index.ts",
     "start": "bun server/index.ts",

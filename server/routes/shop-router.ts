@@ -13,9 +13,7 @@ import { loggedIn } from '../middleware/loggedIn';
 export const shopRouter = new Hono<Context>()
   .get('/', loggedIn, async (c) => {
     const shopItems = await db.query.gameItemTable.findMany({
-      with: {
-        modifier: true,
-      },
+ 
       orderBy: asc(gameItemTable.id),
     });
 

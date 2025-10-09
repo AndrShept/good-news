@@ -60,13 +60,13 @@ export const Modifiers = memo(() => {
           <p className="text-stone-600">DEF</p>
         </div>
         <p>
-          <span>armor:</span> {modifier.armor}
+          <span>defense:</span> {modifier.defense}
         </p>
         <p>
           <span>evasion:</span> {modifier.evasion}
         </p>
         <p>
-          <span>magic resistances:</span> {modifier.magicResistances}
+          <span>magic resistance:</span> {modifier.magicResistance}
         </p>
       </div>
       <Separator />
@@ -76,13 +76,13 @@ export const Modifiers = memo(() => {
           <span>damage:</span> {modifier.minDamage} - {modifier.maxDamage}
         </p>
         <p>
-          <span>melee damage:</span> {modifier.meleeDamage}
+          <span>melee damage:</span> {modifier.physDamage}
         </p>
         <p>
-          <span>melee crit chance:</span> {modifier.meleeDamageCritChance}
+          <span>melee crit chance:</span> {modifier.physCritChance}
         </p>
         <p>
-          <span>melee crit power:</span> {modifier.meleeDamageCritPower}
+          <span>melee crit power:</span> {modifier.physCritPower}
         </p>
       </div>
       <Separator />
@@ -97,10 +97,10 @@ export const Modifiers = memo(() => {
           <span>spell damage:</span> {modifier.spellDamage}
         </p>
         <p>
-          <span>spell crit chance</span> {modifier.spellDamageCritChance}
+          <span>spell crit chance</span> {modifier.spellCritChance}
         </p>
         <p>
-          <span>spell crit power</span> {modifier.spellDamageCritPower}
+          <span>spell crit power</span> {modifier.spellCritPower}
         </p>
       </div>
     </section>

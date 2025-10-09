@@ -103,15 +103,6 @@ export const heroRouter = new Hono<Context>()
               town: true,
             },
           },
-          equipments: {
-            with: {
-              gameItem: {
-                with: {
-                  modifier: true,
-                },
-              },
-            },
-          },
         },
       });
 
@@ -340,7 +331,7 @@ export const heroRouter = new Hono<Context>()
       const inventories = await db.query.inventoryItemTable.findMany({
         where: eq(inventoryItemTable.heroId, id),
         with: {
-          gameItem: { with: { modifier: true } },
+          gameItem: { with: { weapon: true, armor: true, accessory: true, potion: true } },
         },
         orderBy: asc(inventoryItemTable.id),
       });
@@ -368,9 +359,6 @@ export const heroRouter = new Hono<Context>()
 
       const gameItem = await db.query.gameItemTable.findFirst({
         where: eq(gameItemTable.id, itemId),
-        with: {
-          modifier: true,
-        },
       });
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
@@ -413,11 +401,7 @@ export const heroRouter = new Hono<Context>()
       const inventoryItem = await db.query.inventoryItemTable.findFirst({
         where: eq(inventoryItemTable.gameItemId, itemId),
         with: {
-          gameItem: {
-            with: {
-              modifier: true,
-            },
-          },
+          gameItem: true,
         },
       });
       if (gameItem.type === 'POTION' && inventoryItem) {
@@ -510,7 +494,7 @@ export const heroRouter = new Hono<Context>()
       const inventoryItem = await db.query.inventoryItemTable.findFirst({
         where: eq(inventoryItemTable.id, itemId),
         with: {
-          gameItem: true,
+          gameItem: { with: { weapon: true } },
         },
       });
 
@@ -525,7 +509,10 @@ export const heroRouter = new Hono<Context>()
           message: 'You cannot equip this item.',
         });
       }
-      const getEquipSlot = async (itemType: GameItemType, weaponHand: WeaponHandType | null): Promise<EquipmentSlotType | undefined> => {
+      const getEquipSlot = async (
+        itemType: GameItemType,
+        weaponHand: WeaponHandType | null | undefined,
+      ): Promise<EquipmentSlotType | undefined> => {
         const findEnumSlot = slotEnum.enumValues.find((type) => type === itemType);
         if (!findEnumSlot) {
           throw new HTTPException(404, {
@@ -536,6 +523,7 @@ export const heroRouter = new Hono<Context>()
         if (weaponHand === 'TWO_HANDED') {
           const findRightHandSlot = await db.query.equipmentTable.findFirst({
             where: eq(equipmentTable.slot, 'RIGHT_HAND'),
+            with: { gameItem: true },
           });
           const findLeftHandSlot = await db.query.equipmentTable.findFirst({
             where: eq(equipmentTable.slot, 'LEFT_HAND'),
@@ -549,10 +537,10 @@ export const heroRouter = new Hono<Context>()
           const findRightHandSlot = await db.query.equipmentTable.findFirst({
             where: eq(equipmentTable.slot, 'RIGHT_HAND'),
             with: {
-              gameItem: true,
+              gameItem: { with: { weapon: true } },
             },
           });
-          if (findRightHandSlot?.gameItem.weaponHand === 'TWO_HANDED') {
+          if (findRightHandSlot?.gameItem?.weapon?.weaponHand === 'TWO_HANDED') {
             return undefined;
           }
           if (!findRightHandSlot) {
@@ -569,9 +557,9 @@ export const heroRouter = new Hono<Context>()
         if (itemType === 'SHIELD') {
           const findRightHandSlot = await db.query.equipmentTable.findFirst({
             where: eq(equipmentTable.slot, 'RIGHT_HAND'),
-            with: { gameItem: true },
+            with: { gameItem: { with: { weapon: true } } },
           });
-          if (findRightHandSlot?.gameItem.weaponHand === 'TWO_HANDED') {
+          if (findRightHandSlot?.gameItem?.weapon?.weaponHand === 'TWO_HANDED') {
             return undefined;
           }
           const findLeftHandSlot = await db.query.equipmentTable.findFirst({
@@ -607,7 +595,7 @@ export const heroRouter = new Hono<Context>()
         return findEnumSlot;
       };
 
-      const newEquipSlot = await getEquipSlot(inventoryItem.gameItem.type, inventoryItem.gameItem.weaponHand);
+      const newEquipSlot = await getEquipSlot(inventoryItem.gameItem.type, inventoryItem?.gameItem?.weapon?.weaponHand);
       if (!newEquipSlot) {
         return c.json<ErrorResponse>(
           {
@@ -628,7 +616,7 @@ export const heroRouter = new Hono<Context>()
         }
         await tx.insert(equipmentTable).values({
           id: generateRandomUuid(),
-          equipmentHeroId: hero.id,
+          heroId: hero.id,
           gameItemId: inventoryItem.gameItemId,
           slot: newEquipSlot,
         });
@@ -827,18 +815,14 @@ export const heroRouter = new Hono<Context>()
         });
       }
 
-      if (hero.userId !== userId) {
-        throw new HTTPException(403, {
-          message: 'access denied',
-        });
-      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
       const inventoryItemPotion = await db.query.inventoryItemTable.findFirst({
         where: eq(inventoryItemTable.id, itemId),
         with: {
           gameItem: {
             with: {
-              modifier: true,
+              potion: true,
             },
           },
         },
@@ -854,119 +838,40 @@ export const heroRouter = new Hono<Context>()
           message: 'This item not a potion',
         });
       }
-      const isHealthPotion = inventoryItemPotion?.gameItem?.modifier?.restoreHealth && !inventoryItemPotion.gameItem.modifier.restoreMana;
-      const isManaPotion = inventoryItemPotion?.gameItem?.modifier?.restoreMana && !inventoryItemPotion.gameItem.modifier.restoreHealth;
 
-      const isBuffPotion = inventoryItemPotion.gameItem.duration > 0;
+      const isBuffPotion = inventoryItemPotion?.gameItem?.potion?.type === 'BUFF';
       const isFullHealth = hero.currentHealth >= hero.maxHealth;
+      const isHealthPotion = !!(inventoryItemPotion?.gameItem?.potion?.restore?.health ?? 0 > 0);
+      const isManaPotion = !!(inventoryItemPotion?.gameItem?.potion?.restore?.mana ?? 0 > 0);
       const isFullMana = hero.currentMana >= hero.maxMana;
-      if (isHealthPotion) {
-        if (isFullHealth && isHealthPotion) {
-          return c.json<ErrorResponse>(
-            {
-              message: 'You are already at full health',
-              isShowError: true,
-              success: false,
-            },
-            400,
-          );
-        }
-        await restorePotion({
-          currentHealth: hero.currentHealth,
-          currentMana: hero.currentMana,
-          maxHealth: hero.maxHealth,
-          maxMana: hero.maxMana,
-          restoreHealth: inventoryItemPotion?.gameItem?.modifier?.restoreHealth ?? 0,
-          restoreMana: inventoryItemPotion?.gameItem?.modifier?.restoreMana ?? 0,
-          heroId: id,
-          itemId,
-          potionQuantity: inventoryItemPotion.quantity,
-        });
-        return c.json<SuccessResponse<InventoryItem>>({
-          success: true,
-          message: `You success use potion`,
-          data: inventoryItemPotion as InventoryItem,
-        });
+
+      if (isFullHealth && isHealthPotion && !isBuffPotion) {
+        return c.json<ErrorResponse>(
+          {
+            message: 'You are already at full health',
+            isShowError: true,
+            success: false,
+          },
+          400,
+        );
       }
-      if (isManaPotion) {
-        if (isManaPotion && isFullMana) {
-          return c.json<ErrorResponse>(
-            {
-              message: 'You are already at full mana',
-              isShowError: true,
-              success: false,
-            },
-            400,
-          );
-        }
-        await restorePotion({
-          currentHealth: hero.currentHealth,
-          currentMana: hero.currentMana,
-          maxHealth: hero.maxHealth,
-          maxMana: hero.maxMana,
-          restoreHealth: inventoryItemPotion?.gameItem?.modifier?.restoreHealth ?? 0,
-          restoreMana: inventoryItemPotion?.gameItem?.modifier?.restoreMana ?? 0,
-          heroId: id,
-          itemId,
-          potionQuantity: inventoryItemPotion.quantity,
-        });
-      }
-
-      if (isBuffPotion) {
-        const statKeys = Object.keys(statsSchema.shape) as (keyof typeof statsSchema.shape)[];
-        const findStatBuffName = inventoryItemPotion.gameItem.name
-          .split(' ')
-          .find((text) => statKeys.includes(text as keyof typeof statsSchema.shape));
-        if (findStatBuffName) {
-          await db.delete(buffTable).where(and(eq(buffTable.heroId, id), eq(buffTable.name, inventoryItemPotion.gameItem.name)));
-        }
-        await db.transaction(async (tx) => {
-          const completedAt = new Date(Date.now() + inventoryItemPotion.gameItem.duration).toISOString();
-
-          const [newBuff] = await tx
-            .insert(buffTable)
-            .values({
-              id: generateRandomUuid(),
-              name: inventoryItemPotion.gameItem.name,
-              image: inventoryItemPotion.gameItem.image,
-              duration: inventoryItemPotion.gameItem.duration,
-              type: 'POTION',
-              heroId: id,
-              completedAt,
-            })
-            .returning({ id: buffTable.id });
-          await tx.insert(modifierTable).values({
-            ...inventoryItemPotion.gameItem.modifier,
-            id: generateRandomUuid(),
-            createdAt: new Date().toISOString(),
-            buffId: newBuff.id,
-          });
-
-          if (inventoryItemPotion.quantity > 1) {
-            await tx
-              .update(inventoryItemTable)
-              .set({
-                quantity: inventoryItemPotion.quantity - 1,
-              })
-              .where(eq(inventoryItemTable.id, itemId));
-            return;
-          }
-          await tx.delete(inventoryItemTable).where(eq(inventoryItemTable.id, itemId));
-        });
-
-        return c.json<SuccessResponse<InventoryItem>>({
-          success: true,
-          message: `You success use potion`,
-          data: inventoryItemPotion as InventoryItem,
-        });
+      if (isFullMana && isManaPotion && !isBuffPotion) {
+        return c.json<ErrorResponse>(
+          {
+            message: 'You are already at full mana',
+            isShowError: true,
+            success: false,
+          },
+          400,
+        );
       }
       await restorePotion({
         currentHealth: hero.currentHealth,
         currentMana: hero.currentMana,
         maxHealth: hero.maxHealth,
         maxMana: hero.maxMana,
-        restoreHealth: inventoryItemPotion?.gameItem?.modifier?.restoreHealth ?? 0,
-        restoreMana: inventoryItemPotion?.gameItem?.modifier?.restoreMana ?? 0,
+        restoreHealth: inventoryItemPotion?.gameItem?.potion?.restore?.health ?? 0,
+        restoreMana: inventoryItemPotion?.gameItem?.potion?.restore?.mana ?? 0,
         heroId: id,
         itemId,
         potionQuantity: inventoryItemPotion.quantity,
@@ -974,7 +879,7 @@ export const heroRouter = new Hono<Context>()
       return c.json<SuccessResponse<InventoryItem>>({
         success: true,
         message: `You success use potion`,
-        data: inventoryItemPotion as InventoryItem,
+        data: inventoryItemPotion,
       });
     },
   )
@@ -997,14 +902,12 @@ export const heroRouter = new Hono<Context>()
       });
     }
     const buffs = await db.query.buffTable.findMany({
-      with: {
-        modifier: true,
-      },
+      where: eq(buffTable.heroId, hero.id),
     });
     return c.json<SuccessResponse<Buff[]>>({
       message: 'buffs fetched!',
       success: true,
-      data: buffs as Buff[],
+      data: buffs,
     });
   })
 

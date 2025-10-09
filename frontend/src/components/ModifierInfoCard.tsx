@@ -1,7 +1,7 @@
 import { Modifier, OmitModifier } from '@/shared/types';
 
 interface Props {
-  modifier: Modifier | undefined;
+  modifier: Modifier | undefined | null;
 }
 export const ModifierInfoCard = ({ modifier }: Props) => {
   const modifierChangeName = (modifier: keyof OmitModifier) => {
@@ -13,22 +13,22 @@ export const ModifierInfoCard = ({ modifier }: Props) => {
       intelligence: 'intelligence',
       constitution: 'constitution',
       luck: 'luck',
-      armor: 'armor',
+      defense: 'defense',
       evasion: 'evasion',
-      magicResistances: 'magic resistances',
-      healthRegeneration: 'health regeneration',
-      manaRegeneration: 'mana regeneration',
+      magicResistance: 'magic resistance',
+      healthRegen: 'health regen',
+      manaRegen: 'mana regen',
       maxHealth: 'max health',
       maxMana: 'max mana',
-      meleeDamage: 'melee damage',
-      meleeDamageCritChance: 'melee damage CC',
-      meleeDamageCritPower: 'melee damage CP',
+      physDamage: 'phys damage',
+      physCritChance: 'phys crit chance',
+      physCritPower: 'phys crit power',
       spellDamage: 'spell damage',
-      spellDamageCritChance: 'spell damage CC',
-      spellDamageCritPower: 'spell damage CP',
+      spellCritChance: 'spell crit chance',
+      spellCritPower: 'spell crit power',
+      spellHitChance: 'spell hit chance',
       restoreHealth: 'health',
       restoreMana: 'mana',
-      
     };
     return variants[modifier];
   };

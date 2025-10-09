@@ -1,4 +1,3 @@
-import { GameItemCard } from '@/components/GameItemCard';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { memo, useMemo } from 'react';

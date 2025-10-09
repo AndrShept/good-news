@@ -7,6 +7,7 @@ import type { client } from '../frontend/src/lib/utils';
 import {
   actionTable,
   actionTypeEnum,
+  armorTable,
   buildingNameTypeEnum,
   buildingTable,
   groupTable,
@@ -16,16 +17,26 @@ import {
   mapNameTypeEnum,
   mapTable,
   modifierTable,
+  potionTable,
   pvpModeTypeEnum,
   townNameTypeEnum,
   townTable,
   townsToBuildingsTable,
+  weaponTable,
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { buffTable } from '../server/db/schema/buff-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import type { equipmentTable, slotEnum } from '../server/db/schema/equipment-schema';
-import type { gameItemEnum, gameItemTable, rarityEnum, weaponHandEnum, weaponTypeEnum } from '../server/db/schema/game-item-schema';
+import type {
+  accessoryTable,
+  armorSlotEnum,
+  gameItemEnum,
+  gameItemTable,
+  rarityEnum,
+  weaponHandEnum,
+  weaponTypeEnum,
+} from '../server/db/schema/game-item-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
 import type { tileTable, tileTypeEnum } from '../server/db/schema/tile-schema';
@@ -144,6 +155,7 @@ export type GetPostsData = InferResponseType<typeof client.post.$get>;
 
 export type EquipmentSlotType = (typeof slotEnum.enumValues)[number];
 export type GameItemType = (typeof gameItemEnum.enumValues)[number];
+export type ArmorType = (typeof armorSlotEnum.enumValues)[number];
 export type RarityType = (typeof rarityEnum.enumValues)[number];
 export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
@@ -189,8 +201,17 @@ export type Equipment = typeof equipmentTable.$inferSelect & {
 export type InventoryItem = InferSelectModel<typeof inventoryItemTable> & {
   gameItem?: GameItem;
 };
+
+export type Weapon = typeof weaponTable.$inferSelect;
+export type Armor = typeof armorTable.$inferSelect;
+export type Potion = typeof potionTable.$inferSelect;
+export type Accessory = typeof accessoryTable.$inferSelect;
+
 export type GameItem = InferSelectModel<typeof gameItemTable> & {
-  modifier?: Modifier;
+  weapon?: Weapon | null;
+  armor?: Armor | null;
+  potion?: Potion | null;
+  accessory?: Accessory | null;
 };
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier?: Modifier;
@@ -200,9 +221,7 @@ export type Hero = InferSelectModel<typeof heroTable> & {
   state?: State;
   equipments?: Equipment[];
 };
-export type Buff = typeof buffTable.$inferSelect & {
-  modifier?: Modifier;
-};
+export type Buff = typeof buffTable.$inferSelect;
 
 export type IPosition = {
   x: number;

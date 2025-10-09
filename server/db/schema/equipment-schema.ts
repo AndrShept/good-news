@@ -32,7 +32,7 @@ export const equipmentTable = pgTable('equipment', {
     mode: 'string',
   }),
 
-  equipmentHeroId: uuid()
+  heroId: uuid()
     .notNull()
     .references(() => heroTable.id, {
       onDelete: 'cascade',
@@ -41,8 +41,8 @@ export const equipmentTable = pgTable('equipment', {
 });
 
 export const equipmentRelations = relations(equipmentTable, ({ one }) => ({
-  user: one(heroTable, {
-    fields: [equipmentTable.equipmentHeroId],
+  hero: one(heroTable, {
+    fields: [equipmentTable.heroId],
     references: [heroTable.id],
   }),
   gameItem: one(gameItemTable, {
