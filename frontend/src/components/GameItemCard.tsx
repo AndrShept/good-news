@@ -1,29 +1,27 @@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Equipment, GameItem, InventoryItem } from '@/shared/types';
+import { InventoryItem } from '@/shared/types';
 import React, { memo, useState } from 'react';
 
 import { CustomTooltip } from './CustomTooltip';
 import { GameItemCardPopupMenu } from './GameItemCardPopupMenu';
 import { GameItemCardShowInfo } from './GameItemCardShowInfo';
+import { GameItemSlot } from './GameItemSlot';
 
-interface Props {
-  image: string;
-  quantity: number;
-}
+type Props = InventoryItem;
 
-export const GameItemCard = memo(function GameItemCard({ image, quantity }: Props) {
+export const GameItemCard = memo(function GameItemCard({ id, quantity, gameItem }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <article className="hover:border-primary/20 group relative size-12 border">
+    <GameItemSlot rarity={gameItem.rarity}>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger>
+        <PopoverTrigger className="size-full">
           <CustomTooltip>
             <CustomTooltip.Trigger>
               <img
                 style={{ imageRendering: 'pixelated' }}
                 className="size-full object-contain opacity-85 group-hover:opacity-100"
-                src={image}
+                src={gameItem?.image}
                 alt="inventory-image"
               />
               {quantity > 1 && (
@@ -32,13 +30,20 @@ export const GameItemCard = memo(function GameItemCard({ image, quantity }: Prop
                 </div>
               )}
             </CustomTooltip.Trigger>
-            <CustomTooltip.Content>{!isOpen && <GameItemCardShowInfo />}</CustomTooltip.Content>
+            <CustomTooltip.Content>{!isOpen && <GameItemCardShowInfo {...gameItem} />}</CustomTooltip.Content>
           </CustomTooltip>
         </PopoverTrigger>
         <PopoverContent className="w-fit p-0">
-          {/* <GameItemCardPopupMenu onClose={() => setIsOpen(false)} item={inventoryItem || gameItem || equipmentItem} /> */}
+          <GameItemCardPopupMenu
+            quantity={quantity}
+            id={id}
+            gameItem={gameItem}
+            isEquipItem={false}
+            isInventoryItem={true}
+            onClose={() => setIsOpen(false)}
+          />
         </PopoverContent>
       </Popover>
-    </article>
+    </GameItemSlot>
   );
 });

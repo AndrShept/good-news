@@ -42,7 +42,7 @@ export const gameItemRelations = relations(gameItemTable, ({ one, many }) => ({
 
 //WEAPON
 export const weaponTable = pgTable('weapon', {
-  id: uuid().primaryKey().notNull(),
+  id: uuid().primaryKey().defaultRandom().notNull(),
   gameItemId: uuid()
     .references(() => gameItemTable.id, {
       onDelete: 'cascade',
@@ -51,8 +51,8 @@ export const weaponTable = pgTable('weapon', {
   weaponType: weaponTypeEnum().notNull(),
   weaponHand: weaponHandEnum().notNull(),
 
-  maxDamage: integer().default(0).notNull(),
-  minDamage: integer().default(0).notNull(),
+  maxDamage: integer().notNull(),
+  minDamage: integer().notNull(),
 
   spellDamage: integer().default(0).notNull(),
   spellCritPower: integer().default(0).notNull(),
@@ -74,12 +74,12 @@ export const weaponTableRelations = relations(weaponTable, ({ one }) => ({
 
 //ARMOR
 export const armorTable = pgTable('armor', {
-  id: uuid().primaryKey().notNull(),
+  id: uuid().primaryKey().defaultRandom().notNull(),
   slot: armorSlotEnum().notNull(),
 
-  defense: integer().default(0).notNull(),
-  magicResistance: integer().default(0).notNull(),
-  evasion: integer().default(0).notNull(),
+  defense: integer().notNull(),
+  magicResistance: integer().notNull(),
+  evasion: integer().notNull(),
 
   gameItemId: uuid()
     .references(() => gameItemTable.id, {
@@ -96,7 +96,7 @@ export const armorTableRelations = relations(armorTable, ({ one }) => ({
 }));
 //ACCESSORY
 export const accessoryTable = pgTable('accessory', {
-  id: uuid().primaryKey().notNull(),
+  id: uuid().primaryKey().defaultRandom().notNull(),
   slot: accessorySlotEnum().notNull(),
   gameItemId: uuid()
     .references(() => gameItemTable.id, {
@@ -116,7 +116,6 @@ export const accessoryTableRelations = relations(accessoryTable, ({ one }) => ({
 export const potionTable = pgTable('potion', {
   id: uuid().primaryKey().defaultRandom().notNull(),
   type: potionTypeEnum().notNull(),
-  amount: integer().default(1).notNull(),
   gameItemId: uuid()
     .references(() => gameItemTable.id, {
       onDelete: 'cascade',

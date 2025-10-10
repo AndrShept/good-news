@@ -141,6 +141,13 @@
       "when": 1760013601453,
       "tag": "0019_careful_christian_walker",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1760096199453,
+      "tag": "0020_lowly_wallow",
+      "breakpoints": true
     }
   ]
 }

@@ -199,7 +199,7 @@ export type Equipment = typeof equipmentTable.$inferSelect & {
   gameItem?: GameItem;
 };
 export type InventoryItem = InferSelectModel<typeof inventoryItemTable> & {
-  gameItem?: GameItem;
+  gameItem: GameItem;
 };
 
 export type Weapon = typeof weaponTable.$inferSelect;

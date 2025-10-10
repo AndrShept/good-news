@@ -1,6 +1,6 @@
 import { Layer } from '@/shared/json-types';
 import { socketEvents } from '@/shared/socket-events';
-import { IPosition, TileType } from '@/shared/types';
+import { IPosition, OmitModifier, TileType } from '@/shared/types';
 import { IGameMessage } from '@/store/useGameMessages';
 import { type ClassValue, clsx } from 'clsx';
 import { format, intervalToDuration } from 'date-fns';
@@ -121,3 +121,66 @@ export const getTileExists = ({ index, layers, tileType }: IGetTileExists) => {
   const tiles = layers.find((l) => l.name === tileType);
   return tiles?.data[index];
 };
+
+export const rarityConfig = {
+  COMMON: {
+    color: '',
+    border: '',
+    glow: '',
+    bg: '',
+  },
+  MAGIC: {
+    color: 'text-rarity-magic',
+    border: 'border-rarity-magic/50 ',
+    glow: 'shadow-[0_0_20px_rgba(96,165,250,0.4)]',
+    bg: 'bg-rarity-magic/10',
+  },
+  RARE: {
+    color: 'text-rarity-rare',
+    border: 'border-rarity-rare/50',
+    glow: 'shadow-[0_0_20px_rgba(139,92,246,0.4)]',
+    bg: 'bg-rarity-rare/10',
+  },
+  EPIC: {
+    color: 'text-rarity-epic',
+    border: 'border-rarity-epic/50',
+    glow: 'shadow-[0_0_25px_rgba(168,85,247,0.5)]',
+    bg: 'bg-rarity-epic/10',
+  },
+  LEGENDARY: {
+    color: 'text-rarity-legendary',
+    border: 'border-rarity-legendary/60 border-1',
+    glow: 'shadow-[0_0_30px_rgba(251,191,36,0.6)]',
+    bg: 'bg-rarity-legendary/10',
+  },
+};
+
+ export const modifierChangeName = (modifier: keyof OmitModifier) => {
+    const variants: Record<keyof OmitModifier, string> = {
+      minDamage: 'min damage',
+      maxDamage: 'max damage',
+      strength: 'strength',
+      dexterity: 'dexterity',
+      intelligence: 'intelligence',
+      constitution: 'constitution',
+      luck: 'luck',
+      defense: 'defense',
+      evasion: 'evasion',
+      magicResistance: 'magic resistance',
+      healthRegen: 'health regen',
+      manaRegen: 'mana regen',
+      maxHealth: 'max health',
+      maxMana: 'max mana',
+      physDamage: 'phys damage',
+      physCritChance: 'phys crit chance',
+      physCritPower: 'phys crit power',
+      physHitChance: 'phys hit chance',
+      spellDamage: 'spell damage',
+      spellCritChance: 'spell crit chance',
+      spellCritPower: 'spell crit power',
+      spellHitChance: 'spell hit chance',
+      restoreHealth: 'health',
+      restoreMana: 'mana',
+    };
+    return variants[modifier];
+  };

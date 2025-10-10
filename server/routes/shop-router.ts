@@ -10,17 +10,20 @@ import { db } from '../db/db';
 import { gameItemTable } from '../db/schema';
 import { loggedIn } from '../middleware/loggedIn';
 
-export const shopRouter = new Hono<Context>()
-  .get('/', loggedIn, async (c) => {
-    const shopItems = await db.query.gameItemTable.findMany({
- 
-      orderBy: asc(gameItemTable.id),
-    });
+export const shopRouter = new Hono<Context>().get('/', loggedIn, async (c) => {
+  const shopItems = await db.query.gameItemTable.findMany({
+    with: {
+      weapon: true,
+      armor: true,
+      accessory: true,
+      potion: true,
+    },
+    orderBy: asc(gameItemTable.id),
+  });
 
-    return c.json<SuccessResponse<GameItem[]>>({
-      message: 'items fetched!',
-      success: true,
-      data: shopItems,
-    });
-  })
-  
+  return c.json<SuccessResponse<GameItem[]>>({
+    message: 'items fetched!',
+    success: true,
+    data: shopItems,
+  });
+});

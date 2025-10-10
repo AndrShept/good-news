@@ -9,10 +9,11 @@ export const Route = createFileRoute('/game/shop/')({
 
 function RouteComponent() {
   const { data: shopItems, isLoading } = useQuery(getShopItemsOptions());
-
+  // if (isLoading) return <div>loading</div>;
+  console.log('asdasdsa', shopItems)
   return (
     <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-      {shopItems?.data?.map((item) => <GameItemCardShowInfo key={item.id} gameItem={item} isShowBuyButton isShowPrice />)}
+      {shopItems?.data?.map((item) => <GameItemCardShowInfo key={item.id} {...item} isShowBuyButton isShowPrice />)}
     </ul>
   );
 }
