@@ -7,7 +7,6 @@ import { UserAvatar } from '@/components/UserAvatar';
 import { Button } from '@/components/ui/button';
 import { useUpvoteComment } from '@/features/comment/hooks/useUpvoteComment';
 import { useCreateComment } from '@/features/post/components/useCreatePostComment';
-import { childrenVariants } from '@/lib/animation';
 import { getFormatDateTime } from '@/lib/utils';
 import { Comments, paginationSchema } from '@/shared/types';
 import { useInfiniteQuery, useSuspenseInfiniteQuery } from '@tanstack/react-query';
@@ -17,6 +16,7 @@ import React, { memo, useState } from 'react';
 
 import { createCommentReplies } from '../api/create-commnet-replies';
 import { getCommentRepliesQueryOptions } from '../api/get-comment-replies';
+import { childrenVariants } from '@/lib/config';
 
 interface Props {
   comment: Comments;

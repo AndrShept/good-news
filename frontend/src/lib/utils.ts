@@ -66,16 +66,6 @@ export const toastError = (msg = 'Something went wrong') => {
   toast.error(msg);
 };
 
-export const getRarityColor = (data: string) => {
-  return {
-    'text-primary': data === 'COMMON',
-    'text-blue-600': data === 'MAGIC',
-    'text-purple-500': data === 'EPIC',
-    'text-orange-400': data === 'RARE',
-    'text-red-500 ': data === 'LEGENDARY',
-  };
-};
-
 export const joinRoomClient = ({ socket, id, joinMessage, leaveMessage, prevRefId, setGameMessage }: TJoinRoomParams) => {
   if (id) {
     socket.emit(socketEvents.joinRoom(), id, (cb: { accept: boolean }) => {
@@ -122,38 +112,7 @@ export const getTileExists = ({ index, layers, tileType }: IGetTileExists) => {
   return tiles?.data[index];
 };
 
-export const rarityConfig = {
-  COMMON: {
-    color: '',
-    border: '',
-    glow: '',
-    bg: '',
-  },
-  MAGIC: {
-    color: 'text-rarity-magic',
-    border: 'border-rarity-magic/50 ',
-    glow: 'shadow-[0_0_20px_rgba(96,165,250,0.4)]',
-    bg: 'bg-rarity-magic/10',
-  },
-  RARE: {
-    color: 'text-rarity-rare',
-    border: 'border-rarity-rare/50',
-    glow: 'shadow-[0_0_20px_rgba(139,92,246,0.4)]',
-    bg: 'bg-rarity-rare/10',
-  },
-  EPIC: {
-    color: 'text-rarity-epic',
-    border: 'border-rarity-epic/50',
-    glow: 'shadow-[0_0_25px_rgba(168,85,247,0.5)]',
-    bg: 'bg-rarity-epic/10',
-  },
-  LEGENDARY: {
-    color: 'text-rarity-legendary',
-    border: 'border-rarity-legendary/60 border-1',
-    glow: 'shadow-[0_0_30px_rgba(251,191,36,0.6)]',
-    bg: 'bg-rarity-legendary/10',
-  },
-};
+
 
  export const modifierChangeName = (modifier: keyof OmitModifier) => {
     const variants: Record<keyof OmitModifier, string> = {

@@ -5,7 +5,6 @@ import { InfinityScrollComponent } from '@/components/InfinityScrollComponent';
 import { SortByFilter } from '@/components/SortByFilter';
 import { Spinner } from '@/components/Spinner';
 import { PostCard } from '@/features/post/components/PostCard';
-import { childrenVariants, parentVariants } from '@/lib/animation';
 import { Comments, paginationSchema, SuccessResponse } from '@/shared/types';
 import { InfiniteData, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
@@ -18,6 +17,7 @@ import { getPostQueryOptions } from '@/features/post/api/get-post';
 import { getPostCommentsQueryOptions } from '@/features/post/api/get-post-comments';
 import { createPostComment } from '@/features/post/api/create-post-comments';
 import { SearchSchema } from '.';
+import { parentVariants } from '@/lib/config';
 
 export const Route = createFileRoute('/(home)/post/$postId')({
   component: PostPage,

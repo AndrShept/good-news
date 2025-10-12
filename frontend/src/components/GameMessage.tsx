@@ -2,7 +2,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGroupListener } from '@/features/group/hooks/useGroupListener';
 import { useMapListener } from '@/features/map/hooks/useMapListener';
 import { useTownListener } from '@/features/town/hooks/useTownListener';
-import { cn, getRarityColor, getTimeFns } from '@/lib/utils';
+import { cn, getTimeFns } from '@/lib/utils';
 import { useGameMessages } from '@/store/useGameMessages';
 import { memo, useEffect, useRef } from 'react';
 
@@ -36,12 +36,7 @@ export const GameMessage = memo(() => {
               <time className="text-primary">{getTimeFns(message.createdAt!)}</time>
               <span>{message.text}</span>
               <span
-                className={cn(
-                  '',
-                  message.success && {
-                    ...getRarityColor('COMMON'),
-                  },
-                )}
+              
               >
                 <span className="text-primary">{message.data?.gameItem?.name}</span>
               </span>

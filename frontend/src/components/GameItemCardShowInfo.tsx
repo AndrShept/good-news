@@ -1,5 +1,5 @@
 import { ShopBuyButton } from '@/features/shop/components/ShopBuyButton';
-import { cn, rarityConfig } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { GameItem } from '@/shared/types';
 import { memo } from 'react';
 
@@ -7,6 +7,7 @@ import { ArmorInfo } from './ArmorInfo';
 import { PotionInfo } from './PotionInfo';
 import { WeaponInfo } from './WeaponInfo';
 import { GoldIcon } from './game-icons/GoldIcon';
+import { rarityConfig } from '@/lib/config';
 
 interface Props extends GameItem {
   isShowPrice?: boolean;
@@ -15,7 +16,7 @@ interface Props extends GameItem {
 export const GameItemCardShowInfo = memo(
   ({ image, name, type, id, price, rarity, potion, weapon, armor, accessory, isShowBuyButton = false, isShowPrice = false }: Props) => {
     return (
-      <article className={cn('flex flex-col gap-4 rounded border p-4 text-start', rarityConfig[rarity].glow, rarityConfig[rarity].border)}>
+      <article className={cn('flex flex-col gap-4 rounded border p-4 text-start')}>
         <section className="flex gap-4">
           <div>
             <div className="size-10 shrink-0">
