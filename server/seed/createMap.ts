@@ -1,4 +1,3 @@
-import { townEntities } from '../entities/towns';
 import { buildingMapData } from '../lib/buildingMapData';
 
 const go = async () => {

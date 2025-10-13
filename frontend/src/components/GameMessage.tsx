@@ -1,7 +1,7 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGroupListener } from '@/features/group/hooks/useGroupListener';
 import { useMapListener } from '@/features/map/hooks/useMapListener';
-import { useTownListener } from '@/features/town/hooks/useTownListener';
+import { usePlaceListener } from '@/features/place/hooks/usePlaceListener';
 import { cn, getTimeFns } from '@/lib/utils';
 import { useGameMessages } from '@/store/useGameMessages';
 import { memo, useEffect, useRef } from 'react';
@@ -11,7 +11,7 @@ export const GameMessage = memo(() => {
   const ref = useRef<null | HTMLUListElement>(null);
   useGroupListener();
   useMapListener();
-  useTownListener();
+  usePlaceListener();
 
   useEffect(() => {
     ref.current?.lastElementChild?.scrollIntoView({

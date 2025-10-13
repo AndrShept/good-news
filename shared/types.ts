@@ -8,8 +8,6 @@ import {
   actionTable,
   actionTypeEnum,
   armorTable,
-  buildingNameTypeEnum,
-  buildingTable,
   groupTable,
   heroTable,
   inventoryItemTable,
@@ -17,29 +15,19 @@ import {
   mapNameTypeEnum,
   mapTable,
   modifierTable,
+  placeTable,
   potionTable,
   pvpModeTypeEnum,
-  townNameTypeEnum,
-  townTable,
-  townsToBuildingsTable,
   weaponTable,
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { buffTable } from '../server/db/schema/buff-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
-import type { equipmentTable, slotEnum } from '../server/db/schema/equipment-schema';
-import type {
-  accessoryTable,
-  armorSlotEnum,
-  gameItemEnum,
-  gameItemTable,
-  rarityEnum,
-  weaponHandEnum,
-  weaponTypeEnum,
-} from '../server/db/schema/game-item-schema';
+import { equipmentTable, slotEnum } from '../server/db/schema/equipment-schema';
+import { accessoryTable, armorSlotEnum, gameItemEnum, gameItemTable, rarityEnum, weaponHandEnum, weaponTypeEnum } from '../server/db/schema/game-item-schema';
 import { postTable } from '../server/db/schema/posts-schema';
-import type { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
-import type { tileTable, tileTypeEnum } from '../server/db/schema/tile-schema';
+import { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
+import { tileTable, tileTypeEnum } from '../server/db/schema/tile-schema';
 import type { Layer } from './json-types';
 
 export type SuccessResponse<T = undefined> = {
@@ -163,9 +151,7 @@ export type ActionType = (typeof actionTypeEnum.enumValues)[number];
 export type TileType = (typeof tileTypeEnum.enumValues)[number];
 export type MapNameType = (typeof mapNameTypeEnum.enumValues)[number];
 export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
-export type TownNameType = (typeof townNameTypeEnum.enumValues)[number];
 export type StateType = (typeof stateTypeEnum.enumValues)[number];
-export type buildingNameType = (typeof buildingNameTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
@@ -173,28 +159,37 @@ export type State = InferSelectModel<typeof stateTable>;
 export type Action = InferSelectModel<typeof actionTable> & { timeRemaining: number };
 export type Location = InferSelectModel<typeof locationTable> & {
   map?: Map;
-  town?: Town;
+  place?: Place;
   hero?: Hero;
 };
-export type TownToBuildings = InferSelectModel<typeof townsToBuildingsTable> & {
-  building: Building;
+
+export type Place = InferSelectModel<typeof placeTable> & {
+  buildings?: Building[] | null;
 };
-export type Town = InferSelectModel<typeof townTable> & {
-  buildings?: TownToBuildings[];
+
+export const buildingTypeValues = ['MAGIC-SHOP', 'TEMPLE'] as const;
+
+export type BuildingType = (typeof buildingTypeValues)[number];
+
+export type Building = {
+  id: string;
+  name: string;
+  type: BuildingType;
+  image: string;
 };
-export type Building = InferSelectModel<typeof buildingTable>;
 
 export type Map = typeof mapTable.$inferSelect & {
-  towns?: Town[];
+  places?: Place[];
   layers?: Layer[];
 };
 export type Tile = typeof tileTable.$inferSelect & {
   map?: Map;
-  town?: Town;
+  place?: Place;
   location?: Location;
 };
 export type TilesGrid = (Tile | null)[][];
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'heroId'>;
+
 export type Equipment = typeof equipmentTable.$inferSelect & {
   gameItem?: GameItem;
 };

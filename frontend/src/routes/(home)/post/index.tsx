@@ -4,7 +4,7 @@ import { Spinner } from '@/components/Spinner';
 import { getPostsQueryOptions } from '@/features/post/api/get-posts';
 import { PostCard } from '@/features/post/components/PostCard';
 import { PostCreateFrom } from '@/features/post/components/PostCreateFrom';
-import { childrenVariants, parentVariants } from '@/lib/animation';
+import { parentVariants } from '@/lib/config';
 import { orderSchema, paginationSchema, sortBySchema } from '@/shared/types';
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';

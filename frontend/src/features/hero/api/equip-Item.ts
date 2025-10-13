@@ -7,10 +7,10 @@ export const equipItem = async ({ id, itemId }: { id: string; itemId: string }) 
       id,
       itemId,
     },
-  });
-  if (!res.ok) {
-    return (await res.json()) as ErrorResponse;
-  }
+  }); 
+  // if (!res.ok) {
+  //   return (await res.json()) as ErrorResponse;
+  // }
 
   return await res.json();
 };

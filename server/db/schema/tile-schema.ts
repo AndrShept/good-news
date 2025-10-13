@@ -4,7 +4,6 @@ import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzl
 import { heroTable } from './hero-schema';
 import { locationTable } from './location-schema';
 import { mapTable } from './map-schema';
-import { townTable } from './town-schema';
 
 export const tileTypeEnum = pgEnum('tile_type_enum', ['OBJECT', 'WATER', 'HERO', 'TOWN', 'GROUND']);
 

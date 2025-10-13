@@ -1,5 +1,5 @@
 import type { ActionJobEvent, HeroOfflineJob } from '@/shared/job-types';
-import type { HeroOfflineData, MapUpdateEvent, TownUpdateEvent } from '@/shared/socket-data-types';
+import type { HeroOfflineData, MapUpdateEvent, PlaceUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 
 import { io } from '..';
@@ -14,12 +14,12 @@ export const actionQueueListeners = () => {
     const jobData = returnvalue as unknown as ActionJobEvent;
 
     switch (jobData.jobName) {
-      case 'WALK_TOWN': {
-        const socketData: TownUpdateEvent = {
+      case 'WALK_PLACE': {
+        const socketData: PlaceUpdateEvent = {
           payload: jobData.payload,
-          type: 'WALK_TOWN',
+          type: 'WALK_PLACE',
         };
-        io.to(jobData.payload.heroId).emit(socketEvents.townUpdate(), socketData);
+        io.to(jobData.payload.heroId).emit(socketEvents.placeUpdate(), socketData);
         break;
       }
       case 'WALK_MAP': {
@@ -38,8 +38,8 @@ export const actionQueueListeners = () => {
         if (jobData.payload.mapId) {
           io.to(jobData.payload.mapId).emit(socketEvents.mapUpdate(), socketData);
         }
-        if (jobData.payload.townId) {
-          io.to(jobData.payload.townId).emit(socketEvents.townUpdate(), socketData);
+        if (jobData.payload.placeId) {
+          io.to(jobData.payload.placeId).emit(socketEvents.placeUpdate(), socketData);
         }
 
         break;

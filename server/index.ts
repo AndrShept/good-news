@@ -1,5 +1,4 @@
 import { serve } from '@hono/node-server';
-import { Redis } from '@upstash/redis';
 import 'dotenv/config';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -23,7 +22,11 @@ import { mapRouter } from './routes/map-router';
 import { postRouter } from './routes/post-router';
 import { shopRouter } from './routes/shop-router';
 import { tileRouter } from './routes/tile-router';
-import { townRouter } from './routes/town-router';
+import { placeRouter } from './routes/place-router';
+
+import { Redis } from "ioredis";
+import { createAdapter } from "@socket.io/redis-adapter";
+
 
 const app = new Hono<Context>();
 
@@ -40,7 +43,7 @@ const routes = app
   .route('/shop', shopRouter)
   .route('/group', groupRouter)
   .route('/map', mapRouter)
-  .route('/town', townRouter)
+  .route('/place', placeRouter)
   .route('/tile', tileRouter);
 
 // app.onError((err, c) => {
@@ -78,12 +81,18 @@ const httpServer = serve({
 
 actionQueueListeners();
 
+const pubClient = new Redis(process.env['REDIS_CLOUD_DATABASE_URL']!);
+const subClient = pubClient.duplicate();
+
 export const io = new Server(httpServer as HTTPServer, {
   cors: {
     credentials: true,
     origin: process.env['BASE_URL_FRONT'],
   },
+  adapter: createAdapter(pubClient, subClient)
 });
+
+
 
 io.on('connection', async (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };

@@ -17,6 +17,7 @@
     "@lucia-auth/adapter-drizzle": "^1.1.0",
     "@neondatabase/serverless": "^1.0.1",
     "@react-email/components": "0.0.36",
+    "@socket.io/redis-adapter": "^8.3.0",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/nodemailer": "^6.4.17",
     "@upstash/redis": "^1.35.3",

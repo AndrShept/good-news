@@ -1,6 +1,6 @@
-import type { GameMessageType, IGameMessage } from '../frontend/src/store/useGameMessages';
-import type { WalkMapJob, WalkTownJob } from './job-types';
-import type { Hero, IPosition, Location, Tile, Town } from './types';
+import type { GameMessageType } from '../frontend/src/store/useGameMessages';
+import type { WalkMapJob, WalkPlaceJob } from './job-types';
+import type {  Location, } from './types';
 
 export type SocketGroupResponse = {
   message: string;
@@ -12,14 +12,14 @@ export type SocketGroupResponse = {
 
 export type MapUpdateEvent =
   | {
-      type: 'HERO_ENTER_TOWN';
+      type: 'HERO_ENTER_PLACE';
       payload: {
         heroId: string;
-        townId: string;
+        placeId: string;
       };
     }
   | {
-      type: 'HERO_LEAVE_TOWN';
+      type: 'HERO_LEAVE_PLACE';
       payload: { location: Location; mapId: string; heroId: string };
     }
   | {
@@ -27,23 +27,23 @@ export type MapUpdateEvent =
       payload: WalkMapJob['payload'];
     };
 
-export type TownUpdateEvent =
+export type PlaceUpdateEvent =
   | {
-      type: 'HERO_ENTER_TOWN';
+      type: 'HERO_ENTER_PLACE';
       payload: Location;
     }
   | {
-      type: 'HERO_LEAVE_TOWN';
+      type: 'HERO_LEAVE_PLACE';
       payload: { heroId: string; mapId: string };
     }
   | {
-      type: 'WALK_TOWN';
-      payload: WalkTownJob['payload'];
+      type: 'WALK_PLACE';
+      payload: WalkPlaceJob['payload'];
     };
 
 export type HeroOfflineData = {
   type: 'HERO_OFFLINE';
-  payload: { heroId: string; townId?: string; mapId?: string };
+  payload: { heroId: string; placeId?: string; mapId?: string };
 };
 export type HeroOnlineData = {
   type: 'HERO_ONLINE';

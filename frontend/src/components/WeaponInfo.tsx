@@ -21,7 +21,6 @@ export const WeaponInfo = ({
   spellCritPower,
   weaponType,
   weaponHand,
-
 }: Props) => {
   const baseModifier = [
     {
@@ -58,14 +57,14 @@ export const WeaponInfo = ({
     },
   ];
   return (
-    <section className=" flex flex-col gap-2">
+    <section className="flex flex-col gap-2">
       <div>
         <p className="text-muted-foreground/30">{weaponHand}</p>
         <p className="text-muted-foreground/30">{weaponType}</p>
       </div>
 
       <div>
-        <h2 className="font-medium text-yellow-400">BASE:</h2>
+        <h2 className="font-medium text-emerald-500">BASE:</h2>
         <Separator />
         <div className="mt-1 space-x-1">
           <span className="text-muted-foreground">Damage:</span>
@@ -78,7 +77,7 @@ export const WeaponInfo = ({
             if (!modifier.value) return;
             return (
               <li key={modifier.name} className="flex items-center gap-1">
-                <p className="text-green-500">+{modifier.value}</p>
+                <p className="text-green-500 font-medium">+{modifier.value}</p>
                 <p className="text-muted-foreground">{modifier.name}</p>
               </li>
             );
@@ -87,7 +86,7 @@ export const WeaponInfo = ({
       </div>
 
       <div className="mt-1 space-x-1">
-        <h2 className="font-medium text-yellow-400">MODIFIER:</h2>
+        <h2 className="font-medium text-emerald-500">MODIFIER:</h2>
         <Separator />
       </div>
     </section>

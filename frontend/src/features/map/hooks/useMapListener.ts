@@ -32,17 +32,17 @@ export const useMapListener = () => {
   useEffect(() => {
     const listener = (data: MapUpdateEvent | HeroOfflineData | HeroOnlineData) => {
       switch (data.type) {
-        case 'HERO_ENTER_TOWN':
+        case 'HERO_ENTER_PLACE':
           if (id === data.payload.heroId) {
             setGameMessage({
               type: 'success',
               text: `You have entered a town.`,
             });
-            updateHero({ action: { type: 'IDLE' }, location: { mapId: null, townId: data.payload.townId } });
+            updateHero({ action: { type: 'IDLE' }, location: { mapId: null, placeId: data.payload.placeId } });
           }
           deleteHeroes(data.payload.heroId);
           break;
-        case 'HERO_LEAVE_TOWN':
+        case 'HERO_LEAVE_PLACE':
           if (id === data.payload.heroId) {
             console.log('');
           }

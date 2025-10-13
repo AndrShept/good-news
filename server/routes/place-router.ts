@@ -1,4 +1,4 @@
-import type { Location, Map, SuccessResponse, Town } from '@/shared/types';
+import type { Location, Map, Place, SuccessResponse } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { asc, desc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -7,10 +7,10 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { locationTable, mapNameTypeEnum, mapTable, tileTable, townTable } from '../db/schema';
+import { locationTable,  placeTable,  } from '../db/schema';
 import { loggedIn } from '../middleware/loggedIn';
 
-export const townRouter = new Hono<Context>()
+export const placeRouter = new Hono<Context>()
   .get(
     '/:id',
     loggedIn,
@@ -23,27 +23,21 @@ export const townRouter = new Hono<Context>()
 
     async (c) => {
       const { id } = c.req.valid('param');
-      const town = await db.query.townTable.findFirst({
-        where: eq(townTable.id, id),
-        with: {
-          buildings: {
-            with: {
-              building: true,
-            },
-          },
-        },
+      const place = await db.query.placeTable.findFirst({
+        where: eq(placeTable.id, id),
+      
       });
 
-      if (!town) {
+      if (!place) {
         throw new HTTPException(404, {
-          message: 'Town not found',
+          message: 'place not found',
         });
       }
 
-      return c.json<SuccessResponse<Town>>({
-        message: 'town fetched!',
+      return c.json<SuccessResponse<Place>>({
+        message: 'place fetched!',
         success: true,
-        data: town,
+        data: place,
       });
     },
   )
@@ -58,18 +52,18 @@ export const townRouter = new Hono<Context>()
     ),
     async (c) => {
       const { id } = c.req.valid('param');
-      const town = await db.query.townTable.findFirst({
-        where: eq(townTable.id, id),
+      const place = await db.query.placeTable.findFirst({
+        where: eq(placeTable.id, id),
       });
-      if (!town) {
+      if (!place) {
         throw new HTTPException(404, {
-          message: 'town not found',
+          message: 'place not found',
         });
       }
 
       const locationHeroes = await db.query.locationTable.findMany({
         with: { hero: true },
-        where: eq(locationTable.townId, id),
+        where: eq(locationTable.placeId, id),
       });
 
       const onlineLocationHeroes = locationHeroes.filter((l) => l.hero?.isOnline);

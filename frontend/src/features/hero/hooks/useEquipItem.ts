@@ -28,7 +28,7 @@ export const useEquipItem = () => {
           success: true,
           type: 'success',
           text: data.message,
-          data: data.data,
+          // data: data.data,
         });
       } else {
         setGameMessage({

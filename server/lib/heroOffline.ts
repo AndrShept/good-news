@@ -26,7 +26,7 @@ export const heroOffline = async (heroId: string) => {
     payload: {
       heroId: hero.id,
       mapId: hero.location.mapId ?? '',
-      townId: hero.location.townId ?? '',
+      placeId: hero.location.placeId ?? '',
     },
   };
   await actionQueue.remove(jobId);

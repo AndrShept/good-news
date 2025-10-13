@@ -37,7 +37,7 @@ export const heroOnline = async (heroId: string) => {
   if (location.mapId) {
     io.to(location.mapId).emit(socketEvents.mapUpdate(), socketData);
   }
-  if (location.townId) {
-    io.to(location.townId).emit(socketEvents.townUpdate(), socketData);
+  if (location.placeId) {
+    io.to(location.placeId).emit(socketEvents.placeUpdate(), socketData);
   }
 };

@@ -7,7 +7,7 @@ import { Outlet } from '@tanstack/react-router';
 import { GameMessage } from './GameMessage';
 
 export const Game = () => {
-  useRegeneration();
+  // useRegeneration();
 
 
   return (

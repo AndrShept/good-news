@@ -3,8 +3,8 @@ import type { Map, MapNameType, Tile, TileType } from '@/shared/types';
 import { and, eq } from 'drizzle-orm';
 
 import { db } from '../db/db';
-import { mapTable, townTable } from '../db/schema';
-import { townEntities } from '../entities/towns';
+import { mapTable } from '../db/schema';
+
 import { generateRandomUuid } from './utils';
 
 interface MapLoadInfo {

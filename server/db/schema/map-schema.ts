@@ -2,7 +2,7 @@ import { relations } from 'drizzle-orm';
 import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { locationTable } from './location-schema';
-import { townTable } from './town-schema';
+import { placeTable } from './place-schema';
 
 export const mapNameTypeEnum = pgEnum('map_name_type_enum', ['SOLMERE']);
 export const pvpModeTypeEnum = pgEnum('pvp_type_enum', ['PVE', 'PVP']);
@@ -27,5 +27,5 @@ export const mapTable = pgTable('map', {
 
 export const mapTableRelations = relations(mapTable, ({ many }) => ({
   heroesLocation: many(locationTable),
-  towns: many(townTable),
+  places: many(placeTable),
 }));

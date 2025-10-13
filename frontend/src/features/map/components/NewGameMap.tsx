@@ -12,14 +12,14 @@ import { HeroActionsBar } from './HeroActionsBar';
 import { HeroTile } from './HeroTile';
 import { LocationHeroes } from './LocationHeroes';
 import { MovableTile } from './MovableTile';
-import { TownTile } from './TownTile';
+import { PlaceTile } from './PlaceTile';
 
 export const NewGameMap = () => {
   const hero = useHero((state) => ({
     x: state?.data?.location?.x ?? 0,
     y: state?.data?.location?.y ?? 0,
     mapId: state?.data?.location?.mapId ?? '',
-    townId: state?.data?.location?.townId ?? '',
+    placeId: state?.data?.location?.placeId ?? '',
     actionType: state?.data?.action?.type ?? 'IDLE',
   }));
 
@@ -75,7 +75,7 @@ export const NewGameMap = () => {
               transform: `scale(${scale})`,
             }}
           >
-            {map?.towns?.map((town) => <TownTile key={town.id} {...town} TILE_SIZE={TILE_SIZE} />)}
+            {map?.places?.map((place) => <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} />)}
             {heroesLocation?.map((location) => {
               return <HeroTile key={location.id} {...location} TILE_SIZE={TILE_SIZE} />;
             })}

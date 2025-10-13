@@ -1,6 +1,6 @@
 import { BASE_STATS, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
-import { type WalkMapJob, type WalkTownJob, jobName } from '@/shared/job-types';
-import type { HeroOnlineData, MapUpdateEvent, TownUpdateEvent } from '@/shared/socket-data-types';
+import { type WalkMapJob, type WalkPlaceJob, jobName } from '@/shared/job-types';
+import type { HeroOnlineData, MapUpdateEvent, PlaceUpdateEvent } from '@/shared/socket-data-types';
 import {
   type Buff,
   type Equipment,
@@ -12,6 +12,7 @@ import {
   type InventoryItem,
   type SuccessResponse,
   type WeaponHandType,
+  buildingTypeValues,
   createHeroSchema,
   statsSchema,
 } from '@/shared/types';
@@ -27,7 +28,6 @@ import type { Context } from '../context';
 import { db } from '../db/db';
 import {
   actionTable,
-  buildingNameTypeEnum,
   equipmentTable,
   gameItemEnum,
   gameItemTable,
@@ -35,12 +35,10 @@ import {
   inventoryItemTable,
   locationTable,
   modifierTable,
+  placeTable,
   slotEnum,
   stateTable,
   stateTypeEnum,
-  tileTable,
-  townNameTypeEnum,
-  townTable,
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
 import { heroOnline } from '../lib/heroOnline';
@@ -100,7 +98,7 @@ export const heroRouter = new Hono<Context>()
           state: true,
           location: {
             with: {
-              town: true,
+              place: true,
             },
           },
         },
@@ -118,7 +116,6 @@ export const heroRouter = new Hono<Context>()
   .post('/create', loggedIn, zValidator('form', createHeroSchema), async (c) => {
     const { name, avatarImage, freeStatPoints, modifier: heroStats } = c.req.valid('form');
     const userId = c.get('user')?.id as string;
-
     const nameExist = await db.query.heroTable.findFirst({
       where: eq(heroTable.name, name),
     });
@@ -141,16 +138,15 @@ export const heroRouter = new Hono<Context>()
       });
     }
     await db.transaction(async (tx) => {
-      const town = await tx.query.townTable.findFirst({
-        where: eq(townTable.name, 'SOLMERE'),
+      const place = await tx.query.placeTable.findFirst({
+        where: eq(placeTable.name, 'Solmer Town'),
       });
-      if (!town) {
+      if (!place) {
         throw new HTTPException(404, {
-          message: 'Town not found',
+          message: 'place not found',
         });
       }
       const characterImage = '/sprites/new/newb-mage.webp';
-
       const [newHero] = await tx
         .insert(heroTable)
         .values({
@@ -169,17 +165,15 @@ export const heroRouter = new Hono<Context>()
         heroId: newHero.id,
         ...heroStats,
       });
-      await tx.insert(locationTable).values({ townId: town.id, heroId: newHero.id });
+      await tx.insert(locationTable).values({ placeId: place.id, heroId: newHero.id, x: place.x, y: place.y });
       await tx.insert(actionTable).values({
         completedAt: setSqlNow(),
         type: 'IDLE',
         heroId: newHero.id,
       });
-
       await tx.insert(stateTable).values({ type: 'IDLE', heroId: newHero.id });
       return newHero;
     });
-
     return c.json<SuccessResponse>({ message: 'hero created!', success: true });
   })
   .put(
@@ -509,131 +503,36 @@ export const heroRouter = new Hono<Context>()
           message: 'You cannot equip this item.',
         });
       }
-      const getEquipSlot = async (
-        itemType: GameItemType,
-        weaponHand: WeaponHandType | null | undefined,
-      ): Promise<EquipmentSlotType | undefined> => {
-        const findEnumSlot = slotEnum.enumValues.find((type) => type === itemType);
-        if (!findEnumSlot) {
-          throw new HTTPException(404, {
-            message: 'equip slot not find',
-          });
-        }
-
-        if (weaponHand === 'TWO_HANDED') {
-          const findRightHandSlot = await db.query.equipmentTable.findFirst({
-            where: eq(equipmentTable.slot, 'RIGHT_HAND'),
-            with: { gameItem: true },
-          });
-          const findLeftHandSlot = await db.query.equipmentTable.findFirst({
-            where: eq(equipmentTable.slot, 'LEFT_HAND'),
-          });
-          if (!findRightHandSlot && !findLeftHandSlot) {
-            return 'RIGHT_HAND';
-          }
-          return undefined;
-        }
-        if (weaponHand === 'ONE_HANDED') {
-          const findRightHandSlot = await db.query.equipmentTable.findFirst({
-            where: eq(equipmentTable.slot, 'RIGHT_HAND'),
-            with: {
-              gameItem: { with: { weapon: true } },
-            },
-          });
-          if (findRightHandSlot?.gameItem?.weapon?.weaponHand === 'TWO_HANDED') {
-            return undefined;
-          }
-          if (!findRightHandSlot) {
-            return 'RING_RIGHT';
-          }
-          const findLeftHandSlot = await db.query.equipmentTable.findFirst({
-            where: eq(equipmentTable.slot, 'LEFT_HAND'),
-          });
-          if (!findLeftHandSlot) {
-            return 'LEFT_HAND';
-          }
-          return undefined;
-        }
-        if (itemType === 'SHIELD') {
-          const findRightHandSlot = await db.query.equipmentTable.findFirst({
-            where: eq(equipmentTable.slot, 'RIGHT_HAND'),
-            with: { gameItem: { with: { weapon: true } } },
-          });
-          if (findRightHandSlot?.gameItem?.weapon?.weaponHand === 'TWO_HANDED') {
-            return undefined;
-          }
-          const findLeftHandSlot = await db.query.equipmentTable.findFirst({
-            where: eq(equipmentTable.slot, 'LEFT_HAND'),
-          });
-          if (!findLeftHandSlot) {
-            return 'LEFT_HAND';
-          }
-          return undefined;
-        }
-        if (itemType === 'RING') {
-          const findLeftRing = await db.query.equipmentTable.findFirst({
-            where: eq(equipmentTable.slot, 'RING_LEFT'),
-          });
-          if (!findLeftRing) {
-            return 'RING_LEFT';
-          }
-          const findRightRing = await db.query.equipmentTable.findFirst({
-            where: eq(equipmentTable.slot, 'RING_RIGHT'),
-          });
-          if (!findRightRing) {
-            return 'RING_RIGHT';
-          }
-          return undefined;
-        }
-
-        const existing = await db.query.equipmentTable.findFirst({
-          where: eq(equipmentTable.slot, findEnumSlot),
-        });
-        if (existing) {
-          return undefined;
-        }
-        return findEnumSlot;
-      };
-
-      const newEquipSlot = await getEquipSlot(inventoryItem.gameItem.type, inventoryItem?.gameItem?.weapon?.weaponHand);
-      if (!newEquipSlot) {
-        return c.json<ErrorResponse>(
-          {
-            success: false,
-            message: 'Please unequip the currently equipped item before replacing it.',
-            isShowError: true,
-          },
-          409,
-        );
-      }
-
-      await db.transaction(async (tx) => {
-        const existSlot = await db.query.equipmentTable.findFirst({
-          where: eq(equipmentTable.slot, newEquipSlot),
-        });
-        if (existSlot) {
-          tx.rollback();
-        }
-        await tx.insert(equipmentTable).values({
-          id: generateRandomUuid(),
-          heroId: hero.id,
-          gameItemId: inventoryItem.gameItemId,
-          slot: newEquipSlot,
-        });
-        await tx
-          .update(heroTable)
-          .set({
-            currentInventorySlots: hero.currentInventorySlots - 1,
-          })
-          .where(eq(heroTable.id, hero.id));
-        await tx.delete(inventoryItemTable).where(eq(inventoryItemTable.id, inventoryItem.id));
-      });
-
-      return c.json<SuccessResponse<InventoryItem>>(
+      // const getEquipSlot = async (
+      //   itemType: GameItemType,
+      //   weaponHand: WeaponHandType | null | undefined,
+      // ): Promise<EquipmentSlotType | undefined> => {
+      //   await db.transaction(async (tx) => {
+      //     const existSlot = await db.query.equipmentTable.findFirst({
+      //       where: eq(equipmentTable.slot, newEquipSlot),
+      //     });
+      //     if (existSlot) {
+      //       tx.rollback();
+      //     }
+      //     await tx.insert(equipmentTable).values({
+      //       id: generateRandomUuid(),
+      //       heroId: hero.id,
+      //       gameItemId: inventoryItem.gameItemId,
+      //       slot: newEquipSlot,
+      //     });
+      //     await tx
+      //       .update(heroTable)
+      //       .set({
+      //         currentInventorySlots: hero.currentInventorySlots - 1,
+      //       })
+      //       .where(eq(heroTable.id, hero.id));
+      //     await tx.delete(inventoryItemTable).where(eq(inventoryItemTable.id, inventoryItem.id));
+      //   });
+      // };
+      return c.json<SuccessResponse>(
         {
           success: true,
           message: `success equipped item `,
-          data: inventoryItem,
         },
         201,
       );
@@ -777,7 +676,7 @@ export const heroRouter = new Hono<Context>()
         await tx
           .update(heroTable)
           .set({
-            currentInventorySlots: hero.currentInventorySlots + 1,
+            currentInventorySlots: hero.currentInventorySlots - 1,
           })
           .where(eq(heroTable.id, id));
       });
@@ -995,24 +894,24 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post(
-    '/:id/action/walk-town',
+    '/:id/action/walk-place',
     loggedIn,
     zValidator('param', z.object({ id: z.string() })),
     zValidator(
       'json',
       z.object({
-        buildingName: z.enum(buildingNameTypeEnum.enumValues),
+        buildingType: z.enum(buildingTypeValues),
       }),
     ),
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const { buildingName } = c.req.valid('json');
+      const { buildingType } = c.req.valid('json');
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
         with: {
           modifier: { columns: { dexterity: true } },
-          location: { with: { town: true }, columns: { id: true } },
+          location: { with: { place: true }, columns: { id: true } },
           action: { columns: { id: true } },
         },
       });
@@ -1037,7 +936,7 @@ export const heroRouter = new Hono<Context>()
           message: 'location id not found',
         });
       }
-      if (!hero.location?.town?.id) {
+      if (!hero.location?.place?.id) {
         throw new HTTPException(403, {
           message: 'Missing townId: hero is not assigned to a town',
         });
@@ -1054,18 +953,18 @@ export const heroRouter = new Hono<Context>()
           type: 'WALK',
         })
         .where(eq(actionTable.id, hero.action.id));
-      const jobData: WalkTownJob = {
-        jobName: 'WALK_TOWN',
+      const jobData: WalkPlaceJob = {
+        jobName: 'WALK_PLACE',
         payload: {
           actionId: hero.action.id,
           locationId: hero.location.id,
           heroId: hero.id,
           type: 'IDLE',
-          buildingName,
+          buildingType,
         },
       };
       await actionQueue.remove(jobId);
-      await actionQueue.add(jobName['walk-town'], jobData, {
+      await actionQueue.add(jobName['walk-place'], jobData, {
         delay,
         jobId,
         removeOnComplete: true,
@@ -1184,7 +1083,7 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post(
-    '/:id/action/enter-town',
+    '/:id/action/enter-place',
     loggedIn,
     zValidator('param', z.object({ id: z.string() })),
 
@@ -1219,12 +1118,12 @@ export const heroRouter = new Hono<Context>()
       }
       const heroPosX = hero.location?.x;
       const heroPosY = hero.location?.y;
-      const town = await db.query.townTable.findFirst({
-        where: and(eq(townTable.x, heroPosX), eq(townTable.y, heroPosY)),
+      const place = await db.query.placeTable.findFirst({
+        where: and(eq(placeTable.x, heroPosX), eq(placeTable.y, heroPosY)),
       });
-      if (!town) {
+      if (!place) {
         throw new HTTPException(404, {
-          message: 'town not found',
+          message: 'place not found',
         });
       }
 
@@ -1233,24 +1132,24 @@ export const heroRouter = new Hono<Context>()
           .update(locationTable)
           .set({
             mapId: null,
-            townId: town.id,
+            placeId: place.id,
           })
           .where(eq(locationTable.heroId, hero.id));
       });
 
       const socketMapData: MapUpdateEvent = {
-        type: 'HERO_ENTER_TOWN',
+        type: 'HERO_ENTER_PLACE',
         payload: {
-          townId: town.id,
+          placeId: place.id,
           heroId: hero.id,
         },
       };
-      const socketTownData: TownUpdateEvent = {
-        type: 'HERO_ENTER_TOWN',
+      const socketTownData: PlaceUpdateEvent = {
+        type: 'HERO_ENTER_PLACE',
         payload: { ...hero.location, hero: hero as Hero },
       };
       io.to(hero.location.mapId!).emit(socketEvents.mapUpdate(), socketMapData);
-      io.to(town.id).emit(socketEvents.townUpdate(), socketTownData);
+      io.to(place.id).emit(socketEvents.placeUpdate(), socketTownData);
 
       return c.json<SuccessResponse>({
         message: 'enter town success',
@@ -1259,7 +1158,7 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post(
-    '/:id/action/leave-town',
+    '/:id/action/leave-place',
     loggedIn,
     zValidator('param', z.object({ id: z.string() })),
 
@@ -1287,17 +1186,17 @@ export const heroRouter = new Hono<Context>()
           message: 'Hero is currently busy with another action',
         });
       }
-      if (!hero.location?.townId) {
+      if (!hero.location?.placeId) {
         throw new HTTPException(403, {
-          message: 'Missing townId: hero is not assigned to a town',
+          message: 'Missing placeId: hero is not assigned to a place',
         });
       }
-      const town = await db.query.townTable.findFirst({
-        where: eq(townTable.id, hero.location.townId),
+      const place = await db.query.placeTable.findFirst({
+        where: eq(placeTable.id, hero.location.placeId),
       });
-      if (!town) {
+      if (!place) {
         throw new HTTPException(404, {
-          message: 'town not found',
+          message: 'place not found',
         });
       }
 
@@ -1305,35 +1204,35 @@ export const heroRouter = new Hono<Context>()
         await tx
           .update(locationTable)
           .set({
-            mapId: town.mapId,
-            x: town.x,
-            y: town.y,
-            townId: null,
+            mapId: place.mapId,
+            x: place.x,
+            y: place.y,
+            placeId: null,
           })
           .where(eq(locationTable.heroId, hero.id));
       });
 
       const socketMapData: MapUpdateEvent = {
-        type: 'HERO_LEAVE_TOWN',
+        type: 'HERO_LEAVE_PLACE',
         payload: {
           heroId: hero.id,
-          mapId: town.mapId,
+          mapId: place.mapId,
           location: hero.location,
         },
       };
-      const socketTownData: TownUpdateEvent = {
-        type: 'HERO_LEAVE_TOWN',
+      const socketTownData: PlaceUpdateEvent = {
+        type: 'HERO_LEAVE_PLACE',
         payload: {
           heroId: hero.id,
-          mapId: town.mapId,
+          mapId: place.mapId,
         },
       };
 
-      io.to(town.id).emit(socketEvents.townUpdate(), socketTownData);
-      io.to(town.mapId).emit(socketEvents.mapUpdate(), socketMapData);
+      io.to(place.id).emit(socketEvents.placeUpdate(), socketTownData);
+      io.to(place.mapId).emit(socketEvents.mapUpdate(), socketMapData);
 
       return c.json<SuccessResponse>({
-        message: 'leave town success ',
+        message: 'leave place success ',
         success: true,
       });
     },

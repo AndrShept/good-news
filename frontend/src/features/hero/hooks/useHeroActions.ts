@@ -33,10 +33,10 @@ export const useHeroActions = () => {
   const [movedTiles, setMovedTiles] = useState<null | IPosition[]>(null);
 
   const isHeroOnTownTile = useMemo(() => {
-    return map?.towns?.some((town) => {
+    return map?.places?.some((town) => {
       return town.x === hero.x && town.y === hero.y;
     });
-  }, [hero.x, hero.y, map?.towns]);
+  }, [hero.x, hero.y, map?.places]);
 
   const canFish = useMemo(() => {
     const around = getTilesAroundHero({ x: hero.x, y: hero.y }, 1);

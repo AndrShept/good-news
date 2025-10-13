@@ -1,10 +1,10 @@
 import { client } from '@/lib/utils';
 import { useMutation } from '@tanstack/react-query';
 
-export const useEnterTown = () => {
+export const useEnterPlace = () => {
   return useMutation({
     mutationFn: async (id: string) => {
-      const data = await client.hero[':id'].action['enter-town'].$post({
+      const data = await client.hero[':id'].action['enter-place'].$post({
         param: {
           id,
         },

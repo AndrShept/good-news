@@ -1,12 +1,12 @@
-import { Town } from '@/shared/types';
 
+import { Place } from '@/shared/types';
 import { TileImg } from './TileImg';
 
-interface Props extends Town {
+interface Props extends Place {
   TILE_SIZE: number;
 }
 
-export const TownTile = ({ TILE_SIZE, image, x, y }: Props) => {
+export const PlaceTile = ({ TILE_SIZE, image, x, y }: Props) => {
   return (
     <div
       style={{

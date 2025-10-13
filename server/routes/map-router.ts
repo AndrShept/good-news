@@ -1,5 +1,4 @@
-import type { MapUpdateEvent } from '@/shared/socket-data-types';
-import { socketEvents } from '@/shared/socket-events';
+
 import type { Location, Map, SuccessResponse } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq } from 'drizzle-orm';
@@ -7,11 +6,10 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
-import { io } from '..';
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { heroTable, locationTable, mapNameTypeEnum, mapTable, tileTable } from '../db/schema';
-import { buildingMapData, getMapJson } from '../lib/buildingMapData';
+import {  locationTable, mapTable } from '../db/schema';
+import {  getMapJson } from '../lib/buildingMapData';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const mapRouter = new Hono<Context>()
@@ -30,7 +28,7 @@ export const mapRouter = new Hono<Context>()
 
       const map = await db.query.mapTable.findFirst({
         where: eq(mapTable.id, id),
-        with: { towns: true },
+        with: { places: true },
       });
       if (!map) {
         throw new HTTPException(404, {

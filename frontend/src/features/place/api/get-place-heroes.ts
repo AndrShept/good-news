@@ -1,9 +1,9 @@
 import { client } from '@/lib/utils';
 import { queryOptions } from '@tanstack/react-query';
 
-export const getTown = async (id: string) => {
+export const getPlaceHeroesLocation = async (id: string) => {
   try {
-    const res = await client.town[':id'].$get({
+    const res = await client.place[':id'].heroes.$get({
       param: {
         id,
       },
@@ -18,9 +18,10 @@ export const getTown = async (id: string) => {
   }
 };
 
-export const getTownOptions = (id: string) =>
+export const getPlaceHeroesLocationOptions = (placeId: string) =>
   queryOptions({
-    queryKey: ['town', id],
-    queryFn: () => getTown(id),
-    enabled: !!id,
+    queryKey: ['place', placeId, 'heroes'],
+    queryFn: () => getPlaceHeroesLocation(placeId),
+    enabled: !!placeId,
+    staleTime: 0,
   });

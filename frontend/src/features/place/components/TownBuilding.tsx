@@ -1,25 +1,19 @@
 import { useHero } from '@/features/hero/hooks/useHero';
-import { useWalkTown } from '@/features/hero/hooks/useWalkTown';
 import { cn } from '@/lib/utils';
-import { TownToBuildings, buildingNameType } from '@/shared/types';
-import { useSetGameMessage } from '@/store/useGameMessages';
+import { Building } from '@/shared/types';
 
 import { CustomTooltip } from '../../../components/CustomTooltip';
+import { useWalkPlace } from '@/features/hero/hooks/useWalkTown';
 
-export const buildingName: Record<buildingNameType, string> = {
-  'MAGIC-SHOP': 'Magic shop',
-  TEMPLE: 'Temple',
-};
+type Props = Building;
 
-type Props = TownToBuildings;
+export const TownBuilding = ({ image, name, type }: Props) => {
+  const { mutate } = useWalkPlace();
 
-export const TownBuilding = ({ building }: Props) => {
-  const { mutate } = useWalkTown();
-
-  const type = useHero((state) => state?.data?.action?.type);
+  const heroType = useHero((state) => state?.data?.action?.type);
   const onClick = () => {
-    if (type === 'WALK') return;
-    mutate(building.name);
+    if (heroType === 'WALK') return;
+    mutate(type);
   };
 
   return (
@@ -31,12 +25,12 @@ export const TownBuilding = ({ building }: Props) => {
             style={{
               imageRendering: 'pixelated',
             }}
-            src={building.image}
+            src={image}
           />
         </div>
       </CustomTooltip.Trigger>
       <CustomTooltip.Content className="bg-background/80 rounded-md border p-2.5 backdrop-blur-md">
-        {buildingName[building.name]}
+        {name}
       </CustomTooltip.Content>
     </CustomTooltip>
   );

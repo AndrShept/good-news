@@ -1,10 +1,10 @@
 import { MapIcon } from '@/components/game-icons/MapIcon';
 import { Button } from '@/components/ui/button';
+import { useLeavePlace } from '../hooks/useLeavePlace';
 
-import { useLeaveTown } from '../hooks/useLeaveTown';
 
 export const LeaveTownButton = () => {
-  const { mutate, isPending } = useLeaveTown();
+  const { mutate, isPending } = useLeavePlace();
 
   const onClick = () => {
     mutate();

@@ -1,23 +1,23 @@
-import type { Hero, IPosition, Tile, buildingNameType } from './types';
+import type { BuildingType, IPosition } from './types';
 
 export const jobName = {
-  'walk-map': 'WALK_MAP',
-  'walk-town': 'WALK_TOWN',
+  'walk-map': 'WALK_PLACE',
+  'walk-place': 'WALK_PLACE',
   'hero-offline': 'HERO_OFFLINE',
 } as const;
 
 export type JobNameType = (typeof jobName)[keyof typeof jobName];
 
-export type ActionJobEvent = WalkTownJob | WalkMapJob | HeroOfflineJob;
+export type ActionJobEvent = WalkPlaceJob | WalkMapJob | HeroOfflineJob;
 
-export type WalkTownJob = {
-  jobName: 'WALK_TOWN';
+export type WalkPlaceJob = {
+  jobName: 'WALK_PLACE';
   payload: {
     actionId: string;
     locationId: string;
     heroId: string;
     type: 'IDLE';
-    buildingName: buildingNameType;
+    buildingType: BuildingType;
   };
 };
 export type WalkMapJob = {
@@ -34,6 +34,6 @@ export type HeroOfflineJob = {
   payload: {
     heroId: string;
     mapId: string | undefined;
-    townId: string | undefined;
+    placeId: string | undefined;
   };
 };
