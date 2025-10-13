@@ -27,7 +27,7 @@ import { placeRouter } from './routes/place-router';
 import { Redis } from "ioredis";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { db } from './db/db';
-import { heroTable } from './db/schema';
+import { actionTable, heroTable } from './db/schema';
 
 
 const app = new Hono<Context>();
@@ -96,6 +96,9 @@ export const io = new Server(httpServer as HTTPServer, {
 
 await db.update(heroTable).set({
   isOnline: false
+})
+await db.update(actionTable).set({
+  type: 'IDLE'
 })
 
 io.on('connection', async (socket) => {
