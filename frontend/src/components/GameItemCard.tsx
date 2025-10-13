@@ -13,7 +13,7 @@ export const GameItemCard = memo(function GameItemCard({ id, quantity, gameItem 
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <GameItemSlot rarity={gameItem.rarity}>
+    <GameItemSlot >
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger className="size-full">
           <CustomTooltip>

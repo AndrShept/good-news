@@ -16,3 +16,4 @@ export * from './state-schema';
 export * from './tile-schema';
 export * from './map-schema';
 export * from './place-schema';
+export * from './resource-schema';

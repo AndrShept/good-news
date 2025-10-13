@@ -7,14 +7,13 @@ import { ArmorInfo } from './ArmorInfo';
 import { PotionInfo } from './PotionInfo';
 import { WeaponInfo } from './WeaponInfo';
 import { GoldIcon } from './game-icons/GoldIcon';
-import { rarityConfig } from '@/lib/config';
 
 interface Props extends GameItem {
   isShowPrice?: boolean;
   isShowBuyButton?: boolean;
 }
 export const GameItemCardShowInfo = memo(
-  ({ image, name, type, id, price, rarity, potion, weapon, armor, accessory, isShowBuyButton = false, isShowPrice = false }: Props) => {
+  ({ image, name, type, id, price, potion, weapon, armor, resource, accessory, isShowBuyButton = false, isShowPrice = false }: Props) => {
     return (
       <article className={cn('flex flex-col gap-4 rounded border p-4 text-start')}>
         <section className="flex gap-4">
@@ -25,13 +24,12 @@ export const GameItemCardShowInfo = memo(
           </div>
           <div className="flex flex-col">
             <h3 className="line-clamp-2 capitalize">{name}</h3>
-            <p className={cn(rarityConfig[rarity].color)}>{rarity}</p>
             <p className="text-muted-foreground/30">{type}</p>
 
             {/* {modifier && <ModifierInfoCard modifier={modifier} />} */}
             {potion && <PotionInfo {...potion} />}
-            {weapon && <WeaponInfo {...weapon} rarity={rarity} />}
-            {armor && <ArmorInfo {...armor} rarity={rarity} />}
+            {weapon && <WeaponInfo {...weapon} />}
+            {armor && <ArmorInfo {...armor} />}
           </div>
         </section>
         <div className="mt-auto flex justify-between">

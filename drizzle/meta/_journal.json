@@ -155,6 +155,34 @@
       "when": 1760352890953,
       "tag": "0021_worried_the_leader",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1760387838156,
+      "tag": "0022_nostalgic_master_mold",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1760388060432,
+      "tag": "0023_striped_shockwave",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1760388385405,
+      "tag": "0024_bent_turbo",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1760389949149,
+      "tag": "0025_long_thanos",
+      "breakpoints": true
     }
   ]
 }

@@ -4,9 +4,7 @@ import React from 'react';
 
 import { Separator } from './ui/separator';
 
-interface Props extends Weapon {
-  rarity: RarityType;
-}
+type Props = Weapon;
 
 export const WeaponInfo = ({
   minDamage,
@@ -77,7 +75,7 @@ export const WeaponInfo = ({
             if (!modifier.value) return;
             return (
               <li key={modifier.name} className="flex items-center gap-1">
-                <p className="text-green-500 font-medium">+{modifier.value}</p>
+                <p className="font-medium text-green-500">+{modifier.value}</p>
                 <p className="text-muted-foreground">{modifier.name}</p>
               </li>
             );

@@ -3,9 +3,10 @@ import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-
 
 import type { buffTable } from './buff-schema';
 import { inventoryItemTable } from './inventory-item-schema';
+import { resourceTable } from './resource-schema';
 
 export const gameItemEnum = pgEnum('game_item_enum', ['WEAPON', 'ARMOR', 'POTION', 'RESOURCES', 'MISC']);
-export const rarityEnum = pgEnum('rarity_enum', ['COMMON', 'MAGIC', 'EPIC', 'RARE', 'LEGENDARY']);
+
 
 export const armorSlotEnum = pgEnum('armor_slot_enum', ['HELMET', 'CHESTPLATE', 'LEGS', 'BOOTS', 'GLOVES', 'SHIELD']);
 export const accessorySlotEnum = pgEnum('accessory_slot_enum', ['RING', 'AMULET']);
@@ -23,9 +24,7 @@ export const gameItemTable = pgTable('game_item', {
   name: text().notNull(),
   image: text().notNull(),
   price: integer().default(0).notNull(),
-  rarity: rarityEnum().default('COMMON').notNull(),
   createdAt: timestamp('created_at', {
-    withTimezone: true,
     mode: 'string',
   })
     .notNull()
@@ -38,6 +37,7 @@ export const gameItemRelations = relations(gameItemTable, ({ one, many }) => ({
   armor: one(armorTable),
   potion: one(potionTable),
   accessory: one(accessoryTable),
+  resource: one(resourceTable),
 }));
 
 //WEAPON

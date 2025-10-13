@@ -24,8 +24,16 @@ import { userTable } from '../server/db/schema/auth-schema';
 import { buffTable } from '../server/db/schema/buff-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import { equipmentTable, slotEnum } from '../server/db/schema/equipment-schema';
-import { accessoryTable, armorSlotEnum, gameItemEnum, gameItemTable, rarityEnum, weaponHandEnum, weaponTypeEnum } from '../server/db/schema/game-item-schema';
+import {
+  accessoryTable,
+  armorSlotEnum,
+  gameItemEnum,
+  gameItemTable,
+  weaponHandEnum,
+  weaponTypeEnum,
+} from '../server/db/schema/game-item-schema';
 import { postTable } from '../server/db/schema/posts-schema';
+import type { rarityEnum, resourceTable } from '../server/db/schema/resource-schema';
 import { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
 import { tileTable, tileTypeEnum } from '../server/db/schema/tile-schema';
 import type { Layer } from './json-types';
@@ -188,7 +196,7 @@ export type Tile = typeof tileTable.$inferSelect & {
   location?: Location;
 };
 export type TilesGrid = (Tile | null)[][];
-export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'heroId'>;
+export type OmitModifier = Omit<Partial<Modifier>, 'id' | 'createdAt' | 'updatedAt' | 'heroId'>;
 
 export type Equipment = typeof equipmentTable.$inferSelect & {
   gameItem?: GameItem;
@@ -201,12 +209,14 @@ export type Weapon = typeof weaponTable.$inferSelect;
 export type Armor = typeof armorTable.$inferSelect;
 export type Potion = typeof potionTable.$inferSelect;
 export type Accessory = typeof accessoryTable.$inferSelect;
+export type Resource = typeof resourceTable.$inferSelect;
 
 export type GameItem = InferSelectModel<typeof gameItemTable> & {
   weapon?: Weapon | null;
   armor?: Armor | null;
   potion?: Potion | null;
   accessory?: Accessory | null;
+  resource?: Resource | null;
 };
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier?: Modifier;

@@ -4,9 +4,7 @@ import React from 'react';
 
 import { Separator } from './ui/separator';
 
-interface Props extends Armor {
-  rarity: RarityType;
-}
+type Props = Armor 
 
 export const ArmorInfo = ({ defense, evasion, magicResistance, slot }: Props) => {
   const baseModifier = [
