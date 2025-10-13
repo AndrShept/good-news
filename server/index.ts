@@ -26,6 +26,8 @@ import { placeRouter } from './routes/place-router';
 
 import { Redis } from "ioredis";
 import { createAdapter } from "@socket.io/redis-adapter";
+import { db } from './db/db';
+import { heroTable } from './db/schema';
 
 
 const app = new Hono<Context>();
@@ -92,7 +94,9 @@ export const io = new Server(httpServer as HTTPServer, {
   adapter: createAdapter(pubClient, subClient)
 });
 
-
+await db.update(heroTable).set({
+  isOnline: false
+})
 
 io.on('connection', async (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };
