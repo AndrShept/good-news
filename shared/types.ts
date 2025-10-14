@@ -238,6 +238,15 @@ export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>;
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];
 export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
 
+export type IHeroStat = {
+  strength: number;
+  constitution: number;
+  intelligence: number;
+  dexterity: number;
+  luck: number;
+};
+export type IHeroStatEnum = keyof IHeroStat;
+
 export const statsSchema = createSelectSchema(modifierTable, {
   strength: z.number({ coerce: true }),
   constitution: z.number({ coerce: true }),
@@ -251,14 +260,13 @@ export const statsSchema = createSelectSchema(modifierTable, {
   intelligence: true,
   strength: true,
 });
-export type HeroStats = z.infer<typeof statsSchema>;
 export const createHeroSchema = createInsertSchema(heroTable, {
   name: z
     .string()
     .min(3)
     .max(20)
     .regex(/^[a-zA-Z0-9_]+$/, 'hero name can only contain letters, numbers, and underscores'),
-  freeStatPoints: z.number({ coerce: true }),
+  freeStatPoints: z.number(),
   avatarImage: z.string().min(1),
   // characterImage: z.string().min(1),
 })
@@ -269,5 +277,11 @@ export const createHeroSchema = createInsertSchema(heroTable, {
     characterImage: true,
   })
   .extend({
-    modifier: z.string().transform((val) => JSON.parse(val) as HeroStats),
-  });
+  stat: z.object({
+    constitution: z.number(),
+    dexterity: z.number(),
+    luck: z.number(),
+    intelligence: z.number(),
+    strength: z.number(),
+  }),
+})

@@ -1,4 +1,4 @@
-import { HeroStats } from '@/shared/types';
+import { IHeroStat } from '@/shared/types';
 import { CheckIcon } from 'lucide-react';
 import { Dispatch, SetStateAction, memo } from 'react';
 
@@ -8,17 +8,17 @@ import { useConfirmStats } from '../hooks/useConfirmStats';
 import { ResetStatsButton } from './ResetStatsButton';
 
 export interface Stat {
-  name: keyof HeroStats;
+  name: keyof IHeroStat;
   value: number;
 }
 
 interface Props {
   reset: boolean;
-  setCurrentStats: Dispatch<SetStateAction<HeroStats>>;
-  currentStats: HeroStats;
+  setCurrentStats: Dispatch<SetStateAction<IHeroStat>>;
+  currentStats: IHeroStat;
   freePoints: number;
   setFreePoints: Dispatch<SetStateAction<number>>;
-  baseStats: HeroStats;
+  baseStats: IHeroStat;
   baseFreePoints?: number;
 }
 
@@ -35,8 +35,8 @@ export const Stats = memo(({ reset, setCurrentStats, currentStats, freePoints, s
   const onConfirm = async () => {
     mutate();
   };
-  const areStatsEqual = (a: HeroStats, b: HeroStats) => {
-    return Object.keys(a).every((key) => a[key as keyof HeroStats] === b[key as keyof HeroStats]);
+  const areStatsEqual = (a: IHeroStat, b: IHeroStat) => {
+    return Object.keys(a).every((key) => a[key as keyof IHeroStat] === b[key as keyof IHeroStat]);
   };
   return (
     <section className="bg-secondary rounded border p-4">

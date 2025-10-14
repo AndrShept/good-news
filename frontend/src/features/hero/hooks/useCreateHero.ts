@@ -7,8 +7,4 @@ export const useCreateHero = () =>
   useMutation({
     mutationFn: createHero,
 
-    onError(error, variables, context) {
-      toastError();
-      console.error(error.message);
-    },
   });

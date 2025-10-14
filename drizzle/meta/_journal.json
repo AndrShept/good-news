@@ -183,6 +183,13 @@
       "when": 1760389949149,
       "tag": "0025_long_thanos",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1760436750341,
+      "tag": "0026_worried_hulk",
+      "breakpoints": true
     }
   ]
 }

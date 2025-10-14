@@ -1,4 +1,11 @@
-import { BASE_STATS, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
+import {
+  BASE_FREE_POINTS,
+  BASE_STATS,
+  BASE_WALK_TIME,
+  HP_MULTIPLIER_COST,
+  MANA_MULTIPLIER_INT,
+  RESET_STATS_COST,
+} from '@/shared/constants';
 import { type WalkMapJob, type WalkPlaceJob, jobName } from '@/shared/job-types';
 import type { HeroOnlineData, MapUpdateEvent, PlaceUpdateEvent } from '@/shared/socket-data-types';
 import {
@@ -53,6 +60,7 @@ import {
   setSqlNowByInterval,
   verifyHeroOwnership,
 } from '../lib/utils';
+import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
 
@@ -113,8 +121,14 @@ export const heroRouter = new Hono<Context>()
       });
     },
   )
-  .post('/create', loggedIn, zValidator('form', createHeroSchema), async (c) => {
-    const { name, avatarImage, freeStatPoints, modifier: heroStats } = c.req.valid('form');
+  .post('/create', loggedIn, zValidator('json', createHeroSchema), async (c) => {
+    const { name, avatarImage, freeStatPoints, stat } = c.req.valid('json');
+
+    validateHeroStats({
+      freeStatPoints,
+      stat,
+      level: 1,
+    });
     const userId = c.get('user')?.id as string;
     const nameExist = await db.query.heroTable.findFirst({
       where: eq(heroTable.name, name),
@@ -132,6 +146,7 @@ export const heroRouter = new Hono<Context>()
     const heroExist = await db.query.heroTable.findFirst({
       where: eq(heroTable.userId, userId),
     });
+
     if (heroExist) {
       throw new HTTPException(409, {
         message: 'Hero already exists for this user.',
@@ -151,19 +166,19 @@ export const heroRouter = new Hono<Context>()
         .insert(heroTable)
         .values({
           id: generateRandomUuid(),
+          stat,
           avatarImage,
           characterImage,
           name,
           userId,
           freeStatPoints,
-          maxHealth: heroStats.constitution * HP_MULTIPLIER_COST,
-          maxMana: heroStats.intelligence * MANA_MULTIPLIER_INT,
+          maxHealth: stat.constitution * HP_MULTIPLIER_COST,
+          maxMana: stat.intelligence * MANA_MULTIPLIER_INT,
         })
         .returning();
       await tx.insert(modifierTable).values({
         id: generateRandomUuid(),
         heroId: newHero.id,
-        ...heroStats,
       });
       await tx.insert(locationTable).values({ placeId: place.id, heroId: newHero.id, x: place.x, y: place.y });
       await tx.insert(actionTable).values({
@@ -190,19 +205,13 @@ export const heroRouter = new Hono<Context>()
       const userId = c.get('user')?.id as string;
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
-        with: { modifier: { columns: { id: true } } },
       });
 
       if (!hero) {
         throw new HTTPException(404, { message: 'Hero not found' });
       }
-      if (!hero.modifier?.id) {
-        throw new HTTPException(404, { message: 'modifier id  not found' });
-      }
 
-      if (hero.userId !== userId) {
-        throw new HTTPException(403, { message: 'Access denied' });
-      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
       if (hero.goldCoins < RESET_STATS_COST) {
         return c.json<ErrorResponse>(
@@ -218,20 +227,10 @@ export const heroRouter = new Hono<Context>()
           .update(heroTable)
           .set({
             freeStatPoints: hero.level * 10,
-          })
-          .where(eq(heroTable.id, id));
-        await tx
-          .update(heroTable)
-          .set({
             goldCoins: hero.goldCoins - RESET_STATS_COST,
+            stat: BASE_STATS,
           })
           .where(eq(heroTable.id, id));
-        await tx
-          .update(modifierTable)
-          .set({
-            ...BASE_STATS,
-          })
-          .where(eq(modifierTable.id, hero.modifier!.id));
       });
 
       return c.json<SuccessResponse>({ message: 'Hero stats have been reset successfully.', success: true });
@@ -257,41 +256,29 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const userId = c.get('user')?.id as string;
       const { id } = c.req.valid('param');
-      const { freeStatPoints, ...newStats } = c.req.valid('form');
+      const { freeStatPoints, ...stat } = c.req.valid('form');
 
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
-        with: { modifier: { columns: { id: true } } },
       });
+
       if (!hero) {
         throw new HTTPException(404, {
           message: 'Hero not found',
         });
       }
-      if (!hero.modifier?.id) {
-        throw new HTTPException(404, {
-          message: 'modifier id not found',
-        });
-      }
-      if (hero.userId !== userId) {
-        throw new HTTPException(403, {
-          message: 'access denied',
-        });
-      }
+
+      validateHeroStats({ freeStatPoints, stat, level: hero.level });
+      verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
       await db.transaction(async (tx) => {
         await tx
           .update(heroTable)
           .set({
             freeStatPoints,
+            stat,
           })
           .where(eq(heroTable.id, id));
-        await tx
-          .update(modifierTable)
-          .set({
-            ...newStats,
-          })
-          .where(eq(modifierTable.id, hero.modifier!.id));
       });
       return c.json<SuccessResponse>({ success: true, message: 'Stats have been successfully updated.' }, 200);
     },
@@ -776,10 +763,7 @@ export const heroRouter = new Hono<Context>()
         );
       }
 
-      if(isBuffPotion) {
-
-
-        
+      if (isBuffPotion) {
       }
       await restorePotion({
         currentHealth: hero.currentHealth,

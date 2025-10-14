@@ -2,18 +2,24 @@ import { ShieldIcon } from '@/components/game-icons/ShieldIcon';
 import { StaffIcon } from '@/components/game-icons/StaffIcon';
 import { Separator } from '@/components/ui/separator';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { HeroStats } from '@/shared/types';
+import { IHeroStat } from '@/shared/types';
 import { memo, useEffect, useRef, useState } from 'react';
 
 import { Stats } from './Stats';
 
 export const Modifiers = memo(() => {
-  const { freeStatPoints, modifier } = useHero((state) => ({
+  const {
+    freeStatPoints,
+    modifier,
+    stat: heroStat,
+  } = useHero((state) => ({
     modifier: state?.data?.modifier,
     freeStatPoints: state?.data?.freeStatPoints ?? 0,
+    stat: state?.data?.stat,
   }));
 
   if (!modifier) throw new Error('modifier not found');
+  if (!heroStat) throw new Error('stat not found');
   const initialHeroStats = {
     strength: 0,
     constitution: 0,
@@ -21,25 +27,17 @@ export const Modifiers = memo(() => {
     intelligence: 0,
     luck: 0,
   };
-  const [stats, setStats] = useState<HeroStats>(initialHeroStats);
-  const baseStats = useRef<HeroStats>(initialHeroStats);
+  const [stats, setStats] = useState<IHeroStat>(initialHeroStats);
+  const baseStats = useRef<IHeroStat>(initialHeroStats);
   const [freePoints, setFreePoints] = useState(freeStatPoints);
   const baseFreePoints = useRef(freeStatPoints);
 
   useEffect(() => {
-    const newHeroStats = {
-      strength: modifier.strength,
-      constitution: modifier.constitution,
-      dexterity: modifier.dexterity,
-      intelligence: modifier.intelligence,
-      luck: modifier.luck,
-    };
-
-    setStats(newHeroStats);
-    baseStats.current = newHeroStats;
+    setStats(heroStat);
+    baseStats.current = heroStat;
     setFreePoints(freeStatPoints);
     baseFreePoints.current = freeStatPoints;
-  }, [freeStatPoints, modifier.constitution, modifier.dexterity, modifier.intelligence, modifier.luck, modifier.strength]);
+  }, [freeStatPoints, heroStat, modifier.constitution, modifier.dexterity, modifier.intelligence, modifier.luck, modifier.strength]);
   return (
     <section className="h-fit max-w-fit flex-col gap-2 rounded text-sm md:flex">
       <Stats

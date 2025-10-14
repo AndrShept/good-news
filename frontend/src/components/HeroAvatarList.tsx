@@ -12,7 +12,6 @@ interface Props {
 export const HeroAvatarList = memo(({ avatar, setAvatar }: Props) => {
   const avatars = useMemo(() => {
     return [...Array(48)].map((_, idx) => ({
-      name: Date.now(),
       src: `/sprites/avatar/Icon${idx + 1}.png`,
     }));
   }, []);
@@ -22,7 +21,7 @@ export const HeroAvatarList = memo(({ avatar, setAvatar }: Props) => {
         {avatars.map((item) => (
           <HeroAvatar
             key={item.src}
-            setAvatar={setAvatar}
+            setAvatar={() => setAvatar(item.src)}
             src={item.src}
             isSelected={avatar === item.src}
             className="cursor-pointer opacity-60 hover:opacity-100"

@@ -8,20 +8,7 @@ import { Modifiers } from './Modifier';
 import { Paperdoll } from './Paperdoll';
 
 export const CharacterPaperdoll = () => {
-  const {
-    avatarImage,
-    currentExperience,
-    currentHealth,
-    equipments,
-    id,
-    level,
-    maxExperience,
-    maxHealth,
-    maxMana,
-    name,
-    currentMana,
-    characterImage,
-  } = useHero((state) => ({
+  const hero = useHero((state) => ({
     avatarImage: state?.data?.avatarImage ?? '',
     characterImage: state?.data?.characterImage ?? '',
     name: state?.data?.name ?? '',
@@ -43,20 +30,7 @@ export const CharacterPaperdoll = () => {
         Back
       </Button>
       <div className="flex gap-4">
-        <Paperdoll
-          avatarImage={avatarImage}
-          characterImage={characterImage}
-          currentExperience={currentExperience}
-          currentHealth={currentHealth}
-          currentMana={currentMana}
-          id={id}
-          level={level}
-          maxExperience={maxExperience}
-          maxHealth={maxHealth}
-          maxMana={maxMana}
-          name={name}
-          equipments={equipments}
-        />
+        <Paperdoll {...hero} />
         <Modifiers />
         <Inventory />
       </div>

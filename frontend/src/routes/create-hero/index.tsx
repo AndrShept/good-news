@@ -48,13 +48,14 @@ function RouteComponent() {
   // const isLoading = form.formState.isSubmitting;
   const onSetAvatarImage = useCallback((image: string) => setAvatarImage(image), []);
   const onSubmit = (values: z.infer<typeof heroNameSchema>) => {
+    console.log(stats);
     mutation.mutate(
       {
         avatarImage: avatarImage,
         characterImage: '',
         name: values.name,
         freeStatPoints: freePoints,
-        modifier: {
+        stat: {
           constitution: stats.constitution,
           dexterity: stats.dexterity,
           intelligence: stats.intelligence,

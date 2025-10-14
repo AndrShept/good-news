@@ -21,13 +21,14 @@ const avatarVariants = cva('relative rounded-full border', {
 interface HeroAvatarProps extends VariantProps<typeof avatarVariants>, ComponentProps<'article'> {
   src: string;
   isSelected?: boolean;
-  setAvatar?: (image: string) => void;
+  setAvatar?: () => void;
 }
 
 export const HeroAvatar = ({ src, isSelected = false, setAvatar, className, size, ...props }: HeroAvatarProps) => {
+  console.log('RENDER');
   return (
     <article
-      onClick={() => setAvatar?.(src)}
+      onClick={setAvatar}
       className={cn('shrink-0', avatarVariants({ className, size }), {
         'border-primary opacity-100 ring-1 hover:opacity-100': isSelected,
       })}

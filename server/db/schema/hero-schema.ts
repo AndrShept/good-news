@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { actionTable } from './action-schema';
 import { userTable } from './auth-schema';
@@ -10,6 +10,7 @@ import { inventoryItemTable } from './inventory-item-schema';
 import { locationTable } from './location-schema';
 import { modifierTable } from './modifier-schema';
 import { stateTable } from './state-schema';
+import type { IHeroStat } from '@/shared/types';
 
 export const heroTable = pgTable('hero', {
   id: uuid().primaryKey().notNull(),
@@ -35,11 +36,11 @@ export const heroTable = pgTable('hero', {
 
   currentExperience: integer().default(0).notNull(),
   maxExperience: integer().default(100).notNull(),
+  stat: jsonb('stat').$type<IHeroStat>(),
 
   groupId: uuid().references(() => groupTable.id, {
     onDelete: 'set null',
   }),
-
   userId: text()
     .notNull()
     .references(() => userTable.id, {
@@ -52,7 +53,6 @@ export const heroTable = pgTable('hero', {
   })
     .notNull()
     .defaultNow(),
-
 });
 
 export const heroRelations = relations(heroTable, ({ one, many }) => ({
@@ -60,7 +60,7 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
   action: one(actionTable),
   state: one(stateTable),
   location: one(locationTable),
-    group: one(groupTable, {
+  group: one(groupTable, {
     fields: [heroTable.groupId],
     references: [groupTable.id],
   }),
