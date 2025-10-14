@@ -743,8 +743,9 @@ export const heroRouter = new Hono<Context>()
       const isHealthPotion = !!(inventoryItemPotion?.gameItem?.potion?.restore?.health ?? 0 > 0);
       const isManaPotion = !!(inventoryItemPotion?.gameItem?.potion?.restore?.mana ?? 0 > 0);
       const isFullMana = hero.currentMana >= hero.maxMana;
+      const isRestorePotion = isHealthPotion && isManaPotion;
 
-      if (isFullHealth && isHealthPotion && !isBuffPotion) {
+      if (isFullHealth && isHealthPotion && !isBuffPotion && !isRestorePotion) {
         return c.json<ErrorResponse>(
           {
             message: 'You are already at full health',
@@ -754,7 +755,17 @@ export const heroRouter = new Hono<Context>()
           400,
         );
       }
-      if (isFullMana && isManaPotion && !isBuffPotion) {
+      if (isFullHealth && isFullMana && !isBuffPotion && isRestorePotion) {
+        return c.json<ErrorResponse>(
+          {
+            message: 'You are already at full health and mana',
+            isShowError: true,
+            success: false,
+          },
+          400,
+        );
+      }
+      if (isFullMana && isManaPotion && !isBuffPotion && !isRestorePotion) {
         return c.json<ErrorResponse>(
           {
             message: 'You are already at full mana',
@@ -763,6 +774,12 @@ export const heroRouter = new Hono<Context>()
           },
           400,
         );
+      }
+
+      if(isBuffPotion) {
+
+
+        
       }
       await restorePotion({
         currentHealth: hero.currentHealth,

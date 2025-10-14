@@ -8,10 +8,8 @@ import { equipmentTable } from './equipment-schema';
 import { groupTable } from './group-schema';
 import { inventoryItemTable } from './inventory-item-schema';
 import { locationTable } from './location-schema';
-import { mapTable } from './map-schema';
 import { modifierTable } from './modifier-schema';
 import { stateTable } from './state-schema';
-import { tileTable } from './tile-schema';
 
 export const heroTable = pgTable('hero', {
   id: uuid().primaryKey().notNull(),
@@ -54,9 +52,7 @@ export const heroTable = pgTable('hero', {
   })
     .notNull()
     .defaultNow(),
-  updatedAt: timestamp('updated_at', {
-    mode: 'string',
-  }),
+
 });
 
 export const heroRelations = relations(heroTable, ({ one, many }) => ({
