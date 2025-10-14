@@ -937,7 +937,8 @@ export const heroRouter = new Hono<Context>()
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       const jobId = hero.id;
-      const delay = calculateWalkTime(hero.modifier?.dexterity ?? 0 + hero.stat?.dexterity);
+      const sumDex = (hero.modifier?.dexterity ?? 0) + hero.stat.dexterity;
+      const delay = calculateWalkTime(sumDex);
       await db
         .update(actionTable)
         .set({
@@ -1044,7 +1045,8 @@ export const heroRouter = new Hono<Context>()
       }
 
       const jobId = hero.id;
-      const delay = calculateWalkTime(hero.modifier?.dexterity ?? 10);
+      const sumDex = (hero.modifier?.dexterity ?? 0) + hero.stat.dexterity;
+      const delay = calculateWalkTime(sumDex);
       await db
         .update(actionTable)
         .set({

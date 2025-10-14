@@ -4,12 +4,13 @@ import { useMutation } from '@tanstack/react-query';
 export const useEnterPlace = () => {
   return useMutation({
     mutationFn: async (id: string) => {
-      const data = await client.hero[':id'].action['enter-place'].$post({
+      const res = await client.hero[':id'].action['enter-place'].$post({
         param: {
           id,
         },
       });
-      return data.json();
+ 
+      return res.json();
     },
   });
 };
