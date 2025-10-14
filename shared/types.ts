@@ -218,6 +218,8 @@ export type GameItem = InferSelectModel<typeof gameItemTable> & {
   accessory?: Accessory | null;
   resource?: Resource | null;
 };
+
+
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier?: Modifier;
   group?: Group;
@@ -232,6 +234,7 @@ export type IPosition = {
   x: number;
   y: number;
 };
+
 
 //API RESPONSE
 export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>;
@@ -248,11 +251,11 @@ export type IHeroStat = {
 export type IHeroStatEnum = keyof IHeroStat;
 
 export const statsSchema = createSelectSchema(modifierTable, {
-  strength: z.number({ coerce: true }),
-  constitution: z.number({ coerce: true }),
-  intelligence: z.number({ coerce: true }),
-  dexterity: z.number({ coerce: true }),
-  luck: z.number({ coerce: true }),
+  strength: z.number(),
+  constitution: z.number(),
+  intelligence: z.number(),
+  dexterity: z.number(),
+  luck: z.number(),
 }).pick({
   constitution: true,
   dexterity: true,
@@ -277,11 +280,14 @@ export const createHeroSchema = createInsertSchema(heroTable, {
     characterImage: true,
   })
   .extend({
-  stat: z.object({
-    constitution: z.number(),
-    dexterity: z.number(),
-    luck: z.number(),
-    intelligence: z.number(),
-    strength: z.number(),
-  }),
-})
+    stat: z.object({
+      constitution: z.number(),
+      dexterity: z.number(),
+      luck: z.number(),
+      intelligence: z.number(),
+      strength: z.number(),
+    }),
+  });
+export const changeStatSchema = statsSchema.extend({
+  freeStatPoints: z.number(),
+});

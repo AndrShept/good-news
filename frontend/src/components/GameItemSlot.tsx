@@ -4,5 +4,5 @@ import { RarityType } from '@/shared/types';
 import React, { PropsWithChildren } from 'react';
 
 export const GameItemSlot = ({ children }: PropsWithChildren<{ rarity?: RarityType }>) => {
-  return <article className={cn('group relative size-12 border')}>{children}</article>;
+  return <article className={cn('hover:saturate-120 hover:border-primary/20 group relative size-12 border')}>{children}</article>;
 };

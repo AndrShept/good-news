@@ -246,7 +246,7 @@ export const heroRouter = new Hono<Context>()
       }),
     ),
     zValidator(
-      'form',
+      'json',
       statsSchema.extend({
         freeStatPoints: z.number({
           coerce: true,
@@ -256,7 +256,7 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const userId = c.get('user')?.id as string;
       const { id } = c.req.valid('param');
-      const { freeStatPoints, ...stat } = c.req.valid('form');
+      const { freeStatPoints, ...stat } = c.req.valid('json');
 
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
@@ -380,12 +380,13 @@ export const heroRouter = new Hono<Context>()
         );
       }
       const inventoryItem = await db.query.inventoryItemTable.findFirst({
-        where: eq(inventoryItemTable.gameItemId, itemId),
+        where: and(eq(inventoryItemTable.gameItemId, itemId), eq(inventoryItemTable.heroId, id)),
         with: {
           gameItem: true,
         },
       });
-      if (gameItem.type === 'POTION' && inventoryItem) {
+
+      if (gameItem.type !== 'ARMOR' && gameItem.type !== 'WEAPON' && inventoryItem) {
         await db.transaction(async (tx) => {
           await tx
             .update(heroTable)
@@ -398,7 +399,7 @@ export const heroRouter = new Hono<Context>()
             .set({
               quantity: inventoryItem.quantity + 1,
             })
-            .where(eq(inventoryItemTable.id, inventoryItem.id));
+            .where(and(eq(inventoryItemTable.id, inventoryItem.id), eq(inventoryItemTable.heroId, id)));
         });
 
         return c.json<SuccessResponse<InventoryItem>>(
@@ -416,11 +417,6 @@ export const heroRouter = new Hono<Context>()
           .update(heroTable)
           .set({
             currentInventorySlots: hero.currentInventorySlots + 1,
-          })
-          .where(eq(heroTable.id, id));
-        await tx
-          .update(heroTable)
-          .set({
             goldCoins: hero.goldCoins - gameItem.price,
           })
           .where(eq(heroTable.id, id));
@@ -922,11 +918,7 @@ export const heroRouter = new Hono<Context>()
           message: 'hero not found',
         });
       }
-      if (!hero.modifier?.dexterity) {
-        throw new HTTPException(404, {
-          message: 'modifier dexterity not found',
-        });
-      }
+
       if (!hero.action?.id) {
         throw new HTTPException(404, {
           message: 'action id not found',
@@ -945,7 +937,7 @@ export const heroRouter = new Hono<Context>()
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       const jobId = hero.id;
-      const delay = calculateWalkTime(hero.modifier.dexterity);
+      const delay = calculateWalkTime(hero.modifier?.dexterity ?? 0 + hero.stat?.dexterity);
       await db
         .update(actionTable)
         .set({

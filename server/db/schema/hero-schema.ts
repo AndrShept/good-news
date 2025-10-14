@@ -36,7 +36,7 @@ export const heroTable = pgTable('hero', {
 
   currentExperience: integer().default(0).notNull(),
   maxExperience: integer().default(100).notNull(),
-  stat: jsonb('stat').$type<IHeroStat>(),
+  stat: jsonb('stat').$type<IHeroStat>().notNull(),
 
   groupId: uuid().references(() => groupTable.id, {
     onDelete: 'set null',

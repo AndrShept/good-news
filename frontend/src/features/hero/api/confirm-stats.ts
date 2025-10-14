@@ -1,21 +1,15 @@
 import { client } from '@/lib/utils';
-import { ErrorResponse, statsSchema } from '@/shared/types';
+import { changeStatSchema, ErrorResponse } from '@/shared/types';
 import { z } from 'zod';
 
-export const extendedStatsSchema = statsSchema.extend({
-  freeStatPoints: z.number(),
-});
-type StatsData = z.infer<typeof extendedStatsSchema>;
-export const confirmStats = async (id: string, data: z.infer<typeof extendedStatsSchema>) => {
-  const transformedData = Object.fromEntries(Object.entries(data).map(([key, value]) => [key, value.toString()])) as Record<
-    keyof StatsData,
-    string
-  >;
+
+export const confirmStats = async (id: string, data: z.infer<typeof changeStatSchema>) => {
+
   const res = await client.hero[':id'].stats.confirm.$put({
     param: {
       id,
     },
-    form: transformedData,
+    json: data,
   });
   if (!res.ok) {
     return (await res.json()) as unknown as ErrorResponse;

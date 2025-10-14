@@ -20,7 +20,7 @@ export const GameItemCard = memo(function GameItemCard({ id, quantity, gameItem 
             <CustomTooltip.Trigger>
               <img
                 style={{ imageRendering: 'pixelated' }}
-                className="size-full object-contain opacity-85 group-hover:opacity-100"
+                className="size-full object-contain opacity-85 group-hover:opacity-100 "
                 src={gameItem?.image}
                 alt="inventory-image"
               />
