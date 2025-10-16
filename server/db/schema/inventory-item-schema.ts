@@ -5,7 +5,7 @@ import { gameItemTable } from './game-item-schema';
 import { heroTable } from './hero-schema';
 
 export const inventoryItemTable = pgTable('inventory_item', {
-  id: uuid().primaryKey().notNull(),
+  id: uuid().primaryKey().defaultRandom().notNull(),
 
   quantity: integer().notNull().default(1),
 
@@ -18,7 +18,6 @@ export const inventoryItemTable = pgTable('inventory_item', {
       onDelete: 'cascade',
     }),
   createdAt: timestamp('created_at', {
-    withTimezone: true,
     mode: 'string',
   })
     .notNull()

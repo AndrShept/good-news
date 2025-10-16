@@ -11,6 +11,7 @@ export const slotEnum = pgEnum('equipment_slot_enum', [
   'CHESTPLATE',
   'LEGS',
   'BOOTS',
+  'GLOVES',
   'AMULET',
   'RING_LEFT',
   'RING_RIGHT',
@@ -18,7 +19,7 @@ export const slotEnum = pgEnum('equipment_slot_enum', [
 ]);
 
 export const equipmentTable = pgTable('equipment', {
-  id: uuid().primaryKey().notNull(),
+  id: uuid().primaryKey().defaultRandom().notNull(),
 
   slot: slotEnum().notNull(),
 
@@ -28,9 +29,6 @@ export const equipmentTable = pgTable('equipment', {
   })
     .notNull()
     .defaultNow(),
-  updatedAt: timestamp('updated_at', {
-    mode: 'string',
-  }),
 
   heroId: uuid()
     .notNull()

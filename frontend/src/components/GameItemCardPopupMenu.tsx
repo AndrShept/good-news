@@ -7,6 +7,7 @@ import { useUnEquipItem } from '@/features/hero/hooks/useUnEquipItem';
 import { Equipment, GameItem, InventoryItem } from '@/shared/types';
 
 import { ConfirmPopover } from './ConfirmPopover';
+import { GameCartType } from './GameItemCard';
 import { Button } from './ui/button';
 
 interface Props {
@@ -14,12 +15,11 @@ interface Props {
   id: string;
   gameItem: GameItem;
   quantity: number;
-  isInventoryItem: boolean;
-  isEquipItem: boolean;
+  type: GameCartType;
 }
-export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, isEquipItem, isInventoryItem }: Props) => {
+export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type }: Props) => {
   const heroId = useHeroId();
-  const isCanEquip = gameItem.type === 'WEAPON' || gameItem.type === 'ARMOR';
+  const isCanEquip = (gameItem.type === 'WEAPON' || gameItem.type === 'ARMOR') && type !== 'EQUIP';
   const isPotionItem = gameItem.type === 'POTION';
   const equipItemMutation = useEquipItem();
   const unEquipItemMutation = useUnEquipItem();
@@ -84,13 +84,13 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, isEquip
         </Button>
       )}
 
-      {isEquipItem && (
+      {type === 'EQUIP' && (
         <Button disabled={isMutationPending} onClick={unOnEquip} variant={'ghost'} className="flex w-full items-center">
           <img className="size-6" src="/sprites/icons/equip.png" />
           <p className="text-[12px]">un equip</p>
         </Button>
       )}
-      {isInventoryItem && (
+      {type === 'INVENTORY' && (
         <ConfirmPopover onConfirm={onDeleteInventoryItem} setIsShow={onClose}>
           <ConfirmPopover.Trigger>
             <Button disabled={isMutationPending} variant={'ghost'} className="flex w-full items-center transition hover:text-red-500">

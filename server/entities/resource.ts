@@ -10,6 +10,7 @@ export const resourceEntities: (typeof gameItemTable.$inferInsert & { resource: 
     resource: {
       gameItemId: '',
       type: 'IRON',
+      category: 'ORE',
       rarity: 'COMMON',
       modifier: [
         {
@@ -26,6 +27,7 @@ export const resourceEntities: (typeof gameItemTable.$inferInsert & { resource: 
     resource: {
       gameItemId: '',
       type: 'COPPER',
+      category: 'ORE',
       rarity: 'COMMON',
       modifier: [
         {

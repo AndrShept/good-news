@@ -122,7 +122,7 @@ export const potionTable = pgTable('potion', {
     })
     .notNull(),
   restore: jsonb('restore').$type<{ mana?: number; health?: number }>(),
-  potionEffect: jsonb('potionEffect').$type<Pick<typeof buffTable.$inferInsert, 'type' | 'name' | 'image' | 'modifier' | 'duration'>>(),
+  buffInfo: jsonb('buffInfo').$type<Pick<typeof buffTable.$inferInsert, 'type' | 'name' | 'image' | 'modifier' | 'duration'>>(),
 });
 
 export const potionTableRelations = relations(potionTable, ({ one }) => ({

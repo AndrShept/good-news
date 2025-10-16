@@ -25,7 +25,7 @@ export const Inventory = memo(() => {
     <ul className="flex h-fit flex-wrap gap-1">
       {inventoriesData.map((inventory, idx) => {
         if (!inventory) return <GameItemSlot key={idx} />;
-        return <GameItemCard key={inventory.id} {...inventory} />;
+        return <GameItemCard key={inventory.id} {...inventory} type="INVENTORY" />;
       })}
     </ul>
   );

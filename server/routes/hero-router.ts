@@ -63,6 +63,7 @@ import {
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
+import { equipmentService } from '../services/equipment-service';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -70,20 +71,17 @@ export const heroRouter = new Hono<Context>()
     loggedIn,
 
     async (c) => {
-      const id = c.get('user')?.id as string;
+      const userId = c.get('user')?.id as string;
       const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.userId, id),
+        where: eq(heroTable.userId, userId),
       });
       if (!hero) {
         throw new HTTPException(404, {
           message: 'hero not found',
         });
       }
-      if (hero.userId !== id) {
-        throw new HTTPException(403, {
-          message: 'access denied',
-        });
-      }
+
+      verifyHeroOwnership({ heroUserId: hero.userId, userId });
       // const inventoryCount = await db.$count(inventoryItemTable, eq(inventoryItemTable.heroId, hero.id));
       // await db
       //   .update(heroTable)
@@ -94,7 +92,7 @@ export const heroRouter = new Hono<Context>()
       // await db.delete(buffTable).where(and(eq(buffTable.heroId, hero.id), lte(buffTable.completedAt, new Date().toISOString())));
 
       const updatedHero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.userId, id),
+        where: eq(heroTable.userId, userId),
         with: {
           modifier: true,
           group: true,
@@ -102,6 +100,17 @@ export const heroRouter = new Hono<Context>()
             extras: {
               timeRemaining: sql<number>`EXTRACT(EPOCH FROM ${actionTable.completedAt} - NOW())::INT`.as('timeRemaining'),
             },
+          },
+          equipments: {
+            with: {
+              gameItem: {
+                with: {
+                   accessory: true,
+                   armor: true,
+                   weapon: true
+                }
+              }
+            }
           },
           state: true,
           location: {
@@ -303,16 +312,13 @@ export const heroRouter = new Hono<Context>()
           message: 'Hero not found',
         });
       }
-      if (hero.userId !== userId) {
-        throw new HTTPException(403, {
-          message: 'access denied',
-        });
-      }
+
+      verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
       const inventories = await db.query.inventoryItemTable.findMany({
         where: eq(inventoryItemTable.heroId, id),
         with: {
-          gameItem: { with: { weapon: true, armor: true, accessory: true, potion: true } },
+          gameItem: { with: { weapon: true, armor: true, accessory: true, potion: true, resource: true } },
         },
         orderBy: asc(inventoryItemTable.id),
       });
@@ -463,59 +469,80 @@ export const heroRouter = new Hono<Context>()
           message: 'hero not found',
         });
       }
-      if (hero.userId !== userId) {
-        throw new HTTPException(403, {
-          message: 'access denied',
-        });
-      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId });
+
       const inventoryItem = await db.query.inventoryItemTable.findFirst({
         where: eq(inventoryItemTable.id, itemId),
         with: {
-          gameItem: { with: { weapon: true } },
+          gameItem: { with: { weapon: true, armor: true } },
         },
       });
-
-      const isNotEquipment = inventoryItem?.gameItem.type === 'MISC' || inventoryItem?.gameItem.type === 'POTION';
       if (!inventoryItem) {
         throw new HTTPException(404, {
           message: 'inventory item not found',
         });
       }
-      if (isNotEquipment) {
+
+      const isEquipment = inventoryItem?.gameItem.type === 'ARMOR' || inventoryItem?.gameItem.type === 'WEAPON';
+      if (!inventoryItem) {
+        throw new HTTPException(404, {
+          message: 'inventory item not found',
+        });
+      }
+      if (!isEquipment) {
         throw new HTTPException(403, {
           message: 'You cannot equip this item.',
         });
       }
-      // const getEquipSlot = async (
-      //   itemType: GameItemType,
-      //   weaponHand: WeaponHandType | null | undefined,
-      // ): Promise<EquipmentSlotType | undefined> => {
-      //   await db.transaction(async (tx) => {
-      //     const existSlot = await db.query.equipmentTable.findFirst({
-      //       where: eq(equipmentTable.slot, newEquipSlot),
-      //     });
-      //     if (existSlot) {
-      //       tx.rollback();
-      //     }
-      //     await tx.insert(equipmentTable).values({
-      //       id: generateRandomUuid(),
-      //       heroId: hero.id,
-      //       gameItemId: inventoryItem.gameItemId,
-      //       slot: newEquipSlot,
-      //     });
-      //     await tx
-      //       .update(heroTable)
-      //       .set({
-      //         currentInventorySlots: hero.currentInventorySlots - 1,
-      //       })
-      //       .where(eq(heroTable.id, hero.id));
-      //     await tx.delete(inventoryItemTable).where(eq(inventoryItemTable.id, inventoryItem.id));
-      //   });
-      // };
+
+      await db.transaction(async (tx) => {
+        const slot = await equipmentService.getEquipSlot({
+          db: tx,
+          heroId: hero.id,
+          item: inventoryItem.gameItem,
+          currentInventorySlots: hero.currentInventorySlots,
+          maxInventorySlot: hero.maxInventorySlots,
+        });
+
+        if (!slot) {
+          throw new HTTPException(404, {
+            message: 'slot not found',
+          });
+        }
+        const existingEquipItem = await equipmentService.findEquipItem(tx, slot, hero.id);
+        if (existingEquipItem) {
+          const isInventoryFull = await equipmentService.unEquipItem({
+            equipmentItemId: existingEquipItem.id,
+            gameItemId: existingEquipItem.gameItemId,
+            heroId: hero.id,
+            db: tx,
+            currentInventorySlots: hero.currentInventorySlots,
+            maxInventorySlot: hero.maxInventorySlots,
+          });
+          if (isInventoryFull) {
+            return c.json<ErrorResponse>(
+              {
+                success: false,
+                message: `inventory is full`,
+              },
+              409,
+            );
+          }
+        }
+
+        await equipmentService.equipItem({
+          gameItemId: inventoryItem.gameItemId,
+          heroId: hero.id,
+          slot,
+          inventoryItemId: inventoryItem.id,
+          db: tx,
+        });
+      });
+
       return c.json<SuccessResponse>(
         {
           success: true,
-          message: `success equipped item `,
+          message: `success equipped item ${inventoryItem.gameItem.name}`,
         },
         201,
       );
@@ -689,6 +716,9 @@ export const heroRouter = new Hono<Context>()
       const userId = c.get('user')?.id as string;
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
+        with: {
+          modifier: true,
+        },
       });
 
       if (!hero) {
@@ -760,6 +790,34 @@ export const heroRouter = new Hono<Context>()
       }
 
       if (isBuffPotion) {
+        const [newBuff] = await db
+          .insert(buffTable)
+          .values({
+            type: 'POSITIVE',
+
+            modifier: inventoryItemPotion.gameItem.potion?.buffInfo?.modifier ?? {},
+            name: inventoryItemPotion.gameItem.potion?.buffInfo?.name ?? '',
+            image: inventoryItemPotion.gameItem.potion?.buffInfo?.image ?? '',
+            duration: inventoryItemPotion.gameItem.potion?.buffInfo?.duration ?? 0,
+            completedAt: new Date(Date.now() + (inventoryItemPotion.gameItem.potion?.buffInfo?.duration ?? 0)).toISOString(),
+            heroId: hero.id,
+          })
+          .returning({ id: buffTable.id });
+        const sum = sumModifier({
+          heroModifier: hero.modifier,
+          itemModifier: inventoryItemPotion.gameItem.potion?.buffInfo?.modifier,
+        });
+        await db
+          .update(modifierTable)
+          .set({
+            intelligence: inventoryItemPotion.gameItem.potion?.buffInfo?.modifier.intelligence,
+          })
+          .where(eq(modifierTable.heroId, hero.id));
+        return c.json<SuccessResponse<InventoryItem>>({
+          success: true,
+          message: `You success use buff potion`,
+          data: inventoryItemPotion,
+        });
       }
       await restorePotion({
         currentHealth: hero.currentHealth,
@@ -792,11 +850,8 @@ export const heroRouter = new Hono<Context>()
       });
     }
 
-    if (hero.userId !== userId) {
-      throw new HTTPException(403, {
-        message: 'access denied',
-      });
-    }
+    verifyHeroOwnership({ heroUserId: hero.userId, userId });
+
     const buffs = await db.query.buffTable.findMany({
       where: eq(buffTable.heroId, hero.id),
     });

@@ -21,7 +21,7 @@ export const createResource = async () => {
       gameItemId: resource.id!,
     });
   }
-  console.log('✔ places create');
+  console.log('✔ resource create');
   return;
 };
 createResource();
