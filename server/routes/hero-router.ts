@@ -2,6 +2,7 @@ import {
   BASE_FREE_POINTS,
   BASE_STATS,
   BASE_WALK_TIME,
+  DEFAULT_ITEM_STACK,
   HP_MULTIPLIER_COST,
   MANA_MULTIPLIER_INT,
   RESET_STATS_COST,
@@ -24,9 +25,10 @@ import {
   statsSchema,
 } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
-import { and, asc, desc, eq, lte, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, lt, lte, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { resourceLimits } from 'node:worker_threads';
 import { z } from 'zod';
 
 import { io } from '..';
@@ -64,6 +66,8 @@ import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
 import { equipmentService } from '../services/equipment-service';
+import { heroService } from '../services/hero-service';
+import { inventoryService } from '../services/inventory-service';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -105,12 +109,12 @@ export const heroRouter = new Hono<Context>()
             with: {
               gameItem: {
                 with: {
-                   accessory: true,
-                   armor: true,
-                   weapon: true
-                }
-              }
-            }
+                  accessory: true,
+                  armor: true,
+                  weapon: true,
+                },
+              },
+            },
           },
           state: true,
           location: {
@@ -280,15 +284,14 @@ export const heroRouter = new Hono<Context>()
       validateHeroStats({ freeStatPoints, stat, level: hero.level });
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
-      await db.transaction(async (tx) => {
-        await tx
-          .update(heroTable)
-          .set({
-            freeStatPoints,
-            stat,
-          })
-          .where(eq(heroTable.id, id));
-      });
+      await db
+        .update(heroTable)
+        .set({
+          freeStatPoints,
+          stat,
+        })
+        .where(eq(heroTable.id, id));
+
       return c.json<SuccessResponse>({ success: true, message: 'Stats have been successfully updated.' }, 200);
     },
   )
@@ -331,50 +334,30 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post(
-    '/:id/shop/items/:itemId/buy',
+    '/:id/shop/items/:gameItemId/buy',
     loggedIn,
     zValidator(
       'param',
       z.object({
         id: z.string(),
-        itemId: z.string(),
+        gameItemId: z.string(),
       }),
     ),
     async (c) => {
-      const { id, itemId } = c.req.valid('param');
+      const { id, gameItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
 
       const gameItem = await db.query.gameItemTable.findFirst({
-        where: eq(gameItemTable.id, itemId),
+        where: eq(gameItemTable.id, gameItemId),
       });
+      if (!gameItem) throw new HTTPException(404, { message: 'Game item not found' });
+
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
       });
-      if (!gameItem) {
-        throw new HTTPException(404, {
-          message: 'game item not found',
-        });
-      }
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
-      if (hero.userId !== userId) {
-        throw new HTTPException(403, {
-          message: 'access denied',
-        });
-      }
-      if (hero.currentInventorySlots >= hero.maxInventorySlots) {
-        return c.json<ErrorResponse>(
-          {
-            success: false,
-            message: 'Inventory is  full',
-            isShowError: true,
-          },
-          400,
-        );
-      }
+      if (!hero) throw new HTTPException(404, { message: 'Hero not found' });
+      verifyHeroOwnership({ heroUserId: hero.userId, userId });
+
       if (hero.goldCoins < gameItem.price) {
         return c.json<ErrorResponse>(
           {
@@ -385,67 +368,59 @@ export const heroRouter = new Hono<Context>()
           422,
         );
       }
-      const inventoryItem = await db.query.inventoryItemTable.findFirst({
-        where: and(eq(inventoryItemTable.gameItemId, itemId), eq(inventoryItemTable.heroId, id)),
-        with: {
-          gameItem: true,
-        },
+
+      const result = await db.transaction(async (tx) => {
+        const quantity = 9;
+        if (gameItem.type !== 'ARMOR' && gameItem.type !== 'WEAPON') {
+          const inventoryItem = await tx.query.inventoryItemTable.findFirst({
+            where: and(
+              eq(inventoryItemTable.gameItemId, gameItemId),
+              eq(inventoryItemTable.heroId, id),
+              lt(inventoryItemTable.quantity, DEFAULT_ITEM_STACK),
+            ),
+          });
+          if (inventoryItem && inventoryItem.quantity + quantity < DEFAULT_ITEM_STACK) {
+            const updatedItem = await inventoryService(tx).incrementInventoryItemQuantity(inventoryItem.id, quantity);
+
+            return {
+              success: true,
+              data: updatedItem,
+            };
+          }
+        }
+
+        const newItemResult = await inventoryService(tx).addInventoryItem(gameItem.id, hero.id, quantity);
+
+        return {
+          success: newItemResult.success,
+          data: newItemResult.data,
+          message: newItemResult.message,
+          status: newItemResult.status,
+        };
       });
 
-      if (gameItem.type !== 'ARMOR' && gameItem.type !== 'WEAPON' && inventoryItem) {
-        await db.transaction(async (tx) => {
-          await tx
-            .update(heroTable)
-            .set({
-              goldCoins: hero.goldCoins - gameItem.price,
-            })
-            .where(eq(heroTable.id, id));
-          await tx
-            .update(inventoryItemTable)
-            .set({
-              quantity: inventoryItem.quantity + 1,
-            })
-            .where(and(eq(inventoryItemTable.id, inventoryItem.id), eq(inventoryItemTable.heroId, id)));
-        });
-
+      if (result.success) {
         return c.json<SuccessResponse<InventoryItem>>(
           {
             success: true,
-            message: 'You success buy item',
-            data: inventoryItem as InventoryItem,
+            message: `You successfully obtain the`,
+            data: result.data ? { ...result.data, gameItem: gameItem as GameItem } : undefined,
           },
-          200,
+          201,
+        );
+      } else {
+        return c.json<ErrorResponse>(
+          {
+            success: false,
+            message: result.message || '',
+            isShowError: true,
+          },
+          400,
         );
       }
-
-      const [newInventoryItem] = await db.transaction(async (tx) => {
-        await tx
-          .update(heroTable)
-          .set({
-            currentInventorySlots: hero.currentInventorySlots + 1,
-            goldCoins: hero.goldCoins - gameItem.price,
-          })
-          .where(eq(heroTable.id, id));
-        return await tx
-          .insert(inventoryItemTable)
-          .values({
-            id: generateRandomUuid(),
-            gameItemId: itemId,
-            heroId: id,
-          })
-          .returning();
-      });
-
-      return c.json<SuccessResponse<InventoryItem>>(
-        {
-          success: true,
-          message: 'You success buy item',
-          data: { ...newInventoryItem, gameItem: gameItem as GameItem },
-        },
-        201,
-      );
     },
   )
+
   .post(
     '/:id/inventory/:itemId/equip',
     loggedIn,
@@ -496,8 +471,7 @@ export const heroRouter = new Hono<Context>()
       }
 
       await db.transaction(async (tx) => {
-        const slot = await equipmentService.getEquipSlot({
-          db: tx,
+        const slot = await equipmentService(tx).getEquipSlot({
           heroId: hero.id,
           item: inventoryItem.gameItem,
           currentInventorySlots: hero.currentInventorySlots,
@@ -509,13 +483,12 @@ export const heroRouter = new Hono<Context>()
             message: 'slot not found',
           });
         }
-        const existingEquipItem = await equipmentService.findEquipItem(tx, slot, hero.id);
+        const existingEquipItem = await equipmentService(tx).findEquipItem(slot, hero.id);
         if (existingEquipItem) {
-          const isInventoryFull = await equipmentService.unEquipItem({
+          const isInventoryFull = await equipmentService(tx).unEquipItem({
             equipmentItemId: existingEquipItem.id,
             gameItemId: existingEquipItem.gameItemId,
             heroId: hero.id,
-            db: tx,
             currentInventorySlots: hero.currentInventorySlots,
             maxInventorySlot: hero.maxInventorySlots,
           });
@@ -530,12 +503,11 @@ export const heroRouter = new Hono<Context>()
           }
         }
 
-        await equipmentService.equipItem({
+        await equipmentService(tx).equipItem({
           gameItemId: inventoryItem.gameItemId,
           heroId: hero.id,
           slot,
           inventoryItemId: inventoryItem.id,
-          db: tx,
         });
       });
 
@@ -571,22 +543,9 @@ export const heroRouter = new Hono<Context>()
           message: 'hero not found',
         });
       }
-      const isInventoryFull = hero.currentInventorySlots >= hero.maxInventorySlots;
 
-      if (hero.userId !== userId) {
-        throw new HTTPException(403, {
-          message: 'access denied',
-        });
-      }
-      if (isInventoryFull) {
-        return c.json<ErrorResponse>(
-          {
-            success: false,
-            message: `inventory is full`,
-          },
-          409,
-        );
-      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId });
+
       const equipmentItem = await db.query.equipmentTable.findFirst({
         where: eq(equipmentTable.id, itemId),
         with: {
@@ -599,43 +558,34 @@ export const heroRouter = new Hono<Context>()
         });
       }
 
-      await db.transaction(async (tx) => {
-        const hero = await tx.query.heroTable.findFirst({
-          where: eq(heroTable.id, id),
-        });
-
-        if (!hero) {
-          throw new HTTPException(404, {
-            message: 'hero not found',
-          });
-        }
-        const isInventoryFull = hero.currentInventorySlots >= hero.maxInventorySlots;
-        if (isInventoryFull) {
-          tx.rollback();
-        }
-
-        await tx.delete(equipmentTable).where(eq(equipmentTable.id, itemId));
-        await tx
-          .update(heroTable)
-          .set({
-            currentInventorySlots: hero.currentInventorySlots + 1,
-          })
-          .where(eq(heroTable.id, hero.id));
-        await tx.insert(inventoryItemTable).values({
-          id: generateRandomUuid(),
-          heroId: hero.id,
+      const result = await db.transaction(async (tx) => {
+        const data = await equipmentService(tx).unEquipItem({
+          currentInventorySlots: hero.currentInventorySlots,
+          equipmentItemId: equipmentItem.id,
           gameItemId: equipmentItem.gameItemId,
+          heroId: hero.id,
+          maxInventorySlot: hero.maxInventorySlots,
         });
+        return data;
       });
-
-      return c.json<SuccessResponse<Equipment>>(
-        {
-          success: true,
-          message: `success unequipped item `,
-          data: equipmentItem,
-        },
-        201,
-      );
+      if (result.success) {
+        return c.json<SuccessResponse<Equipment>>(
+          {
+            success: true,
+            message: `success unequipped item `,
+            data: equipmentItem,
+          },
+          201,
+        );
+      } else {
+        return c.json<ErrorResponse>(
+          {
+            success: false,
+            message: result.message,
+          },
+          result.status ?? 400,
+        );
+      }
     },
   )
   .delete(
