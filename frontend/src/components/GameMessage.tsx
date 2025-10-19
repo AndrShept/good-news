@@ -35,11 +35,8 @@ export const GameMessage = memo(() => {
             >
               <time className="text-primary">{getTimeFns(message.createdAt!)}</time>
               <span>{message.text}</span>
-              <span
-              
-              >
-                <span className="text-primary">{message.data?.gameItem?.name}</span>
-              </span>
+              <span className="text-primary">{message.data?.gameItemName}</span>
+              {!!message.data?.quantity && <span className="text-primary">{`x${message.data?.quantity}`}</span>}
             </li>
           ))}
         </ul>

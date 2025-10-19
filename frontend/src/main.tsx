@@ -14,6 +14,7 @@ import { ThemeProvider } from './components/providers/theme-provider.tsx';
 import './index.css';
 import { toastError } from './lib/utils.ts';
 import { routeTree } from './routeTree.gen.ts';
+import { useGameMessages } from './store/useGameMessages.ts';
 
 declare module '@tanstack/react-router' {
   interface Register {
@@ -27,15 +28,31 @@ export interface MyRouterContext {
   hero: Hero | undefined;
 }
 
+interface ApiError {
+  message: string;
+  cause?: {
+    canShow?: boolean;
+  };
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000,
     },
     mutations: {
-      onError: () => {
-        toastError();
-
+      onError: (err) => {
+        const error = err as ApiError;
+        console.log(error)
+        const setGameMessage = useGameMessages.getState().setGameMessage;
+        if (error?.cause?.canShow) {
+          setGameMessage({
+            text: error.message,
+            type: 'error',
+          });
+        } else {
+          toastError();
+        }
       },
     },
   },

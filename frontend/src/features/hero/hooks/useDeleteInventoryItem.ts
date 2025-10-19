@@ -17,9 +17,7 @@ export const useDeleteInventoryItem = (itemId: string) => {
         id,
         itemId,
       }),
-    onError: () => {
-      toastError();
-    },
+
     async onSuccess(data) {
       if (data.success) {
         await queryClient.invalidateQueries({
@@ -32,7 +30,7 @@ export const useDeleteInventoryItem = (itemId: string) => {
           success: true,
           type: 'success',
           text: data.message,
-          data: data.data,
+          data: { gameItemName: data.data?.gameItem?.name ?? '', quantity: data.data?.quantity },
         });
       } else {
         setGameMessage({

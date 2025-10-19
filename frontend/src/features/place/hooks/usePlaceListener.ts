@@ -5,13 +5,13 @@ import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
 import { joinRoomClient } from '@/lib/utils';
 import { HeroOfflineData, HeroOnlineData, PlaceUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import { useGameMessages } from '@/store/useGameMessages';
+import { useGameMessages, useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect, useRef } from 'react';
 import { usePlaceHeroesUpdate } from './usePlaceHeroesUpdate';
 
 
 export const usePlaceListener = () => {
-  const setGameMessage = useGameMessages((state) => state.setGameMessage);
+  const setGameMessage = useSetGameMessage()
   const placeId = useHero((state) => state?.data?.location?.placeId ?? '');
   const id = useHeroId();
   const { socket } = useSocket();
@@ -28,7 +28,7 @@ export const usePlaceListener = () => {
       joinMessage: 'join town room',
       leaveMessage: 'leave town room',
     });
-  }, [placeId, socket, setGameMessage]);
+  }, [placeId, socket]);
   useEffect(() => {
     const listener = (data: PlaceUpdateEvent | HeroOfflineData | HeroOnlineData) => {
       switch (data.type) {
@@ -72,5 +72,5 @@ export const usePlaceListener = () => {
     return () => {
       socket.off(socketEvents.placeUpdate(), listener);
     };
-  }, [addHeroes, deleteHeroes, id, setGameMessage, socket, updateHero]);
+  }, []);
 };

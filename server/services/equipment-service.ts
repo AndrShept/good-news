@@ -1,5 +1,6 @@
 import type { EquipmentSlotType, GameItem } from '@/shared/types';
 import { and, eq } from 'drizzle-orm';
+import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction, db } from '../db/db';
 import { equipmentTable, heroTable, inventoryItemTable } from '../db/schema';
@@ -42,11 +43,7 @@ export const equipmentService = (db: TTransaction | TDataBase) => ({
     const isInventoryFull = currentInventorySlots >= maxInventorySlot;
 
     if (isInventoryFull) {
-      return {
-        success: false,
-        message: 'Inventory is full',
-        status: 409,
-      };
+      throw new HTTPException(409, { message: 'Inventory is full', cause: { canShow: true } });
     }
 
     await db.delete(equipmentTable).where(eq(equipmentTable.id, equipmentItemId));
@@ -77,14 +74,14 @@ export const equipmentService = (db: TTransaction | TDataBase) => ({
       const isOneHanded = item.weapon?.weaponHand === 'ONE_HANDED';
       const existLeftSlot = await this.findEquipItem('LEFT_HAND', heroId);
       if (isTwoHanded && existLeftSlot) {
-        const isInventoryFull = await this.unEquipItem({
+        await this.unEquipItem({
           equipmentItemId: existLeftSlot.id,
           gameItemId: existLeftSlot.gameItemId,
           heroId,
           currentInventorySlots,
           maxInventorySlot,
         });
-        if (isInventoryFull) return;
+
         return 'RIGHT_HAND';
       }
       if (isOneHanded && !existLeftSlot) {

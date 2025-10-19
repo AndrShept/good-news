@@ -11,7 +11,7 @@ export const gameMessageType = {
 export type GameMessageType = keyof typeof gameMessageType;
 export interface IGameMessage {
   text: string;
-  data?: InventoryItem | Equipment;
+  data?: { gameItemName: string; quantity?: number };
   success?: boolean;
   type: GameMessageType;
   createdAt?: number;

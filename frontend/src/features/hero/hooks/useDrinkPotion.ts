@@ -26,7 +26,7 @@ export const useDrinkPotion = () => {
           success: true,
           type: 'success',
           text: data.message,
-          data: data.data,
+          data: { gameItemName: data.data?.gameItem?.name ?? '' },
         });
       } else {
         setGameMessage({

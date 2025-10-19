@@ -30,7 +30,7 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type }:
     equipItemMutation.mutate(
       {
         id: heroId,
-        itemId: id,
+        inventoryItemId: id,
       },
       {
         onSuccess: () => {
@@ -43,7 +43,7 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type }:
     unEquipItemMutation.mutate(
       {
         id: heroId,
-        itemId: id,
+        equipmentItemId: id,
       },
       {
         onSuccess: () => {
@@ -56,7 +56,7 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type }:
     drinkPotionMutation.mutate(
       {
         id: heroId,
-        itemId: id,
+        inventoryItemId: id,
       },
       {
         onSuccess: () => {
@@ -100,11 +100,11 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type }:
             </Button>
           </ConfirmPopover.Trigger>
           <ConfirmPopover.Content>
-            <ConfirmPopover.Title>Are you sure you want to delete item?</ConfirmPopover.Title>
-            <ConfirmPopover.Message className="inline-flex text-yellow-500">
-              <p>
+            <ConfirmPopover.Title className="text-rose-500">Are you sure you want to delete item?</ConfirmPopover.Title>
+            <ConfirmPopover.Message className="inline-flex">
+              <p className="font-semibold">
                 {gameItem?.name}
-                {quantity > 1 && <span className="text-primary"> x{quantity}</span>}
+                {quantity > 1 && <span className="text-primary font-normal"> x{quantity}</span>}
               </p>
             </ConfirmPopover.Message>
           </ConfirmPopover.Content>

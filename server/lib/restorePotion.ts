@@ -13,7 +13,7 @@ interface IRestorePotion {
   restoreHealth: number;
   restoreMana: number;
   heroId: string;
-  itemId: string;
+  inventoryItemId: string;
   potionQuantity: number;
 }
 
@@ -25,7 +25,7 @@ export const restorePotion = async ({
   restoreMana,
   restoreHealth,
   heroId,
-  itemId,
+  inventoryItemId,
   potionQuantity,
 }: IRestorePotion) => {
   const restoredHealth = Math.min(maxHealth, currentHealth + restoreHealth);
@@ -45,9 +45,9 @@ export const restorePotion = async ({
         .set({
           quantity: potionQuantity - 1,
         })
-        .where(eq(inventoryItemTable.id, itemId));
+        .where(eq(inventoryItemTable.id, inventoryItemId));
       return;
     }
-    await tx.delete(inventoryItemTable).where(eq(inventoryItemTable.id, itemId));
+    await tx.delete(inventoryItemTable).where(eq(inventoryItemTable.id, inventoryItemId));
   });
 };

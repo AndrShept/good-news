@@ -151,7 +151,7 @@ export const heroRouter = new Hono<Context>()
         {
           message: 'Hero name already taken. Please try another name.',
           success: false,
-          isShowError: true,
+          canShow: true,
         },
         409,
       );
@@ -352,102 +352,54 @@ export const heroRouter = new Hono<Context>()
       });
       if (!gameItem) throw new HTTPException(404, { message: 'Game item not found' });
 
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-      });
-      if (!hero) throw new HTTPException(404, { message: 'Hero not found' });
-      verifyHeroOwnership({ heroUserId: hero.userId, userId });
-
-      if (hero.goldCoins < gameItem.price) {
-        return c.json<ErrorResponse>(
-          {
-            success: false,
-            message: 'Not enough gold',
-            isShowError: true,
-          },
-          422,
-        );
-      }
-
+      const quantity = 6;
       const result = await db.transaction(async (tx) => {
-        const quantity = 9;
-        if (gameItem.type !== 'ARMOR' && gameItem.type !== 'WEAPON') {
-          const inventoryItem = await tx.query.inventoryItemTable.findFirst({
-            where: and(
-              eq(inventoryItemTable.gameItemId, gameItemId),
-              eq(inventoryItemTable.heroId, id),
-              lt(inventoryItemTable.quantity, DEFAULT_ITEM_STACK),
-            ),
-          });
-          if (inventoryItem && inventoryItem.quantity + quantity < DEFAULT_ITEM_STACK) {
-            const updatedItem = await inventoryService(tx).incrementInventoryItemQuantity(inventoryItem.id, quantity);
-
-            return {
-              success: true,
-              data: updatedItem,
-            };
-          }
-        }
-
-        const newItemResult = await inventoryService(tx).addInventoryItem(gameItem.id, hero.id, quantity);
-
-        return {
-          success: newItemResult.success,
-          data: newItemResult.data,
-          message: newItemResult.message,
-          status: newItemResult.status,
-        };
+        const hero = await db.query.heroTable.findFirst({
+          where: eq(heroTable.id, id),
+        });
+        if (!hero) throw new HTTPException(404, { message: 'Hero not found' });
+        verifyHeroOwnership({ heroUserId: hero.userId, userId });
+        const itemPrice = quantity * gameItem.price;
+        await heroService(tx).spendGold(hero.id, itemPrice, hero.goldCoins);
+        const { data } = await inventoryService(tx).obtainInventoryItem({
+          currentInventorySlots: hero.currentInventorySlots,
+          maxInventorySlots: hero.maxInventorySlots,
+          gameItemId: gameItem.id,
+          gameItemType: gameItem.type,
+          heroId: hero.id,
+          quantity,
+        });
+        return data;
       });
 
-      if (result.success) {
-        return c.json<SuccessResponse<InventoryItem>>(
-          {
-            success: true,
-            message: `You successfully obtain the`,
-            data: result.data ? { ...result.data, gameItem: gameItem as GameItem } : undefined,
-          },
-          201,
-        );
-      } else {
-        return c.json<ErrorResponse>(
-          {
-            success: false,
-            message: result.message || '',
-            isShowError: true,
-          },
-          400,
-        );
-      }
+      return c.json<SuccessResponse<InventoryItem>>(
+        {
+          success: true,
+          message: `You successfully obtain the`,
+          data: { ...result, gameItem: gameItem as GameItem, quantity },
+        },
+        201,
+      );
     },
   )
 
   .post(
-    '/:id/inventory/:itemId/equip',
+    '/:id/inventory/:inventoryItemId/equip',
     loggedIn,
     zValidator(
       'param',
       z.object({
         id: z.string(),
-        itemId: z.string(),
+        inventoryItemId: z.string(),
       }),
     ),
 
     async (c) => {
-      const { id, itemId } = c.req.valid('param');
+      const { id, inventoryItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-      });
-
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
-      verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
       const inventoryItem = await db.query.inventoryItemTable.findFirst({
-        where: eq(inventoryItemTable.id, itemId),
+        where: eq(inventoryItemTable.id, inventoryItemId),
         with: {
           gameItem: { with: { weapon: true, armor: true } },
         },
@@ -471,6 +423,16 @@ export const heroRouter = new Hono<Context>()
       }
 
       await db.transaction(async (tx) => {
+        const hero = await db.query.heroTable.findFirst({
+          where: eq(heroTable.id, id),
+        });
+
+        if (!hero) {
+          throw new HTTPException(404, {
+            message: 'hero not found',
+          });
+        }
+        verifyHeroOwnership({ heroUserId: hero.userId, userId });
         const slot = await equipmentService(tx).getEquipSlot({
           heroId: hero.id,
           item: inventoryItem.gameItem,
@@ -485,22 +447,13 @@ export const heroRouter = new Hono<Context>()
         }
         const existingEquipItem = await equipmentService(tx).findEquipItem(slot, hero.id);
         if (existingEquipItem) {
-          const isInventoryFull = await equipmentService(tx).unEquipItem({
+          await equipmentService(tx).unEquipItem({
             equipmentItemId: existingEquipItem.id,
             gameItemId: existingEquipItem.gameItemId,
             heroId: hero.id,
             currentInventorySlots: hero.currentInventorySlots,
             maxInventorySlot: hero.maxInventorySlots,
           });
-          if (isInventoryFull) {
-            return c.json<ErrorResponse>(
-              {
-                success: false,
-                message: `inventory is full`,
-              },
-              409,
-            );
-          }
         }
 
         await equipmentService(tx).equipItem({
@@ -511,28 +464,29 @@ export const heroRouter = new Hono<Context>()
         });
       });
 
-      return c.json<SuccessResponse>(
+      return c.json<SuccessResponse<GameItem>>(
         {
           success: true,
-          message: `success equipped item ${inventoryItem.gameItem.name}`,
+          message: 'success equipped item',
+          data: inventoryItem.gameItem,
         },
         201,
       );
     },
   )
   .post(
-    '/:id/equipment/:itemId/unequip',
+    '/:id/equipment/:equipmentItemId/unequip',
     loggedIn,
     zValidator(
       'param',
       z.object({
         id: z.string(),
-        itemId: z.string(),
+        equipmentItemId: z.string(),
       }),
     ),
 
     async (c) => {
-      const { id, itemId } = c.req.valid('param');
+      const { id, equipmentItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
@@ -547,7 +501,7 @@ export const heroRouter = new Hono<Context>()
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
       const equipmentItem = await db.query.equipmentTable.findFirst({
-        where: eq(equipmentTable.id, itemId),
+        where: eq(equipmentTable.id, equipmentItemId),
         with: {
           gameItem: true,
         },
@@ -558,34 +512,23 @@ export const heroRouter = new Hono<Context>()
         });
       }
 
-      const result = await db.transaction(async (tx) => {
-        const data = await equipmentService(tx).unEquipItem({
+      await db.transaction(async (tx) => {
+        await equipmentService(tx).unEquipItem({
           currentInventorySlots: hero.currentInventorySlots,
           equipmentItemId: equipmentItem.id,
           gameItemId: equipmentItem.gameItemId,
           heroId: hero.id,
           maxInventorySlot: hero.maxInventorySlots,
         });
-        return data;
       });
-      if (result.success) {
-        return c.json<SuccessResponse<Equipment>>(
-          {
-            success: true,
-            message: `success unequipped item `,
-            data: equipmentItem,
-          },
-          201,
-        );
-      } else {
-        return c.json<ErrorResponse>(
-          {
-            success: false,
-            message: result.message,
-          },
-          result.status ?? 400,
-        );
-      }
+      return c.json<SuccessResponse<Equipment>>(
+        {
+          success: true,
+          message: `success unequipped item `,
+          data: equipmentItem,
+        },
+        201,
+      );
     },
   )
   .delete(
@@ -652,17 +595,17 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post(
-    '/:id/inventory/:itemId/drink',
+    '/:id/inventory/:inventoryItemId/drink',
     loggedIn,
     zValidator(
       'param',
       z.object({
         id: z.string(),
-        itemId: z.string(),
+        inventoryItemId: z.string(),
       }),
     ),
     async (c) => {
-      const { id, itemId } = c.req.valid('param');
+      const { id, inventoryItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
       const hero = await db.query.heroTable.findFirst({
         where: eq(heroTable.id, id),
@@ -680,7 +623,7 @@ export const heroRouter = new Hono<Context>()
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
       const inventoryItemPotion = await db.query.inventoryItemTable.findFirst({
-        where: eq(inventoryItemTable.id, itemId),
+        where: eq(inventoryItemTable.id, inventoryItemId),
         with: {
           gameItem: {
             with: {
@@ -712,7 +655,7 @@ export const heroRouter = new Hono<Context>()
         return c.json<ErrorResponse>(
           {
             message: 'You are already at full health',
-            isShowError: true,
+            canShow: true,
             success: false,
           },
           400,
@@ -722,7 +665,7 @@ export const heroRouter = new Hono<Context>()
         return c.json<ErrorResponse>(
           {
             message: 'You are already at full health and mana',
-            isShowError: true,
+            canShow: true,
             success: false,
           },
           400,
@@ -732,7 +675,7 @@ export const heroRouter = new Hono<Context>()
         return c.json<ErrorResponse>(
           {
             message: 'You are already at full mana',
-            isShowError: true,
+            canShow: true,
             success: false,
           },
           400,
@@ -777,7 +720,7 @@ export const heroRouter = new Hono<Context>()
         restoreHealth: inventoryItemPotion?.gameItem?.potion?.restore?.health ?? 0,
         restoreMana: inventoryItemPotion?.gameItem?.potion?.restore?.mana ?? 0,
         heroId: id,
-        itemId,
+        inventoryItemId,
         potionQuantity: inventoryItemPotion.quantity,
       });
       return c.json<SuccessResponse<InventoryItem>>({

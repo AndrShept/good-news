@@ -9,3 +9,4 @@ export interface Context extends Env {
     socket: Socket | null;
   };
 }
+

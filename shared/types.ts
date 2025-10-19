@@ -50,7 +50,7 @@ export type SocketResponse = {
 export type ErrorResponse = {
   success: false;
   message: string;
-  isShowError?: boolean;
+  canShow?: boolean;
 };
 export const loginSchema = z.object({
   email: z.string().email(),

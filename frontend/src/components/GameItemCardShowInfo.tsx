@@ -41,7 +41,7 @@ export const GameItemCardShowInfo = memo(
           )}
           {isShowBuyButton && (
             <div>
-              <ShopBuyButton itemId={id ?? ''} />
+              <ShopBuyButton gameItemId={id} />
             </div>
           )}
         </div>

@@ -1,12 +1,11 @@
 import { Potion } from '@/shared/types';
-import React from 'react';
 
 import { ModifierInfoCard } from './ModifierInfoCard';
 
 type Props = Potion;
 
-export const PotionInfo = ({ potionEffect, restore, type }: Props) => {
-  if (!restore && !potionEffect) return;
+export const PotionInfo = ({ buffInfo, restore, type }: Props) => {
+  if (!restore && !buffInfo) return;
   return (
     <section className='mt-1'>
       {type === 'RESTORE' && (
@@ -26,7 +25,7 @@ export const PotionInfo = ({ potionEffect, restore, type }: Props) => {
           )}
         </div>
       )}
-      {type === 'BUFF' && <ModifierInfoCard modifier={potionEffect?.modifier} />}
+      {type === 'BUFF' && <ModifierInfoCard modifier={buffInfo?.modifier} />}
     </section>
   );
 };

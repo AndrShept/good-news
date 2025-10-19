@@ -2,38 +2,33 @@ import { Button } from '@/components/ui/button';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { getInventoryOptions } from '@/features/hero/api/get-inventory';
 import { shopBuyItems } from '@/features/hero/api/shopBuyItems';
-import { useHero } from '@/features/hero/hooks/useHero';
-import { toastError } from '@/lib/utils';
+import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import React from 'react';
 
 interface Props {
-  itemId: string;
+  gameItemId: string;
 }
 
-export const ShopBuyButton = ({ itemId }: Props) => {
+export const ShopBuyButton = ({ gameItemId }: Props) => {
   const setGameMessage = useSetGameMessage();
-  const heroId = useHero((state) => state?.data?.id ?? '');
+  const heroId = useHeroId();
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
     mutationFn: shopBuyItems,
-    onError: () => {
-      toastError();
-    },
+
     async onSuccess(data) {
-      if (data.success) {
-        await queryClient.invalidateQueries({
-          queryKey: getHeroOptions().queryKey,
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getInventoryOptions(heroId).queryKey,
-        });
-        setGameMessage({ text: data.message, type: 'success', data: data.data });
-      }
-      if (!data.success && data.isShowError) {
-        setGameMessage({ text: data.message, type: 'error' });
-      }
+      await queryClient.invalidateQueries({
+        queryKey: getHeroOptions().queryKey,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: getInventoryOptions(heroId).queryKey,
+      });
+      setGameMessage({
+        text: data.message,
+        type: 'success',
+        data: { gameItemName: data.data?.gameItem.name ?? '', quantity: data.data?.quantity },
+      });
     },
   });
 
@@ -43,11 +38,10 @@ export const ShopBuyButton = ({ itemId }: Props) => {
       onClick={() =>
         mutate({
           id: heroId,
-          itemId,
+          gameItemId,
         })
       }
-      variant={'outline'}
-      className=""
+      variant="outline"
     >
       Buy
     </Button>

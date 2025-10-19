@@ -65,7 +65,7 @@ function RouteComponent() {
       },
       {
         onSuccess(data, variables, context) {
-          if (!data.success && data.isShowError) {
+          if (!data.success && data.canShow) {
             form.setError('name', { message: data.message });
           }
           if (data.success) {

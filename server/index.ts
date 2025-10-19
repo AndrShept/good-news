@@ -8,11 +8,12 @@ import { serveStatic } from 'hono/bun';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
+import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import { Redis } from 'ioredis';
 import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
 
-import type { Context } from './context';
+import { type Context } from './context';
 import { db } from './db/db';
 import { actionTable, heroTable } from './db/schema';
 import { game } from './lib/game';
@@ -56,6 +57,17 @@ app.onError((err, c) => {
         message: 'Database connection failed. Please try again later.',
       },
       503, // 503 Service Unavailable
+    );
+  }
+
+  if (err instanceof HTTPException) {
+    return c.json<ErrorResponse>(
+      {
+        message: err.message,
+        success: false,
+        canShow: (err.cause as { canShow?: boolean })?.canShow,
+      },
+      err.status,
     );
   }
 

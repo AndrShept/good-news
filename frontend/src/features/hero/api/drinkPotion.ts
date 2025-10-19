@@ -1,11 +1,11 @@
 import { client } from '@/lib/utils';
 import { ErrorResponse } from '@/shared/types';
 
-export const drinkPotion = async ({ id, itemId }: { id: string; itemId: string }) => {
-  const res = await client.hero[':id'].inventory[':itemId'].drink.$post({
+export const drinkPotion = async ({ id, inventoryItemId }: { id: string; inventoryItemId: string }) => {
+  const res = await client.hero[':id'].inventory[':inventoryItemId'].drink.$post({
     param: {
       id,
-      itemId,
+      inventoryItemId,
     },
   });
   if (!res.ok) {

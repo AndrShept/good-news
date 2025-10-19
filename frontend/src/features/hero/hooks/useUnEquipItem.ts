@@ -13,30 +13,20 @@ export const useUnEquipItem = () => {
   const heroId = useHero((state) => state?.data?.id ?? '');
   return useMutation({
     mutationFn: unEquipItem,
-    onError: () => {
-      toastError();
-    },
+
     async onSuccess(data) {
-      if (data.success) {
-        await queryClient.invalidateQueries({
-          queryKey: getHeroOptions().queryKey,
-        });
-        await queryClient.invalidateQueries({
-          queryKey: getInventoryOptions(heroId).queryKey,
-        });
-        setGameMessage({
-          success: true,
-          type: 'success',
-          text: data.message,
-          data: data.data,
-        });
-      } else {
-        setGameMessage({
-          success: false,
-          type: 'error',
-          text: data.message,
-        });
-      }
+      await queryClient.invalidateQueries({
+        queryKey: getHeroOptions().queryKey,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: getInventoryOptions(heroId).queryKey,
+      });
+      setGameMessage({
+        success: true,
+        type: 'success',
+        text: data.message,
+        data: { gameItemName: data.data?.gameItem?.name ?? '' },
+      });
     },
   });
 };
