@@ -1,10 +1,9 @@
 import { useDeleteInventoryItem } from '@/features/hero/hooks/useDeleteInventoryItem';
 import { useDrinkPotion } from '@/features/hero/hooks/useDrinkPotion';
 import { useEquipItem } from '@/features/hero/hooks/useEquipItem';
-import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useUnEquipItem } from '@/features/hero/hooks/useUnEquipItem';
-import { Equipment, GameItem, InventoryItem } from '@/shared/types';
+import { GameItem } from '@/shared/types';
 
 import { ConfirmPopover } from './ConfirmPopover';
 import { GameCartType } from './GameItemCard';
@@ -25,7 +24,8 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type }:
   const unEquipItemMutation = useUnEquipItem();
   const drinkPotionMutation = useDrinkPotion();
   const deleteInventoryItemMutation = useDeleteInventoryItem(id);
-  const isMutationPending = equipItemMutation.isPending || deleteInventoryItemMutation.isPending || unEquipItemMutation.isPending;
+  const isMutationPending =
+    equipItemMutation.isPending || deleteInventoryItemMutation.isPending || unEquipItemMutation.isPending || drinkPotionMutation.isPending;
   const onEquip = () => {
     equipItemMutation.mutate(
       {
@@ -104,7 +104,7 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type }:
             <ConfirmPopover.Message className="inline-flex">
               <p className="font-semibold">
                 {gameItem?.name}
-                {quantity > 1 && <span className="text-primary font-normal"> x{quantity}</span>}
+                {quantity > 1 && <span className="text-yellow-300 font-normal"> x{quantity}</span>}
               </p>
             </ConfirmPopover.Message>
           </ConfirmPopover.Content>

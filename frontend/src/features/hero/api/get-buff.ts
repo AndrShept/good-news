@@ -8,7 +8,7 @@ export const getBuff = async (id: string) => {
     });
     const data = await res.json();
 
-    return data;
+    return data.data;
   } catch (error) {
     console.error(error);
   }
@@ -18,5 +18,5 @@ export const getBuffOptions = (id: string) =>
   queryOptions({
     queryKey: ['buff'],
     queryFn: () => getBuff(id),
-    staleTime: 60_000,
+    staleTime: Infinity,
   });

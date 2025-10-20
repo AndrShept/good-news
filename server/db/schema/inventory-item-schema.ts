@@ -11,7 +11,9 @@ export const inventoryItemTable = pgTable('inventory_item', {
 
   gameItemId: uuid()
     .notNull()
-    .references(() => gameItemTable.id),
+    .references(() => gameItemTable.id, {
+      onDelete: 'cascade',
+    }),
   heroId: uuid()
     .notNull()
     .references(() => heroTable.id, {
@@ -22,7 +24,6 @@ export const inventoryItemTable = pgTable('inventory_item', {
   })
     .notNull()
     .defaultNow(),
-
 });
 
 export const inventoryItemRelations = relations(inventoryItemTable, ({ one }) => ({

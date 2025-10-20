@@ -15,7 +15,6 @@ type CreateGameItemPotion = typeof gameItemTable.$inferInsert & {
   potion: typeof potionTable.$inferInsert;
 };
 
-
 export const potionEntities: Record<keyof PotionType, CreateGameItemPotion> = {
   strength: {
     image: '/sprites/potions/str.png',
@@ -25,7 +24,8 @@ export const potionEntities: Record<keyof PotionType, CreateGameItemPotion> = {
     potion: {
       gameItemId: '',
       type: 'BUFF',
-      potionEffect: {
+      buffInfo: {
+        gameItemId: '',
         duration: 60 * 60 * 1000,
         image: '/sprites/potions/str.png',
         name: 'Strength Potion',
@@ -43,7 +43,8 @@ export const potionEntities: Record<keyof PotionType, CreateGameItemPotion> = {
     potion: {
       gameItemId: '',
       type: 'BUFF',
-      potionEffect: {
+      buffInfo: {
+        gameItemId: '',
         duration: 60 * 60 * 1000,
         image: '/sprites/potions/int.png',
         name: 'Intelligence Potion',
@@ -61,7 +62,8 @@ export const potionEntities: Record<keyof PotionType, CreateGameItemPotion> = {
     potion: {
       gameItemId: '',
       type: 'BUFF',
-      potionEffect: {
+      buffInfo: {
+        gameItemId: '',
         duration: 60 * 60 * 1000,
         image: '/sprites/potions/dex.png',
         name: 'Dexterity Potion',
@@ -79,7 +81,8 @@ export const potionEntities: Record<keyof PotionType, CreateGameItemPotion> = {
     potion: {
       gameItemId: '',
       type: 'BUFF',
-      potionEffect: {
+      buffInfo: {
+        gameItemId: '',
         duration: 60 * 60 * 1000,
         image: '/sprites/potions/luck.png',
         name: 'Luck Potion',

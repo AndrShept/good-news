@@ -9,7 +9,7 @@ export const createPotions = async () => {
     await db.insert(potionTable).values({
       type: potion.potion.type,
       gameItemId: newPotion.id,
-      buffInfo: potion.potion.buffInfo,
+      buffInfo: { ...potion.potion.buffInfo, gameItemId: newPotion.id },
       restore: potion.potion.restore,
     });
   }

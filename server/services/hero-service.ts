@@ -1,8 +1,21 @@
-import { eq, sql } from 'drizzle-orm';
+import { type BuffCreateJob, jobName } from '@/shared/job-types';
+import type { InventoryItem } from '@/shared/types';
+import { and, eq, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction, db } from '../db/db';
-import { heroTable } from '../db/schema';
+import { buffTable, heroTable } from '../db/schema';
+import { actionQueue } from '../queue/actionQueue';
+
+interface IDrinkPotion {
+  isBuffPotion: boolean;
+  inventoryItemPotion: InventoryItem;
+  maxHealth: number;
+  currentHealth: number;
+  maxMana: number;
+  currentMana: number;
+  heroId: string;
+}
 
 export const heroService = (db: TTransaction | TDataBase) => ({
   async incrementCurrentInventorySlots(heroId: string) {
@@ -27,5 +40,55 @@ export const heroService = (db: TTransaction | TDataBase) => ({
       .update(heroTable)
       .set({ goldCoins: sql`${heroTable.goldCoins} - ${amount}` })
       .where(eq(heroTable.id, heroId));
+  },
+
+  async drinkPotion({ currentHealth, currentMana, heroId, inventoryItemPotion, isBuffPotion, maxHealth, maxMana }: IDrinkPotion) {
+    if (isBuffPotion) {
+      const gameItemId = inventoryItemPotion.gameItem.potion?.buffInfo?.gameItemId ?? '';
+      const duration = inventoryItemPotion.gameItem.potion?.buffInfo?.duration ?? 0;
+      const modifier = inventoryItemPotion.gameItem.potion?.buffInfo?.modifier ?? {};
+      const name = inventoryItemPotion.gameItem.potion?.buffInfo?.name ?? '';
+      const image = inventoryItemPotion.gameItem.potion?.buffInfo?.image ?? '';
+      const completedAt = new Date(Date.now() + duration).toISOString();
+      const jobId = `buffId-${gameItemId}-heroId-${heroId}`;
+      const findExistBuff = await db.query.buffTable.findFirst({
+        where: and(eq(buffTable.heroId, heroId), eq(buffTable.gameItemId, gameItemId)),
+      });
+      if (findExistBuff) {
+        await actionQueue.remove(jobId);
+        await db.delete(buffTable).where(and(eq(buffTable.heroId, heroId), eq(buffTable.gameItemId, gameItemId)));
+      }
+
+      await db.insert(buffTable).values({
+        type: 'POSITIVE',
+        modifier,
+        name,
+        image,
+        duration,
+        completedAt,
+        heroId,
+        gameItemId,
+      });
+      const jobData: BuffCreateJob = {
+        jobName: 'BUFF_CREATE',
+        payload: { heroId, gameItemId },
+      };
+
+      await actionQueue.add(jobName['buff-create'], jobData, {
+        delay: 10000,
+        jobId,
+        removeOnComplete: true,
+      });
+    } else {
+      const restoredHealth = Math.min(maxHealth, currentHealth + (inventoryItemPotion.gameItem.potion?.restore?.health ?? 0));
+      const restoredMana = Math.min(maxMana, currentMana + (inventoryItemPotion.gameItem.potion?.restore?.mana ?? 0));
+      await db
+        .update(heroTable)
+        .set({
+          currentHealth: restoredHealth,
+          currentMana: restoredMana,
+        })
+        .where(eq(heroTable.id, heroId));
+    }
   },
 });

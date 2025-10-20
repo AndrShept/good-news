@@ -4,11 +4,12 @@ export const jobName = {
   'walk-map': 'WALK_PLACE',
   'walk-place': 'WALK_PLACE',
   'hero-offline': 'HERO_OFFLINE',
+  'buff-create': 'BUFF_CREATE',
 } as const;
 
 export type JobNameType = (typeof jobName)[keyof typeof jobName];
 
-export type ActionJobEvent = WalkPlaceJob | WalkMapJob | HeroOfflineJob;
+export type ActionJobEvent = WalkPlaceJob | WalkMapJob | HeroOfflineJob | BuffCreateJob
 
 export type WalkPlaceJob = {
   jobName: 'WALK_PLACE';
@@ -35,5 +36,12 @@ export type HeroOfflineJob = {
     heroId: string;
     mapId: string | undefined;
     placeId: string | undefined;
+  };
+};
+export type BuffCreateJob = {
+  jobName: 'BUFF_CREATE';
+  payload: {
+    heroId: string;
+    gameItemId: string;
   };
 };

@@ -1,12 +1,4 @@
-import {
-  BASE_FREE_POINTS,
-  BASE_STATS,
-  BASE_WALK_TIME,
-  DEFAULT_ITEM_STACK,
-  HP_MULTIPLIER_COST,
-  MANA_MULTIPLIER_INT,
-  RESET_STATS_COST,
-} from '@/shared/constants';
+import { BASE_STATS, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
 import { type WalkMapJob, type WalkPlaceJob, jobName } from '@/shared/job-types';
 import type { HeroOnlineData, MapUpdateEvent, PlaceUpdateEvent } from '@/shared/socket-data-types';
 import {
@@ -28,7 +20,6 @@ import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq, lt, lte, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { resourceLimits } from 'node:worker_threads';
 import { z } from 'zod';
 
 import { io } from '..';
@@ -51,8 +42,6 @@ import {
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
 import { heroOnline } from '../lib/heroOnline';
-import { restorePotion } from '../lib/restorePotion';
-import { sumModifier } from '../lib/sumModifier';
 import {
   calculateWalkTime,
   generateRandomUuid,
@@ -607,20 +596,6 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const { id, inventoryItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-        with: {
-          modifier: true,
-        },
-      });
-
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
-
-      verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
       const inventoryItemPotion = await db.query.inventoryItemTable.findFirst({
         where: eq(inventoryItemTable.id, inventoryItemId),
@@ -638,6 +613,7 @@ export const heroRouter = new Hono<Context>()
           message: 'inventory item not found',
         });
       }
+
       if (inventoryItemPotion.gameItem.type !== 'POTION') {
         throw new HTTPException(403, {
           message: 'This item not a potion',
@@ -645,87 +621,55 @@ export const heroRouter = new Hono<Context>()
       }
 
       const isBuffPotion = inventoryItemPotion?.gameItem?.potion?.type === 'BUFF';
-      const isFullHealth = hero.currentHealth >= hero.maxHealth;
       const isHealthPotion = !!(inventoryItemPotion?.gameItem?.potion?.restore?.health ?? 0 > 0);
       const isManaPotion = !!(inventoryItemPotion?.gameItem?.potion?.restore?.mana ?? 0 > 0);
-      const isFullMana = hero.currentMana >= hero.maxMana;
       const isRestorePotion = isHealthPotion && isManaPotion;
 
-      if (isFullHealth && isHealthPotion && !isBuffPotion && !isRestorePotion) {
-        return c.json<ErrorResponse>(
-          {
-            message: 'You are already at full health',
-            canShow: true,
-            success: false,
+      await db.transaction(async (tx) => {
+        const hero = await db.query.heroTable.findFirst({
+          where: eq(heroTable.id, id),
+          with: {
+            modifier: true,
           },
-          400,
-        );
-      }
-      if (isFullHealth && isFullMana && !isBuffPotion && isRestorePotion) {
-        return c.json<ErrorResponse>(
-          {
-            message: 'You are already at full health and mana',
-            canShow: true,
-            success: false,
-          },
-          400,
-        );
-      }
-      if (isFullMana && isManaPotion && !isBuffPotion && !isRestorePotion) {
-        return c.json<ErrorResponse>(
-          {
-            message: 'You are already at full mana',
-            canShow: true,
-            success: false,
-          },
-          400,
-        );
-      }
-
-      if (isBuffPotion) {
-        const [newBuff] = await db
-          .insert(buffTable)
-          .values({
-            type: 'POSITIVE',
-
-            modifier: inventoryItemPotion.gameItem.potion?.buffInfo?.modifier ?? {},
-            name: inventoryItemPotion.gameItem.potion?.buffInfo?.name ?? '',
-            image: inventoryItemPotion.gameItem.potion?.buffInfo?.image ?? '',
-            duration: inventoryItemPotion.gameItem.potion?.buffInfo?.duration ?? 0,
-            completedAt: new Date(Date.now() + (inventoryItemPotion.gameItem.potion?.buffInfo?.duration ?? 0)).toISOString(),
-            heroId: hero.id,
-          })
-          .returning({ id: buffTable.id });
-        const sum = sumModifier({
-          heroModifier: hero.modifier,
-          itemModifier: inventoryItemPotion.gameItem.potion?.buffInfo?.modifier,
         });
-        await db
-          .update(modifierTable)
-          .set({
-            intelligence: inventoryItemPotion.gameItem.potion?.buffInfo?.modifier.intelligence,
-          })
-          .where(eq(modifierTable.heroId, hero.id));
-        return c.json<SuccessResponse<InventoryItem>>({
-          success: true,
-          message: `You success use buff potion`,
-          data: inventoryItemPotion,
+
+        if (!hero) {
+          throw new HTTPException(404, {
+            message: 'hero not found',
+          });
+        }
+        const isFullHealth = hero.currentHealth >= hero.maxHealth;
+        const isFullMana = hero.currentMana >= hero.maxMana;
+        verifyHeroOwnership({ heroUserId: hero.userId, userId });
+
+        if (hero.isInBattle) {
+          throw new HTTPException(403, { message: 'You cannot use potions during battle.', cause: { canShow: true } });
+        }
+        if (isFullHealth && isHealthPotion && !isBuffPotion && !isRestorePotion) {
+          throw new HTTPException(400, { message: 'You are already at full health', cause: { canShow: true } });
+        }
+        if (isFullHealth && isFullMana && !isBuffPotion && isRestorePotion) {
+          throw new HTTPException(400, { message: 'You are already at full health and mana', cause: { canShow: true } });
+        }
+        if (isFullMana && isManaPotion && !isBuffPotion && !isRestorePotion) {
+          throw new HTTPException(400, { message: 'You are already at full mana', cause: { canShow: true } });
+        }
+
+        await heroService(tx).drinkPotion({
+          inventoryItemPotion,
+          isBuffPotion,
+          heroId: hero.id,
+          currentHealth: hero.currentHealth,
+          currentMana: hero.currentMana,
+          maxHealth: hero.maxHealth,
+          maxMana: hero.maxMana,
         });
-      }
-      await restorePotion({
-        currentHealth: hero.currentHealth,
-        currentMana: hero.currentMana,
-        maxHealth: hero.maxHealth,
-        maxMana: hero.maxMana,
-        restoreHealth: inventoryItemPotion?.gameItem?.potion?.restore?.health ?? 0,
-        restoreMana: inventoryItemPotion?.gameItem?.potion?.restore?.mana ?? 0,
-        heroId: id,
-        inventoryItemId,
-        potionQuantity: inventoryItemPotion.quantity,
+        await inventoryService(tx).decrementInventoryItemQuantity(inventoryItemPotion.id, hero.id, inventoryItemPotion.quantity);
       });
+
       return c.json<SuccessResponse<InventoryItem>>({
         success: true,
-        message: `You success use potion`,
+        message: `You drink `,
         data: inventoryItemPotion,
       });
     },

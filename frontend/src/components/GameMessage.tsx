@@ -1,5 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGroupListener } from '@/features/group/hooks/useGroupListener';
+import { useHeroListener } from '@/features/hero/hooks/useHeroListener';
 import { useMapListener } from '@/features/map/hooks/useMapListener';
 import { usePlaceListener } from '@/features/place/hooks/usePlaceListener';
 import { cn, getTimeFns } from '@/lib/utils';
@@ -12,6 +13,7 @@ export const GameMessage = memo(() => {
   useGroupListener();
   useMapListener();
   usePlaceListener();
+  useHeroListener();
 
   useEffect(() => {
     ref.current?.lastElementChild?.scrollIntoView({
@@ -36,7 +38,7 @@ export const GameMessage = memo(() => {
               <time className="text-primary">{getTimeFns(message.createdAt!)}</time>
               <span>{message.text}</span>
               <span className="text-primary">{message.data?.gameItemName}</span>
-              {!!message.data?.quantity && <span className="text-primary">{`x${message.data?.quantity}`}</span>}
+              {!!message.data?.quantity && <span className="text-yellow-300">{`x${message.data?.quantity}`}</span>}
             </li>
           ))}
         </ul>

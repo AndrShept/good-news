@@ -10,6 +10,7 @@ export const buffTable = pgTable('buff', {
   id: uuid().primaryKey().defaultRandom().notNull(),
   name: text().notNull(),
   image: text().notNull(),
+  gameItemId: text().notNull(),
   duration: integer().notNull(),
   type: buffTypeEnum().notNull(),
   modifier: jsonb('modifier').$type<Partial<OmitModifier>>().notNull(),

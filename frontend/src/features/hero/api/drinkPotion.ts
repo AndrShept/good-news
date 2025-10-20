@@ -9,8 +9,9 @@ export const drinkPotion = async ({ id, inventoryItemId }: { id: string; invento
     },
   });
   if (!res.ok) {
-    return (await res.json()) as ErrorResponse;
+    const err = (await res.json()) as unknown as ErrorResponse;
+    throw new Error(err.message, { cause: { canShow: err.canShow } });
   }
 
-  return await res.json();
+  return res.json();
 };

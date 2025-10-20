@@ -1,8 +1,11 @@
-import type { ActionJobEvent, HeroOfflineJob } from '@/shared/job-types';
+import type { ActionJobEvent, BuffCreateJob, HeroOfflineJob } from '@/shared/job-types';
 import type { HeroOfflineData, MapUpdateEvent, PlaceUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
+import { and, eq } from 'drizzle-orm';
 
 import { io } from '..';
+import { db } from '../db/db';
+import { buffTable, heroTable } from '../db/schema';
 import { queueEvents } from './actionQueue';
 
 export const actionQueueListeners = () => {
@@ -44,6 +47,15 @@ export const actionQueueListeners = () => {
 
         break;
       }
+      case 'BUFF_CREATE':
+        const socketData: BuffCreateJob = {
+          jobName: 'BUFF_CREATE',
+          payload: { gameItemId: jobData.payload.gameItemId, heroId: jobData.payload.heroId },
+        };
+        await db
+          .delete(buffTable)
+          .where(and(eq(buffTable.heroId, jobData.payload.heroId), eq(buffTable.gameItemId, jobData.payload.gameItemId)));
+        io.to(jobData.payload.heroId).emit(socketEvents.dataSelf(), socketData);
     }
   });
 

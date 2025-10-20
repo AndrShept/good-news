@@ -1,4 +1,5 @@
 export const socketEvents = {
+  dataSelf: () => `self`,
   groupInvite: () => 'group:invite',
   groupInvited: (toHeroId: string) => `group:invited-${toHeroId}`,
   groupUpdated: () => `group:updated`,

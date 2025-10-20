@@ -4,7 +4,7 @@ import { and, eq, lt, lte, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction } from '../db/db';
-import { heroTable, inventoryItemTable } from '../db/schema';
+import {  inventoryItemTable } from '../db/schema';
 import { heroService } from './hero-service';
 
 interface IAddInventoryItem {
@@ -52,13 +52,18 @@ export const inventoryService = (db: TDataBase | TTransaction) => ({
       .returning();
     return data;
   },
-  async decrementInventoryItemQuantity(inventoryItemId: string) {
-    await db
-      .update(inventoryItemTable)
-      .set({
-        quantity: sql`${inventoryItemTable.quantity} - 1`,
-      })
-      .where(eq(inventoryItemTable.id, inventoryItemId));
+  async decrementInventoryItemQuantity(inventoryItemId: string, heroId: string, quantity: number) {
+    if (quantity > 1) {
+      await db
+        .update(inventoryItemTable)
+        .set({
+          quantity: sql`${inventoryItemTable.quantity} - 1`,
+        })
+        .where(eq(inventoryItemTable.id, inventoryItemId));
+    } else {
+      await db.delete(inventoryItemTable).where(eq(inventoryItemTable.id, inventoryItemId));
+      await heroService(db).decrementCurrentInventorySlots(heroId);
+    }
   },
 
   async obtainInventoryItem({
@@ -77,8 +82,7 @@ export const inventoryService = (db: TDataBase | TTransaction) => ({
           lte(inventoryItemTable.quantity, DEFAULT_ITEM_STACK - quantity),
         ),
       });
-      console.log(inventoryItem);
-      if (inventoryItem ) {
+      if (inventoryItem) {
         const updatedItem = await this.incrementInventoryItemQuantity(inventoryItem.id, quantity);
 
         return { data: updatedItem };

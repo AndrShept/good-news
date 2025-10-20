@@ -6,5 +6,5 @@ import { BuffCard } from './BuffCard';
 
 export const BuffList = ({ id }: { id: string }) => {
   const { data: buffs } = useSuspenseQuery(getBuffOptions(id));
-  return <ul className="flex flex-wrap gap-1">{buffs?.data?.map((buff) => <BuffCard key={buff.id} buff={buff} />)}</ul>;
+  return <ul className="flex flex-wrap gap-1">{buffs?.map((buff) => <BuffCard key={buff.id} buff={buff} />)}</ul>;
 };

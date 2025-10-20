@@ -218,6 +218,20 @@
       "when": 1760643128173,
       "tag": "0030_sad_whizzer",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1760963942675,
+      "tag": "0031_superb_rafael_vega",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1760967287492,
+      "tag": "0032_fat_silver_fox",
+      "breakpoints": true
     }
   ]
 }

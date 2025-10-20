@@ -1,6 +1,6 @@
 import type { GameMessageType } from '../frontend/src/store/useGameMessages';
-import type { WalkMapJob, WalkPlaceJob } from './job-types';
-import type {  Location, } from './types';
+import type { BuffCreateJob, WalkMapJob, WalkPlaceJob } from './job-types';
+import type { Location } from './types';
 
 export type SocketGroupResponse = {
   message: string;
@@ -49,3 +49,5 @@ export type HeroOnlineData = {
   type: 'HERO_ONLINE';
   payload: Location;
 };
+
+export type SelfHeroData = BuffCreateJob;
