@@ -42,6 +42,7 @@ import {
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
 import { heroOnline } from '../lib/heroOnline';
+import { sumModifier } from '../lib/sumModifier';
 import {
   calculateWalkTime,
   generateRandomUuid,
@@ -113,7 +114,6 @@ export const heroRouter = new Hono<Context>()
           },
         },
       });
-
       await heroOnline(hero.id);
 
       return c.json<SuccessResponse<Hero>>({
@@ -663,6 +663,7 @@ export const heroRouter = new Hono<Context>()
           currentMana: hero.currentMana,
           maxHealth: hero.maxHealth,
           maxMana: hero.maxMana,
+          heroModifier: hero.modifier!,
         });
         await inventoryService(tx).decrementInventoryItemQuantity(inventoryItemPotion.id, hero.id, inventoryItemPotion.quantity);
       });

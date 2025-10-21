@@ -34,7 +34,6 @@ export const useChangeHeroStats = ({ currentStats, setCurrentStats, setFreePoint
     };
     return priority[stat];
   };
-
   const initialStats = Object.entries(currentStats).map(([key, value]) => ({
     name: key as keyof IHeroStat,
     value,

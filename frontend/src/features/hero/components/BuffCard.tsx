@@ -1,5 +1,6 @@
 import { CustomTooltip } from '@/components/CustomTooltip';
 import { ModifierInfoCard } from '@/components/ModifierInfoCard';
+import { formatDurationFromSeconds } from '@/lib/utils';
 import { Buff } from '@/shared/types';
 import { useEffect, useState } from 'react';
 
@@ -8,12 +9,13 @@ interface Props {
 }
 
 export const BuffCard = ({ buff }: Props) => {
-  const minute = +((new Date(buff.completedAt).getTime() - new Date(buff.createdAt).getTime()) / 60000).toFixed(0);
+  const minute = (new Date(buff.completedAt).getTime() - Date.now()) / 60000;
   const [time, setTime] = useState(minute);
   useEffect(() => {
     const timer = setInterval(() => {
       setTime((prev) => prev - 1);
-    }, 60_000);
+    }, 60000);
+
     return () => clearInterval(timer);
   }, []);
 
@@ -23,7 +25,7 @@ export const BuffCard = ({ buff }: Props) => {
         <CustomTooltip.Trigger>
           <div className="relative flex justify-center">
             <img src={buff.image} alt={buff.name} className="size-8 rounded-md opacity-90 hover:opacity-100" />
-            <p className="absolute top-6 z-10 cursor-default text-xs">{time}m</p>
+            <p className="absolute top-6 z-10 cursor-default text-xs">{time.toFixed(0)}m</p>
           </div>
         </CustomTooltip.Trigger>
         <CustomTooltip.Content>

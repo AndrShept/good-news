@@ -20,8 +20,6 @@ export const modifierTable = pgTable('modifier', {
 
   manaRegen: integer().default(0).notNull(),
   healthRegen: integer().default(0).notNull(),
-  restoreHealth: integer().default(0).notNull(),
-  restoreMana: integer().default(0).notNull(),
 
   defense: integer().default(0).notNull(),
   magicResistance: integer().default(0).notNull(),

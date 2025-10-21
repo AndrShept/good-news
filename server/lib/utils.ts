@@ -1,5 +1,5 @@
 import { BASE_WALK_TIME } from '@/shared/constants';
-import type { Map, Tile, TileType } from '@/shared/types';
+import type { Map, Modifier, OmitModifier, Tile, TileType } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
 import { sql } from 'drizzle-orm';
@@ -87,4 +87,27 @@ export const getTileExists = (mapId: string, index: number, tileType: TileType) 
 
 export const jobQueueId = {
   offline: (heroId: string) => `offline-${heroId}`,
+};
+
+export const combineModifiers = <T extends Partial<OmitModifier>>(
+  base: OmitModifier,
+  mode: 'add' | 'subtract',
+  ...args: T[]
+): Modifier => {
+  const newModifier = { ...base } as Modifier;
+
+  for (const item of args) {
+    for (const key in item) {
+      const typedKey = key as keyof OmitModifier;
+      const value = item[typedKey];
+      if (typeof value === 'number') {
+        newModifier[typedKey] =
+          mode === 'add'
+            ? (newModifier[typedKey] ?? 0) + value
+            : (newModifier[typedKey] ?? 0) - value;
+      }
+    }
+  }
+
+  return newModifier;
 };

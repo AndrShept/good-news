@@ -138,8 +138,7 @@ export const getTileExists = ({ index, layers, tileType }: IGetTileExists) => {
       spellCritChance: 'spell crit chance',
       spellCritPower: 'spell crit power',
       spellHitChance: 'spell hit chance',
-      restoreHealth: 'health',
-      restoreMana: 'mana',
+
     };
     return variants[modifier];
   };

@@ -2,11 +2,20 @@ import { ShieldIcon } from '@/components/game-icons/ShieldIcon';
 import { StaffIcon } from '@/components/game-icons/StaffIcon';
 import { Separator } from '@/components/ui/separator';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { IHeroStat } from '@/shared/types';
+import { IHeroStat, Modifier } from '@/shared/types';
 import { memo, useEffect, useRef, useState } from 'react';
 
 import { Stats } from './Stats';
 
+const sumStats = (stat: IHeroStat, modifier: Modifier) => {
+  const sumStats = {} as IHeroStat;
+  for (const key in stat) {
+    const typedKey = key as keyof IHeroStat;
+
+    sumStats[typedKey] = stat[typedKey] + modifier[typedKey];
+  }
+  return sumStats;
+};
 export const Modifiers = memo(() => {
   const {
     freeStatPoints,
@@ -32,8 +41,11 @@ export const Modifiers = memo(() => {
   const [freePoints, setFreePoints] = useState(freeStatPoints);
   const baseFreePoints = useRef(freeStatPoints);
 
+  // const newStats = sumStats()
+
   useEffect(() => {
     setStats(heroStat);
+    console.log(heroStat);
     baseStats.current = heroStat;
     setFreePoints(freeStatPoints);
     baseFreePoints.current = freeStatPoints;

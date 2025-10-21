@@ -5,7 +5,9 @@ import { and, eq } from 'drizzle-orm';
 
 import { io } from '..';
 import { db } from '../db/db';
-import { buffTable, heroTable } from '../db/schema';
+import { buffTable, gameItemTable, heroTable, modifierTable } from '../db/schema';
+import { combineModifiers } from '../lib/utils';
+import { heroService } from '../services/hero-service';
 import { queueEvents } from './actionQueue';
 
 export const actionQueueListeners = () => {
@@ -52,9 +54,30 @@ export const actionQueueListeners = () => {
           jobName: 'BUFF_CREATE',
           payload: { gameItemId: jobData.payload.gameItemId, heroId: jobData.payload.heroId },
         };
-        await db
-          .delete(buffTable)
-          .where(and(eq(buffTable.heroId, jobData.payload.heroId), eq(buffTable.gameItemId, jobData.payload.gameItemId)));
+        await db.transaction(async (tx) => {
+          const modifier = await tx.query.modifierTable.findFirst({
+            where: eq(modifierTable.heroId, jobData.payload.heroId),
+          });
+          const gameItem = await tx.query.gameItemTable.findFirst({
+            where: eq(gameItemTable.id, jobData.payload.gameItemId),
+            with: {
+              potion: true,
+            },
+          });
+          if (!modifier) {
+            throw new Error('modifier not found');
+          }
+          const combinedModifier = combineModifiers(modifier, 'subtract', gameItem?.potion?.buffInfo?.modifier!);
+          if (!combinedModifier) {
+            throw new Error('combinedModifier not found');
+          }
+
+          await heroService(tx).updateModifier(jobData.payload.heroId, combinedModifier);
+          await tx
+            .delete(buffTable)
+            .where(and(eq(buffTable.heroId, jobData.payload.heroId), eq(buffTable.gameItemId, jobData.payload.gameItemId)));
+        });
+
         io.to(jobData.payload.heroId).emit(socketEvents.dataSelf(), socketData);
     }
   });
