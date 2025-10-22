@@ -4,7 +4,7 @@ import { and, eq, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction, db } from '../db/db';
-import { buffTable, heroTable, modifierTable } from '../db/schema';
+import { buffTable, heroTable, inventoryItemTable, modifierTable } from '../db/schema';
 import { sumModifier } from '../lib/sumModifier';
 import { combineModifiers } from '../lib/utils';
 import { actionQueue } from '../queue/actionQueue';
@@ -36,6 +36,10 @@ export const heroService = (db: TTransaction | TDataBase) => ({
         currentInventorySlots: sql`${heroTable.currentInventorySlots} - 1`,
       })
       .where(eq(heroTable.id, heroId));
+  },
+  async updateCurrentInventorySlots(heroId: string) {
+    const currentInventorySlots = await db.$count(inventoryItemTable, eq(inventoryItemTable.heroId, heroId));
+    await db.update(heroTable).set({ currentInventorySlots }).where(eq(heroTable.id, heroId));
   },
   async spendGold(heroId: string, amount: number, heroCurrentGold: number) {
     if (heroCurrentGold < amount) throw new HTTPException(422, { message: 'You don’t have enough gold', cause: { canShow: true } });

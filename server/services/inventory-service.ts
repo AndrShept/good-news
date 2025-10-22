@@ -4,7 +4,7 @@ import { and, eq, lt, lte, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction } from '../db/db';
-import {  inventoryItemTable } from '../db/schema';
+import { inventoryItemTable } from '../db/schema';
 import { heroService } from './hero-service';
 
 interface IAddInventoryItem {
@@ -28,7 +28,6 @@ export const inventoryService = (db: TDataBase | TTransaction) => ({
     if (currentInventorySlots >= maxInventorySlots) {
       throw new HTTPException(409, { message: 'Inventory is full', cause: { canShow: true } });
     }
-    await heroService(db).incrementCurrentInventorySlots(heroId);
     const [newItem] = await db
       .insert(inventoryItemTable)
       .values({
@@ -37,6 +36,9 @@ export const inventoryService = (db: TDataBase | TTransaction) => ({
         quantity,
       })
       .returning();
+    // await heroService(db).incrementCurrentInventorySlots(heroId);
+    await heroService(db).updateCurrentInventorySlots(heroId);
+
     return {
       data: newItem,
     };
@@ -62,7 +64,8 @@ export const inventoryService = (db: TDataBase | TTransaction) => ({
         .where(eq(inventoryItemTable.id, inventoryItemId));
     } else {
       await db.delete(inventoryItemTable).where(eq(inventoryItemTable.id, inventoryItemId));
-      await heroService(db).decrementCurrentInventorySlots(heroId);
+      // await heroService(db).decrementCurrentInventorySlots(heroId);
+      await heroService(db).updateCurrentInventorySlots(heroId);
     }
   },
 

@@ -36,7 +36,8 @@ export const equipmentService = (db: TTransaction | TDataBase) => ({
       slot,
     });
     await db.delete(inventoryItemTable).where(eq(inventoryItemTable.id, inventoryItemId));
-    await heroService(db).decrementCurrentInventorySlots(heroId);
+    // await heroService(db).decrementCurrentInventorySlots(heroId);
+    await heroService(db).updateCurrentInventorySlots(heroId);
   },
 
   async unEquipItem({ equipmentItemId, gameItemId, heroId, currentInventorySlots, maxInventorySlot }: IUnEquipItem) {
@@ -48,7 +49,8 @@ export const equipmentService = (db: TTransaction | TDataBase) => ({
 
     await db.delete(equipmentTable).where(eq(equipmentTable.id, equipmentItemId));
     const [newInventoryItem] = await db.insert(inventoryItemTable).values({ gameItemId, heroId }).returning();
-    await heroService(db).incrementCurrentInventorySlots(heroId);
+    // await heroService(db).incrementCurrentInventorySlots(heroId);
+    await heroService(db).updateCurrentInventorySlots(heroId);
 
     return {
       success: true,
