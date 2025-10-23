@@ -72,10 +72,10 @@ export const actionQueueListeners = () => {
             throw new Error('combinedModifier not found');
           }
 
-          await heroService(tx).updateModifier(jobData.payload.heroId, combinedModifier);
           await tx
             .delete(buffTable)
             .where(and(eq(buffTable.heroId, jobData.payload.heroId), eq(buffTable.gameItemId, jobData.payload.gameItemId)));
+          await heroService(tx).updateModifier(jobData.payload.heroId);
         });
 
         io.to(jobData.payload.heroId).emit(socketEvents.dataSelf(), socketData);

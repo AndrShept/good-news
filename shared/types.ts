@@ -196,7 +196,7 @@ export type Tile = typeof tileTable.$inferSelect & {
   location?: Location;
 };
 export type TilesGrid = (Tile | null)[][];
-export type OmitModifier = Omit<Partial<Modifier>, 'id' | 'createdAt' | 'updatedAt' | 'heroId'>;
+export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'heroId'>;
 
 export type Equipment = typeof equipmentTable.$inferSelect & {
   gameItem?: GameItem;
@@ -219,7 +219,6 @@ export type GameItem = InferSelectModel<typeof gameItemTable> & {
   resource?: Resource | null;
 };
 
-
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier?: Modifier;
   group?: Group;
@@ -234,7 +233,6 @@ export type IPosition = {
   x: number;
   y: number;
 };
-
 
 //API RESPONSE
 export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>;

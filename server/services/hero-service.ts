@@ -4,9 +4,9 @@ import { and, eq, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction, db } from '../db/db';
-import { buffTable, heroTable, inventoryItemTable, modifierTable } from '../db/schema';
+import { buffTable, equipmentTable, heroTable, inventoryItemTable, modifierTable } from '../db/schema';
 import { sumModifier } from '../lib/sumModifier';
-import { combineModifiers } from '../lib/utils';
+import { combineModifiers, newCombineModifier } from '../lib/utils';
 import { actionQueue } from '../queue/actionQueue';
 
 interface IDrinkPotion {
@@ -41,19 +41,32 @@ export const heroService = (db: TTransaction | TDataBase) => ({
     const currentInventorySlots = await db.$count(inventoryItemTable, eq(inventoryItemTable.heroId, heroId));
     await db.update(heroTable).set({ currentInventorySlots }).where(eq(heroTable.id, heroId));
   },
+  async updateModifier(heroId: string) {
+    const [buffs, equipments] = await Promise.all([
+      db.query.buffTable.findMany({ where: eq(buffTable.heroId, heroId), columns: { modifier: true } }),
+      db.query.equipmentTable.findMany({
+        where: eq(equipmentTable.heroId, heroId),
+        with: {
+          gameItem: { with: { accessory: true, armor: true, weapon: true } },
+        },
+      }),
+    ]);
+
+    const modifiers = [
+      ...buffs.map((b) => b.modifier),
+      ...equipments.map((e) => e.gameItem.armor ?? e.gameItem.accessory ?? e.gameItem.weapon),
+    ];
+
+    const newModifier = newCombineModifier(...modifiers);
+
+    await db.update(modifierTable).set(newModifier).where(eq(modifierTable.heroId, heroId));
+  },
   async spendGold(heroId: string, amount: number, heroCurrentGold: number) {
     if (heroCurrentGold < amount) throw new HTTPException(422, { message: 'You don’t have enough gold', cause: { canShow: true } });
     await db
       .update(heroTable)
       .set({ goldCoins: sql`${heroTable.goldCoins} - ${amount}` })
       .where(eq(heroTable.id, heroId));
-  },
-
-  async updateModifier(heroId: string, newModifier: OmitModifier) {
-    await db
-      .update(modifierTable)
-      .set({ ...newModifier })
-      .where(eq(modifierTable.heroId, heroId));
   },
 
   async drinkPotion({
@@ -97,7 +110,6 @@ export const heroService = (db: TTransaction | TDataBase) => ({
         return;
       }
       const combinedModifier = combineModifiers(heroModifier, 'add', inventoryItemPotion.gameItem.potion?.buffInfo?.modifier!);
-      await this.updateModifier(heroId, combinedModifier);
       await db.insert(buffTable).values({
         type: 'POSITIVE',
         modifier,
@@ -108,9 +120,10 @@ export const heroService = (db: TTransaction | TDataBase) => ({
         heroId,
         gameItemId,
       });
+      await this.updateModifier(heroId);
 
       await actionQueue.add(jobName['buff-create'], jobData, {
-        delay: 10000,
+        delay: duration,
         jobId,
         removeOnComplete: true,
       });

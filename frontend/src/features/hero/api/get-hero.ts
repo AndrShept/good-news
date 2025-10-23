@@ -19,5 +19,5 @@ export const getHeroOptions = () =>
     queryKey: ['hero'],
     queryFn: getHero,
 
-    staleTime: 60_000,
+    staleTime: Infinity,
   });

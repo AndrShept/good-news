@@ -1,4 +1,4 @@
-import { IHeroStat } from '@/shared/types';
+import { IHeroStat, Modifier } from '@/shared/types';
 import { CheckIcon } from 'lucide-react';
 import { Dispatch, SetStateAction, memo } from 'react';
 
@@ -20,15 +20,17 @@ interface Props {
   setFreePoints: Dispatch<SetStateAction<number>>;
   baseStats: IHeroStat;
   baseFreePoints?: number;
+  modifier?: Modifier;
 }
 
-export const Stats = memo(({ reset, setCurrentStats, currentStats, freePoints, setFreePoints, baseStats }: Props) => {
+export const Stats = memo(({ reset, setCurrentStats, currentStats, freePoints, setFreePoints, baseStats, modifier }: Props) => {
   const { initialStats, onDecrement, onIncrement } = useChangeHeroStats({
     baseStats,
     currentStats,
     setCurrentStats,
     setFreePoints,
     freePoints,
+    modifier,
   });
 
   const { mutate, isPending } = useConfirmStats({ ...currentStats, freeStatPoints: freePoints });
@@ -74,11 +76,13 @@ export const Stats = memo(({ reset, setCurrentStats, currentStats, freePoints, s
                 >
                   +
                 </Button>
+                <p className={`${!stat.bonus && 'opacity-0'} text-muted-foreground`}>{stat.bonus}</p>
+                {reset && <p className="ml-2 text-green-500">{(stat.bonus ?? 0) + stat.value}</p>}
               </div>
             </li>
           ))}
         <div className="mt-2 flex justify-between">
-          <p className="font-semibold text-green-400">Free points</p>
+          <p className="font-semibold text-yellow-300">Free points</p>
           <p className="">{freePoints}</p>
         </div>
         {!areStatsEqual(baseStats, currentStats) && reset && (

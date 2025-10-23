@@ -89,11 +89,7 @@ export const jobQueueId = {
   offline: (heroId: string) => `offline-${heroId}`,
 };
 
-export const combineModifiers = <T extends Partial<OmitModifier>>(
-  base: OmitModifier,
-  mode: 'add' | 'subtract',
-  ...args: T[]
-): Modifier => {
+export const combineModifiers = <T extends Partial<OmitModifier>>(base: OmitModifier, mode: 'add' | 'subtract', ...args: T[]): Modifier => {
   const newModifier = { ...base } as Modifier;
 
   for (const item of args) {
@@ -101,13 +97,47 @@ export const combineModifiers = <T extends Partial<OmitModifier>>(
       const typedKey = key as keyof OmitModifier;
       const value = item[typedKey];
       if (typeof value === 'number') {
-        newModifier[typedKey] =
-          mode === 'add'
-            ? (newModifier[typedKey] ?? 0) + value
-            : (newModifier[typedKey] ?? 0) - value;
+        newModifier[typedKey] = mode === 'add' ? (newModifier[typedKey] ?? 0) + value : (newModifier[typedKey] ?? 0) - value;
       }
     }
   }
 
   return newModifier;
+};
+
+export const newCombineModifier = <T extends Partial<Modifier> | null>(...args: T[]) => {
+  const result: OmitModifier = {
+    constitution: 0,
+    defense: 0,
+    dexterity: 0,
+    evasion: 0,
+    healthRegen: 0,
+    intelligence: 0,
+    luck: 0,
+    magicResistance: 0,
+    manaRegen: 0,
+    maxDamage: 0,
+    maxHealth: 0,
+    maxMana: 0,
+    minDamage: 0,
+    physCritChance: 0,
+    physCritPower: 0,
+    physDamage: 0,
+    physHitChance: 0,
+    spellCritChance: 0,
+    spellCritPower: 0,
+    spellDamage: 0,
+    spellHitChance: 0,
+    strength: 0,
+  };
+
+  for (const item of args) {
+    for (const key in item) {
+      const typedKey = key as keyof OmitModifier;
+      if (typeof item[typedKey] === 'number') {
+        result[typedKey] += item[typedKey];
+      }
+    }
+  }
+  return result;
 };

@@ -3,7 +3,7 @@ import { DexterityIcon } from '@/components/game-icons/DexterityIcon';
 import { IntelligenceIcon } from '@/components/game-icons/IntelligenceIcon';
 import { LuckIcon } from '@/components/game-icons/LuckIcon';
 import { StrengthIcon } from '@/components/game-icons/StrengthIcon';
-import { IHeroStat } from '@/shared/types';
+import { IHeroStat, Modifier } from '@/shared/types';
 import { ComponentProps, ComponentType, Dispatch, FC, SetStateAction, useCallback } from 'react';
 
 import { Stat } from '../components/Stats';
@@ -14,6 +14,7 @@ interface Props {
   setFreePoints: Dispatch<SetStateAction<number>>;
   baseStats: IHeroStat;
   freePoints: number;
+  modifier: Modifier | undefined;
 }
 
 export const statIcon: Record<keyof IHeroStat, ComponentType<ComponentProps<'div'>>> = {
@@ -23,7 +24,7 @@ export const statIcon: Record<keyof IHeroStat, ComponentType<ComponentProps<'div
   intelligence: IntelligenceIcon,
   luck: LuckIcon,
 };
-export const useChangeHeroStats = ({ currentStats, setCurrentStats, setFreePoints, baseStats, freePoints }: Props) => {
+export const useChangeHeroStats = ({ currentStats, setCurrentStats, setFreePoints, baseStats, freePoints, modifier }: Props) => {
   const getStatPriority = (stat: keyof IHeroStat) => {
     const priority: Record<keyof IHeroStat, number> = {
       strength: 1,
@@ -39,6 +40,7 @@ export const useChangeHeroStats = ({ currentStats, setCurrentStats, setFreePoint
     value,
     icon: statIcon[key as keyof IHeroStat],
     sort: getStatPriority(key as keyof IHeroStat),
+    bonus: modifier && modifier[key as keyof IHeroStat],
   }));
   const onIncrement = useCallback(
     (data: Stat) => {

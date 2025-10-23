@@ -4,11 +4,15 @@ import { generateRandomUuid } from '../lib/utils';
 type PotionType = {
   strength: string;
   intelligence: string;
+  constitution: string;
   dexterity: string;
   luck: string;
   smallHealth: string;
   smallMana: string;
   smallRestore: string;
+  mediumHealth: string;
+  mediumMana: string;
+  mediumRestore: string;
 };
 
 type CreateGameItemPotion = typeof gameItemTable.$inferInsert & {
@@ -28,9 +32,27 @@ export const potionEntities: Record<keyof PotionType, CreateGameItemPotion> = {
         gameItemId: '',
         duration: 60 * 60 * 1000,
         image: '/sprites/potions/str.png',
-        name: 'Strength Potion',
+        name: 'Effect of Might',
         type: 'POSITIVE',
         modifier: { strength: 8 },
+      },
+    },
+  },
+  constitution: {
+    image: '/sprites/potions/const.png',
+    name: 'Constitution Potion',
+    price: 100,
+    type: 'POTION',
+    potion: {
+      gameItemId: '',
+      type: 'BUFF',
+      buffInfo: {
+        gameItemId: '',
+        duration: 60 * 60 * 1000,
+        image: '/sprites/potions/const.png',
+        name: 'Effect of Vitality',
+        type: 'POSITIVE',
+        modifier: { constitution: 8 },
       },
     },
   },
@@ -47,7 +69,7 @@ export const potionEntities: Record<keyof PotionType, CreateGameItemPotion> = {
         gameItemId: '',
         duration: 60 * 60 * 1000,
         image: '/sprites/potions/int.png',
-        name: 'Intelligence Potion',
+        name: 'Effect of Wisdom',
         type: 'POSITIVE',
         modifier: { intelligence: 8 },
       },
@@ -66,7 +88,7 @@ export const potionEntities: Record<keyof PotionType, CreateGameItemPotion> = {
         gameItemId: '',
         duration: 60 * 60 * 1000,
         image: '/sprites/potions/dex.png',
-        name: 'Dexterity Potion',
+        name: 'Effect of Agility',
         type: 'POSITIVE',
         modifier: { dexterity: 8 },
       },
@@ -85,7 +107,7 @@ export const potionEntities: Record<keyof PotionType, CreateGameItemPotion> = {
         gameItemId: '',
         duration: 60 * 60 * 1000,
         image: '/sprites/potions/luck.png',
-        name: 'Luck Potion',
+        name: 'Effect of Fortune',
         type: 'POSITIVE',
         modifier: { luck: 8 },
       },
@@ -112,7 +134,7 @@ export const potionEntities: Record<keyof PotionType, CreateGameItemPotion> = {
     potion: {
       gameItemId: '',
       type: 'RESTORE',
-      restore: { mana: 50 },
+      restore: { mana: 70 },
     },
   },
 
@@ -125,6 +147,41 @@ export const potionEntities: Record<keyof PotionType, CreateGameItemPotion> = {
       gameItemId: '',
       type: 'RESTORE',
       restore: { health: 35, mana: 40 },
+    },
+  },
+
+  mediumHealth: {
+    image: '/sprites/potions/medium-health.png',
+    name: 'Medium Health Potion',
+    price: 70,
+    type: 'POTION',
+    potion: {
+      gameItemId: '',
+      type: 'RESTORE',
+      restore: { health: 100 },
+    },
+  },
+  mediumMana: {
+    image: '/sprites/potions/medium-mana.png',
+    name: 'Medium Mana Potion',
+    price: 55,
+    type: 'POTION',
+    potion: {
+      gameItemId: '',
+      type: 'RESTORE',
+      restore: { mana: 150 },
+    },
+  },
+
+  mediumRestore: {
+    image: '/sprites/potions/medium-restore.png',
+    name: 'Medium Restore Potion',
+    price: 100,
+    type: 'POTION',
+    potion: {
+      gameItemId: '',
+      type: 'RESTORE',
+      restore: { health: 70, mana: 90 },
     },
   },
 };
