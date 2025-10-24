@@ -1,6 +1,9 @@
 import { useSocket } from '@/components/providers/SocketProvider';
+import { client } from '@/lib/utils';
+import { RegenHealthJob } from '@/shared/job-types';
+import { socketEvents } from '@/shared/socket-events';
 import { ApiHeroResponse } from '@/shared/types';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import { useHero } from './useHero';
@@ -11,32 +14,31 @@ export const useRegeneration = () => {
     currentMana: state?.data?.currentMana ?? 0,
     maxHealth: state?.data?.maxHealth ?? 0,
     maxMana: state?.data?.maxMana ?? 0,
-    id: state?.data?.id,
+    id: state?.data?.id ?? '',
   }));
   const isFullHealth = currentHealth >= maxHealth;
   const isFullMana = currentMana >= maxMana;
-  const {socket} = useSocket();
-  const queryClient = useQueryClient();
-  useEffect(() => {
-    const listener = (data: { currentHealth: number } | { currentMana: number }) => {
-      queryClient.setQueryData<ApiHeroResponse>(['hero'], (oldData) => {
-        if (!oldData || !oldData.data) return;
-
-        return { ...oldData, data: { ...oldData.data, ...data } };
+  const { socket } = useSocket();
+  const mutationHealth = useMutation({
+    mutationFn: async () => {
+      const res = await client.hero[':id'].regeneration.health.$post({
+        param: { id },
       });
-    };
-
+    },
+  });
+  useEffect(() => {
     if (!isFullHealth) {
-      socket.emit('go-health', id);
-      socket.on(`health-regeneration-${id}`, listener);
+      mutationHealth.mutate();
     }
-    if (!isFullMana) {
-      socket.emit('go-mana', id);
-      socket.on(`mana-regeneration-${id}`, listener);
-    }
-    return () => {
-      socket.off(`health-regeneration`, listener);
-      socket.off(`mana-regeneration-${id}`, listener);
+  }, [isFullHealth]);
+  useEffect(() => {
+    const listener = (data: RegenHealthJob) => {
+      console.log(data.payload.currentHealth);
     };
-  }, [id, isFullHealth, isFullMana, queryClient, socket]);
+    socket.on(socketEvents.dataSelf(), listener);
+
+    return () => {
+      socket.off(socketEvents.dataSelf(), listener);
+    };
+  }, [socket]);
 };

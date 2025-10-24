@@ -1,4 +1,4 @@
-import { BASE_WALK_TIME } from '@/shared/constants';
+import { BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
 import type { Map, Modifier, OmitModifier, Tile, TileType } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
@@ -105,7 +105,7 @@ export const combineModifiers = <T extends Partial<OmitModifier>>(base: OmitModi
   return newModifier;
 };
 
-export const newCombineModifier = <T extends Partial<Modifier> | null>(...args: T[]) => {
+export const newCombineModifier = <T extends Partial<Modifier> | null | undefined>(...args: T[]) => {
   const result: OmitModifier = {
     constitution: 0,
     defense: 0,
@@ -140,4 +140,12 @@ export const newCombineModifier = <T extends Partial<Modifier> | null>(...args: 
     }
   }
   return result;
+};
+
+export const calculateMaxValues = (data: { constitution: number; intelligence: number; bonusMaxHealth: number; bonusMaxMana: number }) => {
+  const { constitution, intelligence, bonusMaxHealth, bonusMaxMana } = data;
+  const maxHealth = constitution * HP_MULTIPLIER_COST + bonusMaxHealth;
+  const maxMana = intelligence * MANA_MULTIPLIER_INT + bonusMaxMana;
+
+  return { maxHealth, maxMana };
 };

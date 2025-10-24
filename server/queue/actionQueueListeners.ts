@@ -13,7 +13,7 @@ import { queueEvents } from './actionQueue';
 export const actionQueueListeners = () => {
   queueEvents.on('completed', async ({ jobId, returnvalue }) => {
     if (!returnvalue) {
-      console.error('returnvalue , not found');
+      // console.error('returnvalue , not found');
       return;
     }
     const jobData = returnvalue as unknown as ActionJobEvent;
@@ -54,31 +54,11 @@ export const actionQueueListeners = () => {
           jobName: 'BUFF_CREATE',
           payload: { gameItemId: jobData.payload.gameItemId, heroId: jobData.payload.heroId },
         };
-        await db.transaction(async (tx) => {
-          const modifier = await tx.query.modifierTable.findFirst({
-            where: eq(modifierTable.heroId, jobData.payload.heroId),
-          });
-          const gameItem = await tx.query.gameItemTable.findFirst({
-            where: eq(gameItemTable.id, jobData.payload.gameItemId),
-            with: {
-              potion: true,
-            },
-          });
-          if (!modifier) {
-            throw new Error('modifier not found');
-          }
-          const combinedModifier = combineModifiers(modifier, 'subtract', gameItem?.potion?.buffInfo?.modifier!);
-          if (!combinedModifier) {
-            throw new Error('combinedModifier not found');
-          }
-
-          await tx
-            .delete(buffTable)
-            .where(and(eq(buffTable.heroId, jobData.payload.heroId), eq(buffTable.gameItemId, jobData.payload.gameItemId)));
-          await heroService(tx).updateModifier(jobData.payload.heroId);
-        });
-
         io.to(jobData.payload.heroId).emit(socketEvents.dataSelf(), socketData);
+        break;
+      case 'REGEN_HEALTH':
+        io.to(jobData.payload.heroId).emit(socketEvents.dataSelf(), jobData);
+        break;
     }
   });
 

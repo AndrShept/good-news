@@ -5,11 +5,13 @@ export const jobName = {
   'walk-place': 'WALK_PLACE',
   'hero-offline': 'HERO_OFFLINE',
   'buff-create': 'BUFF_CREATE',
+  'regen-health': 'REGEN_HEALTH',
+  'regen-mana': 'REGEN_MANA',
 } as const;
 
 export type JobNameType = (typeof jobName)[keyof typeof jobName];
 
-export type ActionJobEvent = WalkPlaceJob | WalkMapJob | HeroOfflineJob | BuffCreateJob
+export type ActionJobEvent = WalkPlaceJob | WalkMapJob | HeroOfflineJob | BuffCreateJob | RegenHealthJob | RegenManaJob;
 
 export type WalkPlaceJob = {
   jobName: 'WALK_PLACE';
@@ -43,5 +45,19 @@ export type BuffCreateJob = {
   payload: {
     heroId: string;
     gameItemId: string;
+  };
+};
+export type RegenHealthJob = {
+  jobName: 'REGEN_HEALTH';
+  payload: {
+    heroId: string;
+    currentHealth: number;
+  };
+};
+export type RegenManaJob = {
+  jobName: 'REGEN_MANA';
+  payload: {
+    heroId: string;
+    currentMana: number;
   };
 };
