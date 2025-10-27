@@ -7,11 +7,11 @@ import { HeroOfflineData, HeroOnlineData, PlaceUpdateEvent } from '@/shared/sock
 import { socketEvents } from '@/shared/socket-events';
 import { useGameMessages, useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect, useRef } from 'react';
+
 import { usePlaceHeroesUpdate } from './usePlaceHeroesUpdate';
 
-
 export const usePlaceListener = () => {
-  const setGameMessage = useSetGameMessage()
+  const setGameMessage = useSetGameMessage();
   const placeId = useHero((state) => state?.data?.location?.placeId ?? '');
   const id = useHeroId();
   const { socket } = useSocket();
@@ -72,5 +72,5 @@ export const usePlaceListener = () => {
     return () => {
       socket.off(socketEvents.placeUpdate(), listener);
     };
-  }, []);
+  }, [socket]);
 };

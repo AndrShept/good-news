@@ -1,9 +1,10 @@
 import type { ActionJobEvent, BuffCreateJob, HeroOfflineJob } from '@/shared/job-types';
-import type { HeroOfflineData, MapUpdateEvent, PlaceUpdateEvent } from '@/shared/socket-data-types';
+import type { HeroOfflineData, MapUpdateEvent, PlaceUpdateEvent, SelfHeroData, SelfMessageData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { and, eq } from 'drizzle-orm';
 
 import { io } from '..';
+import type { GameMessageType } from '../../frontend/src/store/useGameMessages';
 import { db } from '../db/db';
 import { buffTable, gameItemTable, heroTable, modifierTable } from '../db/schema';
 import { combineModifiers } from '../lib/utils';
@@ -54,20 +55,44 @@ export const actionQueueListeners = () => {
           jobName: 'BUFF_CREATE',
           payload: { gameItemId: jobData.payload.gameItemId, heroId: jobData.payload.heroId },
         };
-        io.to(jobData.payload.heroId).emit(socketEvents.dataSelf(), socketData);
+
+        io.to(jobData.payload.heroId).emit(socketEvents.selfData(), socketData);
         break;
       case 'REGEN_HEALTH':
-        io.to(jobData.payload.heroId).emit(socketEvents.dataSelf(), jobData);
+        if (jobData.payload.isComplete) {
+          const messageData: SelfMessageData = {
+            message: 'Stop health regen ',
+            type: 'error',
+          };
+          io.to(jobData.payload.heroId).emit(socketEvents.selfMessage(), messageData);
+        }
+        break;
+      case 'REGEN_MANA':
+        if (jobData.payload.isComplete) {
+          const messageData: SelfMessageData = {
+            message: 'Stop mana regen ',
+            type: 'error',
+          };
+          io.to(jobData.payload.heroId).emit(socketEvents.selfMessage(), messageData);
+        }
+        break;
+    }
+  });
+
+  queueEvents.on('progress', ({ jobId, data }) => {
+    const progressData = data as unknown as SelfHeroData;
+
+    switch (progressData.jobName) {
+      case 'REGEN_HEALTH':
+        io.to(progressData.payload.heroId).emit(socketEvents.selfData(), progressData);
+        break;
+      case 'REGEN_MANA':
+        io.to(progressData.payload.heroId).emit(socketEvents.selfData(), progressData);
         break;
     }
   });
 
   queueEvents.on('failed', ({ jobId, failedReason }: { jobId: string; failedReason: string }) => {
     console.error('actionQueueListeners queueEvents ERROR ', failedReason);
-  });
-
-  queueEvents.on('progress', ({ jobId, data }) => {
-    console.log('data', data);
-    console.log('jobId', jobId);
   });
 };

@@ -2,6 +2,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGroupListener } from '@/features/group/hooks/useGroupListener';
 import { useHeroListener } from '@/features/hero/hooks/useHeroListener';
 import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
+import { useSelfMessage } from '@/features/hero/hooks/useSelfMessage';
 import { useMapListener } from '@/features/map/hooks/useMapListener';
 import { usePlaceListener } from '@/features/place/hooks/usePlaceListener';
 import { cn, getTimeFns } from '@/lib/utils';
@@ -14,8 +15,9 @@ export const GameMessage = memo(() => {
   useGroupListener();
   useMapListener();
   usePlaceListener();
+  useRegeneration();
+  useSelfMessage();
   useHeroListener();
-  useRegeneration()
 
   useEffect(() => {
     ref.current?.lastElementChild?.scrollIntoView({

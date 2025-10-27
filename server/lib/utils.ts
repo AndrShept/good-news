@@ -1,4 +1,4 @@
-import { BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
+import { BASE_HEALTH_REGEN_TIME, BASE_MANA_REGEN_TIME, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
 import type { Map, Modifier, OmitModifier, Tile, TileType } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
@@ -148,4 +148,13 @@ export const calculateMaxValues = (data: { constitution: number; intelligence: n
   const maxMana = intelligence * MANA_MULTIPLIER_INT + bonusMaxMana;
 
   return { maxHealth, maxMana };
+};
+
+export const calculateHealthRegenTime = (constitution: number) => {
+  const time = BASE_HEALTH_REGEN_TIME - constitution * 20;
+  return Math.max(1000, time);
+};
+export const calculateManaRegenTime = (intelligence: number) => {
+  const time = BASE_MANA_REGEN_TIME - intelligence * 30;
+  return Math.max(1000, time);
 };

@@ -1,6 +1,6 @@
 import { BASE_STATS, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
-import { type RegenHealthJob, type WalkMapJob, type WalkPlaceJob, jobName } from '@/shared/job-types';
-import type { HeroOnlineData, MapUpdateEvent, PlaceUpdateEvent } from '@/shared/socket-data-types';
+import { type RegenHealthJob, type RegenManaJob, type WalkMapJob, type WalkPlaceJob, jobName } from '@/shared/job-types';
+import type { HeroOnlineData, MapUpdateEvent, PlaceUpdateEvent, SelfHeroData, SelfMessageData } from '@/shared/socket-data-types';
 import {
   type Buff,
   type Equipment,
@@ -24,6 +24,7 @@ import { z } from 'zod';
 
 import { io } from '..';
 import { HeroIcon } from '../../frontend/src/components/game-icons/HeroIcon';
+import type { GameMessageType } from '../../frontend/src/store/useGameMessages';
 import { socketEvents } from '../../shared/socket-events';
 import type { Context } from '../context';
 import { db } from '../db/db';
@@ -42,9 +43,11 @@ import {
   stateTypeEnum,
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
+import { getHeroStatsWithModifiers } from '../lib/getHeroStatsWithModifiers';
 import { heroOnline } from '../lib/heroOnline';
 import { sumModifier } from '../lib/sumModifier';
 import {
+  calculateManaRegenTime,
   calculateWalkTime,
   generateRandomUuid,
   getTileExists,
@@ -1132,16 +1135,23 @@ export const heroRouter = new Hono<Context>()
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
+      const isFullHealth = hero.currentHealth >= hero.maxHealth;
+
       if (hero.isInBattle) {
         throw new HTTPException(403, {
           message: 'hero is a battle',
         });
       }
+      if (isFullHealth) {
+        throw new HTTPException(403, {
+          message: 'hero full HP',
+        });
+      }
 
-      const isFullHealth = hero.currentHealth >= hero.maxHealth;
-      const isFullMana = hero.currentMana >= hero.maxMana;
       const jobId = `hero-${hero.id}-regen-health`;
-      const every = 2000;
+      const { sumStatAndModifier } = await getHeroStatsWithModifiers(db, hero.id);
+      const every = calculateManaRegenTime(sumStatAndModifier.constitution);
+      console.log('healthTime', every);
       const jobData: RegenHealthJob = {
         jobName: 'REGEN_HEALTH',
         payload: {
@@ -1149,15 +1159,78 @@ export const heroRouter = new Hono<Context>()
           currentHealth: hero.currentHealth,
         },
       };
-
-      const res = await actionQueue.upsertJobScheduler(
-        jobName['regen-health'],
-        { every: 2000 },
-        { data: jobData, name: 'LOL', opts: { removeOnComplete: true } },
+      const messageData: SelfMessageData = {
+        message: 'Start health regen',
+        type: 'success',
+      };
+      await actionQueue.upsertJobScheduler(
+        jobId,
+        { every, startDate: new Date(Date.now() + every) },
+        { data: jobData, name: jobName['regen-health'], opts: { removeOnComplete: true } },
       );
-
+      io.to(hero.id).emit(socketEvents.selfMessage(), messageData);
       return c.json<SuccessResponse>({
         message: 'start regen health ',
+        success: true,
+      });
+    },
+  )
+  .post(
+    '/:id/regeneration/mana',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      const isFullMana = hero.currentMana >= hero.maxMana;
+
+      if (hero.isInBattle) {
+        throw new HTTPException(403, {
+          message: 'hero is a battle',
+        });
+      }
+      if (isFullMana) {
+        throw new HTTPException(403, {
+          message: 'hero full MANA',
+        });
+      }
+
+      const jobId = `hero-${hero.id}-regen-mana`;
+      const { sumStatAndModifier } = await getHeroStatsWithModifiers(db, hero.id);
+      const every = calculateManaRegenTime(sumStatAndModifier.intelligence);
+      console.log('manaTime', every);
+      const jobData: RegenManaJob = {
+        jobName: 'REGEN_MANA',
+        payload: {
+          heroId: hero.id,
+          currentMana: hero.currentMana,
+        },
+      };
+      const messageData: SelfMessageData = {
+        message: 'Start mana regen',
+        type: 'success',
+      };
+      await actionQueue.upsertJobScheduler(
+        jobId,
+        { every, startDate: new Date(Date.now() + every) },
+        { data: jobData, name: jobName['regen-mana'], opts: { removeOnComplete: true } },
+      );
+      io.to(hero.id).emit(socketEvents.selfMessage(), messageData);
+      return c.json<SuccessResponse>({
+        message: 'start regen mana ',
         success: true,
       });
     },

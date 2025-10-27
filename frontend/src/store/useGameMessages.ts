@@ -1,4 +1,3 @@
-import { Equipment, GameItem, InventoryItem, SuccessResponse } from '@/shared/types';
 import { create } from 'zustand';
 
 export const gameMessageType = {

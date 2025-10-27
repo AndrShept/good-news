@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { memo } from 'react';
 
 interface Props {
   value: number;
@@ -6,14 +7,14 @@ interface Props {
   type: 'health' | 'mana' | 'exp';
 }
 
-export const FillBar = ({ value, maxValue, type }: Props) => {
+export const FillBar = memo(({ value, maxValue, type }: Props) => {
   const lowPercentHealth = maxValue * 0.3;
 
   return (
-    <div className="bg-secondary/40 relative h-4 w-full rounded border overflow-hidden">
+    <div className="bg-secondary/40 relative h-4 w-full overflow-hidden rounded border">
       <div
         style={{ width: `${(value / maxValue) * 100}%` }}
-        className={cn('h-full  transition-all duration-300 ease-in-out', {
+        className={cn('h-full transition-all duration-300 ease-in-out', {
           'bg-gradient-to-b from-red-500 to-red-900': value <= lowPercentHealth && type === 'health',
           'bg-green-700': type === 'health' && value > lowPercentHealth,
           'bg-blue-600': type === 'mana',
@@ -27,4 +28,4 @@ export const FillBar = ({ value, maxValue, type }: Props) => {
       </div>
     </div>
   );
-};
+});

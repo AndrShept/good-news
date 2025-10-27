@@ -6,6 +6,7 @@ import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction, db } from '../db/db';
 import { buffTable, equipmentTable, heroTable, inventoryItemTable, modifierTable } from '../db/schema';
+import { getHeroStatsWithModifiers } from '../lib/getHeroStatsWithModifiers';
 import { sumModifier } from '../lib/sumModifier';
 import { calculateMaxValues, combineModifiers, newCombineModifier } from '../lib/utils';
 import { actionQueue } from '../queue/actionQueue';
@@ -62,27 +63,7 @@ export const heroService = (db: TTransaction | TDataBase) => ({
       .where(eq(heroTable.id, heroId));
   },
   async updateModifier(heroId: string) {
-    const [buffs, equipments, hero] = await Promise.all([
-      db.query.buffTable.findMany({ where: eq(buffTable.heroId, heroId), columns: { modifier: true } }),
-      db.query.equipmentTable.findMany({
-        where: eq(equipmentTable.heroId, heroId),
-        with: {
-          gameItem: { with: { accessory: true, armor: true, weapon: true } },
-        },
-      }),
-      db.query.heroTable.findFirst({
-        where: eq(heroTable.id, heroId),
-        columns: { currentMana: true, currentHealth: true, stat: true },
-      }),
-    ]);
-
-    const modifiers = [
-      ...buffs.map((b) => b.modifier),
-      ...equipments.map((e) => e.gameItem.armor ?? e.gameItem.accessory ?? e.gameItem.weapon),
-    ];
-
-    const newModifier = newCombineModifier(...modifiers);
-    const sumStatAndModifier = newCombineModifier(newModifier, hero?.stat);
+    const { hero, newModifier, sumStatAndModifier } = await getHeroStatsWithModifiers(db, heroId);
     await this.updateHeroMaxValues({
       bonusMaxHealth: sumStatAndModifier.maxHealth,
       bonusMaxMana: sumStatAndModifier.maxMana,
@@ -105,7 +86,7 @@ export const heroService = (db: TTransaction | TDataBase) => ({
   async drinkPotion({ currentHealth, currentMana, heroId, inventoryItemPotion, isBuffPotion, maxHealth, maxMana }: IDrinkPotion) {
     if (isBuffPotion) {
       const gameItemId = inventoryItemPotion.gameItem.potion?.buffInfo?.gameItemId ?? '';
-      const delay = ( inventoryItemPotion.gameItem.potion?.buffInfo?.duration ?? 0);
+      const delay = inventoryItemPotion.gameItem.potion?.buffInfo?.duration ?? 0;
       const modifier = inventoryItemPotion.gameItem.potion?.buffInfo?.modifier ?? {};
       const name = inventoryItemPotion.gameItem.potion?.buffInfo?.name ?? '';
       const image = inventoryItemPotion.gameItem.potion?.buffInfo?.image ?? '';
@@ -139,7 +120,7 @@ export const heroService = (db: TTransaction | TDataBase) => ({
         modifier,
         name,
         image,
-        duration : delay,
+        duration: delay,
         completedAt,
         heroId,
         gameItemId,

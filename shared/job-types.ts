@@ -51,13 +51,15 @@ export type RegenHealthJob = {
   jobName: 'REGEN_HEALTH';
   payload: {
     heroId: string;
-    currentHealth: number;
+    currentHealth?: number;
+    isComplete?: boolean;
   };
 };
 export type RegenManaJob = {
   jobName: 'REGEN_MANA';
   payload: {
     heroId: string;
-    currentMana: number;
+    currentMana?: number;
+    isComplete?: boolean;
   };
 };

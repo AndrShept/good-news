@@ -10,7 +10,7 @@ interface Props {
   heroStat: IHeroStat | undefined;
 }
 
-export const CharacterStat = ({ freeStatPoints, modifier, heroStat }: Props) => {
+export const CharacterStat = memo(({ freeStatPoints, modifier, heroStat }: Props) => {
   if (!modifier) throw new Error('modifier not found');
   if (!heroStat) throw new Error('stat not found');
   const initialHeroStats = {
@@ -27,7 +27,6 @@ export const CharacterStat = ({ freeStatPoints, modifier, heroStat }: Props) => 
 
   useEffect(() => {
     setStats(heroStat);
-    console.log(heroStat);
     baseStats.current = heroStat;
     setFreePoints(freeStatPoints);
     baseFreePoints.current = freeStatPoints;
@@ -46,4 +45,4 @@ export const CharacterStat = ({ freeStatPoints, modifier, heroStat }: Props) => 
       />
     </>
   );
-};
+});

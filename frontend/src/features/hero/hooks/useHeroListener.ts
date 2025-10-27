@@ -6,12 +6,12 @@ import { useEffect } from 'react';
 
 import { getHeroOptions } from '../api/get-hero';
 import { useBuff } from './useBuff';
-import { useHeroId } from './useHeroId';
+import { useUpdateHero } from './useUpdateHero';
 
 export const useHeroListener = () => {
   const { socket } = useSocket();
   const { removeBuff } = useBuff();
-  const id = useHeroId();
+  const { updateHero } = useUpdateHero();
   const queryClient = useQueryClient();
   useEffect(() => {
     const listener = async (data: SelfHeroData) => {
@@ -20,13 +20,19 @@ export const useHeroListener = () => {
           await queryClient.invalidateQueries({ queryKey: getHeroOptions().queryKey });
           removeBuff(data.payload.gameItemId);
           break;
+        case 'REGEN_HEALTH':
+          updateHero({ currentHealth: data.payload.currentHealth });
+          break;
+        case 'REGEN_MANA':
+          updateHero({ currentMana: data.payload.currentMana });
+          break;
       }
     };
 
-    socket.on(socketEvents.dataSelf(), listener);
+    socket.on(socketEvents.selfData(), listener);
 
     return () => {
-      socket.off(socketEvents.dataSelf(), listener);
+      socket.off(socketEvents.selfData(), listener);
     };
   }, [socket]);
 };
