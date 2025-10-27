@@ -5,10 +5,10 @@ import { weaponEntities } from '../entities/weapon';
 export const createWeapons = async () => {
   const weapons = Object.values(weaponEntities);
   for (const weapon of weapons) {
-    const [newWeapon] = await db.insert(gameItemTable).values(weapon).returning({ id: gameItemTable.id });
+    await db.insert(gameItemTable).values(weapon);
     await db.insert(weaponTable).values({
       ...weapon.weapon,
-      gameItemId: newWeapon.id,
+      gameItemId: weapon.id,
     });
   }
   console.log('✔ weapons create');

@@ -17,7 +17,7 @@ export const weaponHandEnum = pgEnum('weapon_hand_enum', ['ONE_HANDED', 'TWO_HAN
 export const potionTypeEnum = pgEnum('potion_type_enum', ['BUFF', 'RESTORE']);
 
 export const gameItemTable = pgTable('game_item', {
-  id: uuid().primaryKey().defaultRandom().notNull(),
+  id: uuid().primaryKey().notNull(),
 
   type: gameItemEnum().notNull(),
   name: text().notNull(),

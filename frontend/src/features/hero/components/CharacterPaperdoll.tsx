@@ -1,10 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { LucideStepBack } from 'lucide-react';
+import { useState } from 'react';
 
 import { useHero } from '../hooks/useHero';
 import { useHeroStateMutation } from '../hooks/useHeroStateMutation';
 import { CharacterModifier } from './CharacterModifier';
 import { CharacterStat } from './CharacterStat';
+import { CraftModal } from './CraftModal';
 import { Inventory } from './Inventory';
 import { Paperdoll } from './Paperdoll';
 
@@ -27,8 +29,12 @@ export const CharacterPaperdoll = () => {
     equipments: state?.data?.equipments ?? [],
   }));
   const { mutate, isPending } = useHeroStateMutation();
+  const [isShowCraftModal, setIsShowCraftModal] = useState(false);
   return (
     <section className="flex flex-col gap-1">
+      <Button className="w-fit" onClick={() => setIsShowCraftModal(true)}>
+        Craft
+      </Button>
       <Button variant="outline" disabled={isPending} onClick={() => mutate('IDLE')} className="ml-auto w-fit">
         <LucideStepBack />
         Back
@@ -42,6 +48,7 @@ export const CharacterPaperdoll = () => {
 
         <Inventory />
       </div>
+      <CraftModal isShowCraftModal={isShowCraftModal} setIsShowCraftModal={setIsShowCraftModal} />
     </section>
   );
 };

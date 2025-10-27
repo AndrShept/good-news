@@ -1,5 +1,6 @@
 import { BASE_HEALTH_REGEN_TIME, BASE_MANA_REGEN_TIME, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
-import type { Map, Modifier, OmitModifier, Tile, TileType } from '@/shared/types';
+import type { TileMap } from '@/shared/json-types';
+import type { Map, MapNameType, Modifier, OmitModifier, Tile, TileType } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
 import { sql } from 'drizzle-orm';
@@ -7,7 +8,6 @@ import { HTTPException } from 'hono/http-exception';
 import nodemailer from 'nodemailer';
 import z from 'zod';
 
-import { getMapJson } from './buildingMapData';
 
 const schema = z.object({
   DATABASE_URL: z.string(),
@@ -79,6 +79,23 @@ export const calculateWalkTime = (dexterity: number) => {
   return delay;
 };
 
+interface MapLoadInfo {
+  jsonUrl: TileMap;
+  imageUrl: string;
+  name: MapNameType;
+}
+
+export const getMapJson = (mapId: string) => {
+  const map: Record<string, MapLoadInfo> = {
+    '01998100-a29d-7b0f-abad-edd4ef317472': {
+      name: 'SOLMERE',
+      jsonUrl: require('../json/solmer.json'),
+      imageUrl: '/sprites/map/solmer.png',
+    },
+  };
+  return map[mapId];
+};
+
 export const getTileExists = (mapId: string, index: number, tileType: TileType) => {
   const map = getMapJson(mapId);
   const tiles = map.jsonUrl.layers.find((l) => l.name === tileType);
@@ -89,21 +106,6 @@ export const jobQueueId = {
   offline: (heroId: string) => `offline-${heroId}`,
 };
 
-export const combineModifiers = <T extends Partial<OmitModifier>>(base: OmitModifier, mode: 'add' | 'subtract', ...args: T[]): Modifier => {
-  const newModifier = { ...base } as Modifier;
-
-  for (const item of args) {
-    for (const key in item) {
-      const typedKey = key as keyof OmitModifier;
-      const value = item[typedKey];
-      if (typeof value === 'number') {
-        newModifier[typedKey] = mode === 'add' ? (newModifier[typedKey] ?? 0) + value : (newModifier[typedKey] ?? 0) - value;
-      }
-    }
-  }
-
-  return newModifier;
-};
 
 export const newCombineModifier = <T extends Partial<Modifier> | null | undefined>(...args: T[]) => {
   const result: OmitModifier = {

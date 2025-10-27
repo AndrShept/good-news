@@ -9,8 +9,8 @@ import { z } from 'zod';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import {  locationTable, mapTable } from '../db/schema';
-import {  getMapJson } from '../lib/buildingMapData';
 import { loggedIn } from '../middleware/loggedIn';
+import { getMapJson } from '../lib/utils';
 
 export const mapRouter = new Hono<Context>()
   .get(

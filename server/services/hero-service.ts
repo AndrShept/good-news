@@ -1,14 +1,12 @@
-import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
 import { type BuffCreateJob, jobName } from '@/shared/job-types';
 import type { InventoryItem, Modifier, OmitModifier } from '@/shared/types';
 import { and, eq, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
-import type { TDataBase, TTransaction, db } from '../db/db';
-import { buffTable, equipmentTable, heroTable, inventoryItemTable, modifierTable } from '../db/schema';
+import type { TDataBase, TTransaction } from '../db/db';
+import { buffTable, heroTable, inventoryItemTable, modifierTable } from '../db/schema';
 import { getHeroStatsWithModifiers } from '../lib/getHeroStatsWithModifiers';
-import { sumModifier } from '../lib/sumModifier';
-import { calculateMaxValues, combineModifiers, newCombineModifier } from '../lib/utils';
+import { calculateMaxValues } from '../lib/utils';
 import { actionQueue } from '../queue/actionQueue';
 
 interface IDrinkPotion {

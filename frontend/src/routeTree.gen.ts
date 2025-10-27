@@ -22,7 +22,6 @@ import { Route as AuthSignUpImport } from './routes/auth/sign-up'
 import { Route as AuthSignInImport } from './routes/auth/sign-in'
 import { Route as AuthConfirmEmailImport } from './routes/auth/confirm-email'
 import { Route as homeTestRouteImport } from './routes/(home)/test/route'
-import { Route as GameShopIndexImport } from './routes/game/shop/index'
 import { Route as homePostIndexImport } from './routes/(home)/post/index'
 import { Route as homePostPostIdImport } from './routes/(home)/post/$postId'
 
@@ -91,12 +90,6 @@ const homeTestRouteRoute = homeTestRouteImport.update({
   id: '/test',
   path: '/test',
   getParentRoute: () => homeRouteRoute,
-} as any)
-
-const GameShopIndexRoute = GameShopIndexImport.update({
-  id: '/shop/',
-  path: '/shop/',
-  getParentRoute: () => GameRouteRoute,
 } as any)
 
 const homePostIndexRoute = homePostIndexImport.update({
@@ -206,13 +199,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof homePostIndexImport
       parentRoute: typeof homeRouteImport
     }
-    '/game/shop/': {
-      id: '/game/shop/'
-      path: '/shop'
-      fullPath: '/game/shop'
-      preLoaderRoute: typeof GameShopIndexImport
-      parentRoute: typeof GameRouteImport
-    }
   }
 }
 
@@ -256,12 +242,10 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 
 interface GameRouteRouteChildren {
   GameIndexRoute: typeof GameIndexRoute
-  GameShopIndexRoute: typeof GameShopIndexRoute
 }
 
 const GameRouteRouteChildren: GameRouteRouteChildren = {
   GameIndexRoute: GameIndexRoute,
-  GameShopIndexRoute: GameShopIndexRoute,
 }
 
 const GameRouteRouteWithChildren = GameRouteRoute._addFileChildren(
@@ -281,7 +265,6 @@ export interface FileRoutesByFullPath {
   '/game/': typeof GameIndexRoute
   '/post/$postId': typeof homePostPostIdRoute
   '/post': typeof homePostIndexRoute
-  '/game/shop': typeof GameShopIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -295,7 +278,6 @@ export interface FileRoutesByTo {
   '/game': typeof GameIndexRoute
   '/post/$postId': typeof homePostPostIdRoute
   '/post': typeof homePostIndexRoute
-  '/game/shop': typeof GameShopIndexRoute
 }
 
 export interface FileRoutesById {
@@ -313,7 +295,6 @@ export interface FileRoutesById {
   '/game/': typeof GameIndexRoute
   '/(home)/post/$postId': typeof homePostPostIdRoute
   '/(home)/post/': typeof homePostIndexRoute
-  '/game/shop/': typeof GameShopIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -331,7 +312,6 @@ export interface FileRouteTypes {
     | '/game/'
     | '/post/$postId'
     | '/post'
-    | '/game/shop'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/test'
@@ -344,7 +324,6 @@ export interface FileRouteTypes {
     | '/game'
     | '/post/$postId'
     | '/post'
-    | '/game/shop'
   id:
     | '__root__'
     | '/(home)'
@@ -360,7 +339,6 @@ export interface FileRouteTypes {
     | '/game/'
     | '/(home)/post/$postId'
     | '/(home)/post/'
-    | '/game/shop/'
   fileRoutesById: FileRoutesById
 }
 
@@ -415,8 +393,7 @@ export const routeTree = rootRoute
     "/game": {
       "filePath": "game/route.tsx",
       "children": [
-        "/game/",
-        "/game/shop/"
+        "/game/"
       ]
     },
     "/(home)/test": {
@@ -457,10 +434,6 @@ export const routeTree = rootRoute
     "/(home)/post/": {
       "filePath": "(home)/post/index.tsx",
       "parent": "/(home)"
-    },
-    "/game/shop/": {
-      "filePath": "game/shop/index.tsx",
-      "parent": "/game"
     }
   }
 }

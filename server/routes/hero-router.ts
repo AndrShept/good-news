@@ -45,7 +45,6 @@ import {
 import { buffTable } from '../db/schema/buff-schema';
 import { getHeroStatsWithModifiers } from '../lib/getHeroStatsWithModifiers';
 import { heroOnline } from '../lib/heroOnline';
-import { sumModifier } from '../lib/sumModifier';
 import {
   calculateManaRegenTime,
   calculateWalkTime,
