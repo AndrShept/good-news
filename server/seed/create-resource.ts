@@ -19,6 +19,7 @@ export const createResource = async () => {
     await db.insert(resourceTable).values({
       ...resource.resource,
       gameItemId: resource.id!,
+     
     });
   }
   console.log('✔ resource create');

@@ -1,15 +1,18 @@
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 
-interface Props {
-  isShowCraftModal: boolean;
-  setIsShowCraftModal: Dispatch<SetStateAction<boolean>>;
-}
+// interface Props {
+//   isShowCraftModal: boolean;
+//   setIsShowCraftModal: Dispatch<SetStateAction<boolean>>;
+// }
 
-export const CraftModal = ({ isShowCraftModal, setIsShowCraftModal }: Props) => {
+export const CraftModal = () => {
   return (
-    <Dialog open={isShowCraftModal} onOpenChange={setIsShowCraftModal}>
-      <DialogTrigger>Open</DialogTrigger>
+    <Dialog>
+      <DialogTrigger>
+        <div className="w-fit">Craft</div>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>

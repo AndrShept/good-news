@@ -29,12 +29,10 @@ export const CharacterPaperdoll = () => {
     equipments: state?.data?.equipments ?? [],
   }));
   const { mutate, isPending } = useHeroStateMutation();
-  const [isShowCraftModal, setIsShowCraftModal] = useState(false);
   return (
     <section className="flex flex-col gap-1">
-      <Button className="w-fit" onClick={() => setIsShowCraftModal(true)}>
-        Craft
-      </Button>
+      <CraftModal />
+
       <Button variant="outline" disabled={isPending} onClick={() => mutate('IDLE')} className="ml-auto w-fit">
         <LucideStepBack />
         Back
@@ -48,7 +46,6 @@ export const CharacterPaperdoll = () => {
 
         <Inventory />
       </div>
-      <CraftModal isShowCraftModal={isShowCraftModal} setIsShowCraftModal={setIsShowCraftModal} />
     </section>
   );
 };

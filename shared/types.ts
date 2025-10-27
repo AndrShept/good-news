@@ -33,7 +33,7 @@ import {
   weaponTypeEnum,
 } from '../server/db/schema/game-item-schema';
 import { postTable } from '../server/db/schema/posts-schema';
-import type { rarityEnum, resourceTable } from '../server/db/schema/resource-schema';
+import type { rarityEnum, resourceCategoryEnum, resourceTable, resourceTypeEnum } from '../server/db/schema/resource-schema';
 import { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
 import { tileTable, tileTypeEnum } from '../server/db/schema/tile-schema';
 import type { Layer } from './json-types';
@@ -210,6 +210,9 @@ export type Armor = typeof armorTable.$inferSelect;
 export type Potion = typeof potionTable.$inferSelect;
 export type Accessory = typeof accessoryTable.$inferSelect;
 export type Resource = typeof resourceTable.$inferSelect;
+
+export type ResourceType = typeof resourceTypeEnum.enumValues[number]
+export type ResourceCategory = typeof resourceCategoryEnum.enumValues[number]
 
 export type GameItem = InferSelectModel<typeof gameItemTable> & {
   weapon?: Weapon | null;

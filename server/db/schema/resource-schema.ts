@@ -15,7 +15,7 @@ export const resourceTable = pgTable('resource', {
   type: resourceTypeEnum().notNull(),
   category: resourceCategoryEnum().notNull(),
   rarity: rarityEnum().notNull(),
-  modifier: jsonb().$type<OmitModifier[]>(),
+  modifier: jsonb().$type<OmitModifier>(),
   gameItemId: uuid()
     .references(() => gameItemTable.id)
     .notNull(),
