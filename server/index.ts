@@ -87,6 +87,7 @@ app.get('*', serveStatic({ path: './frontend/dist/index.html' }));
 const httpServer = serve({
   fetch: app.fetch,
   port: 3000,
+  hostname: '0.0.0.0', 
 });
 
 actionQueueListeners();
@@ -94,7 +95,10 @@ actionQueueListeners();
 const pubClient = new Redis(process.env['REDIS_CLOUD_DATABASE_URL']!);
 const subClient = pubClient.duplicate();
 
-export const io = new Server(httpServer as HTTPServer, {
+// Або обробити їх підключення/помилки
+pubClient.on('error', (err) => console.log('Redis Pub Client Error', err));
+subClient.on('error', (err) => console.log('Redis Sub Client Error', err));
+export const io = new Server(httpServer, {
   cors: {
     credentials: true,
     origin: process.env['BASE_URL_FRONT'],

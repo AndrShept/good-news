@@ -25,8 +25,6 @@ interface IUpdateHeroMaxValues {
   heroId: string;
   constitution: number;
   intelligence: number;
-  currentHealth: number;
-  currentMana: number;
   bonusMaxMana: number;
   bonusMaxHealth: number;
 }
@@ -53,24 +51,26 @@ export const heroService = (db: TTransaction | TDataBase) => ({
     await db.update(heroTable).set({ currentInventorySlots }).where(eq(heroTable.id, heroId));
   },
   async updateHeroMaxValues(data: IUpdateHeroMaxValues) {
-    const { constitution, currentHealth, currentMana, heroId, intelligence, bonusMaxHealth, bonusMaxMana } = data;
+    const { constitution, heroId, intelligence, bonusMaxHealth, bonusMaxMana } = data;
     const { maxHealth, maxMana } = calculateMaxValues({ constitution, intelligence, bonusMaxHealth, bonusMaxMana });
-    const newCurrentHealth = Math.min(currentHealth, maxHealth);
-    const newCurrentMana = Math.min(currentMana, maxMana);
+
     await db
       .update(heroTable)
-      .set({ maxHealth, maxMana, currentHealth: newCurrentHealth, currentMana: newCurrentMana })
+      .set({
+        maxHealth,
+        maxMana,
+        currentHealth: sql`LEAST(${heroTable.currentHealth}, ${maxHealth})`,
+        currentMana: sql`LEAST(${heroTable.currentMana}, ${maxMana})`,
+      })
       .where(eq(heroTable.id, heroId));
   },
   async updateModifier(heroId: string) {
-    const { hero, newModifier, sumStatAndModifier } = await getHeroStatsWithModifiers(db, heroId);
+    const { newModifier, sumStatAndModifier } = await getHeroStatsWithModifiers(db, heroId);
     await this.updateHeroMaxValues({
       bonusMaxHealth: sumStatAndModifier.maxHealth,
       bonusMaxMana: sumStatAndModifier.maxMana,
       constitution: sumStatAndModifier.constitution,
       intelligence: sumStatAndModifier.intelligence,
-      currentHealth: hero?.currentHealth ?? 0,
-      currentMana: hero?.currentMana ?? 0,
       heroId,
     });
     await db.update(modifierTable).set(newModifier).where(eq(modifierTable.heroId, heroId));

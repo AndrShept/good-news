@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useHero } from './useHero';
 
 export const useRegeneration = () => {
-  const { currentHealth, currentMana, id, maxHealth, maxMana, stat, modifier } = useHero((state) => ({
+  const { currentHealth, currentMana, id, maxHealth, maxMana, stat, modifier, isBattle } = useHero((state) => ({
     currentHealth: state?.data?.currentHealth ?? 0,
     currentMana: state?.data?.currentMana ?? 0,
     maxHealth: state?.data?.maxHealth ?? 0,
@@ -13,6 +13,7 @@ export const useRegeneration = () => {
     id: state?.data?.id ?? '',
     stat: state?.data?.stat,
     modifier: state?.data?.modifier,
+    isBattle: state?.data?.isInBattle,
   }));
   const isFullHealth = currentHealth >= maxHealth;
   const isFullMana = currentMana >= maxMana;
@@ -33,19 +34,19 @@ export const useRegeneration = () => {
   });
   useEffect(() => {
     if (
-      (!isFullHealth && !mutationHealth.isPending) ||
-      (!isFullHealth && !mutationHealth.isPending && (stat?.constitution || modifier?.constitution))
+      (!isFullHealth && !mutationHealth.isPending && !isBattle) ||
+      (!isFullHealth && !mutationHealth.isPending && !isBattle && (stat?.constitution || modifier?.constitution))
     ) {
       mutationHealth.mutate();
     }
-  }, [isFullHealth, modifier?.constitution, stat?.constitution]);
+  }, [isFullHealth, modifier?.constitution, stat?.constitution, isBattle]);
 
   useEffect(() => {
     if (
-      (!isFullMana && !mutationMana.isPending) ||
-      (!isFullMana && !mutationMana.isPending && (stat?.intelligence || modifier?.intelligence))
+      (!isFullMana && !mutationMana.isPending && !isBattle) ||
+      (!isFullMana && !mutationMana.isPending && !isBattle && (stat?.intelligence || modifier?.intelligence))
     ) {
       mutationMana.mutate();
     }
-  }, [isFullMana, modifier?.intelligence, stat?.intelligence]);
+  }, [isFullMana, modifier?.intelligence, stat?.intelligence, isBattle]);
 };

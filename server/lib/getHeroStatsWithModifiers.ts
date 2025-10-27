@@ -30,6 +30,5 @@ export const getHeroStatsWithModifiers = async (db: TTransaction | TDataBase, he
   return {
     newModifier,
     sumStatAndModifier,
-    hero
   };
 };
