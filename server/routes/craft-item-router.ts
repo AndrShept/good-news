@@ -1,4 +1,4 @@
-import type { CraftItem, GameItem, GameItemType, GroupCraftItem, SuccessResponse, WeaponType } from '@/shared/types';
+import type { CraftItem, GameItem, GameItemType, GroupCraftItem, Resource, SuccessResponse, WeaponType } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 
@@ -16,6 +16,7 @@ export const craftItemRouter = new Hono<Context>().get(
         gameItem: { with: { armor: true, weapon: true } },
       },
     });
+    const resources = await db.query.resourceTable.findMany();
 
     const groupObject = Object.groupBy(craftItems, ({ gameItem: { type } }) => type);
 
@@ -44,11 +45,11 @@ export const craftItemRouter = new Hono<Context>().get(
 
       return { itemType, items };
     });
-    console.log(groupedCraftItems);
-    return c.json<SuccessResponse<GroupCraftItem[]>>({
+
+    return c.json<SuccessResponse<{ craftItems: GroupCraftItem[]; resources: Resource[] }>>({
       message: 'craft item fetched!',
       success: true,
-      data: groupedCraftItems as GroupCraftItem[],
+      data: { craftItems: groupedCraftItems as GroupCraftItem[], resources },
     });
   },
 );

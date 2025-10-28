@@ -26,15 +26,16 @@ const BASE_EQUIPMENTS_IMAGE: EquipmentImage[] = [
     slot: 'CHESTPLATE',
     image: '/sprites/icons/armor.png',
   },
+
+  {
+    id: 4,
+    slot: 'GLOVES',
+    image: '/sprites/icons/gloves.png',
+  },
   {
     id: 3,
     slot: 'BELT',
     image: '/sprites/icons/belt.png',
-  },
-  {
-    id: 4,
-    slot: 'LEGS',
-    image: '/sprites/icons/legs.png',
   },
   {
     id: 5,
