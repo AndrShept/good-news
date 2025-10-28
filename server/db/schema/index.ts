@@ -17,4 +17,4 @@ export * from './tile-schema';
 export * from './map-schema';
 export * from './place-schema';
 export * from './resource-schema';
-export * from './craft-schema';
+export * from './craft-item-schema';

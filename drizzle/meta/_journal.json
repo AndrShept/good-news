@@ -253,6 +253,13 @@
       "when": 1761600933262,
       "tag": "0035_salty_glorian",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1761644942477,
+      "tag": "0036_loud_photon",
+      "breakpoints": true
     }
   ]
 }

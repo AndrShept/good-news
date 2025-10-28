@@ -22,6 +22,7 @@ import { sessionHandler } from './middleware/sessionHandler';
 import { actionQueueListeners } from './queue/actionQueueListeners';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
+import { craftItemRouter } from './routes/craft-item-router';
 import { groupRouter } from './routes/group-router';
 import { heroRouter } from './routes/hero-router';
 import { mapRouter } from './routes/map-router';
@@ -46,7 +47,8 @@ const routes = app
   .route('/group', groupRouter)
   .route('/map', mapRouter)
   .route('/place', placeRouter)
-  .route('/tile', tileRouter);
+  .route('/tile', tileRouter)
+  .route('/craft-item', craftItemRouter);
 
 app.onError((err, c) => {
   // Обробка помилки підключення до бази даних
@@ -87,7 +89,7 @@ app.get('*', serveStatic({ path: './frontend/dist/index.html' }));
 const httpServer = serve({
   fetch: app.fetch,
   port: 3000,
-  hostname: '0.0.0.0', 
+  hostname: '0.0.0.0',
 });
 
 actionQueueListeners();

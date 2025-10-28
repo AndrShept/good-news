@@ -4,7 +4,7 @@ import { integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 import { gameItemTable } from './game-item-schema';
 
-export const craftTable = pgTable('craft-item', {
+export const craftItemTable = pgTable('craft-item', {
   id: uuid().primaryKey().defaultRandom().notNull(),
 
   gameItemId: uuid()
@@ -13,12 +13,12 @@ export const craftTable = pgTable('craft-item', {
 
   craftTime: integer().default(0).notNull(),
   requiredLevel: integer().default(1).notNull(),
-  craftResources: jsonb().$type<{ type: ResourceType; quantity: number }[]>(),
+  craftResources: jsonb().$type<{ type: ResourceType; quantity: number }[]>().notNull(),
 });
 
-export const craftTableRelations = relations(craftTable, ({ one }) => ({
+export const craftTableRelations = relations(craftItemTable, ({ one }) => ({
   gameItem: one(gameItemTable, {
-    fields: [craftTable.gameItemId],
+    fields: [craftItemTable.gameItemId],
     references: [gameItemTable.id],
   }),
 }));

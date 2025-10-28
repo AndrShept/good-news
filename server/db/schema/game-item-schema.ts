@@ -2,7 +2,6 @@ import { relations } from 'drizzle-orm';
 import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import type { buffTable } from './buff-schema';
-import { craftTable } from './craft-schema';
 import { inventoryItemTable } from './inventory-item-schema';
 import { resourceTable } from './resource-schema';
 
@@ -33,7 +32,6 @@ export const gameItemTable = pgTable('game_item', {
 
 export const gameItemRelations = relations(gameItemTable, ({ one, many }) => ({
   inventoryItem: many(inventoryItemTable),
-  craftItem: many(craftTable),
   weapon: one(weaponTable),
   armor: one(armorTable),
   potion: one(potionTable),

@@ -8,6 +8,7 @@ import {
   actionTable,
   actionTypeEnum,
   armorTable,
+  craftItemTable,
   groupTable,
   heroTable,
   inventoryItemTable,
@@ -160,6 +161,8 @@ export type TileType = (typeof tileTypeEnum.enumValues)[number];
 export type MapNameType = (typeof mapNameTypeEnum.enumValues)[number];
 export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
 export type StateType = (typeof stateTypeEnum.enumValues)[number];
+export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];
+export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
@@ -211,8 +214,11 @@ export type Potion = typeof potionTable.$inferSelect;
 export type Accessory = typeof accessoryTable.$inferSelect;
 export type Resource = typeof resourceTable.$inferSelect;
 
-export type ResourceType = typeof resourceTypeEnum.enumValues[number]
-export type ResourceCategory = typeof resourceCategoryEnum.enumValues[number]
+export type CraftItem = typeof craftItemTable.$inferSelect & {
+  gameItem?: GameItem | null;
+};
+
+export type GroupCraftItem = { itemType: GameItemType; subgroups: { subtype: WeaponType; items: CraftItem[] }[] };
 
 export type GameItem = InferSelectModel<typeof gameItemTable> & {
   weapon?: Weapon | null;
