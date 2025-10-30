@@ -210,7 +210,9 @@ export type Weapon = typeof weaponTable.$inferSelect;
 export type Armor = typeof armorTable.$inferSelect;
 export type Potion = typeof potionTable.$inferSelect;
 export type Accessory = typeof accessoryTable.$inferSelect;
-export type Resource = typeof resourceTable.$inferSelect;
+export type Resource = typeof resourceTable.$inferSelect & {
+  gameItem?: GameItem | null;
+};
 
 export type CraftItem = typeof craftItemTable.$inferSelect & {
   gameItem?: GameItem | null;
@@ -245,6 +247,8 @@ export type IPosition = {
 export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>;
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];
 export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
+
+export type ApiGetCraftItemResponse = InferResponseType<(typeof client)['craft-item']['$get']>['data'];
 
 export type IHeroStat = {
   strength: number;

@@ -1,10 +1,9 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { DialogTitle } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { client } from '@/lib/utils';
-import { ArmorType, CraftItem, WeaponType } from '@/shared/types';
-import { InferResponseType } from 'hono';
+import { ApiGetCraftItemResponse, ArmorType, CraftItem, WeaponType } from '@/shared/types';
 import { memo } from 'react';
+
+import { CraftSelectResource } from './CraftSelectResource';
 
 const icons: Record<WeaponType | ArmorType, string> = {
   SWORD: '/sprites/icons/shop/sword.png',
@@ -20,7 +19,7 @@ const icons: Record<WeaponType | ArmorType, string> = {
 };
 
 interface Props {
-  data: InferResponseType<(typeof client)['craft-item']['$get']>['data'];
+  data: ApiGetCraftItemResponse;
   onSelect: (item: CraftItem) => void;
 }
 
@@ -62,18 +61,7 @@ export const CraftSidebar = memo(({ data, onSelect }: Props) => {
           </AccordionItem>
         </Accordion>
       ))}
-      <div className="">
-        <Select defaultValue="light">
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="light">Light</SelectItem>
-            <SelectItem value="dark">Dark</SelectItem>
-            <SelectItem value="system">System</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <CraftSelectResource resources={data?.resources} />
     </aside>
   );
 });

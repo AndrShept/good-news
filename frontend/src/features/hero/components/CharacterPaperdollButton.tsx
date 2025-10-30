@@ -7,8 +7,8 @@ import { useHeroStateMutation } from '../hooks/useHeroStateMutation';
 
 export const CharacterPaperdollButton = () => {
   const { action, state } = useHero((state) => ({
-    action: state?.data?.action,
-    state: state?.data?.state,
+    action: state?.data?.action?.type,
+    state: state?.data?.state?.type,
   }));
   const [isPending, startTransition] = useTransition();
   const { mutate } = useHeroStateMutation();
@@ -21,8 +21,8 @@ export const CharacterPaperdollButton = () => {
         });
       }}
       size="icon"
-      disabled={isPending || action?.type !== 'IDLE'}
-      variant={state?.type === 'CHARACTER' ? 'default' : 'outline'}
+      disabled={isPending || action !== 'IDLE'}
+      variant={state === 'CHARACTER' ? 'default' : 'outline'}
     >
       <HeroIcon />
     </Button>

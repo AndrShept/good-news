@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { CraftItem } from '@/shared/types';
+import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -12,7 +13,8 @@ export const CraftModal = () => {
   const [craftItem, setCraftItem] = useState<CraftItem>();
 
   const onSelect = useCallback((item: CraftItem) => setCraftItem(item), []);
-
+  const selectedResourceType = useCraftItemStore((state) => state.selectedResourceType);
+  console.log(selectedResourceType);
   // if (isLoading) return <p>...</p>;
   return (
     <Dialog

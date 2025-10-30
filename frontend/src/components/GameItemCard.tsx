@@ -5,6 +5,7 @@ import React, { memo, useState } from 'react';
 import { CustomTooltip } from './CustomTooltip';
 import { GameItemCardPopupMenu } from './GameItemCardPopupMenu';
 import { GameItemCardShowInfo } from './GameItemCardShowInfo';
+import { GameItemImg } from './GameItemImg';
 import { GameItemSlot } from './GameItemSlot';
 
 export type GameCartType = 'EQUIP' | 'INVENTORY' | 'LOOT';
@@ -24,12 +25,7 @@ export const GameItemCard = memo(function GameItemCard({ id, quantity, gameItem,
         <PopoverTrigger className="size-full">
           <CustomTooltip>
             <CustomTooltip.Trigger>
-              <img
-                style={{ imageRendering: 'pixelated' }}
-                className="size-full object-contain opacity-85 group-hover:opacity-100"
-                src={gameItem?.image}
-                alt="inventory-image"
-              />
+              <GameItemImg image={gameItem.image} />
               {quantity && quantity > 1 && (
                 <div className="absolute bottom-1 right-0 size-3 cursor-default rounded-full text-center text-[11px] font-semibold">
                   {quantity}

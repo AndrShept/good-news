@@ -16,7 +16,11 @@ export const craftItemRouter = new Hono<Context>().get(
         gameItem: { with: { armor: true, weapon: true } },
       },
     });
-    const resources = await db.query.resourceTable.findMany();
+    const resources = await db.query.resourceTable.findMany({
+      with: {
+        gameItem: true,
+      },
+    });
 
     const groupObject = Object.groupBy(craftItems, ({ gameItem }) => gameItem?.type);
 

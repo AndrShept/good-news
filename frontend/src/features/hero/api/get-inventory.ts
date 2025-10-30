@@ -8,7 +8,7 @@ export const getInventory = async (id: string) => {
     });
     const data = await res.json();
 
-    return data;
+    return data.data
   } catch (error) {
     console.error(error);
   }

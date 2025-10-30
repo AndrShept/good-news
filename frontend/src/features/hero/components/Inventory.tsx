@@ -14,13 +14,13 @@ export const Inventory = memo(() => {
   const { data: inventories } = useSuspenseQuery(getInventoryOptions(id));
   const inventoriesData = useMemo(() => {
     return Array.from({ length: maxInventorySlots }, (_, idx) => {
-      const item = inventories?.data?.[idx];
+      const item = inventories?.[idx];
       if (item) {
         return item;
       }
       return null;
     });
-  }, [inventories?.data, maxInventorySlots]);
+  }, [inventories, maxInventorySlots]);
   return (
     <ul className="flex h-fit flex-wrap gap-1">
       {inventoriesData.map((inventory, idx) => {
