@@ -106,6 +106,10 @@ export const io = new Server(httpServer, {
     origin: process.env['BASE_URL_FRONT'],
   },
   adapter: createAdapter(pubClient, subClient),
+  pingInterval: 30000, // 30 sec
+  pingTimeout: 1000 * 60 * 60 * 24, // 24 h
+
+  transports: ['websocket'],
 });
 
 await db.update(heroTable).set({
@@ -121,9 +125,9 @@ io.on('connection', async (socket) => {
   socket.join(heroId);
   game({ socket });
   console.info('connected ' + username);
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
     console.info('disconnect ' + username);
-    heroOffline(heroId);
+    await heroOffline(heroId);
   });
 });
 

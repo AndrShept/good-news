@@ -18,5 +18,4 @@ export const getInventoryOptions = (id: string) =>
   queryOptions({
     queryKey: ['inventory'],
     queryFn: () => getInventory(id),
-    staleTime: Infinity,
   });

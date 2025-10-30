@@ -18,5 +18,4 @@ export const getBuffOptions = (id: string) =>
   queryOptions({
     queryKey: ['buff'],
     queryFn: () => getBuff(id),
-    staleTime: Infinity,
   });

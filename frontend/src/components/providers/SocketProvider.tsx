@@ -27,8 +27,8 @@ export const SocketProvider = ({
         withCredentials: true,
         auth: user,
         query: { heroId },
-
-        autoConnect: false,
+        reconnection: true,
+        autoConnect: true,
       }),
     [heroId, user],
   );

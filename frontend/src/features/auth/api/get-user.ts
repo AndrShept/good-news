@@ -17,6 +17,5 @@ export const getUser = async () => {
     queryOptions({
       queryKey: ['user'],
       queryFn: getUser,
-      staleTime: Infinity,
     });
   

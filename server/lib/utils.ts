@@ -1,6 +1,6 @@
 import { BASE_HEALTH_REGEN_TIME, BASE_MANA_REGEN_TIME, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
 import type { TileMap } from '@/shared/json-types';
-import type { Map, MapNameType, Modifier, OmitModifier, Tile, TileType } from '@/shared/types';
+import type { Map, Modifier, OmitModifier, Tile, TileType } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
 import { sql } from 'drizzle-orm';
@@ -8,6 +8,7 @@ import { HTTPException } from 'hono/http-exception';
 import nodemailer from 'nodemailer';
 import z from 'zod';
 
+import { mapEntities } from '../entities/map';
 
 const schema = z.object({
   DATABASE_URL: z.string(),
@@ -81,16 +82,12 @@ export const calculateWalkTime = (dexterity: number) => {
 
 interface MapLoadInfo {
   jsonUrl: TileMap;
-  imageUrl: string;
-  name: MapNameType;
 }
 
 export const getMapJson = (mapId: string) => {
   const map: Record<string, MapLoadInfo> = {
-    '01998100-a29d-7b0f-abad-edd4ef317472': {
-      name: 'SOLMERE',
-      jsonUrl: require('../json/solmer.json'),
-      imageUrl: '/sprites/map/solmer.png',
+    '019a350c-5552-76dd-b6d5-181b473d3128': {
+      jsonUrl: require('../json/solmer-valley.json'),
     },
   };
   return map[mapId];
@@ -105,7 +102,6 @@ export const getTileExists = (mapId: string, index: number, tileType: TileType) 
 export const jobQueueId = {
   offline: (heroId: string) => `offline-${heroId}`,
 };
-
 
 export const newCombineModifier = <T extends Partial<Modifier> | null | undefined>(...args: T[]) => {
   const result: OmitModifier = {

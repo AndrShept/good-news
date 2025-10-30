@@ -1,6 +1,6 @@
 import { client } from '@/lib/utils';
 import { paginationSchema } from '@/shared/types';
-import { infiniteQueryOptions, keepPreviousData } from '@tanstack/react-query';
+import { infiniteQueryOptions } from '@tanstack/react-query';
 import { z } from 'zod';
 
 export const getCommentReplies = async ({ id, query }: { id: string; query: z.infer<typeof paginationSchema> }) => {
@@ -31,7 +31,6 @@ export const getCommentRepliesQueryOptions = ({ id, query }: { id: string; query
         },
       });
     },
-    placeholderData: keepPreviousData,
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages, lastPageParam) => {
       if (lastPage.pagination.totalPages <= lastPageParam) {

@@ -18,6 +18,6 @@ export const getHeroOptions = () =>
   queryOptions({
     queryKey: ['hero'],
     queryFn: getHero,
-
-    staleTime: Infinity,
+    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 30, //30 min
   });

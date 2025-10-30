@@ -22,6 +22,5 @@ export const getGroupMembersOptions = (groupId: string) =>
     enabled: Boolean(groupId),
     queryFn: () => getGroupMembers({ groupId }),
     staleTime: 0,
-    placeholderData: keepPreviousData,
     select: (data) => data?.data,
   });

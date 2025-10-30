@@ -45,7 +45,7 @@ export const useGroupListener = () => {
     return () => {
       socket.off(socketEvents.groupUpdated(), groupUpdatedListener);
     };
-  }, [socket]);
+  }, [onRemove, selfId, setGameMessage, socket]);
   useEffect(() => {
     const groupSysMessagesListener = (data: SocketGroupResponse) => {
       setGameMessage({
@@ -57,7 +57,7 @@ export const useGroupListener = () => {
     return () => {
       socket.off(socketEvents.groupSysMessages(), groupSysMessagesListener);
     };
-  }, [socket]);
+  }, [setGameMessage, socket]);
 
   useEffect(() => {
     if (groupId) {
@@ -81,5 +81,5 @@ export const useGroupListener = () => {
         }
       });
     }
-  }, [groupId, socket]);
+  }, [groupId, setGameMessage, socket]);
 };

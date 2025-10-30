@@ -34,5 +34,5 @@ export const useHeroListener = () => {
     return () => {
       socket.off(socketEvents.selfData(), listener);
     };
-  }, [socket]);
+  }, [removeBuff, socket, updateHero]);
 };

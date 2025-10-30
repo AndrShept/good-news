@@ -5,11 +5,11 @@ import { potionEntities } from '../entities/potions';
 export const createPotions = async () => {
   const potions = Object.values(potionEntities);
   for (const potion of potions) {
-    const [newPotion] = await db.insert(gameItemTable).values(potion).returning({ id: gameItemTable.id });
+    await db.insert(gameItemTable).values(potion);
     await db.insert(potionTable).values({
       type: potion.potion.type,
-      gameItemId: newPotion.id,
-      buffInfo: { ...potion.potion.buffInfo, gameItemId: newPotion.id },
+      gameItemId: potion.id,
+      buffInfo: { ...potion.potion.buffInfo!, gameItemId: potion.id },
       restore: potion.potion.restore,
     });
   }

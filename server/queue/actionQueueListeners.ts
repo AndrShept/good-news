@@ -7,7 +7,6 @@ import { io } from '..';
 import type { GameMessageType } from '../../frontend/src/store/useGameMessages';
 import { db } from '../db/db';
 import { buffTable, gameItemTable, heroTable, modifierTable } from '../db/schema';
-import { combineModifiers } from '../lib/utils';
 import { heroService } from '../services/hero-service';
 import { queueEvents } from './actionQueue';
 

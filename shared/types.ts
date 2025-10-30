@@ -13,7 +13,6 @@ import {
   heroTable,
   inventoryItemTable,
   locationTable,
-  mapNameTypeEnum,
   mapTable,
   modifierTable,
   placeTable,
@@ -158,7 +157,6 @@ export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
 export type ActionType = (typeof actionTypeEnum.enumValues)[number];
 export type TileType = (typeof tileTypeEnum.enumValues)[number];
-export type MapNameType = (typeof mapNameTypeEnum.enumValues)[number];
 export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
 export type StateType = (typeof stateTypeEnum.enumValues)[number];
 export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];

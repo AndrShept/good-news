@@ -1,5 +1,4 @@
 import { client } from '@/lib/utils';
-import { MapNameType } from '@/shared/types';
 import { queryOptions } from '@tanstack/react-query';
 
 export const getMap = async (id: string) => {
@@ -24,6 +23,4 @@ export const getMapOptions = (mapId: string) =>
     queryKey: ['map', mapId],
     queryFn: () => getMap(mapId),
     enabled: !!mapId,
-    staleTime: Infinity  ,
-    refetchOnWindowFocus: false
   });

@@ -11,7 +11,7 @@ export const placeEntities: Place[] = [
     x: 7,
     y: 7,
     buildings: [buildingEntities['MAGIC-SHOP'], buildingEntities.TEMPLE],
-    mapId: '01998100-a29d-7b0f-abad-edd4ef317472',
+    mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
     createdAt: new Date().toISOString(),
   },
   {
@@ -21,7 +21,7 @@ export const placeEntities: Place[] = [
     image: '/sprites/places/mine.png',
     x: 10,
     y: 10,
-    mapId: '01998100-a29d-7b0f-abad-edd4ef317472',
+    mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
     buildings: null,
     createdAt: new Date().toISOString(),
   },

@@ -21,7 +21,6 @@ export const getPostsQueryOptions = (query?: z.infer<typeof paginationSchema>) =
     queryFn: ({ pageParam }) => {
       return getPosts({ ...query, page: pageParam });
     },
-    placeholderData: keepPreviousData,
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages, lastPageParam) => {
       if (lastPage.pagination.totalPages <= lastPageParam) return undefined;

@@ -17,5 +17,4 @@ export const getPostQueryOptions = (postId: string) =>
   queryOptions({
     queryKey: ['post', postId],
     queryFn: () => getPost(postId),
-    placeholderData: keepPreviousData,
   });

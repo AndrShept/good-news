@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { heroTable, mapNameTypeEnum, mapTable, tileTable } from '../db/schema';
+import { heroTable, mapTable, tileTable } from '../db/schema';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const tileRouter = new Hono<Context>().get(

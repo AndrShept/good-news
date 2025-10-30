@@ -31,7 +31,6 @@ export const getPostCommentsQueryOptions = ({ postId, query }: { postId: string;
         postId,
         query: { ...query, page: pageParam },
       }),
-    placeholderData: keepPreviousData,
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages, lastPageParam) => {
       if (lastPage.pagination.totalPages <= lastPageParam) {

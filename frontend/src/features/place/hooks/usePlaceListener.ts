@@ -28,7 +28,7 @@ export const usePlaceListener = () => {
       joinMessage: 'join town room',
       leaveMessage: 'leave town room',
     });
-  }, [placeId, socket]);
+  }, [placeId, setGameMessage, socket]);
   useEffect(() => {
     const listener = (data: PlaceUpdateEvent | HeroOfflineData | HeroOnlineData) => {
       switch (data.type) {
@@ -72,5 +72,5 @@ export const usePlaceListener = () => {
     return () => {
       socket.off(socketEvents.placeUpdate(), listener);
     };
-  }, [socket]);
+  }, [addHeroes, deleteHeroes, id, setGameMessage, socket, updateHero]);
 };

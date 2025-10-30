@@ -19,5 +19,4 @@ export const getCraftItemOptions = () =>
     queryKey: ['craft-item'],
     queryFn: getCraftItem,
 
-    staleTime: Infinity,
   });

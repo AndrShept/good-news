@@ -18,11 +18,11 @@ export const craftItemRouter = new Hono<Context>().get(
     });
     const resources = await db.query.resourceTable.findMany();
 
-    const groupObject = Object.groupBy(craftItems, ({ gameItem: { type } }) => type);
+    const groupObject = Object.groupBy(craftItems, ({ gameItem }) => gameItem?.type);
 
     const groupedCraftItems = Object.entries(groupObject).map(([itemType, items]) => {
       if (itemType === 'WEAPON') {
-        const weaponGroups = Object.groupBy(items, ({ gameItem: { weapon } }) => weapon?.weaponType ?? 'SWORD');
+        const weaponGroups = Object.groupBy(items, ({ gameItem }) => gameItem?.weapon?.weaponType ?? 'SWORD');
         return {
           itemType,
           subgroups: Object.entries(weaponGroups).map(([weaponType, wItems]) => ({
@@ -33,7 +33,7 @@ export const craftItemRouter = new Hono<Context>().get(
       }
 
       if (itemType === 'ARMOR') {
-        const armorGroups = Object.groupBy(items, ({ gameItem: { armor } }) => armor?.slot ?? 'CHESTPLATE');
+        const armorGroups = Object.groupBy(items, ({ gameItem }) => gameItem?.armor?.slot ?? 'CHESTPLATE');
         return {
           itemType,
           subgroups: Object.entries(armorGroups).map(([armorType, aItems]) => ({

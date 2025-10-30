@@ -15,5 +15,4 @@ export const getShopItemsOptions = () =>
   queryOptions({
     queryKey: ['shop'],
     queryFn: getShopItem,
-    staleTime: Infinity,
   });

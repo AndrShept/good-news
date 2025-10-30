@@ -74,5 +74,5 @@ export const useMapListener = () => {
     return () => {
       socket.off(socketEvents.mapUpdate(), listener);
     };
-  }, [socket]);
+  }, [addHeroes, deleteHeroes, id, setGameMessage, socket, updateHero, updateHeroesPos]);
 };

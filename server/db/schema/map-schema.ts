@@ -4,17 +4,16 @@ import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzl
 import { locationTable } from './location-schema';
 import { placeTable } from './place-schema';
 
-export const mapNameTypeEnum = pgEnum('map_name_type_enum', ['SOLMERE']);
 export const pvpModeTypeEnum = pgEnum('pvp_type_enum', ['PVE', 'PVP']);
 
 export const mapTable = pgTable('map', {
-  id: uuid().primaryKey().defaultRandom(),
+  id: uuid().primaryKey().notNull(),
   width: integer().notNull(),
   height: integer().notNull(),
   tileHeight: integer().notNull(),
   tileWidth: integer().notNull(),
   image: text().notNull(),
-  name: mapNameTypeEnum().notNull(),
+  name: text().notNull(),
   pvpMode: pvpModeTypeEnum()
     .$defaultFn(() => 'PVE')
     .notNull(),

@@ -1,5 +1,5 @@
 import { Hero, User } from '@/shared/types.ts';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, keepPreviousData } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { LazyMotion, domAnimation } from 'motion/react';
@@ -38,12 +38,15 @@ interface ApiError {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,
+      staleTime: Infinity,
+      placeholderData: keepPreviousData,
+      refetchOnWindowFocus: false,
+      
     },
     mutations: {
       onError: (err) => {
         const error = err as ApiError;
-        console.log(error)
+        console.log(error);
         const setGameMessage = useGameMessages.getState().setGameMessage;
         if (error?.cause?.canShow) {
           setGameMessage({
