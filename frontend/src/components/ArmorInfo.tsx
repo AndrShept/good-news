@@ -22,16 +22,15 @@ export const ArmorInfo = ({ defense, evasion, magicResistance, slot }: Props) =>
     },
   ];
   return (
-    <section className="flex flex-col gap-2">
+    <section className="flex flex-col gap-2 ">
       <div>
         <p className="text-muted-foreground/30 capitalize">{slot.toLocaleLowerCase()}</p>
       </div>
       <div className="space-y-1">
         <div>
-          <h2 className="font-medium text-emerald-500">BASE:</h2>
-          <Separator className="my-1" />
+          <Separator className="mb-2" />
 
-          <ul>
+          <ul >
             {baseModifier.map((modifier) => {
               if (!modifier.value) return;
               return (

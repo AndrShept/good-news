@@ -26,17 +26,14 @@ export const CraftModal = () => {
       <DialogTrigger>
         <div className="w-fit">Craft</div>
       </DialogTrigger>
-      <DialogContent className="h-[50%] overflow-hidden p-0 sm:max-w-2xl md:h-[70%] md:max-w-3xl">
-        <DialogHeader>
-          <section className="flex size-full">
-            <CraftSidebar data={data} onSelect={onSelect} />
-            <div className="flex min-w-[200px] flex-1 flex-col">
-              {/* <div className="flex-1">{craftItem && <CraftItemCard {...craftItem} />}</div> */}
-              <div className="flex-1">{craftItem && craftItem.gameItem && <GameItemCardShowInfo {...craftItem.gameItem} />}</div>
-              <div className="bg-secondary h-40"></div>
-            </div>
-          </section>
-        </DialogHeader>
+      <DialogContent className="h-[70%] overflow-hidden p-0 sm:max-w-2xl md:max-w-3xl">
+        <section className="flex min-h-0">
+          <CraftSidebar data={data} onSelect={onSelect} />
+          <div className="flex min-w-[200px] flex-1 flex-col">
+            <div className="flex flex-1 p-2">{craftItem && craftItem.gameItem && <CraftItemCard {...craftItem} />}</div>
+            <div className="bg-secondary h-40"></div>
+          </div>
+        </section>
       </DialogContent>
     </Dialog>
   );

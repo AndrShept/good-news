@@ -62,15 +62,14 @@ export const WeaponInfo = ({
       </div>
 
       <div>
-        <h2 className="font-medium text-emerald-500">BASE:</h2>
-        <Separator className="my-1" />
+        <Separator className="mb-2" />
         <div className="space-x-1">
           <span className="text-muted-foreground">Damage:</span>
           <span className="text-yellow-300">
             {minDamage} - {maxDamage}
           </span>
         </div>
-        <ul>
+        <ul >
           {baseModifier.map((modifier) => {
             if (!modifier.value) return;
             return (

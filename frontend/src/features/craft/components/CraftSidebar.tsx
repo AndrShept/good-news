@@ -1,5 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { DialogTitle } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { ApiGetCraftItemResponse, ArmorType, CraftItem, WeaponType } from '@/shared/types';
 import { memo } from 'react';
 
@@ -25,43 +26,48 @@ interface Props {
 
 export const CraftSidebar = memo(({ data, onSelect }: Props) => {
   return (
-    <aside className="flex w-full max-w-[200px] flex-col border-r">
-      {data?.craftItems.map((craftItem) => (
-        <Accordion key={craftItem.itemType} type="multiple">
-          <AccordionItem value="item-1">
-            <DialogTitle></DialogTitle>
-            <AccordionTrigger className="bg-secondary rounded-none p-3 capitalize">
-              {craftItem.itemType.toLocaleLowerCase()}
-            </AccordionTrigger>
-            <AccordionContent>
-              {craftItem.subgroups.map((group) => (
-                <Accordion key={group.subtype} type="multiple">
-                  <AccordionItem value="item-2">
-                    <DialogTitle></DialogTitle>
-                    <AccordionTrigger className="rounded-none border-b px-1 py-1.5 capitalize">
-                      <div className="ml-2 flex items-center gap-2">
-                        <img src={icons[group.subtype]} className="size-7" style={{ imageRendering: 'pixelated' }} />
-                        <p className="">{group.subtype.toLocaleLowerCase()}</p>
-                      </div>
-                    </AccordionTrigger>
+    <aside className="flex max-w-[200px] flex-col border-r">
+      <ScrollArea className="min-h-0">
+        {data?.craftItems.map((craftItem) => (
+          <Accordion key={craftItem.itemType} type="multiple">
+            <AccordionItem value="item-1">
+              <DialogTitle></DialogTitle>
+              <AccordionTrigger className="bg-secondary rounded-none p-3 capitalize">
+                {craftItem.itemType.toLocaleLowerCase()}
+              </AccordionTrigger>
 
-                    {group.items.map((craftItem) => (
-                      <AccordionContent
-                        key={craftItem.id}
-                        onClick={() => onSelect(craftItem)}
-                        className="hover:bg-secondary/30 p-1.5 hover:cursor-default"
-                      >
-                        <li className="text-muted-foreground sm:ml-4">{craftItem?.gameItem?.name}</li>
-                      </AccordionContent>
-                    ))}
-                  </AccordionItem>
-                </Accordion>
-              ))}
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      ))}
-      <CraftSelectResource resources={data?.resources} />
+              <AccordionContent>
+                {craftItem.subgroups.map((group) => (
+                  <Accordion key={group.subtype} type="multiple">
+                    <AccordionItem value="item-2">
+                      <DialogTitle></DialogTitle>
+                      <AccordionTrigger className="rounded-none border-b px-1 py-1.5 capitalize">
+                        <div className="ml-2 flex items-center gap-2">
+                          <img src={icons[group.subtype]} className="size-7" style={{ imageRendering: 'pixelated' }} />
+                          <p className="">{group.subtype.toLocaleLowerCase()}</p>
+                        </div>
+                      </AccordionTrigger>
+
+                      {group.items.map((craftItem) => (
+                        <AccordionContent
+                          key={craftItem.id}
+                          onClick={() => onSelect(craftItem)}
+                          className="hover:bg-secondary/30 p-1.5 hover:cursor-default"
+                        >
+                          <li className="text-muted-foreground sm:ml-4">{craftItem?.gameItem?.name}</li>
+                        </AccordionContent>
+                      ))}
+                    </AccordionItem>
+                  </Accordion>
+                ))}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        ))}
+      </ScrollArea>
+      <div className="mt-auto">
+        <CraftSelectResource resources={data?.resources} />
+      </div>
     </aside>
   );
 });

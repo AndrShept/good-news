@@ -15,12 +15,12 @@ export const CraftSelectResource = ({ resources }: Props) => {
   const { calculateSumInventoryResource } = useHeroInventory();
   const sumResourceQuantity = calculateSumInventoryResource(resources!);
   return (
-    <div className="">
-      <Select defaultValue="IRON" onValueChange={setSelectedResource}>
-        <SelectTrigger className="w-full">
+    <>
+      <Select  defaultValue="IRON" onValueChange={setSelectedResource}>
+        <SelectTrigger className="w-full rounded-none">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent side='top'>
           {resources?.map((resource) => (
             <SelectItem key={resource.id} value={resource.type} className="">
               <GameIcon className="size-6" image={resource?.gameItem?.image} />
@@ -36,6 +36,6 @@ export const CraftSelectResource = ({ resources }: Props) => {
           ))}
         </SelectContent>
       </Select>
-    </div>
+    </>
   );
 };
