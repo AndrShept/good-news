@@ -1,3 +1,4 @@
+import { GameItemCardShowInfo } from '@/components/GameItemCardShowInfo';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { CraftItem } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
@@ -30,7 +31,8 @@ export const CraftModal = () => {
           <section className="flex size-full">
             <CraftSidebar data={data} onSelect={onSelect} />
             <div className="flex min-w-[200px] flex-1 flex-col">
-              <div className="flex-1">{craftItem && <CraftItemCard {...craftItem} />}</div>
+              {/* <div className="flex-1">{craftItem && <CraftItemCard {...craftItem} />}</div> */}
+              <div className="flex-1">{craftItem && craftItem.gameItem && <GameItemCardShowInfo {...craftItem.gameItem} />}</div>
               <div className="bg-secondary h-40"></div>
             </div>
           </section>

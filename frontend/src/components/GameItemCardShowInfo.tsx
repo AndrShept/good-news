@@ -4,6 +4,7 @@ import { GameItem } from '@/shared/types';
 import { memo } from 'react';
 
 import { ArmorInfo } from './ArmorInfo';
+import { GameItemImg } from './GameItemImg';
 import { PotionInfo } from './PotionInfo';
 import { WeaponInfo } from './WeaponInfo';
 import { GoldIcon } from './game-icons/GoldIcon';
@@ -17,16 +18,12 @@ export const GameItemCardShowInfo = memo(
     return (
       <article className={cn('flex flex-col gap-4 rounded border p-4 text-start')}>
         <section className="flex gap-4">
-          <div>
-            <div className="size-10 shrink-0">
-              <img style={{ imageRendering: 'pixelated' }} className="size-full" src={image} alt={'item-image'} />
-            </div>
-          </div>
+          <GameItemImg className="size-10" image={image} />
+
           <div className="flex flex-col">
             <h3 className="line-clamp-2 capitalize">{name}</h3>
-            <p className="text-muted-foreground/30">{type}</p>
+            <p className="text-muted-foreground/30 capitalize">{type.toLocaleLowerCase()}</p>
 
-            {/* {modifier && <ModifierInfoCard modifier={modifier} />} */}
             {potion && <PotionInfo {...potion} />}
             {weapon && <WeaponInfo {...weapon} />}
             {armor && <ArmorInfo {...armor} />}

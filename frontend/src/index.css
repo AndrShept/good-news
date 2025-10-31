@@ -257,3 +257,25 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+
+@keyframes glow_silver {
+  0%, 100% { box-shadow: 0 0 15px rgba(203,213,225,0.3); }
+  50% { box-shadow: 0 0 25px rgba(203,213,225,0.6); }
+}
+
+@keyframes glow_gold {
+  0%, 100% { box-shadow: 0 0 20px rgba(250,204,21,0.4); }
+  50% { box-shadow: 0 0 35px rgba(250,204,21,0.8); }
+}
+
+@keyframes glow_mithril {
+  0%, 100% { box-shadow: 0 0 20px rgba(56,189,248,0.4); }
+  50% { box-shadow: 0 0 35px rgba(56,189,248,0.8); }
+}
+
+@keyframes glow_adamantine {
+  0%, 100% { box-shadow: 0 0 20px rgba(52,211,153,0.4); }
+  50% { box-shadow: 0 0 35px rgba(52,211,153,0.8); }
+}
