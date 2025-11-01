@@ -14,23 +14,24 @@ export const CraftModal = () => {
   const [craftItem, setCraftItem] = useState<CraftItem>();
 
   const onSelect = useCallback((item: CraftItem) => setCraftItem(item), []);
-  const selectedResourceType = useCraftItemStore((state) => state.selectedResourceType);
-  console.log(selectedResourceType);
+
   // if (isLoading) return <p>...</p>;
   return (
     <Dialog
-      onOpenChange={() => {
-        setCraftItem(undefined);
-      }}
+    // onOpenChange={() => {
+    //   setCraftItem(undefined);
+    // }}
     >
       <DialogTrigger>
         <div className="w-fit">Craft</div>
       </DialogTrigger>
-      <DialogContent className="h-[70%] overflow-hidden p-0 sm:max-w-2xl md:max-w-3xl">
+      <DialogContent className="h-[60%] overflow-hidden p-0 sm:h-[80%] sm:max-w-2xl md:max-w-3xl">
         <section className="flex min-h-0">
-          <CraftSidebar data={data} onSelect={onSelect} />
+          <CraftSidebar data={data} onSelect={onSelect} selectedItemId={craftItem?.id} />
           <div className="flex min-w-[200px] flex-1 flex-col">
-            <div className="flex flex-1 p-2">{craftItem && craftItem.gameItem && <CraftItemCard {...craftItem} />}</div>
+            {/* <div className="flex flex-1 flex-col items-center p-2 text-center">
+              {craftItem && craftItem.gameItem && <CraftItemCard {...craftItem} resources={data?.resources} />}
+            </div> */}
             <div className="bg-secondary h-40"></div>
           </div>
         </section>
