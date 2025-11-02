@@ -16,8 +16,8 @@ export const HeroAvatarList = memo(({ avatar, setAvatar }: Props) => {
     }));
   }, []);
   return (
-    <ScrollArea className="h-[40vh] max-w-[300px]">
-      <ul className="flex flex-wrap gap-2">
+    <ScrollArea className="h-[200px] md:h-[400px]">
+      <ul className="flex max-w-[300px] flex-wrap gap-2">
         {avatars.map((item) => (
           <HeroAvatar
             key={item.src}
