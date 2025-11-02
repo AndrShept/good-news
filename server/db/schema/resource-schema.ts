@@ -3,6 +3,7 @@ import { relations } from 'drizzle-orm';
 import { boolean, integer, json, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { gameItemTable } from './game-item-schema';
+import { modifierTable } from './modifier-schema';
 
 const ores = ['IRON', 'COPPER', 'SILVER', 'GOLD', 'MITHRIL', 'ADAMANTINE'] as const;
 
@@ -15,9 +16,10 @@ export const resourceTable = pgTable('resource', {
   type: resourceTypeEnum().notNull(),
   category: resourceCategoryEnum().notNull(),
   rarity: rarityEnum().notNull(),
-  modifier: jsonb().$type<OmitModifier>(),
   gameItemId: uuid()
-    .references(() => gameItemTable.id)
+    .references(() => gameItemTable.id, {
+      onDelete: 'cascade',
+    })
     .notNull(),
   createdAt: timestamp('created_at', {
     mode: 'string',
@@ -31,4 +33,5 @@ export const resourceTableRelations = relations(resourceTable, ({ one }) => ({
     fields: [resourceTable.gameItemId],
     references: [gameItemTable.id],
   }),
+  modifier: one(modifierTable),
 }));

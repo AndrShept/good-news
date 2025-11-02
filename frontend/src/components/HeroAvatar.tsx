@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { VariantProps, cva } from 'class-variance-authority';
-import React, { ComponentProps } from 'react';
+import React, { ComponentProps, memo } from 'react';
 
 const avatarVariants = cva('relative rounded-full border', {
   variants: {
@@ -21,14 +21,13 @@ const avatarVariants = cva('relative rounded-full border', {
 interface HeroAvatarProps extends VariantProps<typeof avatarVariants>, ComponentProps<'article'> {
   src: string;
   isSelected?: boolean;
-  setAvatar?: () => void;
+  setAvatar?: (imgae: string) => void;
 }
 
-export const HeroAvatar = ({ src, isSelected = false, setAvatar, className, size, ...props }: HeroAvatarProps) => {
-  console.log('RENDER');
+export const HeroAvatar = memo(({ src, isSelected = false, setAvatar, className, size, ...props }: HeroAvatarProps) => {
   return (
     <article
-      onClick={setAvatar}
+      onClick={() => setAvatar?.(src)}
       className={cn('shrink-0', avatarVariants({ className, size }), {
         'border-primary opacity-100 ring-1 hover:opacity-100': isSelected,
       })}
@@ -45,4 +44,4 @@ export const HeroAvatar = ({ src, isSelected = false, setAvatar, className, size
       />
     </article>
   );
-};
+});

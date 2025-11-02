@@ -46,7 +46,7 @@ function RouteComponent() {
     resolver: zodResolver(heroNameSchema),
   });
   // const isLoading = form.formState.isSubmitting;
-  const onSetAvatarImage = useCallback((image: string) => setAvatarImage(image), []);
+
   const onSubmit = (values: z.infer<typeof heroNameSchema>) => {
     console.log(stats);
     mutation.mutate(
@@ -80,7 +80,7 @@ function RouteComponent() {
   return (
     <Background imageUrl="/sprites/shrine6.png">
       <div className="m-auto flex max-w-5xl flex-col gap-4 rounded-lg border bg-black/70 p-4 text-[15px] backdrop-blur-md md:flex-row md:p-10">
-          <HeroAvatarList avatar={avatarImage} setAvatar={onSetAvatarImage} />
+          <HeroAvatarList avatar={avatarImage} setAvatar={setAvatarImage} />
 
         <div className="mx-auto flex max-w-[220px] flex-col gap-4">
           <Form {...form}>

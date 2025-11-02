@@ -1,12 +1,14 @@
 import { ArmorInfo } from '@/components/ArmorInfo';
 import { GameItemImg } from '@/components/GameItemImg';
+import { ModifierInfoCard } from '@/components/ModifierInfoCard';
 import { WeaponInfo } from '@/components/WeaponInfo';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { formatDurationFromSeconds } from '@/lib/utils';
-import { CraftItem, Resource, ResourceType } from '@/shared/types';
+import { materialConfig } from '@/lib/config';
+import { cn, formatDurationFromSeconds } from '@/lib/utils';
+import { CraftItem, Modifier, Resource, ResourceType } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
-import React, { memo, useMemo } from 'react';
+import React, { memo, useEffect, useMemo } from 'react';
 
 interface Props extends CraftItem {
   resources: Array<Resource> | undefined;
@@ -18,38 +20,50 @@ export const CraftItemCard = memo((props: Props) => {
         (acc, item) => {
           if (!item?.gameItem) return acc;
           const typedKey = item.type as ResourceType;
-          acc[typedKey] = item.gameItem.image;
+          acc[typedKey] = { image: item.gameItem.image, modifier: item.modifier ? item.modifier : null };
           return acc;
         },
-        {} as Record<ResourceType, string>,
+        {} as Record<ResourceType, { image: string; modifier: Modifier | null }>,
       ),
     [props.resources],
   );
   const selectedResourceType = useCraftItemStore((state) => state.selectedResourceType);
+  const setSelectedResource = useCraftItemStore((state) => state.setSelectedResource);
+
+  useEffect(() => {
+    setSelectedResource('IRON');
+  }, [setSelectedResource]);
   return (
-    <>
-      <h3 className="text-lg font-semibold capitalize md:text-xl">{props?.gameItem?.name}</h3>
+    <div className="flex flex-col items-center">
+      <div className="mb-2 space-x-1 text-lg font-semibold capitalize md:text-xl">
+        <span className={cn(materialConfig[selectedResourceType].color)}>{selectedResourceType.toLocaleLowerCase()}</span>
+        <span>{props?.gameItem?.name}</span>
+      </div>
       <GameItemImg className="md:size-15 size-10" image={props?.gameItem?.image} />
       <p className="text-muted-foreground/30 capitalize">{props?.gameItem?.type.toLocaleLowerCase()}</p>
       {props?.gameItem?.weapon && <WeaponInfo {...props.gameItem.weapon} />}
       {props?.gameItem?.armor && <ArmorInfo {...props.gameItem.armor} />}
-      <h2 className="my-2 text-xl">Craft Info:</h2>
-      <div className="flex items-center gap-1">
-        <p className="text-muted-foreground">skill:</p>
-        <p>{props.requiredLevel}</p>
+      <h2 className="my-1 text-xl text-yellow-300">Craft Info:</h2>
+      <div>
+        <div className="space-x-1">
+          <span className="text-muted-foreground">skill:</span>
+          <span>{props.requiredLevel}</span>
+        </div>
+        <div className="space-x-1">
+          <span className="text-muted-foreground">craft time:</span>
+          <span>{formatDurationFromSeconds(props.craftTime / 1000)}</span>
+        </div>
+        <ModifierInfoCard modifier={resourceGroup?.[selectedResourceType].modifier} />
       </div>
-      <div className="flex items-center gap-1">
-        <p className="text-muted-foreground">craft time:</p>
-        <p>{formatDurationFromSeconds(props.craftTime / 1000)}</p>
-      </div>
+
       <ul>
         {props.craftResources.map((resource) => (
           <div key={resource.type} className="flex items-center gap-1">
-            <GameItemImg image={resourceGroup?.[selectedResourceType]} />
+            <GameItemImg image={resourceGroup?.[selectedResourceType].image} />
             <p>x{resource.quantity}</p>
           </div>
         ))}
       </ul>
-    </>
+    </div>
   );
 });

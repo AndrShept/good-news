@@ -274,6 +274,20 @@
       "when": 1761938630973,
       "tag": "0038_blue_roland_deschain",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1762114832343,
+      "tag": "0039_condemned_red_wolf",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1762115901743,
+      "tag": "0040_awesome_martin_li",
+      "breakpoints": true
     }
   ]
 }

@@ -12,11 +12,6 @@ export const resourceEntities: (typeof gameItemTable.$inferInsert & { resource: 
       type: 'IRON',
       category: 'ORE',
       rarity: 'COMMON',
-      modifier: [
-        {
-          maxHealth: 10,
-        },
-      ],
     },
   },
   {
@@ -29,11 +24,6 @@ export const resourceEntities: (typeof gameItemTable.$inferInsert & { resource: 
       type: 'COPPER',
       category: 'ORE',
       rarity: 'COMMON',
-      modifier: [
-        {
-          defense: 10,
-        },
-      ],
     },
   },
 ];

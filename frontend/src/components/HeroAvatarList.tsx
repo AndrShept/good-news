@@ -21,7 +21,7 @@ export const HeroAvatarList = memo(({ avatar, setAvatar }: Props) => {
         {avatars.map((item) => (
           <HeroAvatar
             key={item.src}
-            setAvatar={() => setAvatar(item.src)}
+            setAvatar={setAvatar}
             src={item.src}
             isSelected={avatar === item.src}
             className="cursor-pointer opacity-60 hover:opacity-100"

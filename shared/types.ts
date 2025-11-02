@@ -197,7 +197,7 @@ export type Tile = typeof tileTable.$inferSelect & {
   location?: Location;
 };
 export type TilesGrid = (Tile | null)[][];
-export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'heroId'>;
+export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'heroId' | 'resourceId'>;
 
 export type Equipment = typeof equipmentTable.$inferSelect & {
   gameItem?: GameItem;
@@ -212,6 +212,7 @@ export type Potion = typeof potionTable.$inferSelect;
 export type Accessory = typeof accessoryTable.$inferSelect;
 export type Resource = typeof resourceTable.$inferSelect & {
   gameItem?: GameItem | null;
+  modifier?: Modifier | null;
 };
 
 export type CraftItem = typeof craftItemTable.$inferSelect & {
