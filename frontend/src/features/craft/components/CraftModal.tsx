@@ -1,17 +1,21 @@
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CraftItem } from '@/shared/types';
+import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { getCraftItemOptions } from '../api/get-craft-item';
+import { useCraftItemMutation } from '../hooks/useCraftItemMutation';
 import { CraftItemCard } from './CraftItemCard';
 import { CraftSidebar } from './CraftSidebar';
 
 export const CraftModal = () => {
   const { data, isLoading } = useQuery(getCraftItemOptions());
   const [craftItem, setCraftItem] = useState<CraftItem>();
-
+  const selectedResourceType = useCraftItemStore((state) => state.selectedResourceType);
+  const { mutate, isPending } = useCraftItemMutation();
   // if (isLoading) return <p>...</p>;
   return (
     <Dialog
@@ -31,6 +35,18 @@ export const CraftModal = () => {
             </div>
 
             <div className="bg-secondary h-40"></div>
+            <Button
+              disabled={isPending}
+              onClick={() =>
+                mutate({
+                  craftItemId: craftItem?.id ?? '',
+                  resourceType: selectedResourceType,
+                })
+              }
+              className="ml-auto"
+            >
+              Craft
+            </Button>
           </div>
         </section>
       </DialogContent>

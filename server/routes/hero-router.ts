@@ -30,6 +30,7 @@ import type { Context } from '../context';
 import { db } from '../db/db';
 import {
   actionTable,
+  craftItemTable,
   equipmentTable,
   gameItemEnum,
   gameItemTable,
@@ -38,6 +39,8 @@ import {
   locationTable,
   modifierTable,
   placeTable,
+  resourceTable,
+  resourceTypeEnum,
   slotEnum,
   stateTable,
   stateTypeEnum,
@@ -1288,6 +1291,82 @@ export const heroRouter = new Hono<Context>()
 
       return c.json<SuccessResponse>({
         message: 'state changed',
+        success: true,
+      });
+    },
+  )
+  .post(
+    '/:id/action/craft',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+    zValidator('json', z.object({ resourceType: z.enum(resourceTypeEnum.enumValues), craftItemId: z.string() })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const { craftItemId, resourceType } = c.req.valid('json');
+      const hero = await db.query.heroTable.findFirst({
+        where: eq(heroTable.id, id),
+        with: {
+          action: true,
+          state: { columns: { id: true } },
+        },
+      });
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+      if (!hero.action) {
+        throw new HTTPException(404, {
+          message: 'hero action not found',
+        });
+      }
+
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      if (hero.action.type !== 'IDLE') {
+        throw new HTTPException(409, {
+          message: 'Your hero is busy now',
+        });
+      }
+      if (hero.isInBattle) {
+        throw new HTTPException(409, {
+          message: 'Action not allowed: hero now is battle',
+        });
+      }
+      const craftItem = await db.query.craftItemTable.findFirst({
+        where: eq(craftItemTable.id, craftItemId),
+      });
+      if (!craftItem) {
+        throw new HTTPException(404, {
+          message: 'craft item not found',
+        });
+      }
+      const craftResource = await db.query.resourceTable.findFirst({ where: eq(resourceTable.type, resourceType) });
+      if (!craftResource) {
+        throw new HTTPException(404, {
+          message: 'craft resource not found',
+        });
+      }
+      for (const requiredResource of craftItem.craftResources) {
+        const inventoryResources = await db.query.inventoryItemTable.findMany({
+          where: and(eq(inventoryItemTable.gameItemId, craftResource.gameItemId), eq(inventoryItemTable.heroId, hero.id)),
+        });
+
+        const totalOwnedQuantity = inventoryResources.reduce((acc, item) => acc + item.quantity, 0);
+
+        console.log('asdas', inventoryResources);
+        if (totalOwnedQuantity < requiredResource.quantity) {
+          throw new HTTPException(409, {
+            message: 'Not enough resources to craft this item',
+            cause: { canShow: true },
+          });
+        }
+      }
+
+      return c.json<SuccessResponse>({
+        message: 'craft started',
         success: true,
       });
     },
