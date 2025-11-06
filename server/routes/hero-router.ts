@@ -10,6 +10,7 @@ import {
   type GameItemType,
   type Hero,
   type InventoryItem,
+  type QueueCraftItem,
   type SuccessResponse,
   type WeaponHandType,
   buildingTypeValues,
@@ -46,6 +47,7 @@ import {
   stateTypeEnum,
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
+import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
 import { getHeroStatsWithModifiers } from '../lib/getHeroStatsWithModifiers';
 import { heroOnline } from '../lib/heroOnline';
 import {
@@ -94,6 +96,7 @@ export const heroRouter = new Hono<Context>()
               },
             },
           },
+          queueCraftItems: true,
           state: true,
           location: {
             with: {
@@ -1305,13 +1308,20 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
       const { craftItemId, resourceType } = c.req.valid('json');
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-        with: {
-          action: true,
-          state: { columns: { id: true } },
-        },
-      });
+
+      const [hero, craftItem, craftResource] = await Promise.all([
+        await db.query.heroTable.findFirst({
+          where: eq(heroTable.id, id),
+          with: {
+            action: true,
+            state: { columns: { id: true } },
+          },
+        }),
+        await db.query.craftItemTable.findFirst({
+          where: eq(craftItemTable.id, craftItemId),
+        }),
+        await db.query.resourceTable.findFirst({ where: eq(resourceTable.type, resourceType) }),
+      ]);
 
       if (!hero) {
         throw new HTTPException(404, {
@@ -1335,15 +1345,13 @@ export const heroRouter = new Hono<Context>()
           message: 'Action not allowed: hero now is battle',
         });
       }
-      const craftItem = await db.query.craftItemTable.findFirst({
-        where: eq(craftItemTable.id, craftItemId),
-      });
+
       if (!craftItem) {
         throw new HTTPException(404, {
           message: 'craft item not found',
         });
       }
-      const craftResource = await db.query.resourceTable.findFirst({ where: eq(resourceTable.type, resourceType) });
+
       if (!craftResource) {
         throw new HTTPException(404, {
           message: 'craft resource not found',
@@ -1356,7 +1364,6 @@ export const heroRouter = new Hono<Context>()
 
         const totalOwnedQuantity = inventoryResources.reduce((acc, item) => acc + item.quantity, 0);
 
-        console.log('asdas', inventoryResources);
         if (totalOwnedQuantity < requiredResource.quantity) {
           throw new HTTPException(409, {
             message: 'Not enough resources to craft this item',
@@ -1364,10 +1371,16 @@ export const heroRouter = new Hono<Context>()
           });
         }
       }
+      const completedAt = new Date(Date.now() + craftItem.craftTime).toISOString();
+      const [newQueueCraftItem] = await db
+        .insert(queueCraftItemTable)
+        .values({ heroId: hero.id, craftItemId: craftItem.id, completedAt })
+        .returning();
 
-      return c.json<SuccessResponse>({
+      return c.json<SuccessResponse<QueueCraftItem>>({
         message: 'craft started',
         success: true,
+        data: newQueueCraftItem,
       });
     },
   );

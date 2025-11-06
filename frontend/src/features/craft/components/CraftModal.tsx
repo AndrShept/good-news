@@ -1,21 +1,19 @@
-import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CraftItem } from '@/shared/types';
-import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { getCraftItemOptions } from '../api/get-craft-item';
-import { useCraftItemMutation } from '../hooks/useCraftItemMutation';
+import { CraftButton } from './CraftButton';
 import { CraftItemCard } from './CraftItemCard';
 import { CraftSidebar } from './CraftSidebar';
+import { QueueCraftItemsList } from './QueueCraftItemsList';
 
 export const CraftModal = () => {
   const { data, isLoading } = useQuery(getCraftItemOptions());
   const [craftItem, setCraftItem] = useState<CraftItem>();
-  const selectedResourceType = useCraftItemStore((state) => state.selectedResourceType);
-  const { mutate, isPending } = useCraftItemMutation();
+
   // if (isLoading) return <p>...</p>;
   return (
     <Dialog
@@ -26,29 +24,16 @@ export const CraftModal = () => {
       <DialogTrigger>
         <div className="w-fit">Craft</div>
       </DialogTrigger>
-      <DialogContent className="h-[60%] overflow-hidden p-0 sm:h-[80%] sm:max-w-2xl md:max-w-3xl">
-        <section className="flex min-h-0">
-          <CraftSidebar data={data} onSelect={setCraftItem} selectedItemId={craftItem?.id} />
-          <div className="flex min-w-[200px] flex-1 flex-col">
-            <div className="flex-1 p-2 text-center">
-              {craftItem && craftItem.gameItem && <CraftItemCard {...craftItem} resources={data?.resources} />}
-            </div>
-
-            <div className="bg-secondary h-40"></div>
-            <Button
-              disabled={isPending}
-              onClick={() =>
-                mutate({
-                  craftItemId: craftItem?.id ?? '',
-                  resourceType: selectedResourceType,
-                })
-              }
-              className="ml-auto"
-            >
-              Craft
-            </Button>
+      <DialogContent className="flex h-[30%] p-0 sm:h-[80%] sm:max-w-2xl md:max-w-3xl">
+        <CraftSidebar data={data} onSelect={setCraftItem} selectedItemId={craftItem?.id} />
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            {craftItem && craftItem.gameItem && <CraftItemCard {...craftItem} resources={data?.resources} />}
           </div>
-        </section>
+
+          <QueueCraftItemsList />
+          <CraftButton craftItem={craftItem} />
+        </div>
       </DialogContent>
     </Dialog>
   );

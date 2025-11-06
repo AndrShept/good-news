@@ -34,7 +34,7 @@ export const CraftItemCard = memo((props: Props) => {
     setSelectedResource('IRON');
   }, [setSelectedResource]);
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-1 flex-col items-center overflow-y-auto text-center">
       <div className="mb-2 space-x-1 text-lg font-semibold capitalize md:text-xl">
         <span className={cn(materialConfig[selectedResourceType].color)}>{selectedResourceType.toLocaleLowerCase()}</span>
         <span>{props?.gameItem?.name}</span>

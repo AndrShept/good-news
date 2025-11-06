@@ -1,3 +1,4 @@
+import type { IHeroStat } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { boolean, integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
@@ -9,8 +10,8 @@ import { groupTable } from './group-schema';
 import { inventoryItemTable } from './inventory-item-schema';
 import { locationTable } from './location-schema';
 import { modifierTable } from './modifier-schema';
+import { queueCraftItemTable } from './queue-craft-item-schema';
 import { stateTable } from './state-schema';
-import type { IHeroStat } from '@/shared/types';
 
 export const heroTable = pgTable('hero', {
   id: uuid().primaryKey().notNull(),
@@ -69,6 +70,7 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
     references: [userTable.id],
   }),
   equipments: many(equipmentTable),
+  queueCraftItems: many(queueCraftItemTable),
   inventoryItem: many(inventoryItemTable),
   buffs: many(buffTable),
 }));

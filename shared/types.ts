@@ -33,6 +33,7 @@ import {
   weaponTypeEnum,
 } from '../server/db/schema/game-item-schema';
 import { postTable } from '../server/db/schema/posts-schema';
+import type { queueCraftItemTable } from '../server/db/schema/queue-craft-item-schema';
 import type { rarityEnum, resourceCategoryEnum, resourceTable, resourceTypeEnum } from '../server/db/schema/resource-schema';
 import { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
 import { tileTable, tileTypeEnum } from '../server/db/schema/tile-schema';
@@ -172,6 +173,8 @@ export type Location = InferSelectModel<typeof locationTable> & {
   hero?: Hero;
 };
 
+export type QueueCraftItem = typeof queueCraftItemTable.$inferSelect;
+
 export type Place = InferSelectModel<typeof placeTable> & {
   buildings?: Building[] | null;
 };
@@ -236,6 +239,7 @@ export type Hero = InferSelectModel<typeof heroTable> & {
   location?: Location;
   state?: State;
   equipments?: Equipment[];
+  queueCraftItems?: QueueCraftItem[];
 };
 export type Buff = typeof buffTable.$inferSelect;
 
