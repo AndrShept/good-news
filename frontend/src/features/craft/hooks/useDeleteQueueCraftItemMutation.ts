@@ -5,18 +5,15 @@ import { client } from '@/lib/utils';
 import { ErrorResponse, ResourceType } from '@/shared/types';
 import { useMutation } from '@tanstack/react-query';
 
-export const useCraftItemMutation = () => {
+export const useDeleteQueueCraftItemMutation = () => {
   const id = useHeroId();
-  const { addCraftItemsQueue } = useHeroUpdate();
+  const { deleteCraftItemsQueue } = useHeroUpdate();
   return useMutation({
-    mutationFn: async ({ craftItemId, resourceType }: { craftItemId: string; resourceType: ResourceType }) => {
-      const res = await client.hero[':id'].action.craft.$post({
+    mutationFn: async (queueCraftItemId: string) => {
+      const res = await client.hero[':id'].action['queue-craft'][':queueCraftItemId'].$delete({
         param: {
           id,
-        },
-        json: {
-          craftItemId,
-          resourceType,
+          queueCraftItemId,
         },
       });
       if (!res.ok) {
@@ -25,8 +22,8 @@ export const useCraftItemMutation = () => {
       }
       return await res.json();
     },
-    onSuccess: ({ data }) => {
-      addCraftItemsQueue(data);
+    onSuccess: (_, queueCraftItemId) => {
+      deleteCraftItemsQueue(queueCraftItemId);
     },
   });
 };

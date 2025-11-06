@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { CraftItem } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 
-import { useCraftItemMutation } from '../hooks/useCraftItemMutation';
+import { useCreateQueueCraftItemMutation } from '../hooks/useCreateQueueCraftItemMutation';
 
 interface Props {
   craftItem: CraftItem | undefined;
@@ -10,9 +10,10 @@ interface Props {
 
 export const CraftButton = ({ craftItem }: Props) => {
   const selectedResourceType = useCraftItemStore((state) => state.selectedResourceType);
-  const { mutate, isPending } = useCraftItemMutation();
+  const { mutate, isPending } = useCreateQueueCraftItemMutation();
   return (
     <Button
+    className='w-full'
       disabled={isPending || !craftItem || !selectedResourceType}
       onClick={() =>
         mutate({
@@ -20,7 +21,6 @@ export const CraftButton = ({ craftItem }: Props) => {
           resourceType: selectedResourceType,
         })
       }
-      className="ml-auto"
     >
       Craft
     </Button>

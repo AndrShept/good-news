@@ -24,15 +24,16 @@ export const CraftModal = () => {
       <DialogTrigger>
         <div className="w-fit">Craft</div>
       </DialogTrigger>
-      <DialogContent className="flex h-[30%] p-0 sm:h-[80%] sm:max-w-2xl md:max-w-3xl">
+      <DialogContent className="flex h-[60%] gap-0 p-0 sm:h-[80%] sm:max-w-2xl md:max-w-3xl">
         <CraftSidebar data={data} onSelect={setCraftItem} selectedItemId={craftItem?.id} />
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col p-1">
+          <div className="min-h-0 flex-1">
             {craftItem && craftItem.gameItem && <CraftItemCard {...craftItem} resources={data?.resources} />}
           </div>
-
           <QueueCraftItemsList />
-          <CraftButton craftItem={craftItem} />
+          <div className="mx-auto w-[200px] p-3">
+            <CraftButton craftItem={craftItem} />
+          </div>
         </div>
       </DialogContent>
     </Dialog>

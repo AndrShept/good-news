@@ -1,11 +1,11 @@
 import { cn } from '@/lib/utils';
-import React, { ComponentProps } from 'react';
+import React, { ComponentProps, memo } from 'react';
 
 interface Props extends ComponentProps<'img'> {
   image: string | undefined;
   isPixelate?: boolean;
 }
-export const GameIcon = ({ image, isPixelate = true, className }: Props) => {
+export const GameIcon = memo(({ image, isPixelate = true, className }: Props) => {
   return (
     <>
       <img
@@ -16,4 +16,4 @@ export const GameIcon = ({ image, isPixelate = true, className }: Props) => {
       />
     </>
   );
-};
+});

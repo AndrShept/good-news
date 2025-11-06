@@ -1299,7 +1299,7 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post(
-    '/:id/action/craft',
+    '/:id/action/queue-craft',
     loggedIn,
     zValidator('param', z.object({ id: z.string() })),
     zValidator('json', z.object({ resourceType: z.enum(resourceTypeEnum.enumValues), craftItemId: z.string() })),
@@ -1310,17 +1310,17 @@ export const heroRouter = new Hono<Context>()
       const { craftItemId, resourceType } = c.req.valid('json');
 
       const [hero, craftItem, craftResource] = await Promise.all([
-        await db.query.heroTable.findFirst({
+        db.query.heroTable.findFirst({
           where: eq(heroTable.id, id),
           with: {
             action: true,
             state: { columns: { id: true } },
           },
         }),
-        await db.query.craftItemTable.findFirst({
+        db.query.craftItemTable.findFirst({
           where: eq(craftItemTable.id, craftItemId),
         }),
-        await db.query.resourceTable.findFirst({ where: eq(resourceTable.type, resourceType) }),
+        db.query.resourceTable.findFirst({ where: eq(resourceTable.type, resourceType) }),
       ]);
 
       if (!hero) {
@@ -1381,6 +1381,52 @@ export const heroRouter = new Hono<Context>()
         message: 'craft started',
         success: true,
         data: newQueueCraftItem,
+      });
+    },
+  )
+  .delete(
+    '/:id/action/queue-craft/:queueCraftItemId',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string(), queueCraftItemId: z.string() })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id, queueCraftItemId } = c.req.valid('param');
+
+      const [hero, queueCraftItem] = await Promise.all([
+        db.query.heroTable.findFirst({
+          where: eq(heroTable.id, id),
+        }),
+        db.query.queueCraftItemTable.findFirst({
+          where: eq(queueCraftItemTable.id, queueCraftItemId),
+        }),
+      ]);
+
+      if (!hero) {
+        throw new HTTPException(404, {
+          message: 'hero not found',
+        });
+      }
+
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      if (hero.isInBattle) {
+        throw new HTTPException(409, {
+          message: 'Action not allowed: hero now is battle',
+        });
+      }
+
+      if (!queueCraftItem) {
+        throw new HTTPException(404, {
+          message: 'queue craft item not found',
+        });
+      }
+
+      await db.delete(queueCraftItemTable).where(eq(queueCraftItemTable.id, queueCraftItemId));
+
+      return c.json<SuccessResponse>({
+        message: 'queue craft item deleted ',
+        success: true,
       });
     },
   );
