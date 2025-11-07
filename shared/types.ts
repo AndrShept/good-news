@@ -33,7 +33,7 @@ import {
   weaponTypeEnum,
 } from '../server/db/schema/game-item-schema';
 import { postTable } from '../server/db/schema/posts-schema';
-import type { queueCraftItemTable } from '../server/db/schema/queue-craft-item-schema';
+import type { queueCraftItemTable, queueCraftStatusEnum } from '../server/db/schema/queue-craft-item-schema';
 import type { rarityEnum, resourceCategoryEnum, resourceTable, resourceTypeEnum } from '../server/db/schema/resource-schema';
 import { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
 import { tileTable, tileTypeEnum } from '../server/db/schema/tile-schema';
@@ -162,6 +162,7 @@ export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
 export type StateType = (typeof stateTypeEnum.enumValues)[number];
 export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];
 export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[number];
+export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;

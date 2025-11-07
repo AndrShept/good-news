@@ -29,7 +29,6 @@ export const useHeroUpdate = () => {
             ...data.location,
           },
           group: { ...oldData.data.group, ...data.group },
-          queueCraftItems: data.queueCraftItems,
         },
       } as ApiHeroResponse;
     });

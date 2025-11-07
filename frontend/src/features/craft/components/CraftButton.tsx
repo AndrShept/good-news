@@ -12,17 +12,19 @@ export const CraftButton = ({ craftItem }: Props) => {
   const selectedResourceType = useCraftItemStore((state) => state.selectedResourceType);
   const { mutate, isPending } = useCreateQueueCraftItemMutation();
   return (
-    <Button
-    className='w-full'
-      disabled={isPending || !craftItem || !selectedResourceType}
-      onClick={() =>
-        mutate({
-          craftItemId: craftItem?.id ?? '',
-          resourceType: selectedResourceType,
-        })
-      }
-    >
-      Craft
-    </Button>
+    <>
+      <Button
+        className="w-full"
+        disabled={isPending || !craftItem || !selectedResourceType}
+        onClick={() =>
+          mutate({
+            craftItemId: craftItem?.id ?? '',
+            resourceType: selectedResourceType,
+          })
+        }
+      >
+        Craft
+      </Button>
+    </>
   );
 };

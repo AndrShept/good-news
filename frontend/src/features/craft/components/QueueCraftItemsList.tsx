@@ -11,14 +11,15 @@ export const QueueCraftItemsList = () => {
   const { craftItemMap } = useCraftItem();
   const queueCraftItems = useHero((state) => state?.data?.queueCraftItems);
   const { mutate, isPending } = useDeleteQueueCraftItemMutation();
+  if (!queueCraftItems?.length) return;
   return (
-    <ScrollArea className="pb-3">
-      <ul className="flex gap-2">
+    <ScrollArea className="pb-2">
+      <ul className="flex gap-2 border-y py-2">
         {queueCraftItems?.map((queueItem) => (
-          <li className="flex h-auto w-20 flex-col gap-1 items-center justify-center " key={queueItem.id}>
+          <li className="flex h-auto w-20 flex-col items-center justify-center gap-1" key={queueItem.id}>
             <GameItemImg className="size-10" image={craftItemMap[queueItem.craftItemId].gameItem?.image} />
             <p className="line-clamp-1 text-sm">{craftItemMap[queueItem.craftItemId].gameItem?.name}</p>
-            <Button variant={'destructive'} className='p-0 w-full h-6' disabled={isPending} onClick={() => mutate(queueItem.id)}>
+            <Button variant={'destructive'} className="w-17 h-6 p-0 text-xs" disabled={isPending} onClick={() => mutate(queueItem.id)}>
               Delete
             </Button>
           </li>

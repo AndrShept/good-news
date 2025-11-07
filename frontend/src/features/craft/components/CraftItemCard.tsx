@@ -28,11 +28,7 @@ export const CraftItemCard = memo((props: Props) => {
     [props.resources],
   );
   const selectedResourceType = useCraftItemStore((state) => state.selectedResourceType);
-  const setSelectedResource = useCraftItemStore((state) => state.setSelectedResource);
 
-  useEffect(() => {
-    setSelectedResource('IRON');
-  }, [setSelectedResource]);
   return (
     <ScrollArea className="h-full">
       <div className="flex flex-1 flex-col items-center text-center">

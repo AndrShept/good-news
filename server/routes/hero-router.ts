@@ -1,5 +1,12 @@
 import { BASE_STATS, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
-import { type RegenHealthJob, type RegenManaJob, type WalkMapJob, type WalkPlaceJob, jobName } from '@/shared/job-types';
+import {
+  type QueueCraftItemJob,
+  type RegenHealthJob,
+  type RegenManaJob,
+  type WalkMapJob,
+  type WalkPlaceJob,
+  jobName,
+} from '@/shared/job-types';
 import type { HeroOnlineData, MapUpdateEvent, PlaceUpdateEvent, SelfHeroData, SelfMessageData } from '@/shared/socket-data-types';
 import {
   type Buff,
@@ -18,6 +25,7 @@ import {
   statsSchema,
 } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
+import { randomUUIDv7 } from 'bun';
 import { and, asc, desc, eq, lt, lte, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -1371,14 +1379,34 @@ export const heroRouter = new Hono<Context>()
           });
         }
       }
-      const completedAt = new Date(Date.now() + craftItem.craftTime).toISOString();
+
+      const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({ where: eq(queueCraftItemTable.heroId, hero.id) });
+
+      const completedAt = !!heroQueueCraftItems.length
+        ? new Date((heroQueueCraftItems.at(-1)?.completedAt ?? '') + craftItem.craftTime).toISOString()
+        : new Date(Date.now() + craftItem.craftTime).toISOString();
+      const randomUuid = generateRandomUuid();
+      const jobId = `hero-${hero.id}_queue-craft-${randomUuid}`;
       const [newQueueCraftItem] = await db
         .insert(queueCraftItemTable)
-        .values({ heroId: hero.id, craftItemId: craftItem.id, completedAt })
+        .values({ heroId: hero.id, jobId, status: 'PENDING', craftItemId: craftItem.id, completedAt })
         .returning();
+      const jobData: QueueCraftItemJob = {
+        jobName: 'QUEUE_CRAFT_ITEM',
+        payload: {
+          heroId: hero.id,
+          queueCraftItemId: newQueueCraftItem.id,
+        },
+      };
+
+      await actionQueue.add(jobName['queue-craft-item'], jobData, {
+        delay: craftItem.craftTime,
+        jobId,
+        removeOnComplete: true,
+      });
 
       return c.json<SuccessResponse<QueueCraftItem>>({
-        message: 'craft started',
+        message: 'craft item add to queue',
         success: true,
         data: newQueueCraftItem,
       });
