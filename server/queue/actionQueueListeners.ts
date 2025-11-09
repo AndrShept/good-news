@@ -1,5 +1,12 @@
 import type { ActionJobEvent, BuffCreateJob, HeroOfflineJob } from '@/shared/job-types';
-import type { HeroOfflineData, MapUpdateEvent, PlaceUpdateEvent, SelfHeroData, SelfMessageData } from '@/shared/socket-data-types';
+import type {
+  HeroOfflineData,
+  MapUpdateEvent,
+  PlaceUpdateEvent,
+  QueueCraftItemSocketData,
+  SelfHeroData,
+  SelfMessageData,
+} from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { and, eq } from 'drizzle-orm';
 
@@ -75,6 +82,14 @@ export const actionQueueListeners = () => {
           io.to(jobData.payload.heroId).emit(socketEvents.selfMessage(), messageData);
         }
         break;
+      case 'QUEUE_CRAFT_ITEM':
+        const data: QueueCraftItemSocketData = {
+          type: 'QUEUE_CRAFT_ITEM_COMPLETE',
+          payload: {
+            queueItemCraftId: jobData.payload.queueCraftItemId,
+          },
+        };
+        io.to(jobData.payload.heroId).emit(socketEvents.queueCraft(), data);
     }
   });
 

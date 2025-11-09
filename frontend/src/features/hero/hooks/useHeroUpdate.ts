@@ -51,6 +51,26 @@ export const useHeroUpdate = () => {
       } as ApiHeroResponse;
     });
   }, []);
+  const updateCraftItemsQueue = useCallback((queueCraftItemId: string, data: Partial<QueueCraftItem>) => {
+    queryClient.setQueriesData<ApiHeroResponse>({ queryKey: getHeroOptions().queryKey }, (oldData) => {
+      if (!oldData?.data) return;
 
-  return { updateHero, addCraftItemsQueue, deleteCraftItemsQueue };
+      console.log(oldData.data.queueCraftItems);
+      return {
+        ...oldData,
+        data: {
+          ...oldData.data,
+          queueCraftItems: oldData.data?.queueCraftItems?.map((item) => {
+
+            if (item.id === queueCraftItemId) {
+              return { ...item, ...data };
+            }
+            return item;
+          }),
+        },
+      } as ApiHeroResponse;
+    });
+  }, []);
+
+  return { updateHero, addCraftItemsQueue, deleteCraftItemsQueue, updateCraftItemsQueue };
 };

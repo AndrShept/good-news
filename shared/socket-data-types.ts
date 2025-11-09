@@ -1,6 +1,6 @@
 import type { GameMessageType } from '../frontend/src/store/useGameMessages';
 import type { BuffCreateJob, RegenHealthJob, RegenManaJob, WalkMapJob, WalkPlaceJob } from './job-types';
-import type { Location } from './types';
+import type { Location, QueueCraftStatusType } from './types';
 
 export type SocketGroupResponse = {
   message: string;
@@ -49,6 +49,16 @@ export type HeroOnlineData = {
   type: 'HERO_ONLINE';
   payload: Location;
 };
+
+export type QueueCraftItemSocketData =
+  | {
+      type: 'QUEUE_CRAFT_ITEM_COMPLETE';
+      payload: { queueItemCraftId: string };
+    }
+  | {
+      type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE';
+      payload: { queueItemCraftId: string; status: QueueCraftStatusType };
+    };
 
 export type SelfMessageData = { message: string; type: GameMessageType };
 

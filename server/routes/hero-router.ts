@@ -7,7 +7,14 @@ import {
   type WalkPlaceJob,
   jobName,
 } from '@/shared/job-types';
-import type { HeroOnlineData, MapUpdateEvent, PlaceUpdateEvent, SelfHeroData, SelfMessageData } from '@/shared/socket-data-types';
+import type {
+  HeroOnlineData,
+  MapUpdateEvent,
+  PlaceUpdateEvent,
+  QueueCraftItemSocketData,
+  SelfHeroData,
+  SelfMessageData,
+} from '@/shared/socket-data-types';
 import {
   type Buff,
   type Equipment,
@@ -1382,14 +1389,25 @@ export const heroRouter = new Hono<Context>()
 
       const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({ where: eq(queueCraftItemTable.heroId, hero.id) });
 
-      const completedAt = !!heroQueueCraftItems.length
-        ? new Date((heroQueueCraftItems.at(-1)?.completedAt ?? '') + craftItem.craftTime).toISOString()
-        : new Date(Date.now() + craftItem.craftTime).toISOString();
+      const lastItem = heroQueueCraftItems.at(-1);
+
+      let delay = craftItem.craftTime;
+
+      if (lastItem) {
+        const now = Date.now();
+        const completedAt = new Date(lastItem.completedAt).getTime();
+
+        const remainingTime = Math.max(0, completedAt - now);
+
+        delay = remainingTime + craftItem.craftTime;
+      }
+
+      const completedAt = new Date(Date.now() + delay).toISOString();
       const randomUuid = generateRandomUuid();
       const jobId = `hero-${hero.id}_queue-craft-${randomUuid}`;
       const [newQueueCraftItem] = await db
         .insert(queueCraftItemTable)
-        .values({ heroId: hero.id, jobId, status: 'PENDING', craftItemId: craftItem.id, completedAt })
+        .values({ heroId: hero.id, jobId, status: !lastItem ? 'PROGRESS' : 'PENDING', craftItemId: craftItem.id, completedAt })
         .returning();
       const jobData: QueueCraftItemJob = {
         jobName: 'QUEUE_CRAFT_ITEM',
@@ -1398,9 +1416,9 @@ export const heroRouter = new Hono<Context>()
           queueCraftItemId: newQueueCraftItem.id,
         },
       };
-
+      console.log('@@@@@@@', delay);
       await actionQueue.add(jobName['queue-craft-item'], jobData, {
-        delay: craftItem.craftTime,
+        delay,
         jobId,
         removeOnComplete: true,
       });

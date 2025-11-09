@@ -23,8 +23,10 @@ export const gameItemTable = pgTable('game_item', {
   name: text().notNull(),
   image: text().notNull(),
   price: integer().default(0).notNull(),
+  
   createdAt: timestamp('created_at', {
     mode: 'string',
+    withTimezone: true,
   })
     .notNull()
     .defaultNow(),
@@ -37,6 +39,7 @@ export const gameItemRelations = relations(gameItemTable, ({ one, many }) => ({
   potion: one(potionTable),
   accessory: one(accessoryTable),
   resource: one(resourceTable),
+ 
 }));
 
 //WEAPON
@@ -47,9 +50,7 @@ export const weaponTable = pgTable('weapon', {
       onDelete: 'cascade',
     })
     .notNull(),
-  materialId: uuid().references(() => resourceTable.id, {
-    onDelete: 'set null',
-  }),
+
   weaponType: weaponTypeEnum().notNull(),
   weaponHand: weaponHandEnum().notNull(),
 
@@ -72,10 +73,6 @@ export const weaponTableRelations = relations(weaponTable, ({ one }) => ({
     fields: [weaponTable.gameItemId],
     references: [gameItemTable.id],
   }),
-  material: one(resourceTable, {
-    fields: [weaponTable.materialId],
-    references: [resourceTable.id],
-  }),
 }));
 
 //ARMOR
@@ -92,19 +89,12 @@ export const armorTable = pgTable('armor', {
       onDelete: 'cascade',
     })
     .notNull(),
-  materialId: uuid().references(() => resourceTable.id, {
-    onDelete: 'set null',
-  }),
 });
 
 export const armorTableRelations = relations(armorTable, ({ one }) => ({
   gameItem: one(gameItemTable, {
     fields: [armorTable.gameItemId],
     references: [gameItemTable.id],
-  }),
-  material: one(resourceTable, {
-    fields: [armorTable.materialId],
-    references: [resourceTable.id],
   }),
 }));
 //ACCESSORY

@@ -1,4 +1,5 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useQueueCraftListener } from '@/features/craft/hooks/useQueueCraftListener';
 import { useGroupListener } from '@/features/group/hooks/useGroupListener';
 import { useHeroListener } from '@/features/hero/hooks/useHeroListener';
 import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
@@ -18,6 +19,7 @@ export const GameMessage = memo(() => {
   useRegeneration();
   useSelfMessage();
   useHeroListener();
+  useQueueCraftListener()
 
   useEffect(() => {
     ref.current?.lastElementChild?.scrollIntoView({

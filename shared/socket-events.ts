@@ -11,4 +11,5 @@ export const socketEvents = {
   actionWalkMapComplete: () => `action:walk-map-complete`,
   mapUpdate: () => `update:map`,
   placeUpdate: () => `update:place`,
+  queueCraft : () => 'queue:craft'
 };

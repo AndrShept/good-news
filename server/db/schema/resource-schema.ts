@@ -28,10 +28,11 @@ export const resourceTable = pgTable('resource', {
     .notNull(),
 });
 
-export const resourceTableRelations = relations(resourceTable, ({ one }) => ({
+export const resourceTableRelations = relations(resourceTable, ({ one, many }) => ({
   gameItem: one(gameItemTable, {
     fields: [resourceTable.gameItemId],
     references: [gameItemTable.id],
   }),
+
   modifier: one(modifierTable),
 }));
