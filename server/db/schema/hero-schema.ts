@@ -7,7 +7,7 @@ import { userTable } from './auth-schema';
 import { buffTable } from './buff-schema';
 import { equipmentTable } from './equipment-schema';
 import { groupTable } from './group-schema';
-import { inventoryItemTable } from './inventory-item-schema';
+import { itemContainerTable } from './item-container-schema';
 import { locationTable } from './location-schema';
 import { modifierTable } from './modifier-schema';
 import { queueCraftItemTable } from './queue-craft-item-schema';
@@ -31,9 +31,6 @@ export const heroTable = pgTable('hero', {
   currentMana: integer().default(100).notNull(),
   maxHealth: integer().default(0).notNull(),
   maxMana: integer().default(0).notNull(),
-
-  currentInventorySlots: integer().default(0).notNull(),
-  maxInventorySlots: integer().default(40).notNull(),
 
   currentExperience: integer().default(0).notNull(),
   maxExperience: integer().default(100).notNull(),
@@ -71,6 +68,6 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
   }),
   equipments: many(equipmentTable),
   queueCraftItems: many(queueCraftItemTable),
-  inventoryItem: many(inventoryItemTable),
   buffs: many(buffTable),
+  itemContainers: many(itemContainerTable),
 }));

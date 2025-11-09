@@ -3,8 +3,9 @@ import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { gameItemTable } from './game-item-schema';
 import { heroTable } from './hero-schema';
+import { itemContainerTable } from './item-container-schema';
 
-export const inventoryItemTable = pgTable('inventory_item', {
+export const containerSlotTable = pgTable('container_slot', {
   id: uuid().primaryKey().defaultRandom().notNull(),
 
   quantity: integer().notNull().default(1),
@@ -14,9 +15,9 @@ export const inventoryItemTable = pgTable('inventory_item', {
     .references(() => gameItemTable.id, {
       onDelete: 'cascade',
     }),
-  heroId: uuid()
+  itemContainerId: uuid()
     .notNull()
-    .references(() => heroTable.id, {
+    .references(() => itemContainerTable.id, {
       onDelete: 'cascade',
     }),
   createdAt: timestamp('created_at', {
@@ -26,13 +27,13 @@ export const inventoryItemTable = pgTable('inventory_item', {
     .defaultNow(),
 });
 
-export const inventoryItemRelations = relations(inventoryItemTable, ({ one }) => ({
+export const containerItemTableRelations = relations(containerSlotTable, ({ one }) => ({
   gameItem: one(gameItemTable, {
-    fields: [inventoryItemTable.gameItemId],
+    fields: [containerSlotTable.gameItemId],
     references: [gameItemTable.id],
   }),
-  hero: one(heroTable, {
-    fields: [inventoryItemTable.heroId],
-    references: [heroTable.id],
+  itemContainer: one(itemContainerTable, {
+    fields: [containerSlotTable.itemContainerId],
+    references: [itemContainerTable.id],
   }),
 }));

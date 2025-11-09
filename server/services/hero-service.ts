@@ -1,17 +1,17 @@
 import { type BuffCreateJob, jobName } from '@/shared/job-types';
-import type { InventoryItem, Modifier, OmitModifier } from '@/shared/types';
+import type {  ContainerSlotType, Modifier, OmitModifier } from '@/shared/types';
 import { and, eq, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction } from '../db/db';
-import { buffTable, heroTable, inventoryItemTable, modifierTable } from '../db/schema';
+import { buffTable, heroTable, modifierTable } from '../db/schema';
 import { getHeroStatsWithModifiers } from '../lib/getHeroStatsWithModifiers';
 import { calculateMaxValues } from '../lib/utils';
 import { actionQueue } from '../queue/actionQueue';
 
 interface IDrinkPotion {
   isBuffPotion: boolean;
-  inventoryItemPotion: InventoryItem;
+  inventoryItemPotion: ContainerSlotType;
   maxHealth: number;
   currentHealth: number;
   maxMana: number;
@@ -28,26 +28,6 @@ interface IUpdateHeroMaxValues {
 }
 
 export const heroService = (db: TTransaction | TDataBase) => ({
-  async incrementCurrentInventorySlots(heroId: string) {
-    await db
-      .update(heroTable)
-      .set({
-        currentInventorySlots: sql`${heroTable.currentInventorySlots} + 1`,
-      })
-      .where(eq(heroTable.id, heroId));
-  },
-  async decrementCurrentInventorySlots(heroId: string) {
-    await db
-      .update(heroTable)
-      .set({
-        currentInventorySlots: sql`${heroTable.currentInventorySlots} - 1`,
-      })
-      .where(eq(heroTable.id, heroId));
-  },
-  async updateCurrentInventorySlots(heroId: string) {
-    const currentInventorySlots = await db.$count(inventoryItemTable, eq(inventoryItemTable.heroId, heroId));
-    await db.update(heroTable).set({ currentInventorySlots }).where(eq(heroTable.id, heroId));
-  },
   async updateHeroMaxValues(data: IUpdateHeroMaxValues) {
     const { constitution, heroId, intelligence, bonusMaxHealth, bonusMaxMana } = data;
     const { maxHealth, maxMana } = calculateMaxValues({ constitution, intelligence, bonusMaxHealth, bonusMaxMana });
@@ -83,11 +63,11 @@ export const heroService = (db: TTransaction | TDataBase) => ({
 
   async drinkPotion({ currentHealth, currentMana, heroId, inventoryItemPotion, isBuffPotion, maxHealth, maxMana }: IDrinkPotion) {
     if (isBuffPotion) {
-      const gameItemId = inventoryItemPotion.gameItem.potion?.buffInfo?.gameItemId ?? '';
-      const delay = inventoryItemPotion.gameItem.potion?.buffInfo?.duration ?? 0;
-      const modifier = inventoryItemPotion.gameItem.potion?.buffInfo?.modifier ?? {};
-      const name = inventoryItemPotion.gameItem.potion?.buffInfo?.name ?? '';
-      const image = inventoryItemPotion.gameItem.potion?.buffInfo?.image ?? '';
+      const gameItemId = inventoryItemPotion?.gameItem?.potion?.buffInfo?.gameItemId ?? '';
+      const delay = inventoryItemPotion?.gameItem?.potion?.buffInfo?.duration ?? 0;
+      const modifier = inventoryItemPotion?.gameItem?.potion?.buffInfo?.modifier ?? {};
+      const name = inventoryItemPotion?.gameItem?.potion?.buffInfo?.name ?? '';
+      const image = inventoryItemPotion?.gameItem?.potion?.buffInfo?.image ?? '';
       const completedAt = new Date(Date.now() + delay).toISOString();
       const jobId = `buffId-${gameItemId}-heroId-${heroId}`;
       const jobData: BuffCreateJob = {
@@ -131,8 +111,8 @@ export const heroService = (db: TTransaction | TDataBase) => ({
         removeOnComplete: true,
       });
     } else {
-      const restoredHealth = Math.min(maxHealth, currentHealth + (inventoryItemPotion.gameItem.potion?.restore?.health ?? 0));
-      const restoredMana = Math.min(maxMana, currentMana + (inventoryItemPotion.gameItem.potion?.restore?.mana ?? 0));
+      const restoredHealth = Math.min(maxHealth, currentHealth + (inventoryItemPotion?.gameItem?.potion?.restore?.health ?? 0));
+      const restoredMana = Math.min(maxMana, currentMana + (inventoryItemPotion?.gameItem?.potion?.restore?.mana ?? 0));
       await db
         .update(heroTable)
         .set({

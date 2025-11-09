@@ -8,10 +8,11 @@ import {
   actionTable,
   actionTypeEnum,
   armorTable,
+  containerSlotTable,
   craftItemTable,
   groupTable,
   heroTable,
-  inventoryItemTable,
+  itemContainerTable,
   locationTable,
   mapTable,
   modifierTable,
@@ -206,9 +207,12 @@ export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'he
 export type Equipment = typeof equipmentTable.$inferSelect & {
   gameItem?: GameItem;
 };
-export type InventoryItem = InferSelectModel<typeof inventoryItemTable> & {
-  gameItem: GameItem;
+export type ItemContainerType = typeof itemContainerTable.$inferSelect & {
+  containerSlots?: ContainerSlotType[] | null;
 };
+export type ContainerSlotType = typeof containerSlotTable.$inferSelect & {
+  gameItem? : GameItem | null
+}
 
 export type Weapon = typeof weaponTable.$inferSelect;
 export type Armor = typeof armorTable.$inferSelect;

@@ -4,68 +4,68 @@ import { and, eq, lt, lte, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction } from '../db/db';
-import { inventoryItemTable } from '../db/schema';
+import { containerSlotTable } from '../db/schema';
 import { heroService } from './hero-service';
+import { itemContainerService } from './item-container-service';
 
 interface IAddInventoryItem {
   gameItemId: string;
-  heroId: string;
   quantity: number;
   currentInventorySlots: number;
   maxInventorySlots: number;
+  itemContainerId: string;
 }
 interface IObtainInventoryItem {
   gameItemType: GameItemType;
   gameItemId: string;
   quantity: number;
-  heroId: string;
+  itemContainerId: string;
   currentInventorySlots: number;
   maxInventorySlots: number;
 }
 
 export const inventoryService = (db: TDataBase | TTransaction) => ({
-  async addInventoryItem({ currentInventorySlots, maxInventorySlots, gameItemId, heroId, quantity = 1 }: IAddInventoryItem) {
+  async addInventoryItem({ currentInventorySlots, maxInventorySlots, gameItemId, quantity = 1, itemContainerId }: IAddInventoryItem) {
     if (currentInventorySlots >= maxInventorySlots) {
       throw new HTTPException(409, { message: 'Inventory is full', cause: { canShow: true } });
     }
     const [newItem] = await db
-      .insert(inventoryItemTable)
+      .insert(containerSlotTable)
       .values({
         gameItemId,
-        heroId,
         quantity,
+        itemContainerId,
       })
       .returning();
     // await heroService(db).incrementCurrentInventorySlots(heroId);
-    await heroService(db).updateCurrentInventorySlots(heroId);
+    await itemContainerService(db).setUsedSlots(itemContainerId);
 
     return {
       data: newItem,
     };
   },
 
-  async incrementInventoryItemQuantity(inventoryItemId: string, quantity: number) {
+  async incrementInventoryItemQuantity(containerSlotId: string, quantity: number) {
     const [data] = await db
-      .update(inventoryItemTable)
+      .update(containerSlotTable)
       .set({
-        quantity: sql`${inventoryItemTable.quantity} + ${quantity}`,
+        quantity: sql`${containerSlotTable.quantity} + ${quantity}`,
       })
-      .where(eq(inventoryItemTable.id, inventoryItemId))
+      .where(eq(containerSlotTable.id, containerSlotId))
       .returning();
     return data;
   },
-  async decrementInventoryItemQuantity(inventoryItemId: string, heroId: string, quantity: number) {
+  async decrementInventoryItemQuantity(inventoryItemId: string, itemContainerId: string, quantity: number) {
     if (quantity > 1) {
       await db
-        .update(inventoryItemTable)
+        .update(containerSlotTable)
         .set({
-          quantity: sql`${inventoryItemTable.quantity} - 1`,
+          quantity: sql`${containerSlotTable.quantity} - 1`,
         })
-        .where(eq(inventoryItemTable.id, inventoryItemId));
+        .where(eq(containerSlotTable.id, inventoryItemId));
     } else {
-      await db.delete(inventoryItemTable).where(eq(inventoryItemTable.id, inventoryItemId));
-      // await heroService(db).decrementCurrentInventorySlots(heroId);
-      await heroService(db).updateCurrentInventorySlots(heroId);
+      await db.delete(containerSlotTable).where(eq(containerSlotTable.id, inventoryItemId));
+      await itemContainerService(db).setUsedSlots(itemContainerId);
     }
   },
 
@@ -73,16 +73,16 @@ export const inventoryService = (db: TDataBase | TTransaction) => ({
     currentInventorySlots,
     gameItemId,
     gameItemType,
-    heroId,
+    itemContainerId,
     maxInventorySlots,
     quantity,
   }: IObtainInventoryItem) {
     if (gameItemType !== 'ARMOR' && gameItemType !== 'WEAPON') {
-      const inventoryItem = await db.query.inventoryItemTable.findFirst({
+      const inventoryItem = await db.query.containerSlotTable.findFirst({
         where: and(
-          eq(inventoryItemTable.gameItemId, gameItemId),
-          eq(inventoryItemTable.heroId, heroId),
-          lte(inventoryItemTable.quantity, DEFAULT_ITEM_STACK - quantity),
+          eq(containerSlotTable.gameItemId, gameItemId),
+          eq(containerSlotTable.itemContainerId, itemContainerId),
+          lte(containerSlotTable.quantity, DEFAULT_ITEM_STACK - quantity),
         ),
       });
       if (inventoryItem) {
@@ -94,10 +94,10 @@ export const inventoryService = (db: TDataBase | TTransaction) => ({
 
     const newItemResult = await this.addInventoryItem({
       gameItemId,
-      heroId,
       currentInventorySlots,
       maxInventorySlots,
       quantity,
+      itemContainerId
     });
 
     return {
