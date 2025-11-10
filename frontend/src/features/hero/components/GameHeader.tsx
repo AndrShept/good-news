@@ -13,11 +13,10 @@ import { memo } from 'react';
 import { CharacterPaperdollButton } from './CharacterPaperdollButton';
 
 export const GameHeader = memo(() => {
-  const { currentInventorySlots, goldCoins, maxInventorySlots, premiumCoins } = useHero((state) => ({
+  const {  goldCoins,  premiumCoins } = useHero((state) => ({
     goldCoins: state?.data?.goldCoins,
     premiumCoins: state?.data?.premiumCoins,
-    currentInventorySlots: state?.data?.currentInventorySlots,
-    maxInventorySlots: state?.data?.maxInventorySlots,
+
   }));
   const isOpen = useBackpack((state) => state.isOpen);
   const onOpen = useBackpack((state) => state.onOpen);

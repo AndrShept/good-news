@@ -3,55 +3,57 @@ import { and, eq } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction, db } from '../db/db';
-import { equipmentTable, heroTable, inventoryItemTable } from '../db/schema';
+import { containerSlotTable, equipmentTable, heroTable } from '../db/schema';
 import { heroService } from './hero-service';
+import { itemContainerService } from './item-container-service';
 
 interface IEquipItem {
   inventoryItemId: string;
   gameItemId: string;
   heroId: string;
+  itemContainerId: string;
   slot: EquipmentSlotType;
 }
 
 interface IUnEquipItem {
   equipmentItemId: string;
   gameItemId: string;
+  itemContainerId: string;
   heroId: string;
-  currentInventorySlots: number;
-  maxInventorySlot: number;
+  usedSlots: number;
+  maxSlots: number;
 }
 
 interface IGetEquip {
   item: GameItem;
+  itemContainerId: string;
   heroId: string;
-  currentInventorySlots: number;
-  maxInventorySlot: number;
+  usedSlots: number;
+  maxSlots: number;
 }
 
 export const equipmentService = (db: TTransaction | TDataBase) => ({
-  async equipItem({ gameItemId, inventoryItemId, heroId, slot }: IEquipItem) {
+  async equipItem({ gameItemId, inventoryItemId, heroId, slot, itemContainerId }: IEquipItem) {
     await db.insert(equipmentTable).values({
       heroId,
       gameItemId,
       slot,
     });
-    await db.delete(inventoryItemTable).where(eq(inventoryItemTable.id, inventoryItemId));
-    // await heroService(db).decrementCurrentInventorySlots(heroId);
-    await heroService(db).updateCurrentInventorySlots(heroId);
-     await heroService(db).updateModifier(heroId);
+    await db.delete(containerSlotTable).where(eq(containerSlotTable.id, inventoryItemId));
+    await itemContainerService(db).setUsedSlots(itemContainerId);
+    await heroService(db).updateModifier(heroId);
   },
 
-  async unEquipItem({ equipmentItemId, gameItemId, heroId, currentInventorySlots, maxInventorySlot }: IUnEquipItem) {
-    const isInventoryFull = currentInventorySlots >= maxInventorySlot;
+  async unEquipItem({ equipmentItemId, gameItemId, heroId, itemContainerId, maxSlots, usedSlots }: IUnEquipItem) {
+    const isInventoryFull = usedSlots >= maxSlots;
 
     if (isInventoryFull) {
       throw new HTTPException(409, { message: 'Inventory is full', cause: { canShow: true } });
     }
 
     await db.delete(equipmentTable).where(eq(equipmentTable.id, equipmentItemId));
-    const [newInventoryItem] = await db.insert(inventoryItemTable).values({ gameItemId, heroId }).returning();
-    // await heroService(db).incrementCurrentInventorySlots(heroId);
-    await heroService(db).updateCurrentInventorySlots(heroId);
+    const [newInventoryItem] = await db.insert(containerSlotTable).values({ gameItemId, itemContainerId }).returning();
+    await itemContainerService(db).setUsedSlots(itemContainerId);
     await heroService(db).updateModifier(heroId);
 
     return {
@@ -69,7 +71,7 @@ export const equipmentService = (db: TTransaction | TDataBase) => ({
     return equipItem;
   },
 
-  async getEquipSlot({ currentInventorySlots, maxInventorySlot, heroId, item }: IGetEquip): Promise<EquipmentSlotType | undefined> {
+  async getEquipSlot({ usedSlots, maxSlots, itemContainerId, heroId, item }: IGetEquip): Promise<EquipmentSlotType | undefined> {
     if (item.type === 'ARMOR') {
       return item.armor?.slot === 'SHIELD' ? 'LEFT_HAND' : item.armor?.slot;
     }
@@ -82,8 +84,9 @@ export const equipmentService = (db: TTransaction | TDataBase) => ({
           equipmentItemId: existLeftSlot.id,
           gameItemId: existLeftSlot.gameItemId,
           heroId,
-          currentInventorySlots,
-          maxInventorySlot,
+          itemContainerId,
+          maxSlots,
+          usedSlots,
         });
 
         return 'RIGHT_HAND';

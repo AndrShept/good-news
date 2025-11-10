@@ -1,13 +1,15 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
-import { heroTable } from './hero-schema';
 import { containerSlotTable } from './container-slot-schema';
+import { heroTable } from './hero-schema';
+
+export const itemContainerTypeEnum = pgEnum('item_container_type_enum', ['BACKPACK', 'BANK']);
 
 export const itemContainerTable = pgTable('item_container', {
   id: uuid().defaultRandom().primaryKey(),
   heroId: uuid().references(() => heroTable.id, { onDelete: 'cascade' }),
-  type: text('type').$type<'backpack' | 'bank'>().notNull(),
+  type: itemContainerTypeEnum().notNull(),
   name: text().notNull(),
   usedSlots: integer().default(0).notNull(),
   maxSlots: integer().default(40).notNull(),
@@ -19,6 +21,5 @@ export const itemContainerTableRelations = relations(itemContainerTable, ({ one,
     fields: [itemContainerTable.heroId],
     references: [heroTable.id],
   }),
-  containerSlots : many(containerSlotTable)
-
+  containerSlots: many(containerSlotTable),
 }));

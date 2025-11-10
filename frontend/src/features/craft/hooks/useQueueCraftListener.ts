@@ -1,6 +1,6 @@
 import { useSocket } from '@/components/providers/SocketProvider';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
-import { getInventoryOptions } from '@/features/hero/api/get-inventory';
+import { getInventoryOptions } from '@/features/item-container/api/get-item-container-by-type';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';

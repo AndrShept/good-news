@@ -1,6 +1,7 @@
 import { type BuffCreateJob, jobName } from '@/shared/job-types';
-import type {  ContainerSlotType, Modifier, OmitModifier } from '@/shared/types';
+import type {  ContainerSlot, Modifier, OmitModifier } from '@/shared/types';
 import { and, eq, sql } from 'drizzle-orm';
+import type {} from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction } from '../db/db';
@@ -11,7 +12,7 @@ import { actionQueue } from '../queue/actionQueue';
 
 interface IDrinkPotion {
   isBuffPotion: boolean;
-  inventoryItemPotion: ContainerSlotType;
+  inventoryItemPotion: ContainerSlot;
   maxHealth: number;
   currentHealth: number;
   maxMana: number;
@@ -28,6 +29,18 @@ interface IUpdateHeroMaxValues {
 }
 
 export const heroService = (db: TTransaction | TDataBase) => ({
+  async getHero(id: string, options?:  Parameters<typeof db.query.heroTable.findFirst>[0]) {
+    const hero = await db.query.heroTable.findFirst({
+      where: eq(heroTable.id, id),
+      ...options,
+    });
+    if (!hero) {
+      throw new HTTPException(404, {
+        message: 'hero not found',
+      });
+    }
+    return hero;
+  },
   async updateHeroMaxValues(data: IUpdateHeroMaxValues) {
     const { constitution, heroId, intelligence, bonusMaxHealth, bonusMaxMana } = data;
     const { maxHealth, maxMana } = calculateMaxValues({ constitution, intelligence, bonusMaxHealth, bonusMaxMana });

@@ -56,8 +56,23 @@ export const generateRandomUuid = () => Bun.randomUUIDv7();
 export const setSqlNow = () => sql`NOW()`;
 export const setSqlNowByInterval = (seconds: number) => sql`NOW() + INTERVAL ${sql.raw(`'${seconds} seconds'`)}`;
 
-export const verifyHeroOwnership = ({ heroUserId, userId }: { heroUserId: string; userId: string | undefined }) => {
+export const verifyHeroOwnership = ({
+  heroUserId,
+  userId,
+  containerHeroId,
+  heroId,
+}: {
+  heroUserId: string;
+  userId: string | undefined;
+  containerHeroId?: string | null;
+  heroId?: string | null;
+}) => {
   if (heroUserId !== userId) {
+    throw new HTTPException(403, {
+      message: 'access denied',
+    });
+  }
+  if (containerHeroId && containerHeroId !== heroId) {
     throw new HTTPException(403, {
       message: 'access denied',
     });

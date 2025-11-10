@@ -4,8 +4,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { drinkPotion } from '../api/drinkPotion';
 import { getBuffOptions } from '../api/get-buff';
 import { getHeroOptions } from '../api/get-hero';
-import { getInventoryOptions } from '../api/get-inventory';
 import { useHeroId } from './useHeroId';
+import { getItemContainerByTypeOptions } from '@/features/item-container/api/get-item-container-by-type';
 
 export const useDrinkPotion = () => {
   const setGameMessage = useSetGameMessage();
@@ -19,7 +19,7 @@ export const useDrinkPotion = () => {
         queryKey: getHeroOptions().queryKey,
       });
       await queryClient.invalidateQueries({
-        queryKey: getInventoryOptions(heroId).queryKey,
+        queryKey: getItemContainerByTypeOptions(heroId, 'BACKPACK').queryKey,
       });
       await queryClient.invalidateQueries({
         queryKey: getBuffOptions(heroId).queryKey,

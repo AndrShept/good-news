@@ -1,11 +1,10 @@
-import { toastError } from '@/lib/utils';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { equipItem } from '../api/equip-Item';
 import { getHeroOptions } from '../api/get-hero';
-import { getInventoryOptions } from '../api/get-inventory';
 import { useHero } from './useHero';
+import { getItemContainerByTypeOptions } from '@/features/item-container/api/get-item-container-by-type';
 
 export const useEquipItem = () => {
   const setGameMessage = useSetGameMessage();
@@ -19,7 +18,7 @@ export const useEquipItem = () => {
         queryKey: getHeroOptions().queryKey,
       });
       await queryClient.invalidateQueries({
-        queryKey: getInventoryOptions(heroId).queryKey,
+        queryKey: getItemContainerByTypeOptions(heroId, 'BACKPACK').queryKey,
       });
       setGameMessage({
         success: true,

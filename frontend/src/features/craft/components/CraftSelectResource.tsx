@@ -1,6 +1,6 @@
 import { GameIcon } from '@/components/GameIcon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useHeroInventory } from '@/features/hero/hooks/useHeroInventory';
+import { useHeroInventory } from '@/features/item-container/hooks/useHeroBackpack';
 import { cn } from '@/lib/utils';
 import { Resource } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';

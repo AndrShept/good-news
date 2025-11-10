@@ -1,5 +1,5 @@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Equipment, GameItem, InventoryItem } from '@/shared/types';
+import { Equipment, GameItem } from '@/shared/types';
 import React, { memo, useState } from 'react';
 
 import { CustomTooltip } from './CustomTooltip';
@@ -8,12 +8,12 @@ import { GameItemCardShowInfo } from './GameItemCardShowInfo';
 import { GameItemImg } from './GameItemImg';
 import { GameItemSlot } from './GameItemSlot';
 
-export type GameCartType = 'EQUIP' | 'INVENTORY' | 'LOOT';
+export type GameCartType = 'EQUIP' | 'BACKPACK' | 'LOOT' | 'BANK';
 
 interface Props {
   id: string;
   quantity?: number;
-  gameItem: GameItem | undefined;
+  gameItem: GameItem | undefined | null;
   type: GameCartType;
 }
 export const GameItemCard = memo(function GameItemCard({ id, quantity, gameItem, type }: Props) {

@@ -17,13 +17,14 @@ import type {
 } from '@/shared/socket-data-types';
 import {
   type Buff,
+  type ContainerSlot,
   type Equipment,
   type EquipmentSlotType,
   type ErrorResponse,
   type GameItem,
   type GameItemType,
   type Hero,
-  type ItemContainerType,
+  type ItemContainer,
   type QueueCraftItem,
   type SuccessResponse,
   type WeaponHandType,
@@ -53,6 +54,7 @@ import {
   gameItemTable,
   heroTable,
   itemContainerTable,
+  itemContainerTypeEnum,
   locationTable,
   modifierTable,
   placeTable,
@@ -82,6 +84,7 @@ import { actionQueue } from '../queue/actionQueue';
 import { equipmentService } from '../services/equipment-service';
 import { heroService } from '../services/hero-service';
 import { inventoryService } from '../services/inventory-service';
+import { itemContainerService } from '../services/item-container-service';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -206,7 +209,7 @@ export const heroRouter = new Hono<Context>()
       await tx.insert(stateTable).values({ type: 'IDLE', heroId: newHero.id });
       await tx.insert(itemContainerTable).values({
         name: 'Main Backpack',
-        type: 'backpack',
+        type: 'BACKPACK',
         heroId: newHero.id,
       });
       return newHero;
@@ -309,30 +312,22 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .get(
-    '/:id/backpack',
+    '/:id/item-container/:type',
     loggedIn,
     zValidator(
       'param',
       z.object({
         id: z.string(),
+        type: z.enum(itemContainerTypeEnum.enumValues),
       }),
     ),
     async (c) => {
       const userId = c.get('user')?.id as string;
-      const { id } = c.req.valid('param');
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-      });
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'Hero not found',
-        });
-      }
-
-      verifyHeroOwnership({ heroUserId: hero.userId, userId });
+      const { id, type } = c.req.valid('param');
+      const hero = await heroService(db).getHero(id);
 
       const itemContainer = await db.query.itemContainerTable.findFirst({
-        where: and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.type, 'backpack')),
+        where: and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.type, type)),
         with: {
           containerSlots: {
             orderBy: asc(containerSlotTable.createdAt),
@@ -347,9 +342,9 @@ export const heroRouter = new Hono<Context>()
           message: 'Item container not found',
         });
       }
-
-      return c.json<SuccessResponse<ItemContainerType>>({
-        message: 'Main Backpack fetched !!!',
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
+      return c.json<SuccessResponse<ItemContainer>>({
+        message: `container ${type} fetched !!!`,
         success: true,
         data: itemContainer,
       });
@@ -381,7 +376,7 @@ export const heroRouter = new Hono<Context>()
         });
         if (!hero) throw new HTTPException(404, { message: 'Hero not found' });
         const itemContainer = await db.query.itemContainerTable.findFirst({
-          where: and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.type, 'backpack')),
+          where: and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.type, 'BACKPACK')),
         });
         verifyHeroOwnership({ heroUserId: hero.userId, userId });
         const itemPrice = quantity * gameItem.price;
@@ -397,7 +392,7 @@ export const heroRouter = new Hono<Context>()
         return data;
       });
 
-      return c.json<SuccessResponse<InventoryItem>>(
+      return c.json<SuccessResponse<ContainerSlot>>(
         {
           success: true,
           message: `You successfully obtain the`,
@@ -423,8 +418,8 @@ export const heroRouter = new Hono<Context>()
       const { id, inventoryItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
 
-      const inventoryItem = await db.query.inventoryItemTable.findFirst({
-        where: eq(inventoryItemTable.id, inventoryItemId),
+      const inventoryItem = await db.query.containerSlotTable.findFirst({
+        where: eq(containerSlotTable.id, inventoryItemId),
         with: {
           gameItem: { with: { weapon: true, armor: true } },
         },
@@ -457,12 +452,22 @@ export const heroRouter = new Hono<Context>()
             message: 'hero not found',
           });
         }
+        const itemContainer = await db.query.itemContainerTable.findFirst({
+          where: and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.type, 'BACKPACK')),
+        });
+        if (!itemContainer) {
+          throw new HTTPException(404, {
+            message: 'itemContainer not found',
+          });
+        }
+
         verifyHeroOwnership({ heroUserId: hero.userId, userId });
         const slot = await equipmentService(tx).getEquipSlot({
-          heroId: hero.id,
+          itemContainerId: itemContainer.id,
           item: inventoryItem.gameItem,
-          currentInventorySlots: hero.currentInventorySlots,
-          maxInventorySlot: hero.maxInventorySlots,
+          usedSlots: itemContainer.usedSlots,
+          maxSlots: itemContainer.maxSlots,
+          heroId: hero.id,
         });
 
         if (!slot) {
@@ -475,9 +480,10 @@ export const heroRouter = new Hono<Context>()
           await equipmentService(tx).unEquipItem({
             equipmentItemId: existingEquipItem.id,
             gameItemId: existingEquipItem.gameItemId,
+            itemContainerId: itemContainer.id,
+            usedSlots: itemContainer.usedSlots,
+            maxSlots: itemContainer.maxSlots,
             heroId: hero.id,
-            currentInventorySlots: hero.currentInventorySlots,
-            maxInventorySlot: hero.maxInventorySlots,
           });
         }
 
@@ -486,6 +492,7 @@ export const heroRouter = new Hono<Context>()
           heroId: hero.id,
           slot,
           inventoryItemId: inventoryItem.id,
+          itemContainerId: itemContainer.id,
         });
       });
 
@@ -513,15 +520,8 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const { id, equipmentItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-      });
-
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
+      const hero = await heroService(db).getHero(id);
+      const heroBackpack = await itemContainerService(db).getHeroBackpack(hero.id);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
@@ -539,11 +539,12 @@ export const heroRouter = new Hono<Context>()
 
       await db.transaction(async (tx) => {
         await equipmentService(tx).unEquipItem({
-          currentInventorySlots: hero.currentInventorySlots,
           equipmentItemId: equipmentItem.id,
           gameItemId: equipmentItem.gameItemId,
           heroId: hero.id,
-          maxInventorySlot: hero.maxInventorySlots,
+          maxSlots: heroBackpack.maxSlots,
+          usedSlots: heroBackpack.usedSlots,
+          itemContainerId: heroBackpack.id,
         });
       });
       return c.json<SuccessResponse<Equipment>>(
@@ -557,59 +558,48 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .delete(
-    '/:id/inventory/:itemId/delete',
+    '/:id/item-container/:itemContainerId/:containerSlotId/delete',
     loggedIn,
     zValidator(
       'param',
       z.object({
         id: z.string(),
-        itemId: z.string(),
+        containerSlotId: z.string(),
+        itemContainerId: z.string(),
       }),
     ),
 
     async (c) => {
-      const { id, itemId } = c.req.valid('param');
+      const { id, containerSlotId, itemContainerId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-      });
+      const hero = await heroService(db).getHero(id);
+      const itemContainer = await itemContainerService(db).getItemContainer(itemContainerId);
 
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
 
-      if (hero.userId !== userId) {
-        throw new HTTPException(403, {
-          message: 'access denied',
-        });
-      }
-
-      const inventoryItem = await db.query.inventoryItemTable.findFirst({
-        where: eq(inventoryItemTable.id, itemId),
+      const deletedItem = await db.query.containerSlotTable.findFirst({
+        where: eq(containerSlotTable.id, containerSlotId),
         with: {
           gameItem: true,
         },
       });
 
-      if (!inventoryItem) {
+      if (!deletedItem) {
         throw new HTTPException(404, {
-          message: 'Inventory item not found',
+          message: 'deleted  item not found',
         });
       }
 
       await db.transaction(async (tx) => {
-        await tx.delete(inventoryItemTable).where(eq(inventoryItemTable.id, inventoryItem.id));
-        // await heroService(tx).incrementCurrentInventorySlots(hero.id);
-        await heroService(tx).updateCurrentInventorySlots(hero.id);
+        await tx.delete(containerSlotTable).where(eq(containerSlotTable.id, deletedItem.id));
+        await itemContainerService(tx).setUsedSlots(itemContainer.id);
       });
 
-      return c.json<SuccessResponse<InventoryItem>>(
+      return c.json<SuccessResponse<ContainerSlot>>(
         {
           success: true,
           message: `Success deleted item`,
-          data: inventoryItem,
+          data: deletedItem,
         },
         201,
       );
@@ -629,8 +619,8 @@ export const heroRouter = new Hono<Context>()
       const { id, inventoryItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
 
-      const inventoryItemPotion = await db.query.inventoryItemTable.findFirst({
-        where: eq(inventoryItemTable.id, inventoryItemId),
+      const inventoryItemPotion = await db.query.containerSlotTable.findFirst({
+        where: eq(containerSlotTable.id, inventoryItemId),
         with: {
           gameItem: {
             with: {
@@ -696,7 +686,7 @@ export const heroRouter = new Hono<Context>()
         await inventoryService(tx).decrementInventoryItemQuantity(inventoryItemPotion.id, hero.id, inventoryItemPotion.quantity);
       });
 
-      return c.json<SuccessResponse<InventoryItem>>({
+      return c.json<SuccessResponse<ContainerSlot>>({
         success: true,
         message: `You drink `,
         data: inventoryItemPotion,
@@ -1342,7 +1332,7 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const { craftItemId, resourceType } = c.req.valid('json');
 
-      const [hero, craftItem, craftResource] = await Promise.all([
+      const [hero, craftItem, craftResource, backpack] = await Promise.all([
         db.query.heroTable.findFirst({
           where: eq(heroTable.id, id),
           with: {
@@ -1354,6 +1344,7 @@ export const heroRouter = new Hono<Context>()
           where: eq(craftItemTable.id, craftItemId),
         }),
         db.query.resourceTable.findFirst({ where: eq(resourceTable.type, resourceType) }),
+        db.query.itemContainerTable.findFirst({ where: eq(itemContainerTable.type, 'BACKPACK') }),
       ]);
 
       if (!hero) {
@@ -1390,9 +1381,14 @@ export const heroRouter = new Hono<Context>()
           message: 'craft resource not found',
         });
       }
+      if (!backpack) {
+        throw new HTTPException(404, {
+          message: 'backpack  not found',
+        });
+      }
       for (const requiredResource of craftItem.craftResources) {
-        const inventoryResources = await db.query.inventoryItemTable.findMany({
-          where: and(eq(inventoryItemTable.gameItemId, craftResource.gameItemId), eq(inventoryItemTable.heroId, hero.id)),
+        const inventoryResources = await db.query.containerSlotTable.findMany({
+          where: and(eq(containerSlotTable.gameItemId, craftResource.gameItemId), eq(containerSlotTable.itemContainerId, backpack.id)),
         });
 
         const totalOwnedQuantity = inventoryResources.reduce((acc, item) => acc + item.quantity, 0);

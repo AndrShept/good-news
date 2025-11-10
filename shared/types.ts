@@ -13,6 +13,7 @@ import {
   groupTable,
   heroTable,
   itemContainerTable,
+  itemContainerTypeEnum,
   locationTable,
   mapTable,
   modifierTable,
@@ -164,6 +165,7 @@ export type StateType = (typeof stateTypeEnum.enumValues)[number];
 export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];
 export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[number];
 export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
+export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
@@ -207,12 +209,12 @@ export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'he
 export type Equipment = typeof equipmentTable.$inferSelect & {
   gameItem?: GameItem;
 };
-export type ItemContainerType = typeof itemContainerTable.$inferSelect & {
-  containerSlots?: ContainerSlotType[] | null;
+export type ItemContainer = typeof itemContainerTable.$inferSelect & {
+  containerSlots?: ContainerSlot[] | null;
 };
-export type ContainerSlotType = typeof containerSlotTable.$inferSelect & {
-  gameItem? : GameItem | null
-}
+export type ContainerSlot = typeof containerSlotTable.$inferSelect & {
+  gameItem?: GameItem | null;
+};
 
 export type Weapon = typeof weaponTable.$inferSelect;
 export type Armor = typeof armorTable.$inferSelect;

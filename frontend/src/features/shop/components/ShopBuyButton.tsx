@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
-import { getInventoryOptions } from '@/features/hero/api/get-inventory';
 import { shopBuyItems } from '@/features/hero/api/shopBuyItems';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
+import { getItemContainerByTypeOptions } from '@/features/item-container/api/get-item-container-by-type';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -22,12 +22,12 @@ export const ShopBuyButton = ({ gameItemId }: Props) => {
         queryKey: getHeroOptions().queryKey,
       });
       await queryClient.invalidateQueries({
-        queryKey: getInventoryOptions(heroId).queryKey,
+        queryKey: getItemContainerByTypeOptions(heroId, 'BACKPACK').queryKey,
       });
       setGameMessage({
         text: data.message,
         type: 'success',
-        data: { gameItemName: data.data?.gameItem.name ?? '', quantity: data.data?.quantity },
+        data: { gameItemName: data.data?.gameItem?.name ?? '', quantity: data.data?.quantity },
       });
     },
   });
