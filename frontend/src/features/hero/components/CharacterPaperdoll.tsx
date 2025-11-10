@@ -1,13 +1,16 @@
 import { Button } from '@/components/ui/button';
+import { getItemContainerByTypeOptions } from '@/features/item-container/api/get-item-container-by-type';
+import { ItemContainer } from '@/features/item-container/components/ItemContainer';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { LucideStepBack } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { CraftModal } from '../../craft/components/CraftModal';
 import { useHero } from '../hooks/useHero';
+import { useHeroId } from '../hooks/useHeroId';
 import { useHeroStateMutation } from '../hooks/useHeroStateMutation';
 import { CharacterModifier } from './CharacterModifier';
 import { CharacterStat } from './CharacterStat';
-import { Inventory } from './Inventory';
 import { Paperdoll } from './Paperdoll';
 
 export const CharacterPaperdoll = () => {
@@ -29,11 +32,21 @@ export const CharacterPaperdoll = () => {
     equipments: state?.data?.equipments ?? [],
   }));
   const { mutate, isPending } = useHeroStateMutation();
+
+  const id = useHeroId();
+  const { data } = useSuspenseQuery(getItemContainerByTypeOptions(id, 'BACKPACK'));
+  const containerSlots = useMemo(() => {
+    return Array.from({ length: data?.maxSlots ?? 1 }, (_, idx) => {
+      const item = data?.containerSlots?.[idx];
+      if (item) {
+        return item;
+      }
+      return null;
+    });
+  }, [data?.containerSlots, data?.maxSlots]);
   return (
     <section className="flex flex-col gap-1">
-     
-        <CraftModal />
-
+      <CraftModal />
 
       <Button variant="outline" disabled={isPending} onClick={() => mutate('IDLE')} className="ml-auto w-fit">
         <LucideStepBack />
@@ -46,7 +59,7 @@ export const CharacterPaperdoll = () => {
           <CharacterModifier {...hero.modifier!} />
         </div>
 
-        <Inventory />
+        <ItemContainer containerSlots={containerSlots} type={data.type} />
       </div>
     </section>
   );

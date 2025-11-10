@@ -1,6 +1,6 @@
 import { GameIcon } from '@/components/GameIcon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useHeroInventory } from '@/features/item-container/hooks/useHeroBackpack';
+import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
 import { cn } from '@/lib/utils';
 import { Resource } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
@@ -12,15 +12,15 @@ interface Props {
 
 export const CraftSelectResource = ({ resources }: Props) => {
   const setSelectedResource = useCraftItemStore((state) => state.setSelectedResource);
-  const { calculateSumInventoryResource } = useHeroInventory();
-  const sumResourceQuantity = calculateSumInventoryResource(resources!);
+  const { calculateSumBackpackResource } = useHeroBackpack();
+  const sumResourceQuantity = calculateSumBackpackResource(resources!);
   return (
     <>
-      <Select  defaultValue="IRON" onValueChange={setSelectedResource}>
+      <Select defaultValue="IRON" onValueChange={setSelectedResource}>
         <SelectTrigger className="w-full rounded-none">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent side='top'>
+        <SelectContent side="top">
           {resources?.map((resource) => (
             <SelectItem key={resource.id} value={resource.type} className="">
               <GameIcon className="size-6" image={resource?.gameItem?.image} />

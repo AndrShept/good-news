@@ -10,7 +10,8 @@ export const deleteContainerSlotItem = async ({
   containerSlotId: string;
   itemContainerId: string;
 }) => {
-  const res = await client.hero[':id']['item-container'][':itemContainerId'][':containerSlotId'].delete.$delete({
+  console.log('itemContainerId', itemContainerId);
+  const res = await client.hero[':id']['item-container'][':itemContainerId']['slot-item'][':containerSlotId'].$delete({
     param: {
       id,
       containerSlotId,

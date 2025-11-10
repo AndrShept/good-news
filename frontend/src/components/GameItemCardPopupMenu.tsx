@@ -1,9 +1,9 @@
-import { useDeleteInventoryItem } from '@/features/hero/hooks/useDeleteInventoryItem';
 import { useDrinkPotion } from '@/features/hero/hooks/useDrinkPotion';
 import { useEquipItem } from '@/features/hero/hooks/useEquipItem';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useUnEquipItem } from '@/features/hero/hooks/useUnEquipItem';
-import { GameItem } from '@/shared/types';
+import { useDeleteContainerSlotItem } from '@/features/item-container/hooks/useDeleteContainerSlotItem';
+import { GameItem, ItemContainerType } from '@/shared/types';
 
 import { ConfirmPopover } from './ConfirmPopover';
 import { GameCartType } from './GameItemCard';
@@ -15,15 +15,17 @@ interface Props {
   gameItem: GameItem;
   quantity: number;
   type: GameCartType;
+  itemContainerId: string;
+  containerType: ItemContainerType;
 }
-export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type }: Props) => {
+export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type, itemContainerId, containerType }: Props) => {
   const heroId = useHeroId();
   const isCanEquip = (gameItem.type === 'WEAPON' || gameItem.type === 'ARMOR') && type !== 'EQUIP';
   const isPotionItem = gameItem.type === 'POTION';
   const equipItemMutation = useEquipItem();
   const unEquipItemMutation = useUnEquipItem();
   const drinkPotionMutation = useDrinkPotion();
-  const deleteInventoryItemMutation = useDeleteInventoryItem(id);
+  const deleteInventoryItemMutation = useDeleteContainerSlotItem();
   const isMutationPending =
     equipItemMutation.isPending || deleteInventoryItemMutation.isPending || unEquipItemMutation.isPending || drinkPotionMutation.isPending;
   const onEquip = () => {
@@ -66,7 +68,7 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type }:
     );
   };
   const onDeleteInventoryItem = () => {
-    deleteInventoryItemMutation.mutate();
+    deleteInventoryItemMutation.mutate({ containerSlotId: id, id: heroId, itemContainerId, type: containerType });
     onClose();
   };
   return (
@@ -90,7 +92,7 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type }:
           <p className="text-[12px]">un equip</p>
         </Button>
       )}
-      {type === 'INVENTORY' && (
+      {type === 'BACKPACK' && (
         <ConfirmPopover onConfirm={onDeleteInventoryItem} setIsShow={onClose}>
           <ConfirmPopover.Trigger>
             <Button disabled={isMutationPending} variant={'ghost'} className="flex w-full items-center transition hover:text-red-500">
@@ -104,7 +106,7 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type }:
             <ConfirmPopover.Message className="inline-flex">
               <p className="font-semibold">
                 {gameItem?.name}
-                {quantity > 1 && <span className="text-yellow-300 font-normal"> x{quantity}</span>}
+                {quantity > 1 && <span className="font-normal text-yellow-300"> x{quantity}</span>}
               </p>
             </ConfirmPopover.Message>
           </ConfirmPopover.Content>

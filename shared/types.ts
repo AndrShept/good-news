@@ -209,7 +209,7 @@ export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'he
 export type Equipment = typeof equipmentTable.$inferSelect & {
   gameItem?: GameItem;
 };
-export type ItemContainer = typeof itemContainerTable.$inferSelect & {
+export type TItemContainer = typeof itemContainerTable.$inferSelect & {
   containerSlots?: ContainerSlot[] | null;
 };
 export type ContainerSlot = typeof containerSlotTable.$inferSelect & {

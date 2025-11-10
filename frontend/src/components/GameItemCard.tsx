@@ -1,5 +1,5 @@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Equipment, GameItem } from '@/shared/types';
+import { Equipment, GameItem, ItemContainerType } from '@/shared/types';
 import React, { memo, useState } from 'react';
 
 import { CustomTooltip } from './CustomTooltip';
@@ -15,8 +15,10 @@ interface Props {
   quantity?: number;
   gameItem: GameItem | undefined | null;
   type: GameCartType;
+  itemContainerId?: string;
+  containerType?: ItemContainerType;
 }
-export const GameItemCard = memo(function GameItemCard({ id, quantity, gameItem, type }: Props) {
+export const GameItemCard = memo(function GameItemCard({ id, quantity, gameItem, type, itemContainerId, containerType }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   if (!gameItem) return;
   return (
@@ -36,7 +38,15 @@ export const GameItemCard = memo(function GameItemCard({ id, quantity, gameItem,
           </CustomTooltip>
         </PopoverTrigger>
         <PopoverContent className="w-fit p-0">
-          <GameItemCardPopupMenu quantity={quantity ?? 0} id={id} gameItem={gameItem} type={type} onClose={() => setIsOpen(false)} />
+          <GameItemCardPopupMenu
+            quantity={quantity ?? 0}
+            id={id}
+            gameItem={gameItem}
+            type={type}
+            itemContainerId={itemContainerId ?? ''}
+            containerType={containerType ?? 'BACKPACK'}
+            onClose={() => setIsOpen(false)}
+          />
         </PopoverContent>
       </Popover>
     </GameItemSlot>

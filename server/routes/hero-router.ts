@@ -24,7 +24,7 @@ import {
   type GameItem,
   type GameItemType,
   type Hero,
-  type ItemContainer,
+  type TItemContainer,
   type QueueCraftItem,
   type SuccessResponse,
   type WeaponHandType,
@@ -558,7 +558,7 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .delete(
-    '/:id/item-container/:itemContainerId/:containerSlotId/delete',
+    '/:id/item-container/:itemContainerId/slot-item/:containerSlotId',
     loggedIn,
     zValidator(
       'param',

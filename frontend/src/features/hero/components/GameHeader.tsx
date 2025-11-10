@@ -6,6 +6,7 @@ import { PremIcon } from '@/components/game-icons/PremIcon';
 import { Button } from '@/components/ui/button';
 import { GroupMenuButton } from '@/features/group/components/GroupMenuButton';
 import { useHero } from '@/features/hero/hooks/useHero';
+import { useItemContainerByType } from '@/features/item-container/hooks/useItemContainerByType';
 import { useBackpack } from '@/store/useBackpack';
 import { Link } from '@tanstack/react-router';
 import { memo } from 'react';
@@ -13,10 +14,13 @@ import { memo } from 'react';
 import { CharacterPaperdollButton } from './CharacterPaperdollButton';
 
 export const GameHeader = memo(() => {
-  const {  goldCoins,  premiumCoins } = useHero((state) => ({
+  const { goldCoins, premiumCoins } = useHero((state) => ({
     goldCoins: state?.data?.goldCoins,
     premiumCoins: state?.data?.premiumCoins,
-
+  }));
+  const backpack = useItemContainerByType('BACKPACK', (data) => ({
+    usedSlots: data?.usedSlots ?? 0,
+    maxSlots: data?.maxSlots ?? 0,
   }));
   const isOpen = useBackpack((state) => state.isOpen);
   const onOpen = useBackpack((state) => state.onOpen);
@@ -48,7 +52,7 @@ export const GameHeader = memo(() => {
         </div>
         <div className="flex items-center">
           <BackpackIcon className="size-7" />
-          <p>{currentInventorySlots}</p>/<p>{maxInventorySlots}</p>
+          <p>{backpack?.usedSlots}</p>/<p>{backpack?.maxSlots}</p>
         </div>
       </section>
     </header>
