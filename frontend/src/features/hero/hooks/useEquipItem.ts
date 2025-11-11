@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { equipItem } from '../api/equip-Item';
 import { getHeroOptions } from '../api/get-hero';
 import { useHero } from './useHero';
-import { getItemContainerByTypeOptions } from '@/features/item-container/api/get-item-container-by-type';
+import { getItemContainerByTypeOptions } from '@/features/item-container/api/get-item-container';
 
 export const useEquipItem = () => {
   const setGameMessage = useSetGameMessage();

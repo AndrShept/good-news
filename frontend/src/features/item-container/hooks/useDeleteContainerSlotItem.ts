@@ -1,30 +1,26 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { toastError } from '@/lib/utils';
-import { ItemContainerType } from '@/shared/types';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { deleteContainerSlotItem } from '../api/delete-conteiner-slot-item';
-import { getItemContainerByTypeOptions } from '../api/get-item-container-by-type';
+import { deleteContainerSlotItem } from '../api/delete-container-slot-item';
+import { getItemContainerOptions } from '../api/get-item-container';
 
 interface IDeleteContainerSlotItem {
   id: string;
-
   containerSlotId: string;
-  type: ItemContainerType;
 }
 
-export const useDeleteContainerSlotItem = () => {
+export const useDeleteContainerSlotItem = (itemContainerId: string) => {
   const setGameMessage = useSetGameMessage();
   const queryClient = useQueryClient();
   const id = useHeroId();
   return useMutation({
     mutationFn: ({ containerSlotId, id }: IDeleteContainerSlotItem) => deleteContainerSlotItem({ id, containerSlotId }),
 
-    async onSuccess(data, variable) {
+    async onSuccess(data) {
       if (data.success) {
         await queryClient.invalidateQueries({
-          queryKey: getItemContainerByTypeOptions(id, variable.type).queryKey,
+          queryKey: getItemContainerOptions(id, itemContainerId).queryKey,
         });
         setGameMessage({
           success: true,

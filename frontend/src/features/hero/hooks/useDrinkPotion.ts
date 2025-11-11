@@ -5,7 +5,7 @@ import { drinkPotion } from '../api/drinkPotion';
 import { getBuffOptions } from '../api/get-buff';
 import { getHeroOptions } from '../api/get-hero';
 import { useHeroId } from './useHeroId';
-import { getItemContainerByTypeOptions } from '@/features/item-container/api/get-item-container-by-type';
+import { getItemContainerByTypeOptions } from '@/features/item-container/api/get-item-container';
 
 export const useDrinkPotion = () => {
   const setGameMessage = useSetGameMessage();

@@ -1,14 +1,13 @@
 import { GameItemCard } from '@/components/GameItemCard';
 import { GameItemSlot } from '@/components/GameItemSlot';
-import { ContainerSlot, ItemContainerType } from '@/shared/types';
+import { ContainerSlot } from '@/shared/types';
 import { memo } from 'react';
 
 type Props = {
   containerSlots: (ContainerSlot | null)[];
-  type: ItemContainerType;
 };
 
-export const ItemContainer = memo(({ containerSlots, type }: Props) => {
+export const ItemContainer = memo(({ containerSlots }: Props) => {
   return (
     <ul className="flex h-fit flex-wrap gap-1">
       {containerSlots?.map((containerItem, idx) => {
@@ -19,7 +18,7 @@ export const ItemContainer = memo(({ containerSlots, type }: Props) => {
             id={containerItem.id}
             gameItem={containerItem.gameItem}
             quantity={containerItem.quantity}
-            containerType={type}
+            itemContainerId={containerItem.itemContainerId}
             type="BACKPACK"
           />
         );

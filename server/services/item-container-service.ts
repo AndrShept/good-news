@@ -1,4 +1,4 @@
-import type { ItemContainerType } from '@/shared/types';
+import type { ItemContainerType, TItemContainer } from '@/shared/types';
 import { and, eq, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
@@ -17,7 +17,7 @@ export const itemContainerService = (db: TTransaction | TDataBase) => ({
     }
     return heroBackpack;
   },
-  async getItemContainerById(id: string, options?: Parameters<typeof db.query.itemContainerTable.findFirst>[0]) {
+  async getItemContainerById(id: string, options?: Parameters<typeof db.query.itemContainerTable.findFirst>[0]): Promise<TItemContainer> {
     const itemContainer = await db.query.itemContainerTable.findFirst({
       where: eq(itemContainerTable.id, id),
       ...options,

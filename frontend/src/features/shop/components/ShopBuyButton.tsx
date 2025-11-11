@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { shopBuyItems } from '@/features/hero/api/shopBuyItems';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { getItemContainerByTypeOptions } from '@/features/item-container/api/get-item-container-by-type';
+import { getItemContainerByTypeOptions } from '@/features/item-container/api/get-item-container';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 

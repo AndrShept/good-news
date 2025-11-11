@@ -3,7 +3,7 @@ import { useEquipItem } from '@/features/hero/hooks/useEquipItem';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useUnEquipItem } from '@/features/hero/hooks/useUnEquipItem';
 import { useDeleteContainerSlotItem } from '@/features/item-container/hooks/useDeleteContainerSlotItem';
-import { GameItem, ItemContainerType } from '@/shared/types';
+import { GameItem } from '@/shared/types';
 
 import { ConfirmPopover } from './ConfirmPopover';
 import { GameCartType } from './GameItemCard';
@@ -15,16 +15,16 @@ interface Props {
   gameItem: GameItem;
   quantity: number;
   type: GameCartType;
-  containerType: ItemContainerType;
+  itemContainerId?: string;
 }
-export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type, containerType }: Props) => {
+export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type, itemContainerId }: Props) => {
   const heroId = useHeroId();
   const isCanEquip = (gameItem.type === 'WEAPON' || gameItem.type === 'ARMOR') && type !== 'EQUIP';
   const isPotionItem = gameItem.type === 'POTION';
   const equipItemMutation = useEquipItem();
   const unEquipItemMutation = useUnEquipItem();
   const drinkPotionMutation = useDrinkPotion();
-  const deleteInventoryItemMutation = useDeleteContainerSlotItem();
+  const deleteInventoryItemMutation = useDeleteContainerSlotItem(itemContainerId ?? '');
   const isMutationPending =
     equipItemMutation.isPending || deleteInventoryItemMutation.isPending || unEquipItemMutation.isPending || drinkPotionMutation.isPending;
   const onEquip = () => {
@@ -67,7 +67,7 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type, c
     );
   };
   const onDeleteInventoryItem = () => {
-    deleteInventoryItemMutation.mutate({ containerSlotId: id, id: heroId,  type: containerType });
+    deleteInventoryItemMutation.mutate({ containerSlotId: id, id: heroId });
     onClose();
   };
   return (

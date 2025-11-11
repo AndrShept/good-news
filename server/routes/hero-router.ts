@@ -84,7 +84,6 @@ import { actionQueue } from '../queue/actionQueue';
 import { containerSlotItemService } from '../services/container-slot-item-service';
 import { equipmentService } from '../services/equipment-service';
 import { heroService } from '../services/hero-service';
-import { inventoryService } from '../services/inventory-service';
 import { itemContainerService } from '../services/item-container-service';
 
 export const heroRouter = new Hono<Context>()
@@ -116,6 +115,7 @@ export const heroRouter = new Hono<Context>()
               },
             },
           },
+          itemContainers: { columns: { id: true, type: true } },
           queueCraftItems: true,
           state: true,
           location: {
@@ -299,39 +299,35 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .get(
-    '/:id/item-container/:type',
+    '/:id/item-container/:itemContainerId',
     loggedIn,
     zValidator(
       'param',
       z.object({
         id: z.string(),
-        type: z.enum(itemContainerTypeEnum.enumValues),
+        itemContainerId: z.string(),
       }),
     ),
     async (c) => {
       const userId = c.get('user')?.id as string;
-      const { id, type } = c.req.valid('param');
-      const hero = await heroService(db).getHero(id);
-
-      const itemContainer = await db.query.itemContainerTable.findFirst({
-        where: and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.type, type)),
-        with: {
-          containerSlots: {
-            orderBy: asc(containerSlotTable.createdAt),
-            with: {
-              gameItem: { with: { weapon: true, armor: true, accessory: true, potion: true, resource: true } },
+      const { id, itemContainerId } = c.req.valid('param');
+      const [hero, itemContainer] = await Promise.all([
+        heroService(db).getHero(id),
+        itemContainerService(db).getItemContainerById(itemContainerId, {
+          with: {
+            containerSlots: {
+              orderBy: asc(containerSlotTable.createdAt),
+              with: {
+                gameItem: { with: { weapon: true, armor: true, accessory: true, potion: true, resource: true } },
+              },
             },
           },
-        },
-      });
-      if (!itemContainer) {
-        throw new HTTPException(404, {
-          message: 'Item container not found',
-        });
-      }
+        }),
+      ]);
+
       verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
       return c.json<SuccessResponse<TItemContainer>>({
-        message: `container ${type} fetched !!!`,
+        message: `container fetched !!!`,
         success: true,
         data: itemContainer,
       });
@@ -362,7 +358,7 @@ export const heroRouter = new Hono<Context>()
         const itemContainer = await itemContainerService(tx).getHeroBackpack(id);
         verifyHeroOwnership({ heroUserId: hero.userId, userId, heroId: hero.id, containerHeroId: itemContainer.heroId });
         const itemPrice = quantity * gameItem.price;
-        const { data } = await inventoryService(tx).obtainInventoryItem({
+        const { data } = await containerSlotItemService(tx).obtainInventoryItem({
           currentInventorySlots: itemContainer.usedSlots,
           maxInventorySlots: itemContainer.maxSlots,
           gameItemId: gameItem.id,
@@ -611,7 +607,11 @@ export const heroRouter = new Hono<Context>()
           maxHealth: hero.maxHealth,
           maxMana: hero.maxMana,
         });
-        await inventoryService(tx).decrementContainerSlotItemQuantity(inventoryItemPotion.id, hero.id, inventoryItemPotion.quantity);
+        await containerSlotItemService(tx).decrementContainerSlotItemQuantity(
+          inventoryItemPotion.id,
+          hero.id,
+          inventoryItemPotion.quantity,
+        );
       });
 
       return c.json<SuccessResponse<ContainerSlot>>({

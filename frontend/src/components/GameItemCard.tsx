@@ -15,9 +15,9 @@ interface Props {
   quantity?: number;
   gameItem: GameItem | undefined | null;
   type: GameCartType;
-  containerType?: ItemContainerType;
+  itemContainerId?: string;
 }
-export const GameItemCard = memo(function GameItemCard({ id, quantity, gameItem, type, containerType }: Props) {
+export const GameItemCard = memo(function GameItemCard({ id, quantity, gameItem, type, itemContainerId }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   if (!gameItem) return;
   return (
@@ -42,7 +42,7 @@ export const GameItemCard = memo(function GameItemCard({ id, quantity, gameItem,
             id={id}
             gameItem={gameItem}
             type={type}
-            containerType={containerType ?? 'BACKPACK'}
+            itemContainerId={itemContainerId}
             onClose={() => setIsOpen(false)}
           />
         </PopoverContent>

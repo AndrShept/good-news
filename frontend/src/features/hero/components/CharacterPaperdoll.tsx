@@ -1,18 +1,15 @@
 import { Button } from '@/components/ui/button';
-import { getItemContainerByTypeOptions } from '@/features/item-container/api/get-item-container-by-type';
 import { ItemContainer } from '@/features/item-container/components/ItemContainer';
 import { useCreateContainerSlots } from '@/features/item-container/hooks/useCreateContainerSlots';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
 import { LucideStepBack } from 'lucide-react';
-import { useMemo, useState } from 'react';
 
 import { CraftModal } from '../../craft/components/CraftModal';
 import { useHero } from '../hooks/useHero';
-import { useHeroId } from '../hooks/useHeroId';
 import { useHeroStateMutation } from '../hooks/useHeroStateMutation';
-import { CharacterModifier } from './CharacterModifier';
 import { CharacterStat } from './CharacterStat';
 import { Paperdoll } from './Paperdoll';
+import { CharacterModifier } from './CharacterModifier';
 
 export const CharacterPaperdoll = () => {
   const hero = useHero((state) => ({
@@ -34,10 +31,8 @@ export const CharacterPaperdoll = () => {
   }));
   const { mutate, isPending } = useHeroStateMutation();
 
-  const id = useHeroId();
-  const { data } = useSuspenseQuery(getItemContainerByTypeOptions(id, 'BACKPACK'));
-  const containerSlots = useCreateContainerSlots(data?.maxSlots, data?.containerSlots);
-
+  const { backpack } = useHeroBackpack();
+  const containerSlots = useCreateContainerSlots(backpack?.maxSlots, backpack?.containerSlots);
   return (
     <section className="flex flex-col gap-1">
       <CraftModal />
@@ -53,7 +48,7 @@ export const CharacterPaperdoll = () => {
           <CharacterModifier {...hero.modifier!} />
         </div>
 
-        <ItemContainer containerSlots={containerSlots} type={data!.type} />
+        <ItemContainer containerSlots={containerSlots}  />
       </div>
     </section>
   );
