@@ -1,10 +1,12 @@
 import { GameItemCard } from '@/components/GameItemCard';
 import { GameItemSlot } from '@/components/GameItemSlot';
-import { TItemContainer } from '@/shared/types';
+import { ContainerSlot, ItemContainerType } from '@/shared/types';
 import { memo } from 'react';
 
-
-type Props = TItemContainer;
+type Props = {
+  containerSlots: (ContainerSlot | null)[];
+  type: ItemContainerType;
+};
 
 export const ItemContainer = memo(({ containerSlots, type }: Props) => {
   return (
@@ -17,8 +19,7 @@ export const ItemContainer = memo(({ containerSlots, type }: Props) => {
             id={containerItem.id}
             gameItem={containerItem.gameItem}
             quantity={containerItem.quantity}
-            itemContainerId={containerItem.itemContainerId}
-            containerType={type ?? 'BACKPACK'}
+            containerType={type}
             type="BACKPACK"
           />
         );

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { getItemContainerByTypeOptions } from '@/features/item-container/api/get-item-container-by-type';
 import { ItemContainer } from '@/features/item-container/components/ItemContainer';
+import { useCreateContainerSlots } from '@/features/item-container/hooks/useCreateContainerSlots';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { LucideStepBack } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -35,15 +36,8 @@ export const CharacterPaperdoll = () => {
 
   const id = useHeroId();
   const { data } = useSuspenseQuery(getItemContainerByTypeOptions(id, 'BACKPACK'));
-  const containerSlots = useMemo(() => {
-    return Array.from({ length: data?.maxSlots ?? 1 }, (_, idx) => {
-      const item = data?.containerSlots?.[idx];
-      if (item) {
-        return item;
-      }
-      return null;
-    });
-  }, [data?.containerSlots, data?.maxSlots]);
+  const containerSlots = useCreateContainerSlots(data?.maxSlots, data?.containerSlots);
+
   return (
     <section className="flex flex-col gap-1">
       <CraftModal />
@@ -59,7 +53,7 @@ export const CharacterPaperdoll = () => {
           <CharacterModifier {...hero.modifier!} />
         </div>
 
-        <ItemContainer containerSlots={containerSlots} type={data.type} />
+        <ItemContainer containerSlots={containerSlots} type={data!.type} />
       </div>
     </section>
   );

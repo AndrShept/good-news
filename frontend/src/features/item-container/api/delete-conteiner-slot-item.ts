@@ -4,18 +4,14 @@ import { ErrorResponse } from '@/shared/types';
 export const deleteContainerSlotItem = async ({
   id,
   containerSlotId,
-  itemContainerId,
 }: {
   id: string;
   containerSlotId: string;
-  itemContainerId: string;
 }) => {
-  console.log('itemContainerId', itemContainerId);
-  const res = await client.hero[':id']['item-container'][':itemContainerId']['slot-item'][':containerSlotId'].$delete({
+  const res = await client.hero[':id']['item-container']['slot-item'][':containerSlotId'].$delete({
     param: {
       id,
       containerSlotId,
-      itemContainerId,
     },
   });
   if (!res.ok) {

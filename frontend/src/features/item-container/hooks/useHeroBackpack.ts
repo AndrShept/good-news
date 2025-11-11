@@ -1,10 +1,10 @@
 import { Resource, ResourceType } from '@/shared/types';
 import { useMemo } from 'react';
+import { useGetItemContainerByType } from './useGetItemContainerByType';
 
-import { useItemContainerByType } from './useItemContainerByType';
 
 export const useHeroBackpack = () => {
-  const containerSlots = useItemContainerByType('BACKPACK', (data) => data?.containerSlots);
+  const containerSlots = useGetItemContainerByType('BACKPACK', (data) => data?.containerSlots);
   const calculateSumBackpackResource = useMemo(
     () => (resources: Resource[]) => {
       const result: Partial<Record<ResourceType, number>> = {};

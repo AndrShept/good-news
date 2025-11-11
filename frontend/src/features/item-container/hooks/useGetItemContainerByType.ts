@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getItemContainerByTypeOptions } from '../api/get-item-container-by-type';
 
-export const useItemContainerByType = <T = TItemContainer>(type: ItemContainerType, fn?: (data: TItemContainer | undefined) => T): T | undefined => {
+export const useGetItemContainerByType = <T = TItemContainer>(type: ItemContainerType, fn?: (data: TItemContainer | undefined) => T): T | undefined => {
   const heroId = useHeroId();
   const { data } = useQuery({ ...getItemContainerByTypeOptions(heroId, type), select: fn });
 

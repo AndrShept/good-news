@@ -5,10 +5,9 @@ import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction } from '../db/db';
 import { containerSlotTable } from '../db/schema';
-import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 
-interface IAddInventoryItem {
+interface ICreateContainerSlotItem {
   gameItemId: string;
   quantity: number;
   currentInventorySlots: number;
@@ -25,7 +24,13 @@ interface IObtainInventoryItem {
 }
 
 export const inventoryService = (db: TDataBase | TTransaction) => ({
-  async addInventoryItem({ currentInventorySlots, maxInventorySlots, gameItemId, quantity = 1, itemContainerId }: IAddInventoryItem) {
+  async createContainerSlotItem({
+    currentInventorySlots,
+    maxInventorySlots,
+    gameItemId,
+    quantity = 1,
+    itemContainerId,
+  }: ICreateContainerSlotItem) {
     if (currentInventorySlots >= maxInventorySlots) {
       throw new HTTPException(409, { message: 'Inventory is full', cause: { canShow: true } });
     }
@@ -37,7 +42,6 @@ export const inventoryService = (db: TDataBase | TTransaction) => ({
         itemContainerId,
       })
       .returning();
-    // await heroService(db).incrementCurrentInventorySlots(heroId);
     await itemContainerService(db).setUsedSlots(itemContainerId);
 
     return {
@@ -45,7 +49,7 @@ export const inventoryService = (db: TDataBase | TTransaction) => ({
     };
   },
 
-  async incrementInventoryItemQuantity(containerSlotId: string, quantity: number) {
+  async incrementContainerSlotItemQuantity(containerSlotId: string, quantity: number) {
     const [data] = await db
       .update(containerSlotTable)
       .set({
@@ -55,7 +59,7 @@ export const inventoryService = (db: TDataBase | TTransaction) => ({
       .returning();
     return data;
   },
-  async decrementInventoryItemQuantity(inventoryItemId: string, itemContainerId: string, quantity: number) {
+  async decrementContainerSlotItemQuantity(inventoryItemId: string, itemContainerId: string, quantity: number) {
     if (quantity > 1) {
       await db
         .update(containerSlotTable)
@@ -86,18 +90,18 @@ export const inventoryService = (db: TDataBase | TTransaction) => ({
         ),
       });
       if (inventoryItem) {
-        const updatedItem = await this.incrementInventoryItemQuantity(inventoryItem.id, quantity);
+        const updatedItem = await this.incrementContainerSlotItemQuantity(inventoryItem.id, quantity);
 
         return { data: updatedItem };
       }
     }
 
-    const newItemResult = await this.addInventoryItem({
+    const newItemResult = await this.createContainerSlotItem({
       gameItemId,
       currentInventorySlots,
       maxInventorySlots,
       quantity,
-      itemContainerId
+      itemContainerId,
     });
 
     return {

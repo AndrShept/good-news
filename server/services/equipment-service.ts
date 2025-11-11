@@ -1,4 +1,4 @@
-import type { EquipmentSlotType, GameItem } from '@/shared/types';
+import type { Equipment, EquipmentSlotType, GameItem } from '@/shared/types';
 import { and, eq } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
@@ -33,6 +33,14 @@ interface IGetEquip {
 }
 
 export const equipmentService = (db: TTransaction | TDataBase) => ({
+  async getEquipItem(id: string, options?: Parameters<typeof db.query.equipmentTable.findFirst>[0]): Promise<Equipment> {
+    const equipItem = await db.query.equipmentTable.findFirst({ where: eq(equipmentTable.id, id), ...options });
+
+    if (!equipItem) throw new HTTPException(404, { message: 'equipItem not found' });
+
+    return equipItem;
+  },
+
   async equipItem({ gameItemId, inventoryItemId, heroId, slot, itemContainerId }: IEquipItem) {
     await db.insert(equipmentTable).values({
       heroId,

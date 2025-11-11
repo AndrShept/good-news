@@ -9,7 +9,7 @@ import { getItemContainerByTypeOptions } from '../api/get-item-container-by-type
 
 interface IDeleteContainerSlotItem {
   id: string;
-  itemContainerId: string;
+
   containerSlotId: string;
   type: ItemContainerType;
 }
@@ -19,8 +19,7 @@ export const useDeleteContainerSlotItem = () => {
   const queryClient = useQueryClient();
   const id = useHeroId();
   return useMutation({
-    mutationFn: ({ containerSlotId, itemContainerId, id }: IDeleteContainerSlotItem) =>
-      deleteContainerSlotItem({ id, itemContainerId, containerSlotId }),
+    mutationFn: ({ containerSlotId, id }: IDeleteContainerSlotItem) => deleteContainerSlotItem({ id, containerSlotId }),
 
     async onSuccess(data, variable) {
       if (data.success) {

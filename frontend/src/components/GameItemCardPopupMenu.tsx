@@ -15,10 +15,9 @@ interface Props {
   gameItem: GameItem;
   quantity: number;
   type: GameCartType;
-  itemContainerId: string;
   containerType: ItemContainerType;
 }
-export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type, itemContainerId, containerType }: Props) => {
+export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type, containerType }: Props) => {
   const heroId = useHeroId();
   const isCanEquip = (gameItem.type === 'WEAPON' || gameItem.type === 'ARMOR') && type !== 'EQUIP';
   const isPotionItem = gameItem.type === 'POTION';
@@ -68,7 +67,7 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type, i
     );
   };
   const onDeleteInventoryItem = () => {
-    deleteInventoryItemMutation.mutate({ containerSlotId: id, id: heroId, itemContainerId, type: containerType });
+    deleteInventoryItemMutation.mutate({ containerSlotId: id, id: heroId,  type: containerType });
     onClose();
   };
   return (

@@ -24,9 +24,9 @@ import {
   type GameItem,
   type GameItemType,
   type Hero,
-  type TItemContainer,
   type QueueCraftItem,
   type SuccessResponse,
+  type TItemContainer,
   type WeaponHandType,
   buildingTypeValues,
   createHeroSchema,
@@ -81,6 +81,7 @@ import {
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
+import { containerSlotItemService } from '../services/container-slot-item-service';
 import { equipmentService } from '../services/equipment-service';
 import { heroService } from '../services/hero-service';
 import { inventoryService } from '../services/inventory-service';
@@ -228,13 +229,7 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const { id } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-      });
-
-      if (!hero) {
-        throw new HTTPException(404, { message: 'Hero not found' });
-      }
+      const hero = await heroService(db).getHero(id);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
@@ -284,15 +279,7 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const { freeStatPoints, ...stat } = c.req.valid('json');
 
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-      });
-
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'Hero not found',
-        });
-      }
+      const hero = await heroService(db).getHero(id);
 
       validateHeroStats({ freeStatPoints, stat, level: hero.level });
 
@@ -343,7 +330,7 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
-      return c.json<SuccessResponse<ItemContainer>>({
+      return c.json<SuccessResponse<TItemContainer>>({
         message: `container ${type} fetched !!!`,
         success: true,
         data: itemContainer,
@@ -371,21 +358,16 @@ export const heroRouter = new Hono<Context>()
 
       const quantity = 6;
       const result = await db.transaction(async (tx) => {
-        const hero = await db.query.heroTable.findFirst({
-          where: eq(heroTable.id, id),
-        });
-        if (!hero) throw new HTTPException(404, { message: 'Hero not found' });
-        const itemContainer = await db.query.itemContainerTable.findFirst({
-          where: and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.type, 'BACKPACK')),
-        });
-        verifyHeroOwnership({ heroUserId: hero.userId, userId });
+        const hero = await heroService(tx).getHero(id);
+        const itemContainer = await itemContainerService(tx).getHeroBackpack(id);
+        verifyHeroOwnership({ heroUserId: hero.userId, userId, heroId: hero.id, containerHeroId: itemContainer.heroId });
         const itemPrice = quantity * gameItem.price;
         const { data } = await inventoryService(tx).obtainInventoryItem({
-          currentInventorySlots: itemContainer?.usedSlots ?? 0,
-          maxInventorySlots: itemContainer?.maxSlots ?? 40,
+          currentInventorySlots: itemContainer.usedSlots,
+          maxInventorySlots: itemContainer.maxSlots,
           gameItemId: gameItem.id,
           gameItemType: gameItem.type,
-          itemContainerId: itemContainer?.id ?? '',
+          itemContainerId: itemContainer.id,
           quantity,
         });
         await heroService(tx).spendGold(hero.id, itemPrice, hero.goldCoins);
@@ -418,64 +400,46 @@ export const heroRouter = new Hono<Context>()
       const { id, inventoryItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
 
-      const inventoryItem = await db.query.containerSlotTable.findFirst({
-        where: eq(containerSlotTable.id, inventoryItemId),
-        with: {
-          gameItem: { with: { weapon: true, armor: true } },
-        },
-      });
-      if (!inventoryItem) {
-        throw new HTTPException(404, {
-          message: 'inventory item not found',
-        });
-      }
+      const [inventoryItem, hero, itemContainer] = await Promise.all([
+        containerSlotItemService(db).getContainerSlotItem(inventoryItemId, {
+          with: {
+            gameItem: { with: { weapon: true, armor: true } },
+          },
+        }),
+        heroService(db).getHero(id),
+        itemContainerService(db).getHeroBackpack(id),
+      ]);
+      const isEquipment = inventoryItem?.gameItem?.type === 'ARMOR' || inventoryItem?.gameItem?.type === 'WEAPON';
 
-      const isEquipment = inventoryItem?.gameItem.type === 'ARMOR' || inventoryItem?.gameItem.type === 'WEAPON';
-      if (!inventoryItem) {
-        throw new HTTPException(404, {
-          message: 'inventory item not found',
-        });
-      }
       if (!isEquipment) {
         throw new HTTPException(403, {
           message: 'You cannot equip this item.',
         });
       }
+      if (!inventoryItem.gameItem) {
+        throw new HTTPException(403, {
+          message: 'inventoryItem gameItem not found',
+        });
+      }
+
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
+
+      const slot = await equipmentService(db).getEquipSlot({
+        itemContainerId: itemContainer.id,
+        item: inventoryItem.gameItem,
+        usedSlots: itemContainer.usedSlots,
+        maxSlots: itemContainer.maxSlots,
+        heroId: hero.id,
+      });
+
+      if (!slot) {
+        throw new HTTPException(404, {
+          message: 'slot not found',
+        });
+      }
+      const existingEquipItem = await equipmentService(db).findEquipItem(slot, hero.id);
 
       await db.transaction(async (tx) => {
-        const hero = await db.query.heroTable.findFirst({
-          where: eq(heroTable.id, id),
-        });
-
-        if (!hero) {
-          throw new HTTPException(404, {
-            message: 'hero not found',
-          });
-        }
-        const itemContainer = await db.query.itemContainerTable.findFirst({
-          where: and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.type, 'BACKPACK')),
-        });
-        if (!itemContainer) {
-          throw new HTTPException(404, {
-            message: 'itemContainer not found',
-          });
-        }
-
-        verifyHeroOwnership({ heroUserId: hero.userId, userId });
-        const slot = await equipmentService(tx).getEquipSlot({
-          itemContainerId: itemContainer.id,
-          item: inventoryItem.gameItem,
-          usedSlots: itemContainer.usedSlots,
-          maxSlots: itemContainer.maxSlots,
-          heroId: hero.id,
-        });
-
-        if (!slot) {
-          throw new HTTPException(404, {
-            message: 'slot not found',
-          });
-        }
-        const existingEquipItem = await equipmentService(tx).findEquipItem(slot, hero.id);
         if (existingEquipItem) {
           await equipmentService(tx).unEquipItem({
             equipmentItemId: existingEquipItem.id,
@@ -520,33 +484,23 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const { id, equipmentItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-      const hero = await heroService(db).getHero(id);
+      const [hero, equipmentItem] = await Promise.all([
+        heroService(db).getHero(id),
+        equipmentService(db).getEquipItem(equipmentItemId, { with: { gameItem: true } }),
+      ]);
       const heroBackpack = await itemContainerService(db).getHeroBackpack(hero.id);
 
-      verifyHeroOwnership({ heroUserId: hero.userId, userId });
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: heroBackpack.heroId, heroId: hero.id });
 
-      const equipmentItem = await db.query.equipmentTable.findFirst({
-        where: eq(equipmentTable.id, equipmentItemId),
-        with: {
-          gameItem: true,
-        },
+      await equipmentService(db).unEquipItem({
+        equipmentItemId: equipmentItem.id,
+        gameItemId: equipmentItem.gameItemId,
+        heroId: hero.id,
+        maxSlots: heroBackpack.maxSlots,
+        usedSlots: heroBackpack.usedSlots,
+        itemContainerId: heroBackpack.id,
       });
-      if (!equipmentItem) {
-        throw new HTTPException(404, {
-          message: 'equipment item not found',
-        });
-      }
 
-      await db.transaction(async (tx) => {
-        await equipmentService(tx).unEquipItem({
-          equipmentItemId: equipmentItem.id,
-          gameItemId: equipmentItem.gameItemId,
-          heroId: hero.id,
-          maxSlots: heroBackpack.maxSlots,
-          usedSlots: heroBackpack.usedSlots,
-          itemContainerId: heroBackpack.id,
-        });
-      });
       return c.json<SuccessResponse<Equipment>>(
         {
           success: true,
@@ -558,40 +512,27 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .delete(
-    '/:id/item-container/:itemContainerId/slot-item/:containerSlotId',
+    '/:id/item-container/slot-item/:containerSlotId',
     loggedIn,
     zValidator(
       'param',
       z.object({
         id: z.string(),
         containerSlotId: z.string(),
-        itemContainerId: z.string(),
       }),
     ),
 
     async (c) => {
-      const { id, containerSlotId, itemContainerId } = c.req.valid('param');
+      const { id, containerSlotId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
       const hero = await heroService(db).getHero(id);
-      const itemContainer = await itemContainerService(db).getItemContainer(itemContainerId);
+      const containerSlotItem = await containerSlotItemService(db).getContainerSlotItem(containerSlotId, { with: { gameItem: true } });
+      const itemContainer = await itemContainerService(db).getItemContainerById(containerSlotItem.itemContainerId);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
 
-      const deletedItem = await db.query.containerSlotTable.findFirst({
-        where: eq(containerSlotTable.id, containerSlotId),
-        with: {
-          gameItem: true,
-        },
-      });
-
-      if (!deletedItem) {
-        throw new HTTPException(404, {
-          message: 'deleted  item not found',
-        });
-      }
-
       await db.transaction(async (tx) => {
-        await tx.delete(containerSlotTable).where(eq(containerSlotTable.id, deletedItem.id));
+        await tx.delete(containerSlotTable).where(eq(containerSlotTable.id, containerSlotItem.id));
         await itemContainerService(tx).setUsedSlots(itemContainer.id);
       });
 
@@ -599,7 +540,7 @@ export const heroRouter = new Hono<Context>()
         {
           success: true,
           message: `Success deleted item`,
-          data: deletedItem,
+          data: containerSlotItem,
         },
         201,
       );
@@ -618,25 +559,20 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const { id, inventoryItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-
-      const inventoryItemPotion = await db.query.containerSlotTable.findFirst({
-        where: eq(containerSlotTable.id, inventoryItemId),
-        with: {
-          gameItem: {
-            with: {
-              potion: true,
+      const [inventoryItemPotion, hero] = await Promise.all([
+        containerSlotItemService(db).getContainerSlotItem(inventoryItemId, {
+          with: {
+            gameItem: {
+              with: {
+                potion: true,
+              },
             },
           },
-        },
-      });
+        }),
+        heroService(db).getHero(id),
+      ]);
 
-      if (!inventoryItemPotion) {
-        throw new HTTPException(404, {
-          message: 'inventory item not found',
-        });
-      }
-
-      if (inventoryItemPotion.gameItem.type !== 'POTION') {
+      if (inventoryItemPotion.gameItem?.type !== 'POTION') {
         throw new HTTPException(403, {
           message: 'This item not a potion',
         });
@@ -647,33 +583,25 @@ export const heroRouter = new Hono<Context>()
       const isManaPotion = !!(inventoryItemPotion?.gameItem?.potion?.restore?.mana ?? 0 > 0);
       const isRestorePotion = isHealthPotion && isManaPotion;
 
+      const isFullHealth = hero.currentHealth >= hero.maxHealth;
+      const isFullMana = hero.currentMana >= hero.maxMana;
+
+      verifyHeroOwnership({ heroUserId: hero.userId, userId });
+
+      if (hero.isInBattle) {
+        throw new HTTPException(403, { message: 'You cannot use potions during battle.', cause: { canShow: true } });
+      }
+      if (isFullHealth && isHealthPotion && !isBuffPotion && !isRestorePotion) {
+        throw new HTTPException(400, { message: 'You are already at full health', cause: { canShow: true } });
+      }
+      if (isFullHealth && isFullMana && !isBuffPotion && isRestorePotion) {
+        throw new HTTPException(400, { message: 'You are already at full health and mana', cause: { canShow: true } });
+      }
+      if (isFullMana && isManaPotion && !isBuffPotion && !isRestorePotion) {
+        throw new HTTPException(400, { message: 'You are already at full mana', cause: { canShow: true } });
+      }
+
       await db.transaction(async (tx) => {
-        const hero = await db.query.heroTable.findFirst({
-          where: eq(heroTable.id, id),
-        });
-
-        if (!hero) {
-          throw new HTTPException(404, {
-            message: 'hero not found',
-          });
-        }
-        const isFullHealth = hero.currentHealth >= hero.maxHealth;
-        const isFullMana = hero.currentMana >= hero.maxMana;
-        verifyHeroOwnership({ heroUserId: hero.userId, userId });
-
-        if (hero.isInBattle) {
-          throw new HTTPException(403, { message: 'You cannot use potions during battle.', cause: { canShow: true } });
-        }
-        if (isFullHealth && isHealthPotion && !isBuffPotion && !isRestorePotion) {
-          throw new HTTPException(400, { message: 'You are already at full health', cause: { canShow: true } });
-        }
-        if (isFullHealth && isFullMana && !isBuffPotion && isRestorePotion) {
-          throw new HTTPException(400, { message: 'You are already at full health and mana', cause: { canShow: true } });
-        }
-        if (isFullMana && isManaPotion && !isBuffPotion && !isRestorePotion) {
-          throw new HTTPException(400, { message: 'You are already at full mana', cause: { canShow: true } });
-        }
-
         await heroService(tx).drinkPotion({
           inventoryItemPotion,
           isBuffPotion,
@@ -683,7 +611,7 @@ export const heroRouter = new Hono<Context>()
           maxHealth: hero.maxHealth,
           maxMana: hero.maxMana,
         });
-        await inventoryService(tx).decrementInventoryItemQuantity(inventoryItemPotion.id, hero.id, inventoryItemPotion.quantity);
+        await inventoryService(tx).decrementContainerSlotItemQuantity(inventoryItemPotion.id, hero.id, inventoryItemPotion.quantity);
       });
 
       return c.json<SuccessResponse<ContainerSlot>>({
@@ -696,15 +624,7 @@ export const heroRouter = new Hono<Context>()
   .get('/:id/buffs', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
     const userId = c.get('user')?.id;
     const { id } = c.req.valid('param');
-    const hero = await db.query.heroTable.findFirst({
-      where: eq(heroTable.id, id),
-    });
-
-    if (!hero) {
-      throw new HTTPException(404, {
-        message: 'hero not found',
-      });
-    }
+    const hero = await heroService(db).getHero(id);
 
     verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
@@ -726,18 +646,12 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
+      const hero = await heroService(db).getHero(id, {
         with: {
           action: { columns: { id: true } },
         },
       });
 
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
       if (!hero.action?.id) {
         throw new HTTPException(404, {
           message: 'action id not found',
@@ -772,16 +686,10 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
+      const hero = await heroService(db).getHero(id, {
         with: { location: { columns: { id: true } } },
       });
 
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
       if (!hero.location?.id) {
         throw new HTTPException(404, {
           message: 'location id not found',
@@ -815,20 +723,13 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
       const { buildingType } = c.req.valid('json');
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
+      const hero = await heroService(db).getHero(id, {
         with: {
           modifier: { columns: { dexterity: true } },
           location: { with: { place: true }, columns: { id: true } },
           action: { columns: { id: true } },
         },
       });
-
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
 
       if (!hero.action?.id) {
         throw new HTTPException(404, {
@@ -920,6 +821,7 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
       const MAP_WIDTH = hero.location?.map?.width ?? 0;
       const tileIndex = targetPos.y * MAP_WIDTH + targetPos.x;
       const tileExistMap = getTileExists(hero.location?.mapId ?? '', tileIndex, 'GROUND');
@@ -996,20 +898,13 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
+      const hero = await heroService(db).getHero(id, {
         with: {
           location: true,
           action: true,
         },
       });
 
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
       if (!hero.location) {
         throw new HTTPException(404, {
           message: 'hero location not found',
@@ -1033,15 +928,13 @@ export const heroRouter = new Hono<Context>()
         });
       }
 
-      await db.transaction(async (tx) => {
-        await tx
-          .update(locationTable)
-          .set({
-            mapId: null,
-            placeId: place.id,
-          })
-          .where(eq(locationTable.heroId, hero.id));
-      });
+      await db
+        .update(locationTable)
+        .set({
+          mapId: null,
+          placeId: place.id,
+        })
+        .where(eq(locationTable.heroId, hero.id));
 
       const socketMapData: MapUpdateEvent = {
         type: 'HERO_ENTER_PLACE',
@@ -1071,20 +964,13 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
+      const hero = await heroService(db).getHero(id, {
         with: {
           location: { with: { hero: true } },
           action: true,
         },
       });
 
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       if (hero.action?.type !== 'IDLE') {
@@ -1106,17 +992,15 @@ export const heroRouter = new Hono<Context>()
         });
       }
 
-      await db.transaction(async (tx) => {
-        await tx
-          .update(locationTable)
-          .set({
-            mapId: place.mapId,
-            x: place.x,
-            y: place.y,
-            placeId: null,
-          })
-          .where(eq(locationTable.heroId, hero.id));
-      });
+      await db
+        .update(locationTable)
+        .set({
+          mapId: place.mapId,
+          x: place.x,
+          y: place.y,
+          placeId: null,
+        })
+        .where(eq(locationTable.heroId, hero.id));
 
       const socketMapData: MapUpdateEvent = {
         type: 'HERO_LEAVE_PLACE',
@@ -1151,16 +1035,8 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
+      const hero = await heroService(db).getHero(id);
 
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-      });
-
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       const isFullHealth = hero.currentHealth >= hero.maxHealth;
@@ -1212,15 +1088,8 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
 
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
-      });
+      const hero = await heroService(db).getHero(id);
 
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       const isFullMana = hero.currentMana >= hero.maxMana;
@@ -1273,19 +1142,14 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
       const { type } = c.req.valid('json');
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
+
+      const hero = await heroService(db).getHero(id, {
         with: {
           action: true,
           state: { columns: { id: true } },
         },
       });
 
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
       if (!hero.action) {
         throw new HTTPException(404, {
           message: 'hero action not found',
@@ -1333,8 +1197,7 @@ export const heroRouter = new Hono<Context>()
       const { craftItemId, resourceType } = c.req.valid('json');
 
       const [hero, craftItem, craftResource, backpack] = await Promise.all([
-        db.query.heroTable.findFirst({
-          where: eq(heroTable.id, id),
+        heroService(db).getHero(id, {
           with: {
             action: true,
             state: { columns: { id: true } },
@@ -1344,22 +1207,12 @@ export const heroRouter = new Hono<Context>()
           where: eq(craftItemTable.id, craftItemId),
         }),
         db.query.resourceTable.findFirst({ where: eq(resourceTable.type, resourceType) }),
-        db.query.itemContainerTable.findFirst({ where: eq(itemContainerTable.type, 'BACKPACK') }),
+        itemContainerService(db).getHeroBackpack(id),
       ]);
 
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
-      if (!hero.action) {
-        throw new HTTPException(404, {
-          message: 'hero action not found',
-        });
-      }
-
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-      if (hero.action.type !== 'IDLE') {
+
+      if (hero.action?.type !== 'IDLE') {
         throw new HTTPException(409, {
           message: 'Your hero is busy now',
         });
@@ -1381,11 +1234,7 @@ export const heroRouter = new Hono<Context>()
           message: 'craft resource not found',
         });
       }
-      if (!backpack) {
-        throw new HTTPException(404, {
-          message: 'backpack  not found',
-        });
-      }
+
       for (const requiredResource of craftItem.craftResources) {
         const inventoryResources = await db.query.containerSlotTable.findMany({
           where: and(eq(containerSlotTable.gameItemId, craftResource.gameItemId), eq(containerSlotTable.itemContainerId, backpack.id)),

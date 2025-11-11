@@ -6,19 +6,19 @@ import { PremIcon } from '@/components/game-icons/PremIcon';
 import { Button } from '@/components/ui/button';
 import { GroupMenuButton } from '@/features/group/components/GroupMenuButton';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { useItemContainerByType } from '@/features/item-container/hooks/useItemContainerByType';
 import { useBackpack } from '@/store/useBackpack';
 import { Link } from '@tanstack/react-router';
 import { memo } from 'react';
 
 import { CharacterPaperdollButton } from './CharacterPaperdollButton';
+import { useGetItemContainerByType } from '@/features/item-container/hooks/useGetItemContainerByType';
 
 export const GameHeader = memo(() => {
   const { goldCoins, premiumCoins } = useHero((state) => ({
     goldCoins: state?.data?.goldCoins,
     premiumCoins: state?.data?.premiumCoins,
   }));
-  const backpack = useItemContainerByType('BACKPACK', (data) => ({
+  const backpack = useGetItemContainerByType('BACKPACK', (data) => ({
     usedSlots: data?.usedSlots ?? 0,
     maxSlots: data?.maxSlots ?? 0,
   }));
