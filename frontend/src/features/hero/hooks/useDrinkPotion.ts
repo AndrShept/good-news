@@ -5,12 +5,14 @@ import { drinkPotion } from '../api/drinkPotion';
 import { getBuffOptions } from '../api/get-buff';
 import { getHeroOptions } from '../api/get-hero';
 import { useHeroId } from './useHeroId';
-import { getItemContainerByTypeOptions } from '@/features/item-container/api/get-item-container';
+import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
+import { getItemContainerOptions } from '@/features/item-container/api/get-item-container';
 
 export const useDrinkPotion = () => {
   const setGameMessage = useSetGameMessage();
   const queryClient = useQueryClient();
   const heroId = useHeroId();
+  const backpackId = useGetBackpackId();
   return useMutation({
     mutationFn: drinkPotion,
 
@@ -19,7 +21,7 @@ export const useDrinkPotion = () => {
         queryKey: getHeroOptions().queryKey,
       });
       await queryClient.invalidateQueries({
-        queryKey: getItemContainerByTypeOptions(heroId, 'BACKPACK').queryKey,
+       queryKey: getItemContainerOptions(heroId, backpackId).queryKey,
       });
       await queryClient.invalidateQueries({
         queryKey: getBuffOptions(heroId).queryKey,

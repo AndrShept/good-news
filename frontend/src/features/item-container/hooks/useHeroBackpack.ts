@@ -2,11 +2,12 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { Resource, ResourceType } from '@/shared/types';
 import { useMemo } from 'react';
 
+import { useGetBackpackId } from './useGetBackpackId';
 import { useItemContainer } from './useItemContainer';
 
 export const useHeroBackpack = () => {
-  const backpackId = useHero((state) => state?.data?.itemContainers.find((container) => container.type === 'BACKPACK'))?.id;
-  const backpack = useItemContainer(backpackId ?? '');
+  const backpackId = useGetBackpackId();
+  const backpack = useItemContainer(backpackId);
   const calculateSumBackpackResource = useMemo(
     () => (resources: Resource[]) => {
       const result: Partial<Record<ResourceType, number>> = {};
