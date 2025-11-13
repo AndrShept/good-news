@@ -1185,6 +1185,22 @@ export const heroRouter = new Hono<Context>()
       });
     },
   )
+  .get('/:id/queue/craft-item', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
+    const user = c.get('user');
+    const { id } = c.req.valid('param');
+    const hero = await heroService(db).getHero(id);
+
+    verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+    const queueCraftItems = await db.query.queueCraftItemTable.findMany({where: eq(queueCraftItemTable.heroId, hero.id)})
+
+
+    
+    return c.json<SuccessResponse<QueueCraftItem[]>>({
+      message: 'craft item add to queue',
+      success: true,
+      data: queueCraftItems,
+    });
+  })
   .post(
     '/:id/action/queue-craft',
     loggedIn,

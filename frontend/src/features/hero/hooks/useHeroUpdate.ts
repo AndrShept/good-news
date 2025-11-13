@@ -1,4 +1,4 @@
-import { ApiHeroResponse, Hero, QueueCraftItem } from '@/shared/types';
+import { ApiHeroResponse, Hero } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
@@ -33,44 +33,7 @@ export const useHeroUpdate = () => {
       } as ApiHeroResponse;
     });
   }, []);
-  const addCraftItemsQueue = useCallback((data: QueueCraftItem | undefined) => {
-    queryClient.setQueriesData<ApiHeroResponse>({ queryKey: getHeroOptions().queryKey }, (oldData) => {
-      if (!oldData?.data) return;
-      return {
-        ...oldData,
-        data: { ...oldData.data, queueCraftItems: [...(oldData.data?.queueCraftItems ?? []), data] },
-      } as ApiHeroResponse;
-    });
-  }, []);
-  const deleteCraftItemsQueue = useCallback((queueCraftItemId: string) => {
-    queryClient.setQueriesData<ApiHeroResponse>({ queryKey: getHeroOptions().queryKey }, (oldData) => {
-      if (!oldData?.data) return;
-      return {
-        ...oldData,
-        data: { ...oldData.data, queueCraftItems: oldData.data?.queueCraftItems?.filter((item) => item.id !== queueCraftItemId) },
-      } as ApiHeroResponse;
-    });
-  }, []);
-  const updateCraftItemsQueue = useCallback((queueCraftItemId: string, data: Partial<QueueCraftItem>) => {
-    queryClient.setQueriesData<ApiHeroResponse>({ queryKey: getHeroOptions().queryKey }, (oldData) => {
-      if (!oldData?.data) return;
 
-      console.log(oldData.data.queueCraftItems);
-      return {
-        ...oldData,
-        data: {
-          ...oldData.data,
-          queueCraftItems: oldData.data?.queueCraftItems?.map((item) => {
 
-            if (item.id === queueCraftItemId) {
-              return { ...item, ...data };
-            }
-            return item;
-          }),
-        },
-      } as ApiHeroResponse;
-    });
-  }, []);
-
-  return { updateHero, addCraftItemsQueue, deleteCraftItemsQueue, updateCraftItemsQueue };
+  return { updateHero };
 };

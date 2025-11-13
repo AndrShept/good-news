@@ -1,15 +1,18 @@
 import { GameItemImg } from '@/components/GameItemImg';
 import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { useHero } from '@/features/hero/hooks/useHero';
+import { useHeroId } from '@/features/hero/hooks/useHeroId';
+import { getQueueCraftItemOptions } from '@/features/queue/api/getQueueCraftItems';
+import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 
-import { useCraftItem } from '../hooks/useCraftItem';
+import { useCraftItem } from '../../craft/hooks/useCraftItem';
 import { useDeleteQueueCraftItemMutation } from '../hooks/useDeleteQueueCraftItemMutation';
 
 export const QueueCraftItemsList = () => {
   const { craftItemMap } = useCraftItem();
-  const queueCraftItems = useHero((state) => state?.data?.queueCraftItems);
+  const heroId = useHeroId();
+  const { data: queueCraftItems } = useQuery(getQueueCraftItemOptions(heroId));
   const { mutate, isPending } = useDeleteQueueCraftItemMutation();
   if (!queueCraftItems?.length) return;
   return (

@@ -8,7 +8,7 @@ import { getCraftItemOptions } from '../api/get-craft-item';
 import { CraftButton } from './CraftButton';
 import { CraftItemCard } from './CraftItemCard';
 import { CraftSidebar } from './CraftSidebar';
-import { QueueCraftItemsList } from './QueueCraftItemsList';
+import { QueueCraftItemsList } from '../../queue/components/QueueCraftItemsList';
 
 export const CraftModal = () => {
   const { data, isLoading } = useQuery(getCraftItemOptions());

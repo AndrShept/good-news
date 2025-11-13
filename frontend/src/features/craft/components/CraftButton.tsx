@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { CraftItem } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 
-import { useCreateQueueCraftItemMutation } from '../hooks/useCreateQueueCraftItemMutation';
+import { useCreateQueueCraftItemMutation } from '../../queue/hooks/useCreateQueueCraftItemMutation';
 
 interface Props {
   craftItem: CraftItem | undefined;

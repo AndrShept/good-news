@@ -7,7 +7,7 @@ import { useMutation } from '@tanstack/react-query';
 
 export const useDeleteQueueCraftItemMutation = () => {
   const id = useHeroId();
-  const { deleteCraftItemsQueue } = useHeroUpdate();
+  const { deleteCraftItemsQueue, } = useHeroUpdate();
   return useMutation({
     mutationFn: async (queueCraftItemId: string) => {
       const res = await client.hero[':id'].action['queue-craft'][':queueCraftItemId'].$delete({
