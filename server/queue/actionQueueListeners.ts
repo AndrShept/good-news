@@ -13,7 +13,7 @@ import { and, eq } from 'drizzle-orm';
 import { io } from '..';
 import type { GameMessageType } from '../../frontend/src/store/useGameMessages';
 import { db } from '../db/db';
-import { buffTable, gameItemTable, heroTable, modifierTable } from '../db/schema';
+import { buffTable, gameItemTable, heroTable, modifierTable, queueCraftItemTable } from '../db/schema';
 import { heroService } from '../services/hero-service';
 import { queueEvents } from './actionQueue';
 
@@ -89,6 +89,19 @@ export const actionQueueListeners = () => {
             queueItemCraftId: jobData.payload.queueCraftItemId,
           },
         };
+        const queueCraftItem = await db.query.queueCraftItemTable.findFirst({
+          where: eq(queueCraftItemTable.heroId, jobData.payload.heroId),
+        });
+        if (queueCraftItem) {
+          const updateData: QueueCraftItemSocketData = {
+            type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
+            payload: {
+              queueItemCraftId: queueCraftItem.id,
+              status: 'PROGRESS',
+            },
+          };
+          io.to(jobData.payload.heroId).emit(socketEvents.queueCraft(), updateData);
+        }
         io.to(jobData.payload.heroId).emit(socketEvents.queueCraft(), data);
     }
   });

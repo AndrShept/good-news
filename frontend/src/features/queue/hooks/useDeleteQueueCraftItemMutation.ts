@@ -1,13 +1,13 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
-import { useUpdateHero } from '@/features/hero/hooks/useUpdateHero';
 import { client } from '@/lib/utils';
-import { ErrorResponse, ResourceType } from '@/shared/types';
+import { ErrorResponse } from '@/shared/types';
 import { useMutation } from '@tanstack/react-query';
+
+import { useQueueCraftItem } from './useQueueCraftItem';
 
 export const useDeleteQueueCraftItemMutation = () => {
   const id = useHeroId();
-  const { deleteCraftItemsQueue, } = useHeroUpdate();
+  const { removeQueueCraftItems } = useQueueCraftItem();
   return useMutation({
     mutationFn: async (queueCraftItemId: string) => {
       const res = await client.hero[':id'].action['queue-craft'][':queueCraftItemId'].$delete({
@@ -23,7 +23,7 @@ export const useDeleteQueueCraftItemMutation = () => {
       return await res.json();
     },
     onSuccess: (_, queueCraftItemId) => {
-      deleteCraftItemsQueue(queueCraftItemId);
+      removeQueueCraftItems(queueCraftItemId);
     },
   });
 };

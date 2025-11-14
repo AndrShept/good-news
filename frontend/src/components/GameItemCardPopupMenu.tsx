@@ -67,7 +67,7 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type, i
     );
   };
   const onDeleteInventoryItem = () => {
-    deleteInventoryItemMutation.mutate({ containerSlotId: id, id: heroId });
+    deleteInventoryItemMutation.mutate({ containerSlotId: id });
     onClose();
   };
   return (

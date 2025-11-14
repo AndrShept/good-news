@@ -1,13 +1,13 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
-import { useUpdateHero } from '@/features/hero/hooks/useUpdateHero';
 import { client } from '@/lib/utils';
 import { ErrorResponse, ResourceType } from '@/shared/types';
 import { useMutation } from '@tanstack/react-query';
 
+import { useQueueCraftItem } from './useQueueCraftItem';
+
 export const useCreateQueueCraftItemMutation = () => {
   const id = useHeroId();
-  const { addCraftItemsQueue } = useHeroUpdate();
+  const { addQueueCraftItems } = useQueueCraftItem();
   return useMutation({
     mutationFn: async ({ craftItemId, resourceType }: { craftItemId: string; resourceType: ResourceType }) => {
       const res = await client.hero[':id'].action['queue-craft'].$post({
@@ -26,7 +26,9 @@ export const useCreateQueueCraftItemMutation = () => {
       return await res.json();
     },
     onSuccess: ({ data }) => {
-      addCraftItemsQueue(data);
+      if (data) {
+        addQueueCraftItems(data);
+      }
     },
   });
 };

@@ -16,6 +16,7 @@ export const useItemContainerUpdate = () => {
   const removeContainerSlotItem = (containerId: string, containerSlotItemId: string) => {
     queryClient.setQueryData<TItemContainer>(getItemContainerOptions(heroId, containerId).queryKey, (oldData) => {
       if (!oldData) return;
+
       return { ...oldData, containerSlots: oldData.containerSlots?.filter((item) => item.id !== containerSlotItemId) };
     });
   };

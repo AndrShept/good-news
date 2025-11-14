@@ -4,24 +4,26 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { deleteContainerSlotItem } from '../api/delete-container-slot-item';
 import { getItemContainerOptions } from '../api/get-item-container';
+import { useItemContainerUpdate } from './useItemContainerUpdate';
 
 interface IDeleteContainerSlotItem {
-  id: string;
   containerSlotId: string;
 }
 
 export const useDeleteContainerSlotItem = (itemContainerId: string) => {
   const setGameMessage = useSetGameMessage();
   const queryClient = useQueryClient();
-  const id = useHeroId();
+  const { removeContainerSlotItem } = useItemContainerUpdate();
+  const heroId = useHeroId();
   return useMutation({
-    mutationFn: ({ containerSlotId, id }: IDeleteContainerSlotItem) => deleteContainerSlotItem({ id, containerSlotId }),
+    mutationFn: ({ containerSlotId }: IDeleteContainerSlotItem) => deleteContainerSlotItem({ id: heroId, containerSlotId }),
 
-    async onSuccess(data) {
+    async onSuccess(data, variable) {
       if (data.success) {
-        await queryClient.invalidateQueries({
-          queryKey: getItemContainerOptions(id, itemContainerId).queryKey,
-        });
+        // await queryClient.invalidateQueries({
+        //   queryKey: getItemContainerOptions(id, itemContainerId).queryKey,
+        // });
+        removeContainerSlotItem(itemContainerId, variable.containerSlotId);
         setGameMessage({
           success: true,
           type: 'success',
