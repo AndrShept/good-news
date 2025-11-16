@@ -1286,74 +1286,72 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id, queueCraftItemId } = c.req.valid('param');
 
-      const [hero, queueCraftItems] = await Promise.all([
+      const [hero, queueItems] = await Promise.all([
         heroService(db).getHero(id),
         db.query.queueCraftItemTable.findMany({
           where: eq(queueCraftItemTable.heroId, id),
-          with: {
-            craftItem: true,
-          },
+          with: { craftItem: true },
         }),
       ]);
-      const queueCraftItem = queueCraftItems.find((i) => i.id === queueCraftItemId);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       if (hero.isInBattle) {
-        throw new HTTPException(409, {
-          message: 'Action not allowed: hero now is battle',
-        });
+        throw new HTTPException(409, { message: 'Action not allowed: hero now is battle' });
       }
 
-      if (!queueCraftItem) {
-        throw new HTTPException(404, {
-          message: 'queue craft item not found',
-        });
+      const deletedItem = queueItems.find((i) => i.id === queueCraftItemId);
+      if (!deletedItem) {
+        throw new HTTPException(404, { message: 'queue craft item not found' });
       }
+
       await db.delete(queueCraftItemTable).where(eq(queueCraftItemTable.id, queueCraftItemId));
-      await actionQueue.remove(queueCraftItem.jobId);
-      if (queueCraftItem.status === 'PROGRESS' && queueCraftItems.length > 1) {
-        const nextElement = queueCraftItems.find((i) => i.status === 'PENDING');
-        if (!nextElement) {
-          console.log('nextElement not found');
-          return;
-        }
+
+      await actionQueue.remove(deletedItem.jobId);
+
+      const remaining = queueItems.filter((i) => i.id !== queueCraftItemId).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+
+      const progressJob = remaining.find((i) => i.status === 'PROGRESS');
+      const pendingJobs = remaining.filter((i) => i.status === 'PENDING');
+
+      if (!progressJob && pendingJobs.length > 0) {
+        const next = pendingJobs[0];
+
+        const startedAt = new Date();
+        const completedAt = new Date(startedAt.getTime() + next.craftItem.craftTime);
+
         await db
           .update(queueCraftItemTable)
           .set({
             status: 'PROGRESS',
-            completedAt: new Date(Date.now() + nextElement.craftItem.craftTime).toISOString(),
-            startedAt: new Date().toISOString(),
+            completedAt: completedAt.toISOString(),
           })
-          .where(eq(queueCraftItemTable.id, nextElement.id));
-        const data: QueueCraftItemSocketData = {
+          .where(eq(queueCraftItemTable.id, next.id));
+
+        io.to(hero.id).emit(socketEvents.queueCraft(), {
           type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
-          payload: {
-            queueItemCraftId: nextElement.id,
-            status: 'PROGRESS',
-          },
-        };
-        io.to(hero.id).emit(socketEvents.queueCraft(), data);
-        const job = await actionQueue.getJob(nextElement.jobId);
+          payload: { queueItemCraftId: next.id, status: 'PROGRESS' },
+        });
+      }
+
+      let delayAccumulator = 0;
+
+      if (progressJob) {
+        const remainingMs = Math.max(new Date(progressJob.completedAt).getTime() - Date.now(), 0);
+        delayAccumulator = remainingMs;
+      }
+
+      for (const item of pendingJobs) {
+        delayAccumulator += item.craftItem.craftTime;
+
+        const job = await actionQueue.getJob(item.jobId);
         if (job) {
-          await job.changeDelay(nextElement.craftItem.craftTime);
+          await job.changeDelay(delayAccumulator);
         }
       }
-      const queueCraftItemsPending = queueCraftItems.filter((i) => i.status === 'PENDING');
-      if (queueCraftItemsPending.length > 1) {
-        const progressQueue = queueCraftItems.find((i) => i.status === 'PROGRESS');
-        const timeRemaining = Math.max(new Date(progressQueue?.completedAt ?? '').getTime() - Date.now(), 0);
-        let delay = timeRemaining;
-        for (const queueCraft of queueCraftItemsPending) {
-          const job = await actionQueue.getJob(queueCraft.jobId);
-          if (job) {
-            delay += queueCraft.craftItem.craftTime;
-            await job.changeDelay(delay);
-          }
-        }
-      }
+
       return c.json<SuccessResponse>({
-        message: 'queue craft item deleted ',
+        message: 'queue craft item deleted',
         success: true,
       });
     },

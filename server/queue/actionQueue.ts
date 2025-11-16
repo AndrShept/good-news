@@ -9,9 +9,3 @@ export const actionQueue = new Queue<ActionJobEvent>('hero-action', {
 export const queueEvents = new QueueEvents('hero-action', {
   connection,
 });
-export const craftQueue = new Queue<ActionJobEvent>('craftQueue', {
-  connection,
-});
-export const craftQueueEvents = new QueueEvents('craftQueue', {
-  connection,
-});

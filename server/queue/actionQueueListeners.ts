@@ -15,7 +15,7 @@ import type { GameMessageType } from '../../frontend/src/store/useGameMessages';
 import { db } from '../db/db';
 import { buffTable, gameItemTable, heroTable, modifierTable, queueCraftItemTable } from '../db/schema';
 import { heroService } from '../services/hero-service';
-import { actionQueue, craftQueueEvents, queueEvents } from './actionQueue';
+import { actionQueue,  queueEvents } from './actionQueue';
 
 export const actionQueueListeners = () => {
   queueEvents.on('completed', async ({ jobId, returnvalue }) => {
@@ -159,10 +159,4 @@ export const actionQueueListeners = () => {
     }
   });
 
-  craftQueueEvents.on('completed', async ({ jobId, returnvalue }) => {
-    console.log('completed', jobId);
-  });
-  craftQueueEvents.on('progress', async ({ data, jobId }) => {
-    console.log('progress', jobId);
-  });
-};
+}

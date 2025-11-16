@@ -16,7 +16,7 @@ export const queueCraftItemTable = pgTable('queue-craft-item', {
   heroId: uuid()
     .references(() => heroTable.id, { onDelete: 'cascade' })
     .notNull(),
-  startedAt: timestamp('started_at', {
+  createdAt: timestamp('created_at', {
     mode: 'string',
     withTimezone: true,
   })
