@@ -19,5 +19,5 @@ export const useSelfMessage = () => {
     return () => {
       socket.off(socketEvents.selfMessage(), listener);
     };
-  }, [ socket]);
+  }, []);
 };

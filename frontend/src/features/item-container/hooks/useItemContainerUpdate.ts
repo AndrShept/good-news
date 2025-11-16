@@ -19,6 +19,7 @@ export const useItemContainerUpdate = () => {
 
       return { ...oldData, containerSlots: oldData.containerSlots?.filter((item) => item.id !== containerSlotItemId) };
     });
+    setUsedSlots(containerId)
   };
   const addContainerSlotItem = (containerId: string, containerSlotItem: ContainerSlot) => {
     queryClient.setQueryData<TItemContainer>(getItemContainerOptions(heroId, containerId).queryKey, (oldData) => {
@@ -35,10 +36,18 @@ export const useItemContainerUpdate = () => {
       };
     });
   };
+  const setUsedSlots = (containerId: string) => {
+    queryClient.setQueryData<TItemContainer>(getItemContainerOptions(heroId, containerId).queryKey, (oldData) => {
+      if (!oldData) return;
+      return { ...oldData, usedSlots: oldData.containerSlots?.length ?? 0 };
+    });
+  };
+
   return {
     itemContainerUpdate,
     removeContainerSlotItem,
     addContainerSlotItem,
     updateContainerSlotItem,
+    setUsedSlots,
   };
 };

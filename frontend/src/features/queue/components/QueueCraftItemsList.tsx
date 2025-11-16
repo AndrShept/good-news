@@ -22,6 +22,7 @@ export const QueueCraftItemsList = () => {
           <li className="flex h-auto w-20 flex-col items-center justify-center gap-1" key={queueItem.id}>
             <GameItemImg className="size-10" image={craftItemMap[queueItem.craftItemId].gameItem?.image} />
             <p className="line-clamp-1 text-sm">{craftItemMap[queueItem.craftItemId].gameItem?.name}</p>
+            {queueItem.status === 'FAILED' && <p className="text-red-500">failed</p>}
             {queueItem.status === 'PROGRESS' && <p className="text-green-500">progress</p>}
             <Button variant={'destructive'} className="w-17 h-6 p-0 text-xs" disabled={isPending} onClick={() => mutate(queueItem.id)}>
               Delete

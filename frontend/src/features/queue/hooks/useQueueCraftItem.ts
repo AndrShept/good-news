@@ -16,7 +16,7 @@ export const useQueueCraftItem = () => {
         return [...oldData, data];
       }
     );
-  }, [queryClient, heroId]);
+  }, []);
   const removeQueueCraftItems = useCallback((queueCraftItemId: string) => {
     queryClient.setQueriesData<QueueCraftItem[]>(
       { queryKey: getQueueCraftItemOptions(heroId).queryKey },
@@ -25,7 +25,7 @@ export const useQueueCraftItem = () => {
         return oldData.filter((item) => item.id !== queueCraftItemId);
       }
     );
-  }, [queryClient, heroId]);
+  }, []);
   const updateQueueCraftItems = useCallback((queueCraftItemId: string, data: Partial<QueueCraftItem>) => {
     queryClient.setQueriesData<QueueCraftItem[]>(
       { queryKey: getQueueCraftItemOptions(heroId).queryKey },
@@ -40,7 +40,7 @@ export const useQueueCraftItem = () => {
         });
       }
     );
-  }, [queryClient, heroId]);
+  }, []);
 
   return { addQueueCraftItems, removeQueueCraftItems, updateQueueCraftItems };
 }

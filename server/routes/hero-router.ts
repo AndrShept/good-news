@@ -34,7 +34,7 @@ import {
 } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { randomUUIDv7 } from 'bun';
-import { and, asc, desc, eq, lt, lte, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, lt, lte, ne, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
@@ -82,6 +82,7 @@ import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
 import { containerSlotItemService } from '../services/container-slot-item-service';
+import { craftItemService } from '../services/craft-item-service';
 import { equipmentService } from '../services/equipment-service';
 import { heroService } from '../services/hero-service';
 import { itemContainerService } from '../services/item-container-service';
@@ -1191,10 +1192,8 @@ export const heroRouter = new Hono<Context>()
     const hero = await heroService(db).getHero(id);
 
     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-    const queueCraftItems = await db.query.queueCraftItemTable.findMany({where: eq(queueCraftItemTable.heroId, hero.id)})
+    const queueCraftItems = await db.query.queueCraftItemTable.findMany({ where: eq(queueCraftItemTable.heroId, hero.id) });
 
-
-    
     return c.json<SuccessResponse<QueueCraftItem[]>>({
       message: 'craft item add to queue',
       success: true,
@@ -1212,20 +1211,12 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const { craftItemId, resourceType } = c.req.valid('json');
 
-      const [hero, craftItem, craftResource, backpack] = await Promise.all([
-        heroService(db).getHero(id, {
-          with: {
-            action: true,
-            state: { columns: { id: true } },
-          },
-        }),
-        db.query.craftItemTable.findFirst({
-          where: eq(craftItemTable.id, craftItemId),
-        }),
-        db.query.resourceTable.findFirst({ where: eq(resourceTable.type, resourceType) }),
-        itemContainerService(db).getHeroBackpack(id),
-      ]);
-
+      const hero = await heroService(db).getHero(id, {
+        with: {
+          action: true,
+          state: { columns: { id: true } },
+        },
+      });
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       if (hero.action?.type !== 'IDLE') {
@@ -1239,34 +1230,11 @@ export const heroRouter = new Hono<Context>()
         });
       }
 
-      if (!craftItem) {
-        throw new HTTPException(404, {
-          message: 'craft item not found',
-        });
-      }
+      const { craftItem } = await craftItemService(db).checkCraftResources(hero.id, craftItemId, resourceType);
 
-      if (!craftResource) {
-        throw new HTTPException(404, {
-          message: 'craft resource not found',
-        });
-      }
-
-      for (const requiredResource of craftItem.craftResources) {
-        const inventoryResources = await db.query.containerSlotTable.findMany({
-          where: and(eq(containerSlotTable.gameItemId, craftResource.gameItemId), eq(containerSlotTable.itemContainerId, backpack.id)),
-        });
-
-        const totalOwnedQuantity = inventoryResources.reduce((acc, item) => acc + item.quantity, 0);
-
-        if (totalOwnedQuantity < requiredResource.quantity) {
-          throw new HTTPException(409, {
-            message: 'Not enough resources to craft this item',
-            cause: { canShow: true },
-          });
-        }
-      }
-
-      const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({ where: eq(queueCraftItemTable.heroId, hero.id) });
+      const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
+        where: and(eq(queueCraftItemTable.heroId, hero.id), ne(queueCraftItemTable.status, 'FAILED')),
+      });
 
       const lastItem = heroQueueCraftItems.at(-1);
 
@@ -1318,20 +1286,16 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id, queueCraftItemId } = c.req.valid('param');
 
-      const [hero, queueCraftItem] = await Promise.all([
-        db.query.heroTable.findFirst({
-          where: eq(heroTable.id, id),
-        }),
-        db.query.queueCraftItemTable.findFirst({
-          where: eq(queueCraftItemTable.id, queueCraftItemId),
+      const [hero, queueCraftItems] = await Promise.all([
+        heroService(db).getHero(id),
+        db.query.queueCraftItemTable.findMany({
+          where: eq(queueCraftItemTable.heroId, id),
+          with: {
+            craftItem: true,
+          },
         }),
       ]);
-
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
+      const queueCraftItem = queueCraftItems.find((i) => i.id === queueCraftItemId);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
@@ -1346,9 +1310,48 @@ export const heroRouter = new Hono<Context>()
           message: 'queue craft item not found',
         });
       }
-
       await db.delete(queueCraftItemTable).where(eq(queueCraftItemTable.id, queueCraftItemId));
-
+      await actionQueue.remove(queueCraftItem.jobId);
+      if (queueCraftItem.status === 'PROGRESS' && queueCraftItems.length > 1) {
+        const nextElement = queueCraftItems.find((i) => i.status === 'PENDING');
+        if (!nextElement) {
+          console.log('nextElement not found');
+          return;
+        }
+        await db
+          .update(queueCraftItemTable)
+          .set({
+            status: 'PROGRESS',
+            completedAt: new Date(Date.now() + nextElement.craftItem.craftTime).toISOString(),
+            startedAt: new Date().toISOString(),
+          })
+          .where(eq(queueCraftItemTable.id, nextElement.id));
+        const data: QueueCraftItemSocketData = {
+          type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
+          payload: {
+            queueItemCraftId: nextElement.id,
+            status: 'PROGRESS',
+          },
+        };
+        io.to(hero.id).emit(socketEvents.queueCraft(), data);
+        const job = await actionQueue.getJob(nextElement.jobId);
+        if (job) {
+          await job.changeDelay(nextElement.craftItem.craftTime);
+        }
+      }
+      const queueCraftItemsPending = queueCraftItems.filter((i) => i.status === 'PENDING');
+      if (queueCraftItemsPending.length > 1) {
+        const progressQueue = queueCraftItems.find((i) => i.status === 'PROGRESS');
+        const timeRemaining = Math.max(new Date(progressQueue?.completedAt ?? '').getTime() - Date.now(), 0);
+        let delay = timeRemaining;
+        for (const queueCraft of queueCraftItemsPending) {
+          const job = await actionQueue.getJob(queueCraft.jobId);
+          if (job) {
+            delay += queueCraft.craftItem.craftTime;
+            await job.changeDelay(delay);
+          }
+        }
+      }
       return c.json<SuccessResponse>({
         message: 'queue craft item deleted ',
         success: true,
