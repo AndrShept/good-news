@@ -13,20 +13,20 @@ interface Props extends QueueCraftItem {
 export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props) {
   const { mutate, isPending } = useDeleteQueueCraftItemMutation();
 
-  const timeRemaining = new Date(props.completedAt).getTime() - Date.now();
-  const [timer, setTimer] = useState(timeRemaining);
-  const computeRemaining = useEffectEvent(() => {
-    setTimer(new Date(props.completedAt).getTime() - Date.now());
-  });
+  const [timer, setTimer] = useState(new Date(props.completedAt).getTime() - Date.now());
 
   useEffect(() => {
-    if (props.status !== 'PROGRESS') return;
+    // Оновлюй state при зміні completedAt
+    setTimer(new Date(props.completedAt).getTime() - Date.now());
+  }, [props.completedAt]);
 
-    const id = setInterval(computeRemaining, 1000);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setTimer((prev) => prev - 1000);
+    }, 1000);
 
     return () => clearInterval(id);
-  }, [props.status, props.completedAt, computeRemaining]);
-
+  }, []);
   return (
     <li
       className={cn('w-22 group relative flex h-auto flex-col items-center justify-center gap-1 overflow-hidden rounded p-1.5', {
@@ -52,7 +52,7 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
           'opacity-100': props.status === 'PROGRESS',
         })}
       >
-        {timer}
+        {Math.max(0, Math.floor(timer / 1000))} сек
       </p>
       <button
         disabled={isPending}

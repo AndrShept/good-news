@@ -9,6 +9,7 @@ export const useSelfMessage = () => {
   const setGameMessage = useSetGameMessage();
 
   useEffect(() => {
+    
     const listener = (data: SelfMessageData) => {
       setGameMessage({
         text: data.message,

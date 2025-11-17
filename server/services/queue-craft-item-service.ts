@@ -41,13 +41,14 @@ export const queueCraftItemService = (db: TTransaction | TDataBase) => ({
 
     const completedAt = new Date(Date.now() + (next.craftItem?.craftTime ?? 0)).toISOString();
 
-    await db
+    const [updatedQueueItem] = await db
       .update(queueCraftItemTable)
       .set({
         status: 'PROGRESS',
         completedAt,
       })
-      .where(eq(queueCraftItemTable.id, next.id));
-    return next;
+      .where(eq(queueCraftItemTable.id, next.id))
+      .returning();
+    return updatedQueueItem;
   },
 });

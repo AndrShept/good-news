@@ -1321,11 +1321,11 @@ export const heroRouter = new Hono<Context>()
       if (!progressJob && pendingJobs.length > 0) {
         const next = await queueCraftItemService(db).setNextQueueCraftItem(hero.id);
 
-        // const updateData: QueueCraftItemSocketData = {
-        //   type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
-        //   payload: { queueItemCraftId: next.id, status: 'PROGRESS', completedAt: next.completedAt ?? '' },
-        // };
-        // io.to(hero.id).emit(socketEvents.queueCraft(), updateData);
+        const updateData: QueueCraftItemSocketData = {
+          type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
+          payload: { queueItemCraftId: next.id, status: 'PROGRESS', completedAt: next.completedAt ?? '' },
+        };
+        io.to(hero.id).emit(socketEvents.queueCraft(), updateData);
       }
 
       let delayAccumulator = 0;
@@ -1342,7 +1342,6 @@ export const heroRouter = new Hono<Context>()
         if (job) {
           await job.changeDelay(delayAccumulator);
         }
-        
       }
 
       return c.json<SuccessResponse>({

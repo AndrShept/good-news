@@ -17,6 +17,7 @@ export const useQueueCraftListener = () => {
   const { updateQueueCraftItems, removeQueueCraftItems } = useQueueCraftItem();
   useEffect(() => {
     const listener = async (data: QueueCraftItemSocketData) => {
+      console.error('FRONT', data);
       switch (data.type) {
         case 'QUEUE_CRAFT_ITEM_COMPLETE':
           removeQueueCraftItems(data.payload.queueItemCraftId);
@@ -26,7 +27,10 @@ export const useQueueCraftListener = () => {
 
           break;
         case 'QUEUE_CRAFT_ITEM_STATUS_UPDATE':
-          updateQueueCraftItems(data.payload.queueItemCraftId, { ...data.payload });
+          updateQueueCraftItems(data.payload.queueItemCraftId, {
+            status: data.payload.status,
+            completedAt: data.payload.completedAt,
+          });
           break;
       }
     };
@@ -35,5 +39,5 @@ export const useQueueCraftListener = () => {
     return () => {
       socket.off(socketEvents.queueCraft(), listener);
     };
-  }, []);
+  }, [socket]);
 };
