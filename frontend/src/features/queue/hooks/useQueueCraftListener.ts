@@ -26,7 +26,7 @@ export const useQueueCraftListener = () => {
 
           break;
         case 'QUEUE_CRAFT_ITEM_STATUS_UPDATE':
-          updateQueueCraftItems(data.payload.queueItemCraftId, { status: data.payload.status });
+          updateQueueCraftItems(data.payload.queueItemCraftId, { ...data.payload });
           break;
       }
     };

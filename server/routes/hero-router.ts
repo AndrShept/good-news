@@ -86,6 +86,7 @@ import { craftItemService } from '../services/craft-item-service';
 import { equipmentService } from '../services/equipment-service';
 import { heroService } from '../services/hero-service';
 import { itemContainerService } from '../services/item-container-service';
+import { queueCraftItemService } from '../services/queue-craft-item-service';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -1192,7 +1193,10 @@ export const heroRouter = new Hono<Context>()
     const hero = await heroService(db).getHero(id);
 
     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-    const queueCraftItems = await db.query.queueCraftItemTable.findMany({ where: eq(queueCraftItemTable.heroId, hero.id) });
+    const queueCraftItems = await db.query.queueCraftItemTable.findMany({
+      where: eq(queueCraftItemTable.heroId, hero.id),
+      orderBy: asc(queueCraftItemTable.createdAt),
+    });
 
     return c.json<SuccessResponse<QueueCraftItem[]>>({
       message: 'craft item add to queue',
@@ -1309,29 +1313,19 @@ export const heroRouter = new Hono<Context>()
 
       await actionQueue.remove(deletedItem.jobId);
 
-      const remaining = queueItems.filter((i) => i.id !== queueCraftItemId).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+      const remaining = queueItems.filter((i) => i.id !== queueCraftItemId);
 
       const progressJob = remaining.find((i) => i.status === 'PROGRESS');
       const pendingJobs = remaining.filter((i) => i.status === 'PENDING');
 
       if (!progressJob && pendingJobs.length > 0) {
-        const next = pendingJobs[0];
+        const next = await queueCraftItemService(db).setNextQueueCraftItem(hero.id);
 
-        const startedAt = new Date();
-        const completedAt = new Date(startedAt.getTime() + next.craftItem.craftTime);
-
-        await db
-          .update(queueCraftItemTable)
-          .set({
-            status: 'PROGRESS',
-            completedAt: completedAt.toISOString(),
-          })
-          .where(eq(queueCraftItemTable.id, next.id));
-
-        io.to(hero.id).emit(socketEvents.queueCraft(), {
-          type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
-          payload: { queueItemCraftId: next.id, status: 'PROGRESS' },
-        });
+        // const updateData: QueueCraftItemSocketData = {
+        //   type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
+        //   payload: { queueItemCraftId: next.id, status: 'PROGRESS', completedAt: next.completedAt ?? '' },
+        // };
+        // io.to(hero.id).emit(socketEvents.queueCraft(), updateData);
       }
 
       let delayAccumulator = 0;
@@ -1348,6 +1342,7 @@ export const heroRouter = new Hono<Context>()
         if (job) {
           await job.changeDelay(delayAccumulator);
         }
+        
       }
 
       return c.json<SuccessResponse>({

@@ -70,5 +70,6 @@ export type QueueCraftItemJob = {
   payload: {
     heroId: string;
     queueCraftItemId: string;
+    completedAt?: string;
   };
 };

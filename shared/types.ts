@@ -177,7 +177,9 @@ export type Location = InferSelectModel<typeof locationTable> & {
   hero?: Hero;
 };
 
-export type QueueCraftItem = typeof queueCraftItemTable.$inferSelect;
+export type QueueCraftItem = typeof queueCraftItemTable.$inferSelect & {
+  craftItem?: CraftItem | null;
+};
 
 export type Place = InferSelectModel<typeof placeTable> & {
   buildings?: Building[] | null;

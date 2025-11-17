@@ -15,7 +15,8 @@ import type { GameMessageType } from '../../frontend/src/store/useGameMessages';
 import { db } from '../db/db';
 import { buffTable, gameItemTable, heroTable, modifierTable, queueCraftItemTable } from '../db/schema';
 import { heroService } from '../services/hero-service';
-import { actionQueue,  queueEvents } from './actionQueue';
+import { queueCraftItemService } from '../services/queue-craft-item-service';
+import { actionQueue, queueEvents } from './actionQueue';
 
 export const actionQueueListeners = () => {
   queueEvents.on('completed', async ({ jobId, returnvalue }) => {
@@ -89,19 +90,17 @@ export const actionQueueListeners = () => {
             queueItemCraftId: jobData.payload.queueCraftItemId,
           },
         };
-        const queueCraftItem = await db.query.queueCraftItemTable.findFirst({
-          where: and(eq(queueCraftItemTable.heroId, jobData.payload.heroId), eq(queueCraftItemTable.status, 'PENDING')),
-        });
-        if (queueCraftItem) {
-          const updateData: QueueCraftItemSocketData = {
-            type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
-            payload: {
-              queueItemCraftId: queueCraftItem.id,
-              status: 'PROGRESS',
-            },
-          };
-          io.to(jobData.payload.heroId).emit(socketEvents.queueCraft(), updateData);
-        }
+
+        const updateData: QueueCraftItemSocketData = {
+          type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
+          payload: {
+            queueItemCraftId: jobData.payload.queueCraftItemId,
+            status: 'PROGRESS',
+            completedAt: jobData.payload.completedAt ?? '',
+          },
+        };
+        io.to(jobData.payload.heroId).emit(socketEvents.queueCraft(), updateData);
+
         io.to(jobData.payload.heroId).emit(socketEvents.queueCraft(), data);
     }
   });
@@ -115,6 +114,17 @@ export const actionQueueListeners = () => {
         break;
       case 'REGEN_MANA':
         io.to(progressData.payload.heroId).emit(socketEvents.selfData(), progressData);
+        break;
+      case 'QUEUE_CRAFT_ITEM':
+        const updateQueueCraftDataProgress: QueueCraftItemSocketData = {
+          type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
+          payload: {
+            status: 'PROGRESS',
+            queueItemCraftId: progressData.payload.queueCraftItemId,
+            completedAt: progressData.payload.completedAt ?? '',
+          },
+        };
+        io.to(progressData.payload.heroId).emit(socketEvents.queueCraft(), updateQueueCraftDataProgress);
         break;
     }
   });
@@ -134,29 +144,14 @@ export const actionQueueListeners = () => {
           payload: {
             status: 'FAILED',
             queueItemCraftId: jobData.data.payload.queueCraftItemId,
+            completedAt: jobData.data.payload.completedAt ?? new Date().toISOString(),
           },
         };
-        await db
-          .update(queueCraftItemTable)
-          .set({ status: 'FAILED' })
-          .where(eq(queueCraftItemTable.id, jobData.data.payload.queueCraftItemId));
+
         io.to(jobData.data.payload.heroId).emit(socketEvents.selfMessage(), selfMessageData);
         io.to(jobData.data.payload.heroId).emit(socketEvents.queueCraft(), updateQueueCraftDataFailed);
-        const findNextQueue = await db.query.queueCraftItemTable.findFirst({
-          where: and(eq(queueCraftItemTable.heroId, jobData.data.payload.heroId), eq(queueCraftItemTable.status, 'PENDING')),
-        });
-        if (findNextQueue) {
-          const updateQueueCraftDataProgress: QueueCraftItemSocketData = {
-            type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
-            payload: {
-              status: 'PROGRESS',
-              queueItemCraftId: findNextQueue.id,
-            },
-          };
-          io.to(jobData.data.payload.heroId).emit(socketEvents.queueCraft(), updateQueueCraftDataProgress);
-        }
+
         break;
     }
   });
-
-}
+};
