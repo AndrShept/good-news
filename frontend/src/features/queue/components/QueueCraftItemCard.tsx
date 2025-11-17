@@ -20,12 +20,15 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
   }, [props.completedAt]);
 
   useEffect(() => {
+    if (props.status !== 'PROGRESS') return;
     const id = setInterval(() => {
       setTimer((prev) => prev - 1000);
     }, 1000);
 
-    return () => clearInterval(id);
-  }, []);
+    return () => {
+      clearInterval(id);
+    };
+  }, [props.status]);
   return (
     <li
       className={cn('w-22 group relative flex h-auto flex-col items-center justify-center gap-1 overflow-hidden rounded p-1.5', {
