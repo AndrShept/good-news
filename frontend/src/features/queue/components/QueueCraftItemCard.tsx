@@ -2,7 +2,7 @@ import { GameItemImg } from '@/components/GameItemImg';
 import { cn } from '@/lib/utils';
 import { CraftItem, QueueCraftItem } from '@/shared/types';
 import { X } from 'lucide-react';
-import React, { memo, useCallback, useEffect, useEffectEvent, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 
 import { useDeleteQueueCraftItemMutation } from '../hooks/useDeleteQueueCraftItemMutation';
 
@@ -16,7 +16,6 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
   const [timer, setTimer] = useState(new Date(props.completedAt).getTime() - Date.now());
 
   useEffect(() => {
-    // Оновлюй state при зміні completedAt
     setTimer(new Date(props.completedAt).getTime() - Date.now());
   }, [props.completedAt]);
 
