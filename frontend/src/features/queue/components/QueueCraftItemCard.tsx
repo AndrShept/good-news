@@ -1,4 +1,5 @@
 import { GameItemImg } from '@/components/GameItemImg';
+import { materialConfig } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { CraftItem, QueueCraftItem } from '@/shared/types';
 import { X } from 'lucide-react';
@@ -40,6 +41,7 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
     >
       <GameItemImg className="size-10" image={props.craftItemMap[props.craftItemId].gameItem?.image} />
       <p className="line-clamp-1 text-sm">{props.craftItemMap[props.craftItemId].gameItem?.name}</p>
+      <p className={(cn('text-sm'), materialConfig[props.baseMaterial].color)}>{props.baseMaterial.toLowerCase()}</p>
       <p
         className={cn('text-sm', {
           'text-muted': props.status === 'PENDING',

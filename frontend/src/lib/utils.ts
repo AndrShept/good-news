@@ -72,7 +72,7 @@ export const joinRoomClient = ({ socket, id, joinMessage, leaveMessage, prevRefI
       if (cb.accept && joinMessage) {
         setGameMessage({
           text: `${joinMessage} ${id}`,
-          type: 'info',
+          type: 'INFO',
         });
       }
     });
@@ -83,7 +83,7 @@ export const joinRoomClient = ({ socket, id, joinMessage, leaveMessage, prevRefI
       if (cb.accept && leaveMessage) {
         setGameMessage({
           text: `${leaveMessage} ${prevRefId.current}`,
-          type: 'error',
+          type: 'ERROR',
         });
       }
     });
@@ -112,33 +112,35 @@ export const getTileExists = ({ index, layers, tileType }: IGetTileExists) => {
   return tiles?.data[index];
 };
 
-
-
- export const modifierChangeName = (modifier: keyof OmitModifier) => {
-    const variants: Record<keyof OmitModifier, string> = {
-      minDamage: 'min damage',
-      maxDamage: 'max damage',
-      strength: 'strength',
-      dexterity: 'dexterity',
-      intelligence: 'intelligence',
-      constitution: 'constitution',
-      luck: 'luck',
-      defense: 'defense',
-      evasion: 'evasion',
-      magicResistance: 'magic resistance',
-      healthRegen: 'health regen',
-      manaRegen: 'mana regen',
-      maxHealth: 'max health',
-      maxMana: 'max mana',
-      physDamage: 'phys damage',
-      physCritChance: 'phys crit chance',
-      physCritPower: 'phys crit power',
-      physHitChance: 'phys hit chance',
-      spellDamage: 'spell damage',
-      spellCritChance: 'spell crit chance',
-      spellCritPower: 'spell crit power',
-      spellHitChance: 'spell hit chance',
-
-    };
-    return variants[modifier];
+export const modifierChangeName = (modifier: keyof OmitModifier) => {
+  const variants: Record<keyof OmitModifier, string> = {
+    minDamage: 'min damage',
+    maxDamage: 'max damage',
+    strength: 'strength',
+    dexterity: 'dexterity',
+    intelligence: 'intelligence',
+    constitution: 'constitution',
+    luck: 'luck',
+    defense: 'defense',
+    evasion: 'evasion',
+    magicResistance: 'magic resistance',
+    healthRegen: 'health regen',
+    manaRegen: 'mana regen',
+    maxHealth: 'max health',
+    maxMana: 'max mana',
+    physDamage: 'phys damage',
+    physCritChance: 'phys crit chance',
+    physCritPower: 'phys crit power',
+    physHitChance: 'phys hit chance',
+    spellDamage: 'spell damage',
+    spellCritChance: 'spell crit chance',
+    spellCritPower: 'spell crit power',
+    spellHitChance: 'spell hit chance',
   };
+  return variants[modifier];
+};
+
+export function capitalize(text: string) {
+  if (!text) return '';
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+}

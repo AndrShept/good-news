@@ -54,7 +54,7 @@ export const CraftItemCard = memo((props: Props) => {
         </div>
 
         <ul>
-          {props.craftResources.map((resource) => (
+          {props.requiredResources.map((resource) => (
             <div key={resource.type} className="flex items-center gap-1">
               <GameItemImg image={resourceGroup?.[selectedResourceType].image} />
               <p>x{resource.quantity}</p>

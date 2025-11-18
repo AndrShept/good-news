@@ -35,7 +35,7 @@ export const useMapListener = () => {
         case 'HERO_ENTER_PLACE':
           if (id === data.payload.heroId) {
             setGameMessage({
-              type: 'success',
+              type: 'SUCCESS',
               text: `You have entered a town.`,
             });
             updateHero({ action: { type: 'IDLE' }, location: { mapId: null, placeId: data.payload.placeId } });
@@ -52,7 +52,7 @@ export const useMapListener = () => {
         case 'WALK_MAP':
           if (id === data.payload.heroId) {
             setGameMessage({
-              type: 'success',
+              type: 'SUCCESS',
               text: `You have entered tile.`,
             });
             updateHero({ action: { type: 'IDLE' }, location: { ...data.payload.newPosition } });

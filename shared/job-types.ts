@@ -1,4 +1,4 @@
-import type { BuildingType, IPosition } from './types';
+import type { BuildingType, IPosition, ResourceType } from './types';
 
 export const jobName = {
   'walk-map': 'WALK_PLACE',
@@ -70,6 +70,8 @@ export type QueueCraftItemJob = {
   payload: {
     heroId: string;
     queueCraftItemId: string;
+    resourceType: ResourceType;
     completedAt?: string;
+    gameItemName?: string;
   };
 };

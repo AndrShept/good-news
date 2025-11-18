@@ -28,7 +28,7 @@ export const ShopBuyButton = ({ gameItemId }: Props) => {
       });
       setGameMessage({
         text: data.message,
-        type: 'success',
+        type: 'SUCCESS',
         data: { gameItemName: data.data?.gameItem?.name ?? '', quantity: data.data?.quantity },
       });
     },

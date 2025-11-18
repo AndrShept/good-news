@@ -46,12 +46,11 @@ const queryClient = new QueryClient({
     mutations: {
       onError: (err) => {
         const error = err as ApiError;
-        console.log(error);
         const setGameMessage = useGameMessages.getState().setGameMessage;
         if (error?.cause?.canShow) {
           setGameMessage({
             text: error.message,
-            type: 'error',
+            type: 'ERROR',
           });
         } else {
           toastError();

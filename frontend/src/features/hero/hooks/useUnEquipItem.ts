@@ -24,7 +24,7 @@ export const useUnEquipItem = () => {
       });
       setGameMessage({
         success: true,
-        type: 'success',
+        type: 'INFO',
         text: data.message,
         data: { gameItemName: data.data?.gameItem?.name ?? '' },
       });

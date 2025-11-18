@@ -13,7 +13,7 @@ export const craftItemTable = pgTable('craft-item', {
 
   craftTime: integer().default(0).notNull(),
   requiredLevel: integer().default(1).notNull(),
-  craftResources: jsonb().$type<{ type: ResourceType; quantity: number }[]>().notNull(),
+  requiredResources: jsonb().$type<{ type: ResourceType; quantity: number }[]>().notNull(),
 });
 
 export const craftTableRelations = relations(craftItemTable, ({ one }) => ({

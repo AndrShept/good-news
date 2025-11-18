@@ -8,7 +8,7 @@ import { modifierTable } from './modifier-schema';
 const ores = ['IRON', 'COPPER', 'SILVER', 'GOLD', 'MITHRIL', 'ADAMANTINE'] as const;
 
 export const resourceTypeEnum = pgEnum('resource_type_enum', [...ores]);
-export const resourceCategoryEnum = pgEnum('resource_category_enum', ['ORE', 'WOOD', 'HERB']);
+export const resourceCategoryEnum = pgEnum('resource_category_enum', ['ORE', 'WOOD', 'HERB', 'LEATHER']);
 export const rarityEnum = pgEnum('rarity_enum', ['COMMON', 'MAGIC', 'EPIC', 'RARE', 'LEGENDARY']);
 
 export const resourceTable = pgTable('resource', {
@@ -16,6 +16,7 @@ export const resourceTable = pgTable('resource', {
   type: resourceTypeEnum().notNull(),
   category: resourceCategoryEnum().notNull(),
   rarity: rarityEnum().notNull(),
+  description: text(),
   gameItemId: uuid()
     .references(() => gameItemTable.id, {
       onDelete: 'cascade',

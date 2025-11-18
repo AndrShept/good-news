@@ -20,7 +20,7 @@ export const useConfirmStats = (data: z.infer<typeof changeStatSchema>) => {
     },
     onSuccess: async (data) => {
       if (data.success) {
-        setGameMessage({ type: 'success', text: data.message });
+        setGameMessage({ type: 'SUCCESS', text: data.message });
       }
 
       await queryClient.invalidateQueries({

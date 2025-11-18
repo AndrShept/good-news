@@ -35,7 +35,7 @@ export const usePlaceListener = () => {
         case 'HERO_LEAVE_PLACE':
           if (data.payload.heroId === id) {
             setGameMessage({
-              type: 'success',
+              type: 'SUCCESS',
               text: `You have leave a town.`,
             });
             updateHero({ action: { type: 'IDLE' }, location: { mapId: data.payload.mapId, placeId: null } });
@@ -52,7 +52,7 @@ export const usePlaceListener = () => {
             },
           });
           setGameMessage({
-            type: 'success',
+            type: 'SUCCESS',
             text: `You have entered the ${data.payload.buildingType}.`,
           });
           break;

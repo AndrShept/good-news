@@ -69,7 +69,7 @@ export const actionQueueListeners = () => {
         if (jobData.payload.isComplete) {
           const messageData: SelfMessageData = {
             message: 'Stop health regen ',
-            type: 'error',
+            type: 'INFO',
           };
           io.to(jobData.payload.heroId).emit(socketEvents.selfMessage(), messageData);
         }
@@ -78,7 +78,7 @@ export const actionQueueListeners = () => {
         if (jobData.payload.isComplete) {
           const messageData: SelfMessageData = {
             message: 'Stop mana regen ',
-            type: 'error',
+            type: 'INFO',
           };
           io.to(jobData.payload.heroId).emit(socketEvents.selfMessage(), messageData);
         }
@@ -88,6 +88,7 @@ export const actionQueueListeners = () => {
           type: 'QUEUE_CRAFT_ITEM_COMPLETE',
           payload: {
             queueItemCraftId: jobData.payload.queueCraftItemId,
+            gameItemName: jobData.payload.gameItemName ?? '',
           },
         };
 
@@ -129,14 +130,14 @@ export const actionQueueListeners = () => {
     }
   });
 
-  queueEvents.on('failed', async ({ jobId, failedReason }: { jobId: string; failedReason: string }) => {
+  queueEvents.on('failed', async ({ jobId, failedReason }) => {
     console.error('actionQueueListeners queueEvents ERROR ', failedReason);
 
     const jobData = await actionQueue.getJob(jobId);
     switch (jobData?.data?.jobName) {
       case 'QUEUE_CRAFT_ITEM':
         const selfMessageData: SelfMessageData = {
-          type: 'error',
+          type: 'ERROR',
           message: failedReason,
         };
         const updateQueueCraftDataFailed: QueueCraftItemSocketData = {

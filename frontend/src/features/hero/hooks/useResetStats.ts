@@ -17,14 +17,14 @@ export const useResetStats = () => {
         });
         setGameMessage({
           success: data.success,
-          type: 'success',
+          type: 'SUCCESS',
           text: data.message,
         });
       }
       if (!data.success) {
         setGameMessage({
           success: data.success,
-          type: 'error',
+          type: 'ERROR',
           text: data.message,
         });
       }

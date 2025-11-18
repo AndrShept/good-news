@@ -1067,7 +1067,7 @@ export const heroRouter = new Hono<Context>()
       };
       const messageData: SelfMessageData = {
         message: 'Start health regen',
-        type: 'success',
+        type: 'INFO',
       };
       await actionQueue.upsertJobScheduler(
         jobId,
@@ -1120,7 +1120,7 @@ export const heroRouter = new Hono<Context>()
       };
       const messageData: SelfMessageData = {
         message: 'Start mana regen',
-        type: 'success',
+        type: 'INFO',
       };
       await actionQueue.upsertJobScheduler(
         jobId,
@@ -1258,13 +1258,14 @@ export const heroRouter = new Hono<Context>()
       const jobId = `hero-${hero.id}_queue-craft-${randomUuid}`;
       const [newQueueCraftItem] = await db
         .insert(queueCraftItemTable)
-        .values({ heroId: hero.id, jobId, status: !lastItem ? 'PROGRESS' : 'PENDING', craftItemId: craftItem.id, completedAt })
+        .values({ heroId: hero.id, jobId, baseMaterial: resourceType, status: !lastItem ? 'PROGRESS' : 'PENDING', craftItemId: craftItem.id, completedAt })
         .returning();
       const jobData: QueueCraftItemJob = {
         jobName: 'QUEUE_CRAFT_ITEM',
         payload: {
           heroId: hero.id,
           queueCraftItemId: newQueueCraftItem.id,
+          resourceType
         },
       };
       console.log('@@@@@@@', delay);

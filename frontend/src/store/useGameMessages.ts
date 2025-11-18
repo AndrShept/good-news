@@ -1,13 +1,15 @@
 import { create } from 'zustand';
 
-export const gameMessageType = {
+export const gameMessageObj = {
   info: 'INFO',
   warning: 'WARNING',
   error: 'ERROR',
   success: 'SUCCESS',
 } as const;
 
-export type GameMessageType = keyof typeof gameMessageType;
+export const gameMessageValues = Object.values(gameMessageObj);
+
+export type GameMessageType = typeof gameMessageValues[number]
 export interface IGameMessage {
   text: string;
   data?: { gameItemName: string; quantity?: number };

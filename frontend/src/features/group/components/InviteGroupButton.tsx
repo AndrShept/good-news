@@ -25,7 +25,7 @@ export const InviteGroupButton = ({ toHeroId, searchTerm }: { toHeroId: string; 
     setIsLoading(true);
     const res = (await socket.emitWithAck(socketEvents.groupInvite(), { fromHeroId, toHeroId })) as SocketResponse;
     setIsLoading(false);
-    if (!res.success) setGameMessage({ text: res.message, type: 'error' });
+    if (!res.success) setGameMessage({ text: res.message, type: 'ERROR' });
     if (res.success) {
       // setGameMessage({ text: res.message, type: 'success' });
       await queryClient.invalidateQueries({

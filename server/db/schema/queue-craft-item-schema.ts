@@ -3,6 +3,7 @@ import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-
 
 import { craftItemTable } from './craft-item-schema';
 import { heroTable } from './hero-schema';
+import { resourceTypeEnum } from './resource-schema';
 
 export const queueCraftStatusEnum = pgEnum('queue_craft_status_enum', ['PENDING', 'PROGRESS', 'COMPLETE', 'FAILED']);
 
@@ -10,6 +11,7 @@ export const queueCraftItemTable = pgTable('queue-craft-item', {
   id: uuid().primaryKey().defaultRandom().notNull(),
   jobId: text().notNull(),
   status: queueCraftStatusEnum().notNull(),
+  baseMaterial: resourceTypeEnum().notNull(),
   craftItemId: uuid()
     .references(() => craftItemTable.id, { onDelete: 'cascade' })
     .notNull(),

@@ -33,7 +33,7 @@ export const craftItemService = (db: TTransaction | TDataBase) => ({
       });
     }
 
-    for (const requiredResource of craftItem.craftResources) {
+    for (const requiredResource of craftItem.requiredResources) {
       const inventoryResources = await db.query.containerSlotTable.findMany({
         where: and(eq(containerSlotTable.gameItemId, craftResource.gameItemId), eq(containerSlotTable.itemContainerId, backpack.id)),
       });
