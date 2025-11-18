@@ -22,7 +22,7 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
   useEffect(() => {
     if (props.status !== 'PROGRESS') return;
     const id = setInterval(() => {
-      setTimer((prev) => prev - 1000);
+      setTimer(new Date(props.completedAt).getTime() - Date.now());
     }, 1000);
 
     return () => {
@@ -54,7 +54,7 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
           'opacity-100': props.status === 'PROGRESS',
         })}
       >
-        {Math.max(0, Math.floor(timer / 1000))} сек
+        {Math.max(0, Math.ceil(timer / 1000))} сек
       </p>
       <button
         disabled={isPending}
