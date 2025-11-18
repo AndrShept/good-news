@@ -49,13 +49,6 @@ interface MaterialProps {
   bg: string;
 }
 
-interface MaterialProps {
-  color: string;
-  border: string;
-  glow: string;
-  bg: string;
-}
-
 export const materialConfig: Record<ResourceType, MaterialProps> = {
   IRON: {
     color: 'text-gray-400',
@@ -92,5 +85,58 @@ export const materialConfig: Record<ResourceType, MaterialProps> = {
     border: 'border-emerald-500/50',
     glow: 'shadow-[0_0_30px_rgba(52,211,153,0.6)] animate-[glow_adamantine_2s_ease-in-out_infinite]',
     bg: 'bg-emerald-400/10',
+  },
+};
+
+export const iconConfig = {
+  ui: {
+    fish: '/sprites/icons/fish.png',
+    gold: '/sprites/icons/gold.png',
+    prem: '/sprites/icons/prem.png',
+    group: '/sprites/icons/group.png',
+    logo: '/sprites/icons/group.logo',
+    map: '/sprites/icons/group.map',
+    random: '/sprites/icons/random.png',
+    town: '/sprites/icons/town.png',
+  },
+  weapon: {
+sword: ''
+  },
+  stat: {
+    strength: '/sprites/icons/stats/strength.png',
+    constitution: '/sprites/icons/stats/constitution.png',
+    intelligence: '/sprites/icons/stats/intelligence.png',
+    dexterity: '/sprites/icons/stats/dexterity.png',
+    luck: '/sprites/icons/stats/luck.png',
+  },
+  potion: {
+    buff: {
+      strength: '/sprites/potions/str.png',
+      constitution: '/sprites/potions/const.png',
+      intelligence: '/sprites/potions/ing.png',
+      dexterity: '/sprites/potions/dex.png',
+      luck: '/sprites/potions/luck.png',
+    },
+    restore: {
+      smallHealth: '/sprites/potions/small-health.png',
+      smallMana: '/sprites/potions/small-mana.png',
+      smallRestore: '/sprites/potions/small-restore.png',
+      mediumHealth: '/sprites/potions/medium-health.png',
+      mediumMana: '/sprites/potions/medium-mana.png',
+      mediumRestore: '/sprites/potions/medium-restore.png',
+    },
+  },
+  resource: {
+    ore: {
+      iron: '/sprites/ores/iron-ore.png',
+      copper: '/sprites/ores/copper-ore.png',
+      silver: '/sprites/ores/silver-ore.png',
+      gold: '/sprites/ores/gold-ore.png',
+      mithril: '/sprites/ores/mithril-ore.png',
+      adamantine: '/sprites/ores/adamantine-ore.png',
+    },
+    wood: {},
+    leather: {},
+    herb: {},
   },
 };
