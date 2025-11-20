@@ -230,6 +230,7 @@ export type Resource = typeof resourceTable.$inferSelect & {
 export type CraftItem = typeof craftItemTable.$inferSelect & {
   gameItem?: GameItem | null;
 };
+export type CraftItemRequiredResources = { type: ResourceType; quantity: number }
 
 export type GroupCraftItem = { itemType: GameItemType; subgroups: { subtype: WeaponType; items: CraftItem[] }[] };
 

@@ -1215,12 +1215,15 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const { craftItemId, resourceType } = c.req.valid('json');
 
-      const hero = await heroService(db).getHero(id, {
-        with: {
-          action: true,
-          state: { columns: { id: true } },
-        },
-      });
+      const [hero, craftItem] = await Promise.all([
+        heroService(db).getHero(id, {
+          with: {
+            action: true,
+            state: { columns: { id: true } },
+          },
+        }),
+        craftItemService(db).getCraftItem(craftItemId),
+      ]);
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       if (hero.action?.type !== 'IDLE') {
@@ -1233,8 +1236,7 @@ export const heroRouter = new Hono<Context>()
           message: 'Action not allowed: hero now is battle',
         });
       }
-
-      const { craftItem } = await craftItemService(db).checkCraftResources(hero.id, craftItemId, resourceType);
+      await itemContainerService(db).checkCraftResources(hero.id, resourceType, craftItem.requiredResources);
 
       const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
         where: and(eq(queueCraftItemTable.heroId, hero.id), ne(queueCraftItemTable.status, 'FAILED')),
@@ -1258,14 +1260,21 @@ export const heroRouter = new Hono<Context>()
       const jobId = `hero-${hero.id}_queue-craft-${randomUuid}`;
       const [newQueueCraftItem] = await db
         .insert(queueCraftItemTable)
-        .values({ heroId: hero.id, jobId, baseMaterial: resourceType, status: !lastItem ? 'PROGRESS' : 'PENDING', craftItemId: craftItem.id, completedAt })
+        .values({
+          heroId: hero.id,
+          jobId,
+          baseMaterial: resourceType,
+          status: !lastItem ? 'PROGRESS' : 'PENDING',
+          craftItemId: craftItem.id,
+          completedAt,
+        })
         .returning();
       const jobData: QueueCraftItemJob = {
         jobName: 'QUEUE_CRAFT_ITEM',
         payload: {
           heroId: hero.id,
           queueCraftItemId: newQueueCraftItem.id,
-          resourceType
+          resourceType,
         },
       };
       console.log('@@@@@@@', delay);

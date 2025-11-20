@@ -1,4 +1,4 @@
-import type { ResourceType } from '@/shared/types';
+import type { CraftItemRequiredResources, ResourceType } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
@@ -13,7 +13,7 @@ export const craftItemTable = pgTable('craft-item', {
 
   craftTime: integer().default(0).notNull(),
   requiredLevel: integer().default(1).notNull(),
-  requiredResources: jsonb().$type<{ type: ResourceType; quantity: number }[]>().notNull(),
+  requiredResources: jsonb().$type<CraftItemRequiredResources[]>().notNull(),
 });
 
 export const craftTableRelations = relations(craftItemTable, ({ one }) => ({
