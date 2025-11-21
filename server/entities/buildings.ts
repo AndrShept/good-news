@@ -6,12 +6,23 @@ export const buildingEntities: Record<BuildingType, Building> = {
     name: 'Magic Shop',
     type: 'MAGIC-SHOP',
     image: '/sprites/buildings/magic-shop.png',
-    
   },
   TEMPLE: {
     id: '0198c1b2-a9ac-7005-bd8b-ab6014b86374',
     name: 'Temple',
     type: 'TEMPLE',
     image: '/sprites/buildings/temple.png',
+  },
+  BLACKSMITH: {
+    id: '019aa81a-8a32-73df-800a-fcc28ef44821',
+    name: 'Blacksmith',
+    type: 'BLACKSMITH',
+    image: '/sprites/buildings/blacksmith.png',
+  },
+  FORGE: {
+    id: '019aa81b-95fa-773d-a54a-f1b57745444a',
+    name: 'Forge',
+    type: 'FORGE',
+    image: '/sprites/buildings/forge.png',
   },
 };

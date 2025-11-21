@@ -101,6 +101,11 @@ export const iconConfig = {
     dungeon: '/sprites/ui/dungeon.png',
     leave: '/sprites/ui/leave.png',
   },
+  building: {
+    blacksmith: '/sprites/buildings/blacksmith.png',
+    'magic-shop': '/sprites/buildings/magic-shop.png',
+    temple: '/sprites/buildings/temple.png',
+  },
   weapon: {
     sword: '',
   },

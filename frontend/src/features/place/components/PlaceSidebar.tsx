@@ -20,24 +20,24 @@ export const PlaceSidebar = ({ setBuildingId, place, buildingId }: Props) => {
   const [_, startTransition] = useTransition();
   const { mutate, isPending } = useLeavePlace();
   return (
-    <aside className="top-18 sticky h-[calc(100vh-330px)] max-w-[200px] rounded p-1.5">
+    <aside className="top-18 h-[calc(100vh-330px)] max-w-[200px] sticky rounded p-1.5">
       <ScrollArea className="h-full">
-        <PlaceSidebarButton
-          disabled={isPending}
-          matches={matches}
-          variant={!buildingId ? 'secondary' : 'ghost'}
-          size={matches ? 'default' : 'icon'}
-          onClick={() => setBuildingId('')}
-        >
-          <GameIcon
-            className={cn('size-7.5', {
-              'size-8.5': !matches,
-            })}
-            image={place?.type === 'TOWN' ? iconConfig.ui.town : iconConfig.ui.dungeon}
-          />
-          {matches && <p>{capitalize(place?.type)} Info</p>}
-        </PlaceSidebarButton>
-        <ul className="flex flex-col gap-1">
+        <ul className="flex flex-col gap-1.5">
+          <PlaceSidebarButton
+            disabled={isPending}
+            matches={matches}
+            variant={!buildingId ? 'secondary' : 'ghost'}
+            size={matches ? 'default' : 'icon'}
+            onClick={() => setBuildingId('')}
+          >
+            <GameIcon
+              className={cn('size-7.5', {
+                'size-8.5': !matches,
+              })}
+              image={place?.type === 'TOWN' ? iconConfig.ui.town : iconConfig.ui.dungeon}
+            />
+            {matches && <p>{capitalize(place?.type)} Info</p>}
+          </PlaceSidebarButton>
           {place?.buildings?.map((building) => (
             <PlaceSidebarButton
               key={building.id}

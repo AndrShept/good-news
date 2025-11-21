@@ -1,5 +1,4 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { ApiGetCraftItemResponse, ArmorType, CraftItem, WeaponType } from '@/shared/types';
@@ -28,12 +27,11 @@ interface Props {
 
 export const CraftSidebar = memo(({ data, onSelect, selectedItemId }: Props) => {
   return (
-    <aside className="flex w-full max-w-[200px] flex-col border-r">
+    <aside className="flex w-full max-w-[150px] flex-col border-r md:max-w-[200px]">
       <ScrollArea className="min-h-0">
         {data?.craftItems.map((craftItem) => (
           <Accordion key={craftItem.itemType} type="multiple">
             <AccordionItem value="item-1">
-              <DialogTitle></DialogTitle>
               <AccordionTrigger className="bg-secondary rounded-none p-3 capitalize">
                 {craftItem.itemType.toLocaleLowerCase()}
               </AccordionTrigger>
@@ -42,7 +40,6 @@ export const CraftSidebar = memo(({ data, onSelect, selectedItemId }: Props) => 
                 {craftItem.subgroups.map((group) => (
                   <Accordion key={group.subtype} type="multiple">
                     <AccordionItem value="item-2">
-                      <DialogTitle></DialogTitle>
                       <AccordionTrigger className="rounded-none px-1 py-1.5 capitalize text-neutral-500">
                         <div className="ml-2 flex items-center gap-2">
                           <img src={icons[group.subtype]} className="size-7" style={{ imageRendering: 'pixelated' }} />

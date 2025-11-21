@@ -24,7 +24,7 @@ export const CraftSelectResource = ({ resources }: Props) => {
           {resources?.map((resource) => (
             <SelectItem key={resource.id} value={resource.type} className="">
               <GameIcon className="size-6" image={resource?.gameItem?.image} />
-              <p>{resource.gameItem?.name}</p>
+              <p className='truncate'>{resource.gameItem?.name}</p>
               <p
                 className={cn('font-semibold text-green-500', {
                   'text-red-500': !sumResourceQuantity?.[resource.type],

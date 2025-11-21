@@ -7,10 +7,10 @@ interface Props extends ComponentProps<'div'> {
 }
 export const GameIcon = memo(({ image, isPixelate = true, className }: Props) => {
   return (
-    <div className={cn('size-6', className)}>
+    <div className={cn('size-6 shrink-0', className)}>
       <img
         style={{ imageRendering: isPixelate ? 'pixelated' : undefined }}
-        className={cn('size-full shrink-0', className)}
+        className={cn('size-full ', className)}
         src={image}
         alt={image?.split('/').at(-1)}
       />

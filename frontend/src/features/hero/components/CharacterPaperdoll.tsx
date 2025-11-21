@@ -4,7 +4,6 @@ import { useCreateContainerSlots } from '@/features/item-container/hooks/useCrea
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
 import { LucideStepBack } from 'lucide-react';
 
-import { CraftModal } from '../../craft/components/CraftModal';
 import { useHero } from '../hooks/useHero';
 import { useHeroStateMutation } from '../hooks/useHeroStateMutation';
 import { CharacterStat } from './CharacterStat';
@@ -35,7 +34,6 @@ export const CharacterPaperdoll = () => {
   const containerSlots = useCreateContainerSlots(backpack?.maxSlots, backpack?.containerSlots);
   return (
     <section className="flex flex-col gap-1">
-      <CraftModal />
 
       <Button variant="outline" disabled={isPending} onClick={() => mutate('IDLE')} className="ml-auto w-fit">
         <LucideStepBack />

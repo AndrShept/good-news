@@ -185,7 +185,7 @@ export type Place = InferSelectModel<typeof placeTable> & {
   buildings?: Building[] | null;
 };
 
-export const buildingTypeValues = ['MAGIC-SHOP', 'TEMPLE'] as const;
+export const buildingTypeValues = ['MAGIC-SHOP', 'TEMPLE', 'BLACKSMITH', 'FORGE'] as const;
 
 export type BuildingType = (typeof buildingTypeValues)[number];
 
@@ -230,7 +230,7 @@ export type Resource = typeof resourceTable.$inferSelect & {
 export type CraftItem = typeof craftItemTable.$inferSelect & {
   gameItem?: GameItem | null;
 };
-export type CraftItemRequiredResources = { type: ResourceType; quantity: number }
+export type CraftItemRequiredResources = { type: ResourceType; quantity: number };
 
 export type GroupCraftItem = { itemType: GameItemType; subgroups: { subtype: WeaponType; items: CraftItem[] }[] };
 
