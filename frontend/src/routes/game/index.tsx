@@ -2,7 +2,7 @@ import { Spinner } from '@/components/Spinner';
 import { CharacterPaperdoll } from '@/features/hero/components/CharacterPaperdoll';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { NewGameMap } from '@/features/map/components/NewGameMap';
-import { Town } from '@/features/place/components/Town';
+import { Place } from '@/features/place/components/Place';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/game/')({
@@ -22,13 +22,13 @@ function RouteComponent() {
     mapId: state?.data?.location?.mapId,
   }));
   const isCharacter = type === 'CHARACTER';
-  const isTown = !!placeId && !isCharacter && !currentBuilding;
+  const isPlace = !!placeId && !isCharacter && !currentBuilding;
   const isMap = !isCharacter && !!mapId;
 
   return (
     <>
       {isCharacter && <CharacterPaperdoll />}
-      {isTown && <Town />}
+      {isPlace && <Place />}
       {isMap && <NewGameMap />}
     </>
   );

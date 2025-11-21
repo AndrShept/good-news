@@ -5,11 +5,10 @@ import { useState } from 'react';
 
 import { getPlaceOptions } from '../api/get-place';
 import { getPlaceHeroesLocationOptions } from '../api/get-place-heroes';
-import { LeaveTownButton } from './LeaveTownButton';
 import { PlaceSidebar } from './PlaceSidebar';
 import { SelectedBuildingPage } from './SelectedBuildingPage';
 
-export const Town = () => {
+export const Place = () => {
   const placeId = useHero((state) => state?.data?.location?.placeId ?? '');
   const result = useQueries({ queries: [getPlaceOptions(placeId), getPlaceHeroesLocationOptions(placeId)] });
   const place = result[0].data;
