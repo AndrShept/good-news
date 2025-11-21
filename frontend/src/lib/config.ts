@@ -90,17 +90,19 @@ export const materialConfig: Record<ResourceType, MaterialProps> = {
 
 export const iconConfig = {
   ui: {
-    fish: '/sprites/icons/fish.png',
-    gold: '/sprites/icons/gold.png',
-    prem: '/sprites/icons/prem.png',
-    group: '/sprites/icons/group.png',
-    logo: '/sprites/icons/group.logo',
-    map: '/sprites/icons/group.map',
-    random: '/sprites/icons/random.png',
-    town: '/sprites/icons/town.png',
+    fish: '/sprites/ui/fish.png',
+    gold: '/sprites/ui/gold.png',
+    prem: '/sprites/ui/prem.png',
+    group: '/sprites/ui/group.png',
+    logo: '/sprites/ui/group.logo',
+    map: '/sprites/ui/group.map',
+    random: '/sprites/ui/random.png',
+    town: '/sprites/ui/town.png',
+    dungeon: '/sprites/ui/dungeon.png',
+    leave: '/sprites/ui/leave.png',
   },
   weapon: {
-sword: ''
+    sword: '',
   },
   stat: {
     strength: '/sprites/icons/stats/strength.png',

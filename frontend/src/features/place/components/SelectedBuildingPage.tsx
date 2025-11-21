@@ -1,6 +1,4 @@
 import { Place } from '@/shared/types';
-import { useQuery } from '@tanstack/react-query';
-import React from 'react';
 
 import { MagicShop } from './buildings/MagicShop';
 import { Temple } from './buildings/Temple';
@@ -16,6 +14,7 @@ export const SelectedBuildingPage = ({ buildingId, place }: Props) => {
   const isTemple = building?.type === 'TEMPLE';
   return (
     <section className="flex flex-1 p-1.5">
+      {!buildingId && <p>{place?.name}</p>}
       {isMagicShop && <MagicShop />}
       {isTemple && <Temple />}
     </section>

@@ -8,7 +8,7 @@ interface Props {
 
 export const LocationHeroes = memo(({ locationHeroes }: Props) => {
   return (
-    <ul className="hidden w-full max-w-[200px] flex-col gap-1 md:flex">
+    <ul className="hidden w-full max-w-[200px] flex-col gap-1 md:flex p-1.5">
       {locationHeroes?.map((location) => (
         <li key={location.id} className="hover:bg-secondary flex items-center gap-1.5 rounded px-2 py-1 duration-75">
           <HeroAvatar size={'sm'} src={location.hero?.avatarImage ?? ''} />
