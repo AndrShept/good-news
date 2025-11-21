@@ -19,7 +19,7 @@ export const TownBuilding = ({ image, name, type }: Props) => {
   return (
     <CustomTooltip>
       <CustomTooltip.Trigger>
-        <div onClick={onClick} className={cn('w-50')}>
+        <div onClick={onClick} className={cn('w-full')}>
           <img
             className="size-full transition will-change-transform hover:drop-shadow-[0_0_5px_rgba(255,255,145,0.9)]"
             style={{

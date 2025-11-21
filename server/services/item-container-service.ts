@@ -1,4 +1,4 @@
-import type { CraftItemRequiredResources, ItemContainerType, ResourceType, TItemContainer } from '@/shared/types';
+import type { ContainerSlot, CraftItemRequiredResources, ItemContainerType, ResourceType, TItemContainer } from '@/shared/types';
 import { and, eq, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
@@ -76,6 +76,39 @@ export const itemContainerService = (db: TTransaction | TDataBase) => ({
       });
     }
     return itemContainer;
+  },
+
+  async consumeResources(itemContainerId: string, requiredResources: CraftItemRequiredResources[], containerSlots: ContainerSlot[]) {
+    for (const requiredResource of requiredResources) {
+      let requiredQuantity = requiredResource.quantity;
+
+      // знаходимо ВСІ слоти з потрібним типом ресурсу
+      const slots = containerSlots.filter((slot) => slot.gameItem?.resource?.type === requiredResource.type);
+
+      if (!slots || slots.length === 0) {
+        throw new HTTPException(409, { message: `Not enough ${requiredResource.type}` });
+      }
+
+      for (const slot of slots) {
+        if (requiredQuantity <= 0) break;
+
+        const take = Math.min(slot.quantity, requiredQuantity);
+        const newQuantity = slot.quantity - take;
+
+        if (newQuantity > 0) {
+          await db.update(containerSlotTable).set({ quantity: newQuantity }).where(eq(containerSlotTable.id, slot.id));
+        } else {
+          await db.delete(containerSlotTable).where(eq(containerSlotTable.id, slot.id));
+          await itemContainerService(db).setUsedSlots(itemContainerId);
+        }
+
+        requiredQuantity -= take;
+      }
+
+      if (requiredQuantity > 0) {
+        throw new HTTPException(409, { message: `Not enough ${requiredResource.type}` });
+      }
+    }
   },
 
   async incrementUsedSlots(itemContainerId: string) {
