@@ -2,14 +2,13 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { VariantProps } from 'class-variance-authority';
 import React, { ComponentProps, ReactNode } from 'react';
-import { useMediaQuery } from 'usehooks-ts';
 
 interface Props extends ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   children: ReactNode;
+  matches: boolean;
 }
 
-export const PlaceSidebarButton = ({ className, children, variant, size, ...props }: Props) => {
-  const matches = useMediaQuery('(min-width: 768px)');
+export const PlaceSidebarButton = ({ className, matches, children, variant, size, ...props }: Props) => {
   return (
     <Button
       {...props}

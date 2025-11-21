@@ -20,10 +20,11 @@ export const PlaceSidebar = ({ setBuildingId, place, buildingId }: Props) => {
   const [_, startTransition] = useTransition();
   const { mutate, isPending } = useLeavePlace();
   return (
-    <aside className="top-18 sticky h-[calc(100vh-330px)] max-w-[200px] rounded  p-1.5">
+    <aside className="top-18 sticky h-[calc(100vh-330px)] max-w-[200px] rounded p-1.5">
       <ScrollArea className="h-full">
         <PlaceSidebarButton
           disabled={isPending}
+          matches={matches}
           variant={!buildingId ? 'secondary' : 'ghost'}
           size={matches ? 'default' : 'icon'}
           onClick={() => setBuildingId('')}
@@ -40,6 +41,7 @@ export const PlaceSidebar = ({ setBuildingId, place, buildingId }: Props) => {
           {place?.buildings?.map((building) => (
             <PlaceSidebarButton
               key={building.id}
+              matches={matches}
               disabled={isPending}
               variant={building.id === buildingId ? 'secondary' : 'ghost'}
               size={matches ? 'default' : 'icon'}
@@ -61,6 +63,7 @@ export const PlaceSidebar = ({ setBuildingId, place, buildingId }: Props) => {
 
           <PlaceSidebarButton
             className="hover:bg-red-500/10"
+            matches={matches}
             disabled={isPending}
             variant={'ghost'}
             size={matches ? 'default' : 'icon'}
