@@ -1,8 +1,10 @@
+import { GameIcon } from '@/components/GameIcon';
 import { Search } from '@/components/Search';
 import { GroupIcon } from '@/components/game-icons/GroupIcon';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useHero } from '@/features/hero/hooks/useHero';
+import { imageConfig } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { PlusIcon } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
@@ -20,7 +22,7 @@ export const GroupMenuButton = () => {
     <Popover open={isShow} onOpenChange={setIsShow}>
       <PopoverTrigger asChild>
         <Button variant={isShow ? 'secondary' : 'outline'} size={'icon'}>
-          <GroupIcon />
+          <GameIcon image={imageConfig.icon.ui.group} />
         </Button>
       </PopoverTrigger>
       <PopoverContent className={cn(`overflow-hidden p-0`)} side="right" align="start">

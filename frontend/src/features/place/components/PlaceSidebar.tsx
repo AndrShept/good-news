@@ -1,6 +1,6 @@
 import { GameIcon } from '@/components/GameIcon';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { iconConfig } from '@/lib/config';
+import { imageConfig } from '@/lib/config';
 import { capitalize, cn } from '@/lib/utils';
 import { Place } from '@/shared/types';
 import React, { Dispatch, SetStateAction, useTransition } from 'react';
@@ -20,7 +20,7 @@ export const PlaceSidebar = ({ setBuildingId, place, buildingId }: Props) => {
   const [_, startTransition] = useTransition();
   const { mutate, isPending } = useLeavePlace();
   return (
-    <aside className="top-18 h-[calc(100vh-330px)] max-w-[200px] sticky rounded p-1.5">
+    <aside className="top-18 sticky h-[calc(100vh-330px)] max-w-[200px] rounded p-1.5">
       <ScrollArea className="h-full">
         <ul className="flex flex-col gap-1.5">
           <PlaceSidebarButton
@@ -34,7 +34,7 @@ export const PlaceSidebar = ({ setBuildingId, place, buildingId }: Props) => {
               className={cn('size-7.5', {
                 'size-8.5': !matches,
               })}
-              image={place?.type === 'TOWN' ? iconConfig.ui.town : iconConfig.ui.dungeon}
+              image={place?.type === 'TOWN' ? imageConfig.icon.ui.town : imageConfig.icon.ui.dungeon}
             />
             {matches && <p>{capitalize(place?.type)} Info</p>}
           </PlaceSidebarButton>
@@ -73,7 +73,7 @@ export const PlaceSidebar = ({ setBuildingId, place, buildingId }: Props) => {
               className={cn('size-7.5', {
                 'size-8.5': !matches,
               })}
-              image={iconConfig.ui.leave}
+              image={imageConfig.icon.ui.leave}
             />
             {matches && <p>Leave {capitalize(place?.type)}</p>}
           </PlaceSidebarButton>

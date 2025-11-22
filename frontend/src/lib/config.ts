@@ -1,4 +1,4 @@
-import { ResourceType } from '@/shared/types';
+import { ResourceType, WeaponType } from '@/shared/types';
 
 export const parentVariants = {
   hidden: { opacity: 0 },
@@ -88,62 +88,85 @@ export const materialConfig: Record<ResourceType, MaterialProps> = {
   },
 };
 
-export const iconConfig = {
-  ui: {
-    fish: '/sprites/ui/fish.png',
-    gold: '/sprites/ui/gold.png',
-    prem: '/sprites/ui/prem.png',
-    group: '/sprites/ui/group.png',
-    logo: '/sprites/ui/group.logo',
-    map: '/sprites/ui/group.map',
-    random: '/sprites/ui/random.png',
-    town: '/sprites/ui/town.png',
-    dungeon: '/sprites/ui/dungeon.png',
-    leave: '/sprites/ui/leave.png',
-  },
-  building: {
-    blacksmith: '/sprites/buildings/blacksmith.png',
-    'magic-shop': '/sprites/buildings/magic-shop.png',
-    temple: '/sprites/buildings/temple.png',
-  },
-  weapon: {
-    sword: '',
-  },
-  stat: {
-    strength: '/sprites/icons/stats/strength.png',
-    constitution: '/sprites/icons/stats/constitution.png',
-    intelligence: '/sprites/icons/stats/intelligence.png',
-    dexterity: '/sprites/icons/stats/dexterity.png',
-    luck: '/sprites/icons/stats/luck.png',
-  },
-  potion: {
-    buff: {
-      strength: '/sprites/potions/str.png',
-      constitution: '/sprites/potions/const.png',
-      intelligence: '/sprites/potions/ing.png',
-      dexterity: '/sprites/potions/dex.png',
-      luck: '/sprites/potions/luck.png',
+export const imageConfig = {
+  icon: {
+    ui: {
+      fish: '/sprites/icons/ui/fish.png',
+      gold: '/sprites/icons/ui/gold.png',
+      prem: '/sprites/icons/ui/prem.png',
+      group: '/sprites/icons/ui/group.png',
+      logo: '/sprites/icons/ui/logo.png',
+      map: '/sprites/icons/ui/map.png',
+      random: '/sprites/icons/ui/random.png',
+      town: '/sprites/icons/ui/town.png',
+      dungeon: '/sprites/icons/ui/dungeon.png',
+      leave: '/sprites/icons/ui/leave.png',
+      backpack: '/sprites/icons/ui/backpack.png',
+      bag: '/sprites/icons/ui/bag.png',
+      chest: '/sprites/icons/ui/chest.png',
+      battle: '/sprites/icons/ui/battle.png',
+      book: '/sprites/icons/ui/book.png',
+      defense: '/sprites/icons/ui/defense.png',
+      'magic-resistance': '/sprites/icons/ui/defense.png',
+      fire: '/sprites/icons/ui/fire.png',
+      grave: '/sprites/icons/ui/grave.png',
+      hammer: '/sprites/icons/ui/hammer.png',
+      pick: '/sprites/icons/ui/pick.png',
+      skull: '/sprites/icons/ui/skull.png',
+      walk: '/sprites/icons/ui/walk.png',
+      refresh: '/sprites/icons/ui/refresh.png',
+      settings: '/sprites/icons/ui/settings.png',
     },
-    restore: {
-      smallHealth: '/sprites/potions/small-health.png',
-      smallMana: '/sprites/potions/small-mana.png',
-      smallRestore: '/sprites/potions/small-restore.png',
-      mediumHealth: '/sprites/potions/medium-health.png',
-      mediumMana: '/sprites/potions/medium-mana.png',
-      mediumRestore: '/sprites/potions/medium-restore.png',
+    building: {
+      blacksmith: '/sprites/icons/buildings/blacksmith.png',
+      'magic-shop': '/sprites/icons/buildings/magic-shop.png',
+      temple: '/sprites/icons/buildings/temple.png',
+    },
+    weapon: {
+      SWORD: '',
+    } as Record<WeaponType, string>,
+    stat: {
+      strength: '/sprites/icons/stats/strength.png',
+      constitution: '/sprites/icons/stats/constitution.png',
+      intelligence: '/sprites/icons/stats/intelligence.png',
+      dexterity: '/sprites/icons/stats/dexterity.png',
+      luck: '/sprites/icons/stats/luck.png',
+    },
+    potion: {
+      buff: {
+        strength: '/sprites/icons/potions/str.png',
+        constitution: '/sprites/icons/potions/const.png',
+        intelligence: '/sprites/icons/potions/ing.png',
+        dexterity: '/sprites/icons/potions/dex.png',
+        luck: '/sprites/icons/potions/luck.png',
+      },
+      restore: {
+        smallHealth: '/sprites/icons/potions/small-health.png',
+        smallMana: '/sprites/icons/potions/small-mana.png',
+        smallRestore: '/sprites/icons/potions/small-restore.png',
+        mediumHealth: '/sprites/icons/potions/medium-health.png',
+        mediumMana: '/sprites/icons/potions/medium-mana.png',
+        mediumRestore: '/sprites/icons/potions/medium-restore.png',
+      },
+    },
+    resource: {
+      ore: {
+        iron: '/sprites/icons/resources/ores/iron-ore.png',
+        copper: '/sprites/icons/resources/ores/copper-ore.png',
+        silver: '/sprites/icons/resources/ores/silver-ore.png',
+        gold: '/sprites/icons/resources/ores/gold-ore.png',
+        mithril: '/sprites/icons/resources/ores/mithril-ore.png',
+        adamantine: '/sprites/icons/resources/ores/adamantine-ore.png',
+      },
+      wood: {},
+      leather: {},
+      herb: {},
     },
   },
-  resource: {
-    ore: {
-      iron: '/sprites/ores/iron-ore.png',
-      copper: '/sprites/ores/copper-ore.png',
-      silver: '/sprites/ores/silver-ore.png',
-      gold: '/sprites/ores/gold-ore.png',
-      mithril: '/sprites/ores/mithril-ore.png',
-      adamantine: '/sprites/ores/adamantine-ore.png',
+  bg: {
+    shrine: '/sprites/bg/shrine.png',
+    map: {
+      SolmereValley: '/sprites/bg/map/solmer-valley.png',
     },
-    wood: {},
-    leather: {},
-    herb: {},
   },
 };

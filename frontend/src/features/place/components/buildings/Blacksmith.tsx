@@ -14,7 +14,6 @@ type Props = {
 export const Blacksmith = ({ isBlacksmith }: Props) => {
   const { data, isLoading } = useQuery(getCraftItemOptions());
   const [craftItem, setCraftItem] = useState<CraftItem>();
-  const [show, setShow] = useState(false);
 
   if (isLoading) return <p>...</p>;
   return (
