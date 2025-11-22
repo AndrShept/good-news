@@ -1,9 +1,5 @@
 import { GameIcon } from '@/components/GameIcon';
 import { LogOutButton } from '@/components/LogOutButton';
-import { BackpackIcon } from '@/components/game-icons/BackpackIcon';
-import { GoldIcon } from '@/components/game-icons/GoldIcon';
-import { LogoIcon } from '@/components/game-icons/LogoIcon';
-import { PremIcon } from '@/components/game-icons/PremIcon';
 import { Button } from '@/components/ui/button';
 import { GroupMenuButton } from '@/features/group/components/GroupMenuButton';
 import { useHero } from '@/features/hero/hooks/useHero';
@@ -35,7 +31,7 @@ export const GameHeader = memo(() => {
       <section className="flex gap-0.5">
         <CharacterPaperdollButton />
 
-        <Button onClick={onOpen} className="" variant={isOpen ? 'default' : 'outline'} size="icon">
+        <Button onClick={onOpen} variant={isOpen ? 'default' : 'outline'} size="icon">
           <GameIcon image={imageConfig.icon.ui.backpack} />
         </Button>
         <GroupMenuButton />

@@ -1,17 +1,22 @@
 import { GameItemCard } from '@/components/GameItemCard';
 import { GameItemSlot } from '@/components/GameItemSlot';
-import { ContainerSlot } from '@/shared/types';
+import { TItemContainer } from '@/shared/types';
 import { memo } from 'react';
 
-type Props = {
-  containerSlots: (ContainerSlot | null)[];
-};
+import { useCreateContainerSlots } from '../hooks/useCreateContainerSlots';
 
-export const ItemContainer = memo(({ containerSlots }: Props) => {
+type Props = TItemContainer;
+
+export const ItemContainer = memo(({ containerSlots, maxSlots }: Props) => {
+  const items = useCreateContainerSlots(maxSlots, containerSlots);
+
   return (
     <ul className="flex h-fit flex-wrap gap-1">
-      {containerSlots?.map((containerItem, idx) => {
-        if (!containerItem) return <GameItemSlot key={idx} />;
+      {items?.map((containerItem) => {
+        if (!containerItem) {
+          const id = crypto.randomUUID();
+          return <GameItemSlot key={id} />;
+        }
         return (
           <GameItemCard
             key={containerItem.id}

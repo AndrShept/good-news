@@ -1,4 +1,4 @@
-import { ResourceType, WeaponType } from '@/shared/types';
+import { ArmorType, ResourceCategoryType, ResourceType, WeaponType } from '@/shared/types';
 
 export const parentVariants = {
   hidden: { opacity: 0 },
@@ -117,14 +117,28 @@ export const imageConfig = {
       refresh: '/sprites/icons/ui/refresh.png',
       settings: '/sprites/icons/ui/settings.png',
     },
+    place: {
+      mine: '/sprites/icons/places/mine.png',
+      solmer: '/sprites/icons/places/solmer.webp',
+    },
     building: {
       blacksmith: '/sprites/icons/buildings/blacksmith.png',
       'magic-shop': '/sprites/icons/buildings/magic-shop.png',
       temple: '/sprites/icons/buildings/temple.png',
     },
-    weapon: {
-      SWORD: '',
+    WEAPON: {
+      SWORD: '/sprites/icons/weapon/sword.png',
+      AXE: '/sprites/icons/weapon/axe.png',
+      DAGGER: '/sprites/icons/weapon/dagger.png',
+      STAFF: '/sprites/icons/weapon/staff.png',
     } as Record<WeaponType, string>,
+    ARMOR: {
+      BOOTS: '/sprites/icons/armor/boots.png',
+      CHESTPLATE: '/sprites/icons/armor/chest.png',
+      GLOVES: '/sprites/icons/armor/gloves.png',
+      HELMET: '/sprites/icons/armor/helmet.png',
+      SHIELD: '/sprites/icons/armor/shield.png',
+    } as Record<ArmorType, string>,
     stat: {
       strength: '/sprites/icons/stats/strength.png',
       constitution: '/sprites/icons/stats/constitution.png',
@@ -132,7 +146,7 @@ export const imageConfig = {
       dexterity: '/sprites/icons/stats/dexterity.png',
       luck: '/sprites/icons/stats/luck.png',
     },
-    potion: {
+    POTION: {
       buff: {
         strength: '/sprites/icons/potions/str.png',
         constitution: '/sprites/icons/potions/const.png',
@@ -149,19 +163,19 @@ export const imageConfig = {
         mediumRestore: '/sprites/icons/potions/medium-restore.png',
       },
     },
-    resource: {
-      ore: {
-        iron: '/sprites/icons/resources/ores/iron-ore.png',
-        copper: '/sprites/icons/resources/ores/copper-ore.png',
-        silver: '/sprites/icons/resources/ores/silver-ore.png',
-        gold: '/sprites/icons/resources/ores/gold-ore.png',
-        mithril: '/sprites/icons/resources/ores/mithril-ore.png',
-        adamantine: '/sprites/icons/resources/ores/adamantine-ore.png',
+    RESOURCES: {
+      ORE: {
+        IRON: '/sprites/icons/resources/ores/iron-ore.png',
+        COPPER: '/sprites/icons/resources/ores/copper-ore.png',
+        SILVER: '/sprites/icons/resources/ores/silver-ore.png',
+        GOLD: '/sprites/icons/resources/ores/gold-ore.png',
+        MITHRIL: '/sprites/icons/resources/ores/mithril-ore.png',
+        ADAMANTINE: '/sprites/icons/resources/ores/adamantine-ore.png',
       },
-      wood: {},
-      leather: {},
-      herb: {},
-    },
+      WOOD: {},
+      HERB: {},
+      LEATHER: {},
+    } as Record<ResourceCategoryType, Record<ResourceType, string>>,
   },
   bg: {
     shrine: '/sprites/bg/shrine.png',

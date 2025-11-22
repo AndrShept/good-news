@@ -1,3 +1,4 @@
+import { imageConfig } from '../../frontend/src/lib/config';
 import type { mapTable } from '../db/schema';
 
 export const mapEntities: Record<string, typeof mapTable.$inferInsert> = {
@@ -7,7 +8,7 @@ export const mapEntities: Record<string, typeof mapTable.$inferInsert> = {
     width: 1,
     tileHeight: 32,
     tileWidth: 32,
-    image: '/sprites/map/solmer.png',
+    image: imageConfig.bg.map.SolmereValley,
     name: 'Solmere Valley',
     pvpMode: 'PVE',
   },

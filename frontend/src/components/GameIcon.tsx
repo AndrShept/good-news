@@ -5,7 +5,7 @@ interface Props extends ComponentProps<'div'> {
   image: string | undefined;
   isPixelate?: boolean;
 }
-export const GameIcon = memo(({ image, isPixelate = true, className }: Props) => {
+export const GameIcon = memo(function GameIcon({ image, isPixelate = true, className }: Props)  {
   return (
     <div className={cn('size-7 shrink-0', className)}>
       <img

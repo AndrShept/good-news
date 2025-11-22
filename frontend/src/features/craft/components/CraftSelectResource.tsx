@@ -4,7 +4,6 @@ import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack
 import { cn } from '@/lib/utils';
 import { Resource } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
-import React from 'react';
 
 interface Props {
   resources: Resource[] | undefined;
@@ -22,9 +21,9 @@ export const CraftSelectResource = ({ resources }: Props) => {
         </SelectTrigger>
         <SelectContent side="top">
           {resources?.map((resource) => (
-            <SelectItem key={resource.id} value={resource.type} className="">
+            <SelectItem key={resource.id} value={resource.type} >
               <GameIcon className="size-6" image={resource?.gameItem?.image} />
-              <p className='truncate'>{resource.gameItem?.name}</p>
+              <p className="truncate">{resource.gameItem?.name}</p>
               <p
                 className={cn('font-semibold text-green-500', {
                   'text-red-500': !sumResourceQuantity?.[resource.type],

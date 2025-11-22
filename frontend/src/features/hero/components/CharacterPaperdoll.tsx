@@ -1,14 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { ItemContainer } from '@/features/item-container/components/ItemContainer';
-import { useCreateContainerSlots } from '@/features/item-container/hooks/useCreateContainerSlots';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
 import { LucideStepBack } from 'lucide-react';
 
 import { useHero } from '../hooks/useHero';
 import { useHeroStateMutation } from '../hooks/useHeroStateMutation';
+import { CharacterModifier } from './CharacterModifier';
 import { CharacterStat } from './CharacterStat';
 import { Paperdoll } from './Paperdoll';
-import { CharacterModifier } from './CharacterModifier';
 
 export const CharacterPaperdoll = () => {
   const hero = useHero((state) => ({
@@ -31,10 +30,8 @@ export const CharacterPaperdoll = () => {
   const { mutate, isPending } = useHeroStateMutation();
 
   const { backpack } = useHeroBackpack();
-  const containerSlots = useCreateContainerSlots(backpack?.maxSlots, backpack?.containerSlots);
   return (
     <section className="flex flex-col gap-1">
-
       <Button variant="outline" disabled={isPending} onClick={() => mutate('IDLE')} className="ml-auto w-fit">
         <LucideStepBack />
         Back
@@ -46,7 +43,7 @@ export const CharacterPaperdoll = () => {
           <CharacterModifier {...hero.modifier!} />
         </div>
 
-        <ItemContainer containerSlots={containerSlots}  />
+        <ItemContainer {...backpack!} />
       </div>
     </section>
   );

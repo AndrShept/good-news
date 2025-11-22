@@ -13,10 +13,10 @@ export const useHeroBackpack = () => {
       const result: Partial<Record<ResourceType, number>> = {};
 
       if (!backpack?.containerSlots?.length) return;
-      for (const recourse of resources) {
+      for (const resource of resources) {
         for (const backpackItem of backpack.containerSlots) {
-          if (backpackItem?.gameItem?.resource?.type === recourse.type) {
-            result[recourse.type] = (result[recourse.type] ?? 0) + backpackItem.quantity;
+          if (backpackItem?.gameItem?.resource?.type === resource.type) {
+            result[resource.type] = (result[resource.type] ?? 0) + backpackItem.quantity;
           }
         }
       }

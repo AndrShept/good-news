@@ -1,64 +1,50 @@
 import { cn, modifierChangeName } from '@/lib/utils';
-import { RarityType, Weapon } from '@/shared/types';
-import React from 'react';
+import { Weapon } from '@/shared/types';
 
 import { Separator } from './ui/separator';
 
 type Props = Weapon;
 
-export const WeaponInfo = ({
-  minDamage,
-  maxDamage,
-  physDamage,
-  physHitChance,
-  physCritChance,
-  physCritPower,
-  spellDamage,
-  spellHitChance,
-  spellCritChance,
-  spellCritPower,
-  weaponType,
-  weaponHand,
-}: Props) => {
+export const WeaponInfo = (props: Props) => {
   const baseModifier = [
     {
       name: modifierChangeName('physDamage'),
-      value: physDamage,
+      value: props.physDamage,
     },
     {
       name: modifierChangeName('physHitChance'),
-      value: physHitChance,
+      value: props.physHitChance,
     },
     {
       name: modifierChangeName('physCritChance'),
-      value: physCritChance,
+      value: props.physCritChance,
     },
     {
       name: modifierChangeName('physCritPower'),
-      value: physCritPower,
+      value: props.physCritPower,
     },
     {
       name: modifierChangeName('spellDamage'),
-      value: spellDamage,
+      value: props.spellDamage,
     },
     {
       name: modifierChangeName('spellHitChance'),
-      value: spellHitChance,
+      value: props.spellHitChance,
     },
     {
       name: modifierChangeName('spellCritChance'),
-      value: spellCritChance,
+      value: props.spellCritChance,
     },
     {
       name: modifierChangeName('spellCritPower'),
-      value: spellCritPower,
+      value: props.spellCritPower,
     },
   ];
   return (
     <section className="flex flex-col gap-2">
       <div>
-        <p className="text-muted-foreground/30">{weaponHand.toLocaleLowerCase()}</p>
-        <p className="text-muted-foreground/30">{weaponType.toLocaleLowerCase()}</p>
+        <p className="text-muted-foreground/30">{props.weaponHand.toLocaleLowerCase()}</p>
+        <p className="text-muted-foreground/30">{props.weaponType.toLocaleLowerCase()}</p>
       </div>
 
       <div>
@@ -66,10 +52,10 @@ export const WeaponInfo = ({
         <div className="space-x-1">
           <span className="text-muted-foreground">Damage:</span>
           <span className="text-yellow-300">
-            {minDamage} - {maxDamage}
+            {props.minDamage} - {props.maxDamage}
           </span>
         </div>
-        <ul >
+        <ul>
           {baseModifier.map((modifier) => {
             if (!modifier.value) return;
             return (

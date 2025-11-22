@@ -1,13 +1,14 @@
 import { ShopBuyButton } from '@/features/shop/components/ShopBuyButton';
+import { imageConfig } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { GameItem } from '@/shared/types';
 import { memo } from 'react';
 
 import { ArmorInfo } from './ArmorInfo';
+import { GameIcon } from './GameIcon';
 import { GameItemImg } from './GameItemImg';
 import { PotionInfo } from './PotionInfo';
 import { WeaponInfo } from './WeaponInfo';
-import { GoldIcon } from './game-icons/GoldIcon';
 
 interface Props extends GameItem {
   isShowPrice?: boolean;
@@ -32,8 +33,8 @@ export const GameItemCardShowInfo = memo(
         <div className="mt-auto flex justify-between">
           {isShowPrice && (
             <div className="flex items-center gap-0.5">
-              <GoldIcon />
-              <p className="text-muted-foreground text-xs">{price}</p>
+              <GameIcon image={imageConfig.icon.ui.gold} />
+              <span className="text-muted-foreground text-xs">{price}</span>
             </div>
           )}
           {isShowBuyButton && (

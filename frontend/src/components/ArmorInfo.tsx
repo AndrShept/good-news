@@ -1,6 +1,5 @@
-import { cn, modifierChangeName } from '@/lib/utils';
-import { Armor, RarityType } from '@/shared/types';
-import React from 'react';
+import { capitalize, cn, modifierChangeName } from '@/lib/utils';
+import { Armor } from '@/shared/types';
 
 import { Separator } from './ui/separator';
 
@@ -22,15 +21,13 @@ export const ArmorInfo = ({ defense, evasion, magicResistance, slot }: Props) =>
     },
   ];
   return (
-    <section className="flex flex-col gap-2 ">
-      <div>
-        <p className="text-muted-foreground/30 capitalize">{slot.toLocaleLowerCase()}</p>
-      </div>
+    <section className="flex flex-col gap-2">
+      <p className="text-muted-foreground/30">{capitalize(slot)}</p>
       <div className="space-y-1">
         <div>
           <Separator className="mb-2" />
 
-          <ul >
+          <ul>
             {baseModifier.map((modifier) => {
               if (!modifier.value) return;
               return (

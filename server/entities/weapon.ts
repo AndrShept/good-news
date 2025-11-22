@@ -36,6 +36,7 @@ export const weaponEntities: Record<WeaponNameType, typeof gameItemTable.$inferI
       weaponType: 'DAGGER',
       physCritChance: 15,
       physHitChance: 20,
+      
     },
   },
 };
