@@ -15,7 +15,7 @@ export const placeTable = pgTable('place', {
   x: integer().notNull(),
   y: integer().notNull(),
   mapId: uuid()
-    .references(() => mapTable.id)
+    .references(() => mapTable.id, { onDelete: 'cascade' })
     .notNull(),
   buildings: jsonb('buildings').$type<Building[]>(),
 

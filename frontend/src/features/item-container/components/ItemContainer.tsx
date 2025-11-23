@@ -12,18 +12,18 @@ export const ItemContainer = memo(({ containerSlots, maxSlots }: Props) => {
 
   return (
     <ul className="flex h-fit flex-wrap gap-1">
-      {items?.map((containerItem) => {
-        if (!containerItem) {
+      {items?.map((containerSlot) => {
+        if (!containerSlot) {
           const id = crypto.randomUUID();
           return <GameItemSlot key={id} />;
         }
         return (
           <GameItemCard
-            key={containerItem.id}
-            id={containerItem.id}
-            gameItem={containerItem.gameItem}
-            quantity={containerItem.quantity}
-            itemContainerId={containerItem.itemContainerId}
+            key={containerSlot.id}
+            id={containerSlot.id}
+            gameItem={containerSlot.gameItem}
+            quantity={containerSlot.quantity}
+            itemContainerId={containerSlot.itemContainerId}
             type="BACKPACK"
           />
         );

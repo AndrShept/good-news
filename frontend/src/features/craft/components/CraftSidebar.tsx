@@ -8,18 +8,7 @@ import { memo } from 'react';
 
 import { CraftSelectResource } from './CraftSelectResource';
 
-// const icons: Record<WeaponType | ArmorType, string> = {
-//   SWORD: '/sprites/icons/shop/sword.png',
-//   AXE: '/sprites/icons/shop/axe.png',
-//   DAGGER: '/sprites/icons/shop/dagger.png',
-//   STAFF: '/sprites/icons/shop/staff.png',
-//   BOOTS: '/sprites/icons/shop/boots.png',
-//   CHESTPLATE: '/sprites/icons/shop/chestplate.png',
-//   GLOVES: '/sprites/icons/shop/gloves.png',
-//   HELMET: '/sprites/icons/shop/helmet.png',
-//   LEGS: '/sprites/icons/shop/legs.png',
-//   SHIELD: '/sprites/icons/shop/shield.png',
-// };
+
 
 interface Props {
   data: ApiGetCraftItemResponse;

@@ -2,8 +2,9 @@ import { eq } from 'drizzle-orm';
 
 import { db } from '../db/db';
 import { craftItemTable } from '../db/schema';
-import { armorEntities } from '../entities/armor';
-import { weaponEntities } from '../entities/weapon';
+import { type ArmorNameType, armorEntities } from '../entities/armor';
+import { craftConfig } from '../entities/craft-config';
+import { type WeaponNameType, weaponEntities } from '../entities/weapon';
 
 export const createCraftItem = async () => {
   const weapons = Object.values(weaponEntities);
@@ -15,7 +16,7 @@ export const createCraftItem = async () => {
     await db.insert(craftItemTable).values({
       gameItemId: weapon.id,
       craftTime: 10_000,
-      craftResources: [{ type: 'IRON', quantity: 20 }],
+      requiredResources: craftConfig.WEAPON[weapon.name as WeaponNameType].IRON,
     });
   }
   for (const armor of armors) {
@@ -24,7 +25,7 @@ export const createCraftItem = async () => {
     await db.insert(craftItemTable).values({
       gameItemId: armor.id,
       craftTime: 10_000,
-      craftResources: [{ type: 'IRON', quantity: 30 }],
+      requiredResources: craftConfig.ARMOR[armor.name as ArmorNameType].IRON,
     });
   }
   console.log('create!');

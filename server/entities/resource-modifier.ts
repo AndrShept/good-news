@@ -1,10 +1,10 @@
 import type { OmitModifier, ResourceType } from '@/shared/types';
 
 export const resourceModifierEntity: Record<ResourceType, Partial<OmitModifier>> = {
-  IRON: { maxHealth: 10 },
+  IRON: {},
   COPPER: { defense: 10 },
-  ADAMANTINE: { constitution: 1 },
-  GOLD: { constitution: 1 },
-  MITHRIL: { constitution: 1 },
-  SILVER: { constitution: 1 },
+  ADAMANTINE: { constitution: 10 },
+  GOLD: { dexterity: 10 },
+  MITHRIL: { intelligence: 10 },
+  SILVER: { magicResistance: 10 },
 };

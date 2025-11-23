@@ -2,7 +2,7 @@ import type { armorTable, gameItemTable, weaponTable } from '../db/schema';
 
 const armorName = ['plate', 'Simple gloves'] as const;
 
-type ArmorNameType = (typeof armorName)[number];
+export  type ArmorNameType = (typeof armorName)[number];
 
 export const armorEntities: Record<ArmorNameType, typeof gameItemTable.$inferInsert & { armor: typeof armorTable.$inferInsert }> = {
   plate: {

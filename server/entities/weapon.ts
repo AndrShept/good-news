@@ -4,12 +4,12 @@ import type { gameItemTable, weaponTable } from '../db/schema';
 
 const weaponName = ['broadsword', 'kryss'] as const;
 
-type WeaponNameType = (typeof weaponName)[number];
+export type WeaponNameType = (typeof weaponName)[number];
 
 export const weaponEntities: Record<WeaponNameType, typeof gameItemTable.$inferInsert & { weapon: typeof weaponTable.$inferInsert }> = {
   broadsword: {
     id: '019a2642-10ce-7ee8-ab1b-19674d19536f',
-    name: 'Broadsword',
+    name: 'broadsword',
     image: '/sprites/equipments/swords/Icon1.jpg',
     type: 'WEAPON',
 
