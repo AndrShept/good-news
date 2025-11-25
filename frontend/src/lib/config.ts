@@ -86,6 +86,12 @@ export const materialConfig: Record<ResourceType, MaterialProps> = {
     glow: 'shadow-[0_0_30px_rgba(52,211,153,0.6)] animate-[glow_adamantine_2s_ease-in-out_infinite]',
     bg: 'bg-emerald-400/10',
   },
+  'REGULAR-LEATHER': {
+    color: 'text-gray-400',
+    border: 'border-gray-500/50',
+    glow: 'shadow-[0_0_15px_rgba(156,163,175,0.3)] animate-pulse',
+    bg: 'bg-gray-700/10',
+  },
 };
 
 export const imageConfig = {
@@ -123,6 +129,7 @@ export const imageConfig = {
     },
     building: {
       blacksmith: '/sprites/icons/buildings/blacksmith.png',
+      forge: '/sprites/icons/buildings/forge.png',
       'magic-shop': '/sprites/icons/buildings/magic-shop.png',
       temple: '/sprites/icons/buildings/temple.png',
     },
@@ -164,18 +171,17 @@ export const imageConfig = {
       },
     },
     RESOURCES: {
-      ORE: {
-        IRON: '/sprites/icons/resources/ores/iron-ore.png',
-        COPPER: '/sprites/icons/resources/ores/copper-ore.png',
-        SILVER: '/sprites/icons/resources/ores/silver-ore.png',
-        GOLD: '/sprites/icons/resources/ores/gold-ore.png',
-        MITHRIL: '/sprites/icons/resources/ores/mithril-ore.png',
-        ADAMANTINE: '/sprites/icons/resources/ores/adamantine-ore.png',
-      },
-      WOOD: {},
-      HERB: {},
-      LEATHER: {},
-    } as Record<ResourceCategoryType, Record<ResourceType, string>>,
+      //ORE
+      IRON: '/sprites/icons/resources/ores/iron-ore.png',
+      COPPER: '/sprites/icons/resources/ores/copper-ore.png',
+      SILVER: '/sprites/icons/resources/ores/silver-ore.png',
+      GOLD: '/sprites/icons/resources/ores/gold-ore.png',
+      MITHRIL: '/sprites/icons/resources/ores/mithril-ore.png',
+      ADAMANTINE: '/sprites/icons/resources/ores/adamantine-ore.png',
+
+      //LEATHER
+      'REGULAR-LEATHER': '/sprites/icons/resources/leathers/regular-leather.png',
+    } as Record<ResourceType, string>,
   },
   bg: {
     shrine: '/sprites/bg/shrine.png',

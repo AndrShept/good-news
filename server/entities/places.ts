@@ -11,7 +11,7 @@ export const placeEntities: Place[] = [
     image: imageConfig.icon.place.solmer,
     x: 7,
     y: 7,
-    buildings: [buildingEntities['MAGIC-SHOP'], buildingEntities.TEMPLE, buildingEntities.BLACKSMITH],
+    buildings: [buildingEntities['MAGIC-SHOP'], buildingEntities.TEMPLE, buildingEntities.BLACKSMITH, buildingEntities.FORGE],
     mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
     createdAt: new Date().toISOString(),
   },

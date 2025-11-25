@@ -1,13 +1,13 @@
 import type { armorTable, gameItemTable, weaponTable } from '../db/schema';
 
-const armorName = ['plate', 'Simple gloves'] as const;
+const armorName = ['plate armor', 'simple gloves'] as const;
 
-export  type ArmorNameType = (typeof armorName)[number];
+export type ArmorNameType = (typeof armorName)[number];
 
 export const armorEntities: Record<ArmorNameType, typeof gameItemTable.$inferInsert & { armor: typeof armorTable.$inferInsert }> = {
-  plate: {
+  'plate armor': {
     id: 'e0785970-3c64-4187-b00b-13e3c3f34f55',
-    name: 'Plate armor',
+    name: 'plate armor',
     image: '/sprites/equipments/breastplates/Icon1.jpg',
     type: 'ARMOR',
 
@@ -19,9 +19,9 @@ export const armorEntities: Record<ArmorNameType, typeof gameItemTable.$inferIns
       slot: 'CHESTPLATE',
     },
   },
-  'Simple gloves': {
+  'simple gloves': {
     id: 'c0f02a83-17d9-4b5d-a6f7-8c0b6a2c2107',
-    name: 'Simple gloves',
+    name: 'simple gloves',
     image: '/sprites/equipments/glovers/Icon1.jpg',
     type: 'ARMOR',
 

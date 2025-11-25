@@ -4,8 +4,8 @@ import type { ArmorNameType } from './armor';
 import { type WeaponNameType, weaponEntities } from './weapon';
 
 interface ICraftConfig {
-  WEAPON: Record<WeaponNameType, Record<ResourceType, CraftItemRequiredResources[]>>;
-  ARMOR: Record<ArmorNameType, Record<ResourceType, CraftItemRequiredResources[]>>;
+  WEAPON: Record<WeaponNameType, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;
+  ARMOR: Record<ArmorNameType, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;
 }
 
 export const craftConfig: ICraftConfig = {
@@ -28,15 +28,18 @@ export const craftConfig: ICraftConfig = {
     },
   },
   ARMOR: {
-    'Simple gloves': {
+    'simple gloves': {
       IRON: [{ type: 'IRON', quantity: 5 }],
-      COPPER: [{ type: 'COPPER', quantity: 5 }],
+      COPPER: [
+        { type: 'COPPER', quantity: 5 },
+        { type: 'REGULAR-LEATHER', quantity: 3 },
+      ],
       SILVER: [{ type: 'SILVER', quantity: 5 }],
       GOLD: [{ type: 'GOLD', quantity: 5 }],
       MITHRIL: [{ type: 'MITHRIL', quantity: 5 }],
       ADAMANTINE: [{ type: 'ADAMANTINE', quantity: 5 }],
     },
-    plate: {
+    'plate armor': {
       IRON: [{ type: 'IRON', quantity: 10 }],
       COPPER: [{ type: 'COPPER', quantity: 10 }],
       SILVER: [{ type: 'SILVER', quantity: 10 }],

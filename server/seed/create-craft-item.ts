@@ -16,7 +16,8 @@ export const createCraftItem = async () => {
     await db.insert(craftItemTable).values({
       gameItemId: weapon.id,
       craftTime: 10_000,
-      requiredResources: craftConfig.WEAPON[weapon.name as WeaponNameType].IRON,
+      baseCraftResource: 'ORE',
+      requiredResources: craftConfig.WEAPON[weapon.name as WeaponNameType].IRON!,
     });
   }
   for (const armor of armors) {
@@ -24,8 +25,9 @@ export const createCraftItem = async () => {
     if (findCraftItem) continue;
     await db.insert(craftItemTable).values({
       gameItemId: armor.id,
+      baseCraftResource: 'ORE',
       craftTime: 10_000,
-      requiredResources: craftConfig.ARMOR[armor.name as ArmorNameType].IRON,
+      requiredResources: craftConfig.ARMOR[armor.name as ArmorNameType].IRON!,
     });
   }
   console.log('create!');

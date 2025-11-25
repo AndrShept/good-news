@@ -6,7 +6,7 @@ export const resourceEntities: (typeof gameItemTable.$inferInsert & { resource: 
   {
     id: '0199df54-be65-7db2-af0a-1002d323d64d',
     name: 'Iron ore',
-    image: imageConfig.icon.RESOURCES.ORE.IRON,
+    image: imageConfig.icon.RESOURCES.IRON,
     type: 'RESOURCES',
     resource: {
       gameItemId: '',
@@ -18,12 +18,24 @@ export const resourceEntities: (typeof gameItemTable.$inferInsert & { resource: 
   {
     id: '0199df74-c722-7695-96d9-59a701689d03',
     name: 'Copper ore',
-    image: imageConfig.icon.RESOURCES.ORE.COPPER,
+    image: imageConfig.icon.RESOURCES.COPPER,
     type: 'RESOURCES',
     resource: {
       gameItemId: '',
       type: 'COPPER',
       category: 'ORE',
+      rarity: 'COMMON',
+    },
+  },
+  {
+    id: '019abb58-1d6a-7b1f-b277-409189ddfc64',
+    name: 'Regular leather',
+    image: imageConfig.icon.RESOURCES['REGULAR-LEATHER'],
+    type: 'RESOURCES',
+    resource: {
+      gameItemId: '',
+      type: 'REGULAR-LEATHER',
+      category: 'LEATHER',
       rarity: 'COMMON',
     },
   },
