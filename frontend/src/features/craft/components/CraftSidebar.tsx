@@ -53,7 +53,7 @@ export const CraftSidebar = memo(({ data, onSelect, selectedItemId }: Props) => 
           </Accordion>
         ))}
       </ScrollArea> */}
-      <div>{data?.craftItems.map((craftItem) => craftItem.gameItem?.name)}</div>
+      <ul>{data?.craftItems.map((craftItem) => <div onClick={() => onSelect(craftItem)}>{craftItem.gameItem?.name}</div>)}</ul>
       <div className="mt-auto">{!!data?.resources.length && <SelectBaseResource resources={data?.resources} />}</div>
     </aside>
   );

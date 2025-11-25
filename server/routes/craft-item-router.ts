@@ -58,44 +58,11 @@ export const craftItemRouter = new Hono<Context>().get(
         gameItem: { with: { armor: true, weapon: true } },
       },
     });
-    if (!craftItems.length) throw new HTTPException(404, { message: 'craft items not found !' });
+
     return c.json<SuccessResponse<{ craftItems: CraftItem[]; resources: Resource[] }>>({
       message: 'craft item fetched!',
       success: true,
       data: { craftItems, resources },
     });
-    // const groupObject = Object.groupBy(craftItems, ({ gameItem }) => gameItem?.type);
-
-    // const groupedCraftItems = Object.entries(groupObject).map(([itemType, items]) => {
-    //   if (itemType === 'WEAPON') {
-    //     const weaponGroups = Object.groupBy(items, ({ gameItem }) => gameItem?.weapon?.weaponType ?? 'SWORD');
-    //     return {
-    //       itemType,
-    //       subgroups: Object.entries(weaponGroups).map(([weaponType, wItems]) => ({
-    //         subtype: weaponType,
-    //         items: wItems,
-    //       })),
-    //     };
-    //   }
-
-    //   if (itemType === 'ARMOR') {
-    //     const armorGroups = Object.groupBy(items, ({ gameItem }) => gameItem?.armor?.slot ?? 'CHESTPLATE');
-    //     return {
-    //       itemType,
-    //       subgroups: Object.entries(armorGroups).map(([armorType, aItems]) => ({
-    //         subtype: armorType,
-    //         items: aItems,
-    //       })),
-    //     };
-    //   }
-
-    //   return { itemType, items };
-    // });
-
-    // return c.json<SuccessResponse<{ craftItems: GroupCraftItem[]; resources: Resource[] }>>({
-    //   message: 'craft item fetched!',
-    //   success: true,
-    //   data: { craftItems: groupedCraftItems as GroupCraftItem[], resources },
-    // });
   },
 );
