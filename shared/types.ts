@@ -264,7 +264,7 @@ export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>;
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];
 export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
 
-export type ApiGetCraftItemResponse = InferResponseType<(typeof client)['craft-item']['$get']>['data'];
+export type ApiGetCraftItemResponse = InferResponseType<(typeof client)['craft-item'][':buildingType']['$get']>['data'];
 
 export type IHeroStat = {
   strength: number;

@@ -9,19 +9,19 @@ interface Props {
   resources: Resource[] | undefined;
 }
 
-export const CraftSelectResource = ({ resources }: Props) => {
-  const setSelectedResource = useCraftItemStore((state) => state.setSelectedResource);
+export const SelectBaseResource = ({ resources }: Props) => {
+  const setBaseResource = useCraftItemStore((state) => state.setBaseResource);
   const { calculateSumBackpackResource } = useHeroBackpack();
   const sumResourceQuantity = calculateSumBackpackResource(resources!);
   return (
     <>
-      <Select defaultValue="IRON" onValueChange={setSelectedResource}>
+      <Select defaultValue="IRON" onValueChange={setBaseResource}>
         <SelectTrigger className="w-full rounded-none">
           <SelectValue />
         </SelectTrigger>
         <SelectContent side="top">
           {resources?.map((resource) => (
-            <SelectItem key={resource.id} value={resource.type} >
+            <SelectItem key={resource.id} value={resource.type}>
               <GameIcon className="size-6" image={resource?.gameItem?.image} />
               <p className="truncate">{resource.gameItem?.name}</p>
               <p

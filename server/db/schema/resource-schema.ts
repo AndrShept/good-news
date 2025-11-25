@@ -9,7 +9,7 @@ const ores = ['IRON', 'COPPER', 'SILVER', 'GOLD', 'MITHRIL', 'ADAMANTINE'] as co
 const leathers = ['REGULAR-LEATHER'] as const;
 
 export const resourceTypeEnum = pgEnum('resource_type_enum', [...ores, ...leathers]);
-export const resourceCategoryEnum = pgEnum('resource_category_enum', ['ORE', 'WOOD', 'HERB', 'LEATHER']);
+export const resourceCategoryEnum = pgEnum('resource_category_enum', ['ORE', 'WOOD', 'HERB', 'LEATHER', 'INGOT']);
 export const rarityEnum = pgEnum('rarity_enum', ['COMMON', 'MAGIC', 'EPIC', 'RARE', 'LEGENDARY']);
 
 export const resourceTable = pgTable('resource', {

@@ -14,13 +14,12 @@ export const Place = () => {
   const place = result[0].data;
   const townLocationHeroes = result[1].data;
   const isLoading = result.some((r) => r.isLoading);
-  const [buildingId, setBuildingId] = useState('');
 
   if (isLoading) return <p>LOADING TOWN...</p>;
   return (
     <section className="mx-auto flex w-full">
-      <PlaceSidebar place={place} setBuildingId={setBuildingId} buildingId={buildingId} />
-      <SelectedBuildingPage place={place} buildingId={buildingId} />
+      <PlaceSidebar place={place}  />
+      <SelectedBuildingPage place={place}  />
       <LocationHeroes locationHeroes={townLocationHeroes} />
     </section>
   );

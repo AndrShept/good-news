@@ -9,17 +9,17 @@ interface Props {
 }
 
 export const CraftButton = ({ craftItem }: Props) => {
-  const selectedResourceType = useCraftItemStore((state) => state.selectedResourceType);
+  const baseResourceType = useCraftItemStore((state) => state.baseResourceType);
   const { mutate, isPending } = useCreateQueueCraftItemMutation();
   return (
     <>
       <Button
         className="w-full"
-        disabled={isPending || !craftItem || !selectedResourceType}
+        disabled={isPending || !craftItem || !baseResourceType}
         onClick={() =>
           mutate({
             craftItemId: craftItem?.id ?? '',
-            resourceType: selectedResourceType,
+            baseResourceType: baseResourceType!,
           })
         }
       >

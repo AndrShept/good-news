@@ -3,22 +3,23 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { imageConfig } from '@/lib/config';
 import { capitalize, cn } from '@/lib/utils';
 import { Place } from '@/shared/types';
-import React, { Dispatch, SetStateAction, useTransition } from 'react';
+import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
+import React, { useTransition } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 
 import { useLeavePlace } from '../hooks/useLeavePlace';
 import { PlaceSidebarButton } from './PlaceSidebarButton';
 
 interface Props {
-  setBuildingId: Dispatch<SetStateAction<string>>;
   place: Place | undefined;
-  buildingId: string;
 }
 
-export const PlaceSidebar = ({ setBuildingId, place, buildingId }: Props) => {
+export const PlaceSidebar = ({ place }: Props) => {
   const matches = useMediaQuery('(min-width: 768px)');
   const [_, startTransition] = useTransition();
   const { mutate, isPending } = useLeavePlace();
+  const setSelectBuilding = useSelectBuildingStore((state) => state.setSelectBuilding);
+  const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
   return (
     <aside className="top-18 sticky h-[calc(100vh-330px)] max-w-[200px] rounded p-1.5">
       <ScrollArea className="h-full">
@@ -26,9 +27,9 @@ export const PlaceSidebar = ({ setBuildingId, place, buildingId }: Props) => {
           <PlaceSidebarButton
             disabled={isPending}
             matches={matches}
-            variant={!buildingId ? 'secondary' : 'ghost'}
+            variant={!selectBuilding ? 'secondary' : 'ghost'}
             size={matches ? 'default' : 'icon'}
-            onClick={() => setBuildingId('')}
+            onClick={() => setSelectBuilding(null)}
           >
             <GameIcon
               className={cn('size-7.5', {
@@ -43,11 +44,11 @@ export const PlaceSidebar = ({ setBuildingId, place, buildingId }: Props) => {
               key={building.id}
               matches={matches}
               disabled={isPending}
-              variant={building.id === buildingId ? 'secondary' : 'ghost'}
+              variant={building.id === selectBuilding?.id ? 'secondary' : 'ghost'}
               size={matches ? 'default' : 'icon'}
               onClick={() =>
                 startTransition(() => {
-                  setBuildingId(building.id);
+                  setSelectBuilding(building);
                 })
               }
             >

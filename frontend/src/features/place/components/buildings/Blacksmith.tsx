@@ -1,4 +1,5 @@
 import { CraftItem } from '@/shared/types';
+import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQuery } from '@tanstack/react-query';
 import { Activity, useEffect, useState } from 'react';
 
@@ -9,15 +10,16 @@ import { CraftSidebar } from '../../../craft/components/CraftSidebar';
 import { QueueCraftItemsList } from '../../../queue/components/QueueCraftItemsList';
 
 type Props = {
-  isBlacksmith: boolean;
+  isCraftBuilding: boolean;
 };
-export const Blacksmith = ({ isBlacksmith }: Props) => {
-  const { data, isLoading } = useQuery(getCraftItemOptions());
+export const Blacksmith = ({ isCraftBuilding }: Props) => {
+  const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
+  const { data, isLoading } = useQuery(getCraftItemOptions(selectBuilding?.type));
   const [craftItem, setCraftItem] = useState<CraftItem>();
 
   if (isLoading) return <p>...</p>;
   return (
-    <Activity mode={isBlacksmith ? 'visible' : 'hidden'}>
+    <Activity mode={isCraftBuilding ? 'visible' : 'hidden'}>
       <section className="flex w-full">
         <CraftSidebar data={data} onSelect={setCraftItem} selectedItemId={craftItem?.id} />
         <div className="flex min-h-0 min-w-0 flex-1 flex-col p-1">

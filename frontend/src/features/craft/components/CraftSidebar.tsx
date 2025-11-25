@@ -6,9 +6,7 @@ import { capitalize, cn } from '@/lib/utils';
 import { ApiGetCraftItemResponse, ArmorType, CraftItem, WeaponType } from '@/shared/types';
 import { memo } from 'react';
 
-import { CraftSelectResource } from './CraftSelectResource';
-
-
+import { SelectBaseResource } from './CraftSelectResource';
 
 interface Props {
   data: ApiGetCraftItemResponse;
@@ -19,7 +17,7 @@ interface Props {
 export const CraftSidebar = memo(({ data, onSelect, selectedItemId }: Props) => {
   return (
     <aside className="flex w-full max-w-[150px] flex-col border-r md:max-w-[200px]">
-      <ScrollArea className="min-h-0">
+      {/* <ScrollArea className="min-h-0">
         {data?.craftItems.map((craftItem) => (
           <Accordion key={craftItem.itemType} type="multiple">
             <AccordionItem value="item-1">
@@ -54,10 +52,9 @@ export const CraftSidebar = memo(({ data, onSelect, selectedItemId }: Props) => 
             </AccordionItem>
           </Accordion>
         ))}
-      </ScrollArea>
-      <div className="mt-auto">
-        <CraftSelectResource resources={data?.resources} />
-      </div>
+      </ScrollArea> */}
+      <div>{data?.craftItems.map((craftItem) => craftItem.gameItem?.name)}</div>
+      <div className="mt-auto">{!!data?.resources.length && <SelectBaseResource resources={data?.resources} />}</div>
     </aside>
   );
 });

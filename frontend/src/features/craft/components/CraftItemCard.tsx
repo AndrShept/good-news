@@ -27,13 +27,13 @@ export const CraftItemCard = memo((props: Props) => {
       ),
     [props.resources],
   );
-  const selectedResourceType = useCraftItemStore((state) => state.selectedResourceType);
+  const baseResourceType = useCraftItemStore((state) => state.baseResourceType);
 
   return (
     <ScrollArea className="h-full">
       <div className="flex flex-1 flex-col items-center text-center">
         <div className="mb-2 space-x-1 text-lg font-semibold capitalize md:text-xl">
-          <span className={cn(materialConfig[selectedResourceType].color)}>{selectedResourceType.toLocaleLowerCase()}</span>
+          {baseResourceType && <span className={cn(materialConfig[baseResourceType].color)}>{baseResourceType.toLocaleLowerCase()}</span>}
           <span>{props?.gameItem?.name}</span>
         </div>
         <GameItemImg className="md:size-15 size-10" image={props?.gameItem?.image} />
@@ -50,13 +50,13 @@ export const CraftItemCard = memo((props: Props) => {
             <span className="text-muted-foreground">craft time:</span>
             <span>{formatDurationFromSeconds(props.craftTime / 1000)}</span>
           </div>
-          <ModifierInfoCard modifier={resourceGroup?.[selectedResourceType].modifier} />
+          {baseResourceType && <ModifierInfoCard modifier={resourceGroup?.[baseResourceType].modifier} />}
         </div>
 
         <ul>
           {props.requiredResources.map((resource) => (
             <div key={resource.type} className="flex items-center gap-1">
-              <GameItemImg image={resourceGroup?.[selectedResourceType].image} />
+              {baseResourceType && <GameItemImg image={resourceGroup?.[baseResourceType].image} />}
               <p>x{resource.quantity}</p>
             </div>
           ))}

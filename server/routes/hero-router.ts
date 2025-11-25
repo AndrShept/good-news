@@ -1187,33 +1187,43 @@ export const heroRouter = new Hono<Context>()
       });
     },
   )
-  .get('/:id/queue/craft-item', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
-    const user = c.get('user');
-    const { id } = c.req.valid('param');
-    const hero = await heroService(db).getHero(id);
+  .get(
+    '/:id/queue/craft-item',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+      }),
+    ),
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const hero = await heroService(db).getHero(id);
 
-    verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-    const queueCraftItems = await db.query.queueCraftItemTable.findMany({
-      where: eq(queueCraftItemTable.heroId, hero.id),
-      orderBy: asc(queueCraftItemTable.createdAt),
-    });
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      const queueCraftItems = await db.query.queueCraftItemTable.findMany({
+        where: eq(queueCraftItemTable.heroId, hero.id),
+        orderBy: asc(queueCraftItemTable.createdAt),
+      });
 
-    return c.json<SuccessResponse<QueueCraftItem[]>>({
-      message: 'craft item add to queue',
-      success: true,
-      data: queueCraftItems,
-    });
-  })
+      return c.json<SuccessResponse<QueueCraftItem[]>>({
+        message: 'craft item add to queue',
+        success: true,
+        data: queueCraftItems,
+      });
+    },
+  )
   .post(
     '/:id/action/queue-craft',
     loggedIn,
     zValidator('param', z.object({ id: z.string() })),
-    zValidator('json', z.object({ resourceType: z.enum(resourceTypeEnum.enumValues), craftItemId: z.string() })),
+    zValidator('json', z.object({ baseResourceType: z.enum(resourceTypeEnum.enumValues), craftItemId: z.string() })),
 
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const { craftItemId, resourceType } = c.req.valid('json');
+      const { craftItemId, baseResourceType } = c.req.valid('json');
 
       const [hero, craftItem] = await Promise.all([
         heroService(db).getHero(id, {
@@ -1236,7 +1246,7 @@ export const heroRouter = new Hono<Context>()
           message: 'Action not allowed: hero now is battle',
         });
       }
-      await itemContainerService(db).checkCraftResources(hero.id, resourceType, craftItem.requiredResources);
+      await itemContainerService(db).checkCraftResources(hero.id, baseResourceType, craftItem.requiredResources);
 
       const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
         where: and(eq(queueCraftItemTable.heroId, hero.id), ne(queueCraftItemTable.status, 'FAILED')),
@@ -1263,7 +1273,7 @@ export const heroRouter = new Hono<Context>()
         .values({
           heroId: hero.id,
           jobId,
-          baseMaterial: resourceType,
+          baseMaterial: baseResourceType,
           status: !lastItem ? 'PROGRESS' : 'PENDING',
           craftItemId: craftItem.id,
           completedAt,
@@ -1274,7 +1284,7 @@ export const heroRouter = new Hono<Context>()
         payload: {
           heroId: hero.id,
           queueCraftItemId: newQueueCraftItem.id,
-          resourceType,
+          baseResourceType,
         },
       };
       console.log('@@@@@@@', delay);
