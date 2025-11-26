@@ -30,9 +30,9 @@ export const itemContainerService = (db: TTransaction | TDataBase) => ({
     }
     return itemContainer;
   },
-  async checkCraftResources(heroId: string, resourceType: ResourceType, requiredResources: CraftItemRequiredResources[]) {
+  async checkCraftResources(heroId: string, baseResourceType: ResourceType, requiredResources: CraftItemRequiredResources[]) {
     const [craftResource, backpack] = await Promise.all([
-      db.query.resourceTable.findFirst({ where: eq(resourceTable.type, resourceType) }),
+      db.query.resourceTable.findFirst({ where: eq(resourceTable.type, baseResourceType) }),
       itemContainerService(db).getHeroBackpack(heroId),
     ]);
 
@@ -51,7 +51,7 @@ export const itemContainerService = (db: TTransaction | TDataBase) => ({
 
       if (totalOwnedQuantity < requiredResource.quantity) {
         throw new HTTPException(409, {
-          message: 'Not enough resources to craft this item',
+          message: `Not enough resources ${requiredResource.type.toLowerCase()} to craft this item`,
           cause: { canShow: true },
         });
       }

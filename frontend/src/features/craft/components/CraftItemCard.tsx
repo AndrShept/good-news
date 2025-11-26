@@ -3,30 +3,18 @@ import { GameItemImg } from '@/components/GameItemImg';
 import { ModifierInfoCard } from '@/components/ModifierInfoCard';
 import { WeaponInfo } from '@/components/WeaponInfo';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { materialConfig } from '@/lib/config';
 import { cn, formatDurationFromSeconds } from '@/lib/utils';
-import { CraftItem, Modifier, Resource, ResourceType } from '@/shared/types';
+import { CraftInfo, CraftItem } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
-import React, { memo, useEffect, useMemo } from 'react';
 
-interface Props extends CraftItem {
-  resources: Array<Resource> | undefined;
-}
-export const CraftItemCard = memo((props: Props) => {
-  const resourceGroup = useMemo(
-    () =>
-      props.resources?.reduce(
-        (acc, item) => {
-          if (!item?.gameItem) return acc;
-          const typedKey = item.type as ResourceType;
-          acc[typedKey] = { image: item.gameItem.image, modifier: item.modifier ? item.modifier : null };
-          return acc;
-        },
-        {} as Record<ResourceType, { image: string; modifier: Modifier | null }>,
-      ),
-    [props.resources],
-  );
+import { useCraftItem } from '../hooks/useCraftItem';
+
+type Props = CraftItem;
+
+export const CraftItemCard = (props: Props) => {
+  const { resourceMap } = useCraftItem();
+
   const baseResourceType = useCraftItemStore((state) => state.baseResourceType);
 
   return (
@@ -50,18 +38,18 @@ export const CraftItemCard = memo((props: Props) => {
             <span className="text-muted-foreground">craft time:</span>
             <span>{formatDurationFromSeconds(props.craftTime / 1000)}</span>
           </div>
-          {baseResourceType && <ModifierInfoCard modifier={resourceGroup?.[baseResourceType].modifier} />}
+          {baseResourceType && <ModifierInfoCard modifier={resourceMap?.[baseResourceType].modifier} />}
         </div>
 
-        <ul>
+        {/* <ul>
           {props.requiredResources.map((resource) => (
             <div key={resource.type} className="flex items-center gap-1">
               {baseResourceType && <GameItemImg image={resourceGroup?.[baseResourceType].image} />}
               <p>x{resource.quantity}</p>
             </div>
           ))}
-        </ul>
+        </ul> */}
       </div>
     </ScrollArea>
   );
-});
+};

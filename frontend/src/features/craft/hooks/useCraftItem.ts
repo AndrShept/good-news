@@ -1,4 +1,4 @@
-import { CraftItem } from '@/shared/types';
+import { CraftItem, Modifier, ResourceType } from '@/shared/types';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -23,7 +23,22 @@ export const useCraftItem = () => {
     );
   }, [data]);
 
+  const resourceMap = useMemo(
+    () =>
+      data?.resources?.reduce(
+        (acc, item) => {
+          if (!item?.gameItem) return acc;
+          const typedKey = item.type as ResourceType;
+          acc[typedKey] = { image: item.gameItem.image, modifier: item.modifier ? item.modifier : null };
+          return acc;
+        },
+        {} as Record<ResourceType, { image: string; modifier: Modifier | null }>,
+      ),
+    [data?.resources],
+  );
+
   return {
     craftItemMap,
+    resourceMap,
   };
 };

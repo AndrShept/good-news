@@ -1,11 +1,7 @@
 import type { armorTable, gameItemTable, weaponTable } from '../db/schema';
 
-const armorName = ['plate armor', 'simple gloves'] as const;
-
-export type ArmorNameType = (typeof armorName)[number];
-
-export const armorEntities: Record<ArmorNameType, typeof gameItemTable.$inferInsert & { armor: typeof armorTable.$inferInsert }> = {
-  'plate armor': {
+export const armorEntities: Array<typeof gameItemTable.$inferInsert & { armor: typeof armorTable.$inferInsert }> = [
+  {
     id: 'e0785970-3c64-4187-b00b-13e3c3f34f55',
     name: 'plate armor',
     image: '/sprites/equipments/breastplates/Icon1.jpg',
@@ -18,8 +14,13 @@ export const armorEntities: Record<ArmorNameType, typeof gameItemTable.$inferIns
       magicResistance: 5,
       slot: 'CHESTPLATE',
     },
+    craftInfo: {
+      craftTIme: 10_000,
+      baseResourceCategory: 'INGOT',
+      requiredBuildingType: 'BLACKSMITH',
+    },
   },
-  'simple gloves': {
+  {
     id: 'c0f02a83-17d9-4b5d-a6f7-8c0b6a2c2107',
     name: 'simple gloves',
     image: '/sprites/equipments/glovers/Icon1.jpg',
@@ -32,5 +33,29 @@ export const armorEntities: Record<ArmorNameType, typeof gameItemTable.$inferIns
       defense: 6,
       slot: 'GLOVES',
     },
+      craftInfo: {
+      craftTIme: 10_000,
+      baseResourceCategory: 'INGOT',
+      requiredBuildingType: 'BLACKSMITH',
+    },
   },
-};
+  {
+    id: 'c0f02a83-17d9-4b5d-a6f7-8c0b6a2c2107',
+    name: 'simple gloves',
+    image: '/sprites/equipments/glovers/Icon1.jpg',
+    type: 'ARMOR',
+
+    armor: {
+      gameItemId: '',
+      evasion: 0,
+      magicResistance: 0,
+      defense: 6,
+      slot: 'GLOVES',
+    },
+      craftInfo: {
+      craftTIme: 10_000,
+      baseResourceCategory: 'INGOT',
+      requiredBuildingType: 'BLACKSMITH',
+    },
+  },
+];

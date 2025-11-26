@@ -5,8 +5,7 @@ import { gameItemTable, weaponTable } from '../db/schema';
 import { weaponEntities } from '../entities/weapon';
 
 export const createWeapons = async () => {
-  const weapons = Object.values(weaponEntities);
-  for (const weapon of weapons) {
+  for (const weapon of weaponEntities) {
     const findWeapon = await db.query.gameItemTable.findFirst({ where: eq(gameItemTable.id, weapon.id) });
     if (findWeapon) continue;
     await db.insert(gameItemTable).values(weapon);

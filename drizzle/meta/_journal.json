@@ -15,6 +15,13 @@
       "when": 1764168404359,
       "tag": "0001_cloudy_satana",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764185917549,
+      "tag": "0002_careful_excalibur",
+      "breakpoints": true
     }
   ]
 }

@@ -14,10 +14,10 @@ export const craftItemTable = pgTable('craft-item', {
     .notNull(),
 
   craftTime: integer().default(0).notNull(),
-  requiredBaseCraftResource: resourceCategoryEnum().notNull(),
+  requiredCraftResourceCategory: resourceCategoryEnum().notNull(),
   requiredBuildingType: buildingTypeEnum().notNull(),
   requiredLevel: integer().default(1).notNull(),
-  requiredResources: jsonb().$type<CraftItemRequiredResources[]>().notNull(),
+  // requiredResources: jsonb().$type<CraftItemRequiredResources[]>().notNull(),
 });
 
 export const craftTableRelations = relations(craftItemTable, ({ one }) => ({

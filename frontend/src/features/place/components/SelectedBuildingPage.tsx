@@ -1,7 +1,7 @@
 import { Place } from '@/shared/types';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 
-import { Blacksmith } from './buildings/Blacksmith';
+import { CraftBuilding } from './buildings/CraftBuilding';
 import { MagicShop } from './buildings/MagicShop';
 import { Temple } from './buildings/Temple';
 
@@ -19,7 +19,7 @@ export const SelectedBuildingPage = ({ place }: Props) => {
       {!selectBuilding && <p>{place?.name}</p>}
       {isMagicShop && <MagicShop />}
       {isTemple && <Temple />}
-      <Blacksmith isCraftBuilding={isCraftBuilding} />
+      <CraftBuilding isCraftBuilding={isCraftBuilding} />
     </section>
   );
 };

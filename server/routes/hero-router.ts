@@ -1239,11 +1239,25 @@ export const heroRouter = new Hono<Context>()
           with: {
             action: true,
             state: { columns: { id: true } },
+            location: { with: { place: true } },
           },
         }),
         craftItemService(db).getCraftItem(craftItemId),
       ]);
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      if (hero.location?.place?.buildings?.some((b) => b.type !== buildingType)) {
+        throw new HTTPException(400, {
+          message: 'You are not inside the required town building.',
+           cause: { canShow: true },
+        });
+      }
+      if (buildingType !== craftItem.requiredBuildingType) {
+        throw new HTTPException(403, {
+          message: 'This building does not support crafting this item.',
+          cause: { canShow: true },
+        });
+      }
 
       if (hero.action?.type !== 'IDLE') {
         throw new HTTPException(409, {

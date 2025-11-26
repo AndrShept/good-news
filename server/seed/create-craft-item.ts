@@ -2,34 +2,31 @@ import { eq } from 'drizzle-orm';
 
 import { db } from '../db/db';
 import { craftItemTable } from '../db/schema';
-import { type ArmorNameType, armorEntities } from '../entities/armor';
-import { craftConfig } from '../entities/craft-config';
-import { type WeaponNameType, weaponEntities } from '../entities/weapon';
+import { armorEntities } from '../entities/armor';
+import { weaponEntities } from '../entities/weapon';
 
 export const createCraftItem = async () => {
-  const weapons = Object.values(weaponEntities);
-  const armors = Object.values(armorEntities);
+  // const weapons = Object.values(weaponEntities);
+  // const armors = Object.values(armorEntities);
 
-  for (const weapon of weapons) {
+  for (const weapon of weaponEntities) {
     const findCraftItem = await db.query.craftItemTable.findFirst({ where: eq(craftItemTable.gameItemId, weapon.id) });
-    if (findCraftItem) continue;
+    if (findCraftItem || !weapon.craftInfo) continue;
     await db.insert(craftItemTable).values({
       gameItemId: weapon.id,
-      craftTime: 10_000,
-      requiredBaseCraftResource: 'ORE',
-      requiredBuildingType: 'BLACKSMITH',
-      requiredResources: craftConfig.WEAPON[weapon.name as WeaponNameType].IRON!,
+      craftTime: weapon.craftInfo.craftTIme,
+      requiredCraftResourceCategory: weapon.craftInfo.baseResourceCategory,
+      requiredBuildingType: weapon.craftInfo.requiredBuildingType,
     });
   }
-  for (const armor of armors) {
+  for (const armor of armorEntities) {
     const findCraftItem = await db.query.craftItemTable.findFirst({ where: eq(craftItemTable.gameItemId, armor.id) });
-    if (findCraftItem) continue;
+    if (findCraftItem || !armor.craftInfo) continue;
     await db.insert(craftItemTable).values({
       gameItemId: armor.id,
-      requiredBaseCraftResource: 'ORE',
-      requiredBuildingType: 'BLACKSMITH',
-      craftTime: 10_000,
-      requiredResources: craftConfig.ARMOR[armor.name as ArmorNameType].IRON!,
+      craftTime: armor.craftInfo.craftTIme,
+      requiredCraftResourceCategory: armor.craftInfo.baseResourceCategory,
+      requiredBuildingType: armor.craftInfo.requiredBuildingType,
     });
   }
   console.log('create!');

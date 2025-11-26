@@ -1,8 +1,4 @@
-import { GameIcon } from '@/components/GameIcon';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { imageConfig } from '@/lib/config';
-import { capitalize, cn } from '@/lib/utils';
+
 import { ApiGetCraftItemResponse, ArmorType, CraftItem, WeaponType } from '@/shared/types';
 import { memo } from 'react';
 

@@ -5,8 +5,7 @@ import { armorTable, gameItemTable } from '../db/schema';
 import { armorEntities } from '../entities/armor';
 
 export const createArmors = async () => {
-  const armors = Object.values(armorEntities);
-  for (const armor of armors) {
+  for (const armor of armorEntities) {
     const findArmor = await db.query.gameItemTable.findFirst({ where: eq(gameItemTable.id, armor.id) });
     if (findArmor) continue;
     await db.insert(gameItemTable).values(armor);

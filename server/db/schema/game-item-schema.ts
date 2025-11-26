@@ -1,9 +1,10 @@
+import type { BuildingType, CraftInfo, ResourceCategoryType } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import type { buffTable } from './buff-schema';
-import { resourceTable } from './resource-schema';
 import { containerSlotTable } from './container-slot-schema';
+import { resourceCategoryEnum, resourceTable } from './resource-schema';
 
 export const gameItemEnum = pgEnum('game_item_enum', ['WEAPON', 'ARMOR', 'POTION', 'RESOURCES', 'MISC']);
 
@@ -23,7 +24,7 @@ export const gameItemTable = pgTable('game_item', {
   name: text().notNull(),
   image: text().notNull(),
   price: integer().default(0).notNull(),
-  
+  craftInfo: jsonb().$type<CraftInfo>(),
   createdAt: timestamp('created_at', {
     mode: 'string',
     withTimezone: true,
@@ -39,7 +40,6 @@ export const gameItemRelations = relations(gameItemTable, ({ one, many }) => ({
   potion: one(potionTable),
   accessory: one(accessoryTable),
   resource: one(resourceTable),
- 
 }));
 
 //WEAPON
