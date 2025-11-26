@@ -1,11 +1,13 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { client } from '@/lib/utils';
 import { ErrorResponse, ResourceType } from '@/shared/types';
+import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useMutation } from '@tanstack/react-query';
 
 import { useQueueCraftItem } from './useQueueCraftItem';
 
 export const useCreateQueueCraftItemMutation = () => {
+  const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
   const id = useHeroId();
   const { addQueueCraftItems } = useQueueCraftItem();
   return useMutation({
@@ -17,6 +19,7 @@ export const useCreateQueueCraftItemMutation = () => {
         json: {
           craftItemId,
           baseResourceType,
+          buildingType: selectBuilding!.type,
         },
       });
       if (!res.ok) {

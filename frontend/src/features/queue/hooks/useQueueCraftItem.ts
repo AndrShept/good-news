@@ -1,5 +1,6 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { QueueCraftItem } from '@/shared/types';
+import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
@@ -8,27 +9,28 @@ import { getQueueCraftItemOptions } from '../api/getQueueCraftItems';
 export const useQueueCraftItem = () => {
   const queryClient = useQueryClient();
   const heroId = useHeroId();
+  const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
   const addQueueCraftItems = useCallback((data: QueueCraftItem) => {
     queryClient.setQueriesData<QueueCraftItem[]>(
-      { queryKey: getQueueCraftItemOptions(heroId).queryKey },
+      { queryKey: getQueueCraftItemOptions(heroId, selectBuilding?.type).queryKey },
       (oldData) => {
         if (!oldData) return;
         return [...oldData, data];
-      }
+      },
     );
   }, []);
   const removeQueueCraftItems = useCallback((queueCraftItemId: string) => {
     queryClient.setQueriesData<QueueCraftItem[]>(
-      { queryKey: getQueueCraftItemOptions(heroId).queryKey },
+      { queryKey: getQueueCraftItemOptions(heroId, selectBuilding?.type).queryKey },
       (oldData) => {
         if (!oldData) return;
         return oldData.filter((item) => item.id !== queueCraftItemId);
-      }
+      },
     );
   }, []);
   const updateQueueCraftItems = useCallback((queueCraftItemId: string, data: Partial<QueueCraftItem>) => {
     queryClient.setQueriesData<QueueCraftItem[]>(
-      { queryKey: getQueueCraftItemOptions(heroId).queryKey },
+      { queryKey: getQueueCraftItemOptions(heroId, selectBuilding?.type).queryKey },
       (oldData) => {
         if (!oldData) return;
 
@@ -38,9 +40,9 @@ export const useQueueCraftItem = () => {
           }
           return item;
         });
-      }
+      },
     );
   }, []);
 
   return { addQueueCraftItems, removeQueueCraftItems, updateQueueCraftItems };
-}
+};

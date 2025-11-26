@@ -28,7 +28,6 @@ import {
   type SuccessResponse,
   type TItemContainer,
   type WeaponHandType,
-  buildingTypeValues,
   createHeroSchema,
   statsSchema,
 } from '@/shared/types';
@@ -47,6 +46,7 @@ import type { Context } from '../context';
 import { db } from '../db/db';
 import {
   actionTable,
+  buildingTypeEnum,
   containerSlotTable,
   craftItemTable,
   equipmentTable,
@@ -718,7 +718,7 @@ export const heroRouter = new Hono<Context>()
     zValidator(
       'json',
       z.object({
-        buildingType: z.enum(buildingTypeValues),
+        buildingType: z.enum(buildingTypeEnum.enumValues),
       }),
     ),
     async (c) => {
@@ -1188,22 +1188,23 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .get(
-    '/:id/queue/craft-item',
+    '/:id/queue/craft-item/:buildingType',
     loggedIn,
     zValidator(
       'param',
       z.object({
         id: z.string(),
+        buildingType: z.enum(buildingTypeEnum.enumValues),
       }),
     ),
     async (c) => {
       const user = c.get('user');
-      const { id } = c.req.valid('param');
+      const { id, buildingType } = c.req.valid('param');
       const hero = await heroService(db).getHero(id);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
       const queueCraftItems = await db.query.queueCraftItemTable.findMany({
-        where: eq(queueCraftItemTable.heroId, hero.id),
+        where: and(eq(queueCraftItemTable.heroId, hero.id), eq(queueCraftItemTable.buildingType, buildingType)),
         orderBy: asc(queueCraftItemTable.createdAt),
       });
 
@@ -1218,12 +1219,20 @@ export const heroRouter = new Hono<Context>()
     '/:id/action/queue-craft',
     loggedIn,
     zValidator('param', z.object({ id: z.string() })),
-    zValidator('json', z.object({ baseResourceType: z.enum(resourceTypeEnum.enumValues), craftItemId: z.string() })),
+    zValidator(
+      'json',
+      z.object({
+        baseResourceType: z.enum(resourceTypeEnum.enumValues),
+
+        craftItemId: z.string(),
+        buildingType: z.enum(buildingTypeEnum.enumValues),
+      }),
+    ),
 
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const { craftItemId, baseResourceType } = c.req.valid('json');
+      const { craftItemId, baseResourceType, buildingType } = c.req.valid('json');
 
       const [hero, craftItem] = await Promise.all([
         heroService(db).getHero(id, {
@@ -1272,6 +1281,7 @@ export const heroRouter = new Hono<Context>()
         .insert(queueCraftItemTable)
         .values({
           heroId: hero.id,
+          buildingType,
           jobId,
           baseMaterial: baseResourceType,
           status: !lastItem ? 'PROGRESS' : 'PENDING',

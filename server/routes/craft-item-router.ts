@@ -6,7 +6,6 @@ import {
   type Resource,
   type SuccessResponse,
   type WeaponType,
-  buildingTypeValues,
 } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { eq } from 'drizzle-orm';
@@ -16,7 +15,7 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { craftItemTable } from '../db/schema';
+import { buildingTypeEnum, craftItemTable } from '../db/schema';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const craftItemRouter = new Hono<Context>().get(
@@ -24,7 +23,7 @@ export const craftItemRouter = new Hono<Context>().get(
   zValidator(
     'param',
     z.object({
-      buildingType: z.enum(buildingTypeValues),
+      buildingType: z.enum(buildingTypeEnum.enumValues),
     }),
   ),
   loggedIn,
@@ -41,7 +40,7 @@ export const craftItemRouter = new Hono<Context>().get(
 
     if (buildingType === 'FORGE') {
       const forgeItems = await db.query.craftItemTable.findMany({
-        where: eq(craftItemTable.baseCraftResource, 'ORE'),
+        where: eq(craftItemTable.requiredBuildingType, 'FORGE'),
         with: { gameItem: { with: { resource: true } } },
       });
 
@@ -53,7 +52,7 @@ export const craftItemRouter = new Hono<Context>().get(
     }
 
     const craftItems = await db.query.craftItemTable.findMany({
-      where: eq(craftItemTable.baseCraftResource, 'INGOT'),
+      where: eq(craftItemTable.requiredBuildingType, 'BLACKSMITH'),
       with: {
         gameItem: { with: { armor: true, weapon: true } },
       },

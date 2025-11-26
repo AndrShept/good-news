@@ -16,7 +16,8 @@ export const createCraftItem = async () => {
     await db.insert(craftItemTable).values({
       gameItemId: weapon.id,
       craftTime: 10_000,
-      baseCraftResource: 'ORE',
+      requiredBaseCraftResource: 'ORE',
+      requiredBuildingType: 'BLACKSMITH',
       requiredResources: craftConfig.WEAPON[weapon.name as WeaponNameType].IRON!,
     });
   }

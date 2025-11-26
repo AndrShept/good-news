@@ -3,6 +3,7 @@ import { relations } from 'drizzle-orm';
 import { integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 import { gameItemTable } from './game-item-schema';
+import { buildingTypeEnum } from './place-schema';
 import { resourceCategoryEnum } from './resource-schema';
 
 export const craftItemTable = pgTable('craft-item', {
@@ -13,7 +14,8 @@ export const craftItemTable = pgTable('craft-item', {
     .notNull(),
 
   craftTime: integer().default(0).notNull(),
-  baseCraftResource: resourceCategoryEnum().notNull(),
+  requiredBaseCraftResource: resourceCategoryEnum().notNull(),
+  requiredBuildingType: buildingTypeEnum().notNull(),
   requiredLevel: integer().default(1).notNull(),
   requiredResources: jsonb().$type<CraftItemRequiredResources[]>().notNull(),
 });

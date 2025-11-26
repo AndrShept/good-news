@@ -1,11 +1,13 @@
 import { client } from '@/lib/utils';
+import { BuildingType } from '@/shared/types';
 import { queryOptions } from '@tanstack/react-query';
 
-export const getQueueCraftItems = async (heroId: string) => {
+export const getQueueCraftItems = async (heroId: string, buildingType: BuildingType) => {
   try {
-    const res = await client.hero[':id'].queue['craft-item'].$get({
+    const res = await client.hero[':id'].queue['craft-item'][':buildingType'].$get({
       param: {
         id: heroId,
+        buildingType,
       },
     });
     const data = await res.json();
@@ -18,9 +20,9 @@ export const getQueueCraftItems = async (heroId: string) => {
   }
 };
 
-export const getQueueCraftItemOptions = (heroId: string) =>
+export const getQueueCraftItemOptions = (heroId: string, buildingType: BuildingType | undefined | null) =>
   queryOptions({
-    queryKey: ['queue-craft-items', heroId],
-    queryFn: () => getQueueCraftItems(heroId),
-    enabled: !!heroId,
+    queryKey: ['queue-craft-items', heroId, buildingType],
+    queryFn: () => getQueueCraftItems(heroId, buildingType ?? 'BLACKSMITH'),
+    enabled: buildingType === 'BLACKSMITH' || buildingType === 'FORGE',
   });

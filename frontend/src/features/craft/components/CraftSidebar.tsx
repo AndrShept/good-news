@@ -16,44 +16,8 @@ interface Props {
 
 export const CraftSidebar = memo(({ data, onSelect, selectedItemId }: Props) => {
   return (
-    <aside className="flex w-full max-w-[150px] flex-col border-r md:max-w-[200px]">
-      {/* <ScrollArea className="min-h-0">
-        {data?.craftItems.map((craftItem) => (
-          <Accordion key={craftItem.itemType} type="multiple">
-            <AccordionItem value="item-1">
-              <AccordionTrigger className="bg-secondary rounded-none p-3 capitalize">{capitalize(craftItem.itemType)}</AccordionTrigger>
-
-              <AccordionContent>
-                {craftItem.subgroups.map((group) => (
-                  <Accordion key={group.subtype} type="multiple">
-                    <AccordionItem value="item-2">
-                      <AccordionTrigger className="rounded-none px-1 py-1.5 capitalize text-neutral-500">
-                        <div className="ml-2 flex items-center gap-2">
-                          <GameIcon className='size-6' image={{ ...imageConfig.icon.ARMOR, ...imageConfig.icon.WEAPON }[group.subtype]} />
-                          <span className="">{capitalize(group.subtype)}</span>
-                        </div>
-                      </AccordionTrigger>
-
-                      {group.items.map((item) => (
-                        <AccordionContent
-                          key={item.id}
-                          onClick={() => onSelect(item)}
-                          className={cn('hover:bg-secondary/30 text-primary p-1.5 hover:cursor-default', {
-                            'bg-yellow-500/20 hover:bg-yellow-500/20': selectedItemId === item.id,
-                          })}
-                        >
-                          <li className="sm:ml-4">{item?.gameItem?.name}</li>
-                        </AccordionContent>
-                      ))}
-                    </AccordionItem>
-                  </Accordion>
-                ))}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        ))}
-      </ScrollArea> */}
-      <ul>{data?.craftItems.map((craftItem) => <div onClick={() => onSelect(craftItem)}>{craftItem.gameItem?.name}</div>)}</ul>
+    <aside className="flex w-full max-w-[150px] flex-col  md:max-w-[200px] ">
+      <ul className=''>{data?.craftItems.map((craftItem) => <div onClick={() => onSelect(craftItem)}>{craftItem.gameItem?.name}</div>)}</ul>
       <div className="mt-auto">{!!data?.resources.length && <SelectBaseResource resources={data?.resources} />}</div>
     </aside>
   );

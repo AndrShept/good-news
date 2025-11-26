@@ -8,6 +8,7 @@ import {
   actionTable,
   actionTypeEnum,
   armorTable,
+  buildingTypeEnum,
   containerSlotTable,
   craftItemTable,
   groupTable,
@@ -166,6 +167,7 @@ export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];
 export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[number];
 export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
 export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number];
+export type BuildingType = (typeof buildingTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
@@ -184,10 +186,6 @@ export type QueueCraftItem = typeof queueCraftItemTable.$inferSelect & {
 export type Place = InferSelectModel<typeof placeTable> & {
   buildings?: Building[] | null;
 };
-
-export const buildingTypeValues = ['MAGIC-SHOP', 'TEMPLE', 'BLACKSMITH', 'FORGE'] as const;
-
-export type BuildingType = (typeof buildingTypeValues)[number];
 
 export type Building = {
   id: string;
