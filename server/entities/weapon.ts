@@ -2,7 +2,7 @@ import type { GameItem } from '@/shared/types';
 
 import type { gameItemTable, weaponTable } from '../db/schema';
 
-export const weaponEntities: Array<typeof gameItemTable.$inferInsert & { weapon: typeof weaponTable.$inferInsert }> = [
+export const weaponEntities = [
   {
     id: '019a2642-10ce-7ee8-ab1b-19674d19536f',
     name: 'broadsword',
@@ -44,4 +44,4 @@ export const weaponEntities: Array<typeof gameItemTable.$inferInsert & { weapon:
       requiredBuildingType: 'BLACKSMITH',
     },
   },
-];
+] as const satisfies Array<typeof gameItemTable.$inferInsert & { weapon: typeof weaponTable.$inferInsert }>;

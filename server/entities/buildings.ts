@@ -27,4 +27,4 @@ export const buildingEntities: Record<BuildingType, Building> = {
     type: 'FORGE',
     image: imageConfig.icon.building.forge,
   },
-};
+} as const

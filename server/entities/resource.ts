@@ -2,7 +2,7 @@ import { imageConfig } from '../../frontend/src/lib/config';
 import type { gameItemTable, potionTable } from '../db/schema';
 import type { resourceTable } from '../db/schema/resource-schema';
 
-export const resourceEntities: (typeof gameItemTable.$inferInsert & { resource: typeof resourceTable.$inferInsert })[] = [
+export const resourceEntities = [
   {
     id: '0199df54-be65-7db2-af0a-1002d323d64d',
     name: 'Iron ore',
@@ -39,4 +39,4 @@ export const resourceEntities: (typeof gameItemTable.$inferInsert & { resource: 
       rarity: 'COMMON',
     },
   },
-];
+] as const satisfies Array<typeof gameItemTable.$inferInsert & { resource: typeof resourceTable.$inferInsert }>;

@@ -1,6 +1,6 @@
 import type { armorTable, gameItemTable, weaponTable } from '../db/schema';
 
-export const armorEntities: Array<typeof gameItemTable.$inferInsert & { armor: typeof armorTable.$inferInsert }> = [
+export const armorEntities = [
   {
     id: 'e0785970-3c64-4187-b00b-13e3c3f34f55',
     name: 'plate armor',
@@ -33,7 +33,7 @@ export const armorEntities: Array<typeof gameItemTable.$inferInsert & { armor: t
       defense: 6,
       slot: 'GLOVES',
     },
-      craftInfo: {
+    craftInfo: {
       craftTIme: 10_000,
       baseResourceCategory: 'INGOT',
       requiredBuildingType: 'BLACKSMITH',
@@ -52,10 +52,10 @@ export const armorEntities: Array<typeof gameItemTable.$inferInsert & { armor: t
       defense: 6,
       slot: 'GLOVES',
     },
-      craftInfo: {
+    craftInfo: {
       craftTIme: 10_000,
       baseResourceCategory: 'INGOT',
       requiredBuildingType: 'BLACKSMITH',
     },
   },
-];
+] as const satisfies Array<typeof gameItemTable.$inferInsert & { armor: typeof armorTable.$inferInsert }>;

@@ -1223,9 +1223,8 @@ export const heroRouter = new Hono<Context>()
       'json',
       z.object({
         baseResourceType: z.enum(resourceTypeEnum.enumValues),
-
-        craftItemId: z.string(),
         buildingType: z.enum(buildingTypeEnum.enumValues),
+        craftItemId: z.string(),
       }),
     ),
 
@@ -1234,7 +1233,7 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const { craftItemId, baseResourceType, buildingType } = c.req.valid('json');
 
-      const [hero, craftItem] = await Promise.all([
+      const [hero, craftItem, resource] = await Promise.all([
         heroService(db).getHero(id, {
           with: {
             action: true,
@@ -1243,22 +1242,22 @@ export const heroRouter = new Hono<Context>()
           },
         }),
         craftItemService(db).getCraftItem(craftItemId),
+        db.query.resourceTable.findFirst({ where: eq(resourceTable.type, baseResourceType) }),
       ]);
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      if (hero.location?.place?.buildings?.some((b) => b.type !== buildingType)) {
+      if (hero.location?.place?.buildings?.some((b) => b.type !== craftItem.requiredBuildingType)) {
         throw new HTTPException(400, {
-          message: 'You are not inside the required town building.',
-           cause: { canShow: true },
-        });
-      }
-      if (buildingType !== craftItem.requiredBuildingType) {
-        throw new HTTPException(403, {
-          message: 'This building does not support crafting this item.',
+          message: 'You are not inside the required place building.',
           cause: { canShow: true },
         });
       }
-
+      if (resource?.category !== craftItem.requiredCraftResourceCategory) {
+        throw new HTTPException(400, {
+          message: 'Invalid base resource for this craft item.',
+          cause: { canShow: true },
+        });
+      }
       if (hero.action?.type !== 'IDLE') {
         throw new HTTPException(409, {
           message: 'Your hero is busy now',

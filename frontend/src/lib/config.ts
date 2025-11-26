@@ -189,4 +189,4 @@ export const imageConfig = {
       SolmereValley: '/sprites/bg/map/solmer-valley.png',
     },
   },
-};
+} as const;

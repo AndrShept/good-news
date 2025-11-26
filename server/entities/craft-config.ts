@@ -1,7 +1,12 @@
 import type { ArmorType, CraftItemRequiredResources, ResourceType } from '@/shared/types';
 
-import type { ArmorNameType } from './armor';
-import { type WeaponNameType, weaponEntities } from './weapon';
+import { armorEntities } from './armor';
+import { weaponEntities } from './weapon';
+
+const weaponNames = weaponEntities.map((weapon) => weapon.name);
+type WeaponNameType = (typeof weaponNames)[number];
+const armorNames = armorEntities.map((armor) => armor.name);
+type ArmorNameType = (typeof armorNames)[number];
 
 interface ICraftConfig {
   WEAPON: Record<WeaponNameType, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;

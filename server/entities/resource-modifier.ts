@@ -8,4 +8,4 @@ export const resourceModifierEntity: Record<ResourceType, Partial<OmitModifier>>
   MITHRIL: { intelligence: 10 },
   SILVER: { magicResistance: 10 },
   'REGULAR-LEATHER': {},
-};
+} 
