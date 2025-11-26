@@ -26,7 +26,8 @@ export const createCraftItem = async () => {
     if (findCraftItem) continue;
     await db.insert(craftItemTable).values({
       gameItemId: armor.id,
-      baseCraftResource: 'ORE',
+      requiredBaseCraftResource: 'ORE',
+      requiredBuildingType: 'BLACKSMITH',
       craftTime: 10_000,
       requiredResources: craftConfig.ARMOR[armor.name as ArmorNameType].IRON!,
     });
