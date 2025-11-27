@@ -8,7 +8,7 @@ import { resourceCategoryEnum, resourceTable } from './resource-schema';
 
 export const gameItemEnum = pgEnum('game_item_enum', ['WEAPON', 'ARMOR', 'POTION', 'RESOURCES', 'MISC']);
 
-export const armorSlotEnum = pgEnum('armor_slot_enum', ['HELMET', 'CHESTPLATE', 'LEGS', 'BOOTS', 'GLOVES', 'SHIELD']);
+export const armorSlotEnum = pgEnum('armor_slot_enum', ['HELMET', 'CHESTPLATE', 'LEGS','BELT', 'BOOTS', 'GLOVES', 'SHIELD']);
 export const accessorySlotEnum = pgEnum('accessory_slot_enum', ['RING', 'AMULET']);
 
 export const weaponTypeEnum = pgEnum('weapon_type_enum', ['DAGGER', 'SWORD', 'AXE', 'STAFF']);

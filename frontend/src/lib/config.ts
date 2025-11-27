@@ -49,7 +49,7 @@ interface MaterialProps {
   bg: string;
 }
 
-export const materialConfig: Record<ResourceType, MaterialProps> = {
+export const materialConfig: Partial<Record<ResourceType, MaterialProps>> = {
   IRON: {
     color: 'text-gray-400',
     border: 'border-gray-500/50',
@@ -141,6 +141,7 @@ export const imageConfig = {
     } as Record<WeaponType, string>,
     ARMOR: {
       BOOTS: '/sprites/icons/armor/boots.png',
+      BELT: '/sprites/icons/armor/belt.png',
       CHESTPLATE: '/sprites/icons/armor/chest.png',
       GLOVES: '/sprites/icons/armor/gloves.png',
       HELMET: '/sprites/icons/armor/helmet.png',
@@ -182,6 +183,14 @@ export const imageConfig = {
       GOLD: '/sprites/icons/resources/ores/gold-ore.png',
       MITHRIL: '/sprites/icons/resources/ores/mithril-ore.png',
       ADAMANTINE: '/sprites/icons/resources/ores/adamantine-ore.png',
+
+      //INGOT
+      'IRON-INGOT': '/sprites/icons/resources/ingots/iron-ingot.png',
+      'COPPER-INGOT': '/sprites/icons/resources/ingots/copper-ingot.png',
+      'SILVER-INGOT': '/sprites/icons/resources/ingots/silver-ingot.png',
+      'GOLD-INGOT': '/sprites/icons/resources/ingots/gold-ingot.png',
+      'MITHRIL-INGOT': '/sprites/icons/resources/ingots/mithril-ingot.png',
+      'ADAMANTINE-INGOT': '/sprites/icons/resources/ingots/adamantine-ingot.png',
 
       //LEATHER
       'REGULAR-LEATHER': '/sprites/icons/resources/leathers/regular-leather.png',

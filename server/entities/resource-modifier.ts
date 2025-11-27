@@ -1,6 +1,6 @@
 import type { OmitModifier, ResourceType } from '@/shared/types';
 
-export const resourceModifierEntity: Record<ResourceType, Partial<OmitModifier>> = {
+export const resourceModifierEntity: Partial<Record<ResourceType, Partial<OmitModifier>>> = {
   IRON: {},
   COPPER: { defense: 10 },
   ADAMANTINE: { constitution: 10 },
@@ -8,4 +8,4 @@ export const resourceModifierEntity: Record<ResourceType, Partial<OmitModifier>>
   MITHRIL: { intelligence: 10 },
   SILVER: { magicResistance: 10 },
   'REGULAR-LEATHER': {},
-} 
+};

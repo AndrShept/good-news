@@ -7,8 +7,9 @@ import { modifierTable } from './modifier-schema';
 
 const ores = ['IRON', 'COPPER', 'SILVER', 'GOLD', 'MITHRIL', 'ADAMANTINE'] as const;
 const leathers = ['REGULAR-LEATHER'] as const;
+const ingots = ['IRON-INGOT', 'COPPER-INGOT', 'SILVER-INGOT', 'GOLD-INGOT', 'MITHRIL-INGOT', 'ADAMANTINE-INGOT'] as const;
 
-export const resourceTypeEnum = pgEnum('resource_type_enum', [...ores, ...leathers]);
+export const resourceTypeEnum = pgEnum('resource_type_enum', [...ores, ...leathers, ...ingots]);
 export const resourceCategoryEnum = pgEnum('resource_category_enum', ['ORE', 'WOOD', 'HERB', 'LEATHER', 'INGOT']);
 export const rarityEnum = pgEnum('rarity_enum', ['COMMON', 'MAGIC', 'EPIC', 'RARE', 'LEGENDARY']);
 
