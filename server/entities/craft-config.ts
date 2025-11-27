@@ -8,12 +8,12 @@ type WeaponNameType = (typeof weaponNames)[number];
 const armorNames = armorEntities.map((armor) => armor.name);
 type ArmorNameType = (typeof armorNames)[number];
 
-interface ICraftConfig {
+export interface ICraftConfig {
   WEAPON: Record<WeaponNameType, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;
   ARMOR: Record<ArmorNameType, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;
 }
 
-export const craftConfig: ICraftConfig = {
+export const craftConfig = {
   WEAPON: {
     broadsword: {
       IRON: [{ type: 'IRON', quantity: 10 }],
@@ -53,4 +53,4 @@ export const craftConfig: ICraftConfig = {
       ADAMANTINE: [{ type: 'ADAMANTINE', quantity: 10 }],
     },
   },
-};
+} as const satisfies ICraftConfig;

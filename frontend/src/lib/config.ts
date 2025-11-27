@@ -1,4 +1,4 @@
-import { ArmorType, ResourceCategoryType, ResourceType, WeaponType } from '@/shared/types';
+import { ArmorType, EquipmentSlotType, ResourceCategoryType, ResourceType, WeaponType } from '@/shared/types';
 
 export const parentVariants = {
   hidden: { opacity: 0 },
@@ -146,6 +146,10 @@ export const imageConfig = {
       HELMET: '/sprites/icons/armor/helmet.png',
       SHIELD: '/sprites/icons/armor/shield.png',
     } as Record<ArmorType, string>,
+    ACCESSORY: {
+      AMULET: '/sprites/icons/accessory/amulet.png',
+      RING: '/sprites/icons/accessory/ring.png',
+    },
     stat: {
       strength: '/sprites/icons/stats/strength.png',
       constitution: '/sprites/icons/stats/constitution.png',
@@ -190,3 +194,63 @@ export const imageConfig = {
     },
   },
 } as const;
+
+interface EquipmentImage {
+  id: number;
+  image: string;
+  slot: EquipmentSlotType;
+}
+export const BASE_EQUIPMENTS_IMAGE: EquipmentImage[] = [
+  {
+    id: 1,
+    slot: 'HELMET',
+    image: imageConfig.icon.ARMOR.HELMET,
+  },
+  {
+    id: 2,
+    slot: 'CHESTPLATE',
+    image: imageConfig.icon.ARMOR.CHESTPLATE,
+  },
+
+  {
+    id: 4,
+    slot: 'GLOVES',
+    image: imageConfig.icon.ARMOR.GLOVES,
+  },
+  {
+    id: 3,
+    slot: 'BELT',
+    image: '/sprites/icons/belt.png',
+  },
+  {
+    id: 5,
+    slot: 'BOOTS',
+    image: imageConfig.icon.ARMOR.BOOTS,
+  },
+
+  {
+    id: 8,
+    slot: 'AMULET',
+    image: imageConfig.icon.ACCESSORY.AMULET,
+  },
+  {
+    id: 9,
+    slot: 'RING_LEFT',
+    image: imageConfig.icon.ACCESSORY.RING,
+  },
+  {
+    id: 10,
+    slot: 'RING_RIGHT',
+    image: imageConfig.icon.ACCESSORY.RING,
+  },
+  {
+    id: 6,
+    slot: 'RIGHT_HAND',
+    image: imageConfig.icon.WEAPON.SWORD,
+  },
+  {
+    id: 7,
+    slot: 'LEFT_HAND',
+    image: imageConfig.icon.ARMOR.SHIELD,
+  },
+];

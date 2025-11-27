@@ -9,7 +9,9 @@ export const useCraftItem = () => {
   const queryClient = useQueryClient();
   const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
   const data = queryClient.getQueryData(getCraftItemOptions(selectBuilding?.type).queryKey);
-
+  const filteredResourcesBySelectBuilding = useMemo(() => {
+    return data?.resources.filter((r) => r.category === selectBuilding?.workingResourceCategory);
+  }, [data?.resources, selectBuilding?.workingResourceCategory]);
   const craftItemMap = useMemo(() => {
     if (!data) return {};
 
@@ -40,5 +42,7 @@ export const useCraftItem = () => {
   return {
     craftItemMap,
     resourceMap,
+
+    filteredResourcesBySelectBuilding,
   };
 };

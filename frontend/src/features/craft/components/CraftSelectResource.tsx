@@ -5,14 +5,14 @@ import { cn } from '@/lib/utils';
 import { Resource } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 
-interface Props {
-  resources: Resource[] | undefined;
-}
+import { useCraftItem } from '../hooks/useCraftItem';
 
-export const SelectBaseResource = ({ resources }: Props) => {
+export const SelectBaseResource = () => {
   const setBaseResource = useCraftItemStore((state) => state.setBaseResource);
   const { calculateSumBackpackResource } = useHeroBackpack();
-  const sumResourceQuantity = calculateSumBackpackResource(resources!);
+  const { filteredResourcesBySelectBuilding } = useCraftItem();
+  const sumResourceQuantity = calculateSumBackpackResource(filteredResourcesBySelectBuilding);
+
   return (
     <>
       <Select defaultValue="IRON" onValueChange={setBaseResource}>
@@ -20,7 +20,7 @@ export const SelectBaseResource = ({ resources }: Props) => {
           <SelectValue />
         </SelectTrigger>
         <SelectContent side="top">
-          {resources?.map((resource) => (
+          {filteredResourcesBySelectBuilding?.map((resource) => (
             <SelectItem key={resource.id} value={resource.type}>
               <GameIcon className="size-6" image={resource?.gameItem?.image} />
               <p className="truncate">{resource.gameItem?.name}</p>

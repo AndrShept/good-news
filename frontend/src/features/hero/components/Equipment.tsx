@@ -1,4 +1,6 @@
 import { GameItemCard } from '@/components/GameItemCard';
+import { GameItemImg } from '@/components/GameItemImg';
+import { BASE_EQUIPMENTS_IMAGE } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { Equipment, EquipmentSlotType } from '@/shared/types';
 import { memo } from 'react';
@@ -10,66 +12,6 @@ interface Props {
   characterImage: string;
 }
 
-interface EquipmentImage {
-  id: number;
-  image: string;
-  slot: EquipmentSlotType;
-}
-const BASE_EQUIPMENTS_IMAGE: EquipmentImage[] = [
-  {
-    id: 1,
-    slot: 'HELMET',
-    image: '/sprites/icons/helmet.png',
-  },
-  {
-    id: 2,
-    slot: 'CHESTPLATE',
-    image: '/sprites/icons/armor.png',
-  },
-
-  {
-    id: 4,
-    slot: 'GLOVES',
-    image: '/sprites/icons/gloves.png',
-  },
-  {
-    id: 3,
-    slot: 'BELT',
-    image: '/sprites/icons/belt.png',
-  },
-  {
-    id: 5,
-    slot: 'BOOTS',
-    image: '/sprites/icons/boots.png',
-  },
-
-  {
-    id: 8,
-    slot: 'AMULET',
-    image: '/sprites/icons/amulet.png',
-  },
-  {
-    id: 9,
-    slot: 'RING_LEFT',
-    image: '/sprites/icons/ring.png',
-  },
-  {
-    id: 10,
-    slot: 'RING_RIGHT',
-    image: '/sprites/icons/ring.png',
-  },
-  {
-    id: 6,
-    slot: 'RIGHT_HAND',
-    image: '/sprites/icons/weapon.png',
-  },
-  {
-    id: 7,
-    slot: 'LEFT_HAND',
-    image: '/sprites/icons/shield.png',
-  },
-];
-
 export const Equipments = memo(({ equipments, characterImage }: Props) => {
   const equipmentBySlot = equipments.reduce(
     (acc, equip) => {
@@ -79,21 +21,14 @@ export const Equipments = memo(({ equipments, characterImage }: Props) => {
     {} as Record<EquipmentSlotType, Equipment>,
   );
   return (
-    <div className="mx-auto flex">
+    <div className="mx-auto flex ">
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(0, 5).map((equipment) => (
-          <li className="size-12 border" key={equipment.id}>
+          <li className="flex size-12 items-center justify-center border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
               <GameItemCard id={equipmentBySlot[equipment.slot].id} gameItem={equipmentBySlot[equipment.slot].gameItem} type="EQUIP" />
             ) : (
-              <img
-                style={{ imageRendering: 'pixelated' }}
-                className={cn('size-full opacity-15 grayscale', {
-                  'm-auto size-8': equipment.slot === 'RING_LEFT' || equipment.slot === 'RING_RIGHT' || equipment.slot === 'AMULET',
-                })}
-                src={equipment.image}
-                alt="equip_slot_image"
-              />
+              <GameItemImg className="size-10 opacity-20 grayscale" image={equipment.image} />
             )}
           </li>
         ))}
@@ -101,17 +36,15 @@ export const Equipments = memo(({ equipments, characterImage }: Props) => {
       <CharacterSprite src={characterImage} />
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(5, 10).map((equipment) => (
-          <li className="size-12 border" key={equipment.id}>
+          <li className="flex size-12 items-center justify-center border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
               <GameItemCard id={equipmentBySlot[equipment.slot].id} gameItem={equipmentBySlot[equipment.slot].gameItem} type="EQUIP" />
             ) : (
-              <img
-                style={{ imageRendering: 'pixelated' }}
-                className={cn('size-full opacity-15 grayscale', {
-                  'm-auto mt-1 size-9': equipment.slot === 'RING_LEFT' || equipment.slot === 'RING_RIGHT' || equipment.slot === 'AMULET',
+              <GameItemImg
+                className={cn('size-10 opacity-20 grayscale', {
+                  'size-8': equipment.slot === 'RING_LEFT' || equipment.slot === 'RING_RIGHT' || equipment.slot === 'AMULET',
                 })}
-                src={equipment.image}
-                alt="equip_slot_image"
+                image={equipment.image}
               />
             )}
           </li>

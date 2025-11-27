@@ -191,6 +191,7 @@ export type Building = {
   id: string;
   name: string;
   type: BuildingType;
+  workingResourceCategory?: ResourceCategoryType;
   image: string;
 };
 

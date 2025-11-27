@@ -1,4 +1,3 @@
-import { useHero } from '@/features/hero/hooks/useHero';
 import { Resource, ResourceType } from '@/shared/types';
 import { useMemo } from 'react';
 
@@ -9,10 +8,11 @@ export const useHeroBackpack = () => {
   const backpackId = useGetBackpackId();
   const backpack = useItemContainer(backpackId);
   const calculateSumBackpackResource = useMemo(
-    () => (resources: Resource[]) => {
+    () => (resources: Resource[] | undefined) => {
       const result: Partial<Record<ResourceType, number>> = {};
 
       if (!backpack?.containerSlots?.length) return;
+      if (!resources?.length) return;
       for (const resource of resources) {
         for (const backpackItem of backpack.containerSlots) {
           if (backpackItem?.gameItem?.resource?.type === resource.type) {
