@@ -4,6 +4,7 @@ import { db } from '../db/db';
 import { craftItemTable } from '../db/schema';
 import { armorEntities } from '../entities/armor';
 import { weaponEntities } from '../entities/weapon';
+import { resourceEntities } from '../entities/resource';
 
 export const createCraftItem = async () => {
   // const weapons = Object.values(weaponEntities);
@@ -27,6 +28,16 @@ export const createCraftItem = async () => {
       craftTime: armor.craftInfo.craftTIme,
       requiredCraftResourceCategory: armor.craftInfo.baseResourceCategory,
       requiredBuildingType: armor.craftInfo.requiredBuildingType,
+    });
+  }
+  for (const resource of resourceEntities) {
+    const findCraftItem = await db.query.craftItemTable.findFirst({ where: eq(craftItemTable.gameItemId, resource.id) });
+    if (findCraftItem || !resource.craftInfo) continue;
+    await db.insert(craftItemTable).values({
+      gameItemId: resource.id,
+      craftTime: resource.craftInfo.craftTIme,
+      requiredCraftResourceCategory: resource.craftInfo.baseResourceCategory,
+      requiredBuildingType: resource.craftInfo.requiredBuildingType,
     });
   }
   console.log('create!');

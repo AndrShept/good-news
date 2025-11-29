@@ -39,23 +39,5 @@ export const armorEntities = [
       requiredBuildingType: 'BLACKSMITH',
     },
   },
-  {
-    id: 'c0f02a83-17d9-4b5d-a6f7-8c0b6a2c2107',
-    name: 'simple gloves',
-    image: '/sprites/equipments/glovers/Icon1.jpg',
-    type: 'ARMOR',
-
-    armor: {
-      gameItemId: '',
-      evasion: 0,
-      magicResistance: 0,
-      defense: 6,
-      slot: 'GLOVES',
-    },
-    craftInfo: {
-      craftTIme: 10_000,
-      baseResourceCategory: 'INGOT',
-      requiredBuildingType: 'BLACKSMITH',
-    },
-  },
+ 
 ] as const satisfies Array<typeof gameItemTable.$inferInsert & { armor: typeof armorTable.$inferInsert }>;

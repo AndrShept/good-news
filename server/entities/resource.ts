@@ -14,6 +14,7 @@ export const resourceEntities = [
       category: 'ORE',
       rarity: 'COMMON',
     },
+    craftInfo: null
   },
   {
     id: '0199df74-c722-7695-96d9-59a701689d03',
@@ -26,6 +27,7 @@ export const resourceEntities = [
       category: 'ORE',
       rarity: 'COMMON',
     },
+    craftInfo: null
   },
   {
     id: '019ac735-a9c0-7e79-98cb-e392af762b03',
@@ -38,6 +40,7 @@ export const resourceEntities = [
       category: 'ORE',
       rarity: 'COMMON',
     },
+    craftInfo: null
   },
   {
     id: '019ac738-6ec9-7763-b633-d5ed4046b6f0',
@@ -50,6 +53,7 @@ export const resourceEntities = [
       category: 'ORE',
       rarity: 'COMMON',
     },
+    craftInfo: null
   },
   {
     id: '019ac738-e2f2-79a0-9f96-968231e0853e',
@@ -62,6 +66,7 @@ export const resourceEntities = [
       category: 'ORE',
       rarity: 'RARE',
     },
+    craftInfo: null
   },
   {
     id: '019ac739-be74-7813-9a75-8e8b0710a51e',
@@ -74,6 +79,7 @@ export const resourceEntities = [
       category: 'ORE',
       rarity: 'EPIC',
     },
+    craftInfo: null
   },
   {
     id: '019ac73a-d3f4-7c91-90b5-e0756f68d876',
@@ -188,5 +194,6 @@ export const resourceEntities = [
       category: 'LEATHER',
       rarity: 'COMMON',
     },
+    craftInfo: null
   },
 ] as const satisfies Array<typeof gameItemTable.$inferInsert & { resource: typeof resourceTable.$inferInsert }>;

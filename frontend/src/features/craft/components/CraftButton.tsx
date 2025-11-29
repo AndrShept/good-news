@@ -5,7 +5,7 @@ import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { useCreateQueueCraftItemMutation } from '../../queue/hooks/useCreateQueueCraftItemMutation';
 
 interface Props {
-  craftItem: CraftItem | undefined;
+  craftItem: CraftItem | null | undefined;
 }
 
 export const CraftButton = ({ craftItem }: Props) => {

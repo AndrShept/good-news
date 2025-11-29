@@ -42,7 +42,7 @@ export const useCraftItem = () => {
   return {
     craftItemMap,
     resourceMap,
-
+    requiredResourceCraft: data?.requiredResourceCraft,
     filteredResourcesBySelectBuilding,
   };
 };

@@ -13,15 +13,18 @@ import { useCraftItem } from '../hooks/useCraftItem';
 type Props = CraftItem;
 
 export const CraftItemCard = (props: Props) => {
-  const { resourceMap } = useCraftItem();
-
+  const { resourceMap, requiredResourceCraft } = useCraftItem();
   const baseResourceType = useCraftItemStore((state) => state.baseResourceType);
+  console.log(requiredResourceCraft);
 
+  const requeredResources =
+    props.gameItem?.type === 'ARMOR' || props.gameItem?.type === 'WEAPON'
+      ? requiredResourceCraft?.[props.gameItem?.type][props.gameItem?.name][baseResourceType]
+      : requiredResourceCraft?.[props.gameItem?.type][props.gameItem?.name];
   return (
     <ScrollArea className="h-full">
       <div className="flex flex-1 flex-col items-center text-center">
         <div className="mb-2 space-x-1 text-lg font-semibold capitalize md:text-xl">
-          {baseResourceType && <span className={cn(materialConfig[baseResourceType].color)}>{baseResourceType.toLocaleLowerCase()}</span>}
           <span>{props?.gameItem?.name}</span>
         </div>
         <GameItemImg className="md:size-15 size-10" image={props?.gameItem?.image} />
@@ -41,14 +44,14 @@ export const CraftItemCard = (props: Props) => {
           {baseResourceType && <ModifierInfoCard modifier={resourceMap?.[baseResourceType].modifier} />}
         </div>
 
-        {/* <ul>
-          {props.requiredResources.map((resource) => (
+        <ul>
+          {requeredResources?.map((resource) => (
             <div key={resource.type} className="flex items-center gap-1">
-              {baseResourceType && <GameItemImg image={resourceGroup?.[baseResourceType].image} />}
+              <GameItemImg image={resourceMap[resource.type].image} />
               <p>x{resource.quantity}</p>
             </div>
           ))}
-        </ul> */}
+        </ul>
       </div>
     </ScrollArea>
   );

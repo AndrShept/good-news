@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { ApiGetCraftItemResponse, ArmorType, CraftItem, WeaponType } from '@/shared/types';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 
 import { useCraftItem } from '../hooks/useCraftItem';
 import { SelectBaseResource } from './CraftSelectResource';
@@ -14,7 +14,10 @@ interface Props {
 
 export const CraftSidebar = memo(({ data, onSelect, selectedItemId }: Props) => {
   const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
-  const canShowSelectResource = selectBuilding?.type === 'BLACKSMITH' || selectBuilding?.type === 'FORGE';
+
+  const canShowSelectResource = selectBuilding?.type === 'BLACKSMITH';
+
+
   return (
     <aside className="flex w-full max-w-[150px] flex-col md:max-w-[200px]">
       <ul className="text-muted-foreground flex flex-col gap-0.5">
