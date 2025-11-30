@@ -47,7 +47,7 @@ export const CraftItemCard = (props: Props) => {
         <ul>
           {requeredResources?.map((resource) => (
             <div key={resource.type} className="flex items-center gap-1">
-              <GameItemImg image={resourceMap[resource.type].image} />
+              <GameItemImg image={resourceMap?.[resource.type].image} />
               <p>x{resource.quantity}</p>
             </div>
           ))}

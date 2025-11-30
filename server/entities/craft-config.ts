@@ -1,4 +1,4 @@
-import type { ArmorType, CraftItemRequiredResources, ResourceType } from '@/shared/types';
+import type { ArmorType, CraftItemRequiredResources, GameItemType, ResourceType } from '@/shared/types';
 
 import { armorEntities } from './armor';
 import { resourceEntities } from './resource';
@@ -11,12 +11,12 @@ function isIngot(
 }
 
 const weaponNames = weaponEntities.map((weapon) => weapon.name);
-type WeaponNameType = (typeof weaponNames)[number];
+export type WeaponNameType = (typeof weaponNames)[number];
 const armorNames = armorEntities.map((armor) => armor.name);
-type ArmorNameType = (typeof armorNames)[number];
+export type ArmorNameType = (typeof armorNames)[number];
 const ingots = resourceEntities.filter(isIngot);
 const names = ingots.map((i) => i.name);
-type IngotName = (typeof names)[number];
+export type IngotName = (typeof names)[number];
 
 export interface ICraftConfig {
   WEAPON: Record<WeaponNameType, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;
