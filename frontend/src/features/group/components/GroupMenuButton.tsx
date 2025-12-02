@@ -4,7 +4,6 @@ import { GroupIcon } from '@/components/game-icons/GroupIcon';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { imageConfig } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { PlusIcon } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
@@ -12,6 +11,7 @@ import React, { useCallback, useState } from 'react';
 import { CreateGroupButton } from './CreateGroupButton';
 import { GroupAvailableHeroesList } from './GroupAvailableHeroesList';
 import { GroupMembersList } from './GroupMembersList';
+import { imageConfig } from '@/shared/image-config';
 
 export const GroupMenuButton = () => {
   const [searchTerm, setSearchTerm] = useState('');

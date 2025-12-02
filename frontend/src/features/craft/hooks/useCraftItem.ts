@@ -1,4 +1,5 @@
-import { CraftItem, Modifier, ResourceType } from '@/shared/types';
+import { CraftItem, GameItem, Modifier, ResourceType } from '@/shared/types';
+import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -9,6 +10,7 @@ export const useCraftItem = () => {
   const queryClient = useQueryClient();
   const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
   const data = queryClient.getQueryData(getCraftItemOptions(selectBuilding?.type).queryKey);
+  const coreMaterialType = useCraftItemStore((state) => state.coreMaterialType);
   const filteredResourcesBySelectBuilding = useMemo(() => {
     return data?.resources.filter((r) => r.category === selectBuilding?.workingResourceCategory);
   }, [data?.resources, selectBuilding?.workingResourceCategory]);
@@ -39,10 +41,25 @@ export const useCraftItem = () => {
     [data?.resources],
   );
 
+  const getRequiredResources = (gameItem: GameItem | undefined | null) => {
+    if (!gameItem || !coreMaterialType) return undefined;
+
+    const { type, name } = gameItem;
+
+    if (type === 'ARMOR') {
+      return data?.requiredResourceCraft?.[type][name][coreMaterialType];
+    }
+
+    if (type === 'WEAPON') {
+      return data?.requiredResourceCraft?.[type][name][coreMaterialType];
+    }
+    return data?.requiredResourceCraft?.[type][name];
+  };
+
   return {
     craftItemMap,
     resourceMap,
-    requiredResourceCraft: data?.requiredResourceCraft,
+    getRequiredResources,
     filteredResourcesBySelectBuilding,
   };
 };

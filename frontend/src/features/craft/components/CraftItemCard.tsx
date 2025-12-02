@@ -5,7 +5,7 @@ import { WeaponInfo } from '@/components/WeaponInfo';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { materialConfig } from '@/lib/config';
 import { cn, formatDurationFromSeconds } from '@/lib/utils';
-import { CraftInfo, CraftItem } from '@/shared/types';
+import { CraftInfo, CraftItem, GameItemType } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 
 import { useCraftItem } from '../hooks/useCraftItem';
@@ -13,14 +13,10 @@ import { useCraftItem } from '../hooks/useCraftItem';
 type Props = CraftItem;
 
 export const CraftItemCard = (props: Props) => {
-  const { resourceMap, requiredResourceCraft } = useCraftItem();
-  const baseResourceType = useCraftItemStore((state) => state.baseResourceType);
-  console.log(requiredResourceCraft);
+  const { resourceMap, getRequiredResources } = useCraftItem();
+  const coreMaterialType = useCraftItemStore((state) => state.coreMaterialType);
 
-  const requeredResources =
-    props.gameItem?.type === 'ARMOR' || props.gameItem?.type === 'WEAPON'
-      ? requiredResourceCraft?.[props.gameItem?.type][props.gameItem?.name][baseResourceType]
-      : requiredResourceCraft?.[props.gameItem?.type][props.gameItem?.name];
+  const requiredResources = getRequiredResources(props.gameItem);
   return (
     <ScrollArea className="h-full">
       <div className="flex flex-1 flex-col items-center text-center">
@@ -41,11 +37,11 @@ export const CraftItemCard = (props: Props) => {
             <span className="text-muted-foreground">craft time:</span>
             <span>{formatDurationFromSeconds(props.craftTime / 1000)}</span>
           </div>
-          {baseResourceType && <ModifierInfoCard modifier={resourceMap?.[baseResourceType].modifier} />}
+          {coreMaterialType && <ModifierInfoCard modifier={resourceMap?.[coreMaterialType].modifier} />}
         </div>
 
         <ul>
-          {requeredResources?.map((resource) => (
+          {requiredResources?.map((resource) => (
             <div key={resource.type} className="flex items-center gap-1">
               <GameItemImg image={resourceMap?.[resource.type].image} />
               <p>x{resource.quantity}</p>

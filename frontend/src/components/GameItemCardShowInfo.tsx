@@ -1,5 +1,4 @@
 import { ShopBuyButton } from '@/features/shop/components/ShopBuyButton';
-import { imageConfig } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { GameItem } from '@/shared/types';
 import { memo } from 'react';
@@ -9,6 +8,7 @@ import { GameIcon } from './GameIcon';
 import { GameItemImg } from './GameItemImg';
 import { PotionInfo } from './PotionInfo';
 import { WeaponInfo } from './WeaponInfo';
+import { imageConfig } from '@/shared/image-config';
 
 interface Props extends GameItem {
   isShowPrice?: boolean;

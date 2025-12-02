@@ -18,13 +18,13 @@ export const CraftBuilding = ({ isCraftBuilding }: Props) => {
   const { data, isLoading } = useQuery(getCraftItemOptions(selectBuilding?.type));
   const craftItem = useCraftItemStore((state) => state.craftItem);
   const setCraftItem = useCraftItemStore((state) => state.setCraftItem);
-  const setBaseResource = useCraftItemStore((state) => state.setBaseResource);
+  const setCoreMaterial = useCraftItemStore((state) => state.setCoreMaterial);
   const { filteredResourcesBySelectBuilding } = useCraftItem();
 
   useEffect(() => {
     setCraftItem(data?.craftItems?.[0]);
-    setBaseResource(filteredResourcesBySelectBuilding?.[0].type ?? null);
-  }, [data?.craftItems, filteredResourcesBySelectBuilding, selectBuilding, setBaseResource, setCraftItem]);
+    setCoreMaterial(filteredResourcesBySelectBuilding?.[0].type ?? null);
+  }, [data?.craftItems, filteredResourcesBySelectBuilding, selectBuilding, setCoreMaterial, setCraftItem]);
   if (isLoading) return <p>...</p>;
   return (
     <Activity mode={isCraftBuilding ? 'visible' : 'hidden'}>

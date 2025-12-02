@@ -19,9 +19,11 @@ const names = ingots.map((i) => i.name);
 export type IngotName = (typeof names)[number];
 
 export interface ICraftConfig {
-  WEAPON: Record<WeaponNameType, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;
-  ARMOR: Record<ArmorNameType, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;
-  RESOURCES: Record<IngotName, CraftItemRequiredResources[]>;
+  WEAPON: Record<string, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;
+  ARMOR: Record<string, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;
+  RESOURCES: Record<string, CraftItemRequiredResources[]>;
+  POTION: Record<string, CraftItemRequiredResources[]>;
+  MISC: Record<string, CraftItemRequiredResources[]>;
 }
 
 export const craftConfig = {
@@ -71,5 +73,8 @@ export const craftConfig = {
     'gold ingot': [{ type: 'GOLD', quantity: 3 }],
     'mithril ingot': [{ type: 'MITHRIL', quantity: 3 }],
     'adamantine ingot': [{ type: 'ADAMANTINE', quantity: 3 }],
+    
   },
+  POTION: {},
+  MISC: {},
 } as const satisfies ICraftConfig;

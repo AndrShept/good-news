@@ -5,12 +5,12 @@ import { GroupMenuButton } from '@/features/group/components/GroupMenuButton';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { ContainerUsedSlots } from '@/features/item-container/components/ContainerUsedSlots';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
-import { imageConfig } from '@/lib/config';
 import { useBackpack } from '@/store/useBackpack';
 import { Link } from '@tanstack/react-router';
 import { memo } from 'react';
 
 import { CharacterPaperdollButton } from './CharacterPaperdollButton';
+import { imageConfig } from '@/shared/image-config';
 
 export const GameHeader = memo(() => {
   const { goldCoins, premiumCoins } = useHero((state) => ({

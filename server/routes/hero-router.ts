@@ -1222,7 +1222,7 @@ export const heroRouter = new Hono<Context>()
     zValidator(
       'json',
       z.object({
-        baseResourceType: z.enum(resourceTypeEnum.enumValues),
+        coreMaterialType: z.enum(resourceTypeEnum.enumValues),
         buildingType: z.enum(buildingTypeEnum.enumValues),
         craftItemId: z.string(),
       }),
@@ -1231,7 +1231,7 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const { craftItemId, baseResourceType, buildingType } = c.req.valid('json');
+      const { craftItemId, coreMaterialType, buildingType } = c.req.valid('json');
 
       const [hero, craftItem, resource] = await Promise.all([
         heroService(db).getHero(id, {
@@ -1242,7 +1242,7 @@ export const heroRouter = new Hono<Context>()
           },
         }),
         craftItemService(db).getCraftItem(craftItemId),
-        db.query.resourceTable.findFirst({ where: eq(resourceTable.type, baseResourceType) }),
+        db.query.resourceTable.findFirst({ where: eq(resourceTable.type, coreMaterialType) }),
       ]);
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
@@ -1268,7 +1268,7 @@ export const heroRouter = new Hono<Context>()
           message: 'Action not allowed: hero now is battle',
         });
       }
-      await itemContainerService(db).checkCraftResources(hero.id, baseResourceType, craftItem.requiredResources);
+      // await itemContainerService(db).checkCraftResources(hero.id, coreMaterialType, craftItem.requiredResources);
 
       const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
         where: and(eq(queueCraftItemTable.heroId, hero.id), ne(queueCraftItemTable.status, 'FAILED')),
@@ -1296,7 +1296,7 @@ export const heroRouter = new Hono<Context>()
           heroId: hero.id,
           buildingType,
           jobId,
-          baseMaterial: baseResourceType,
+          coreMaterialType,
           status: !lastItem ? 'PROGRESS' : 'PENDING',
           craftItemId: craftItem.id,
           completedAt,
@@ -1307,7 +1307,7 @@ export const heroRouter = new Hono<Context>()
         payload: {
           heroId: hero.id,
           queueCraftItemId: newQueueCraftItem.id,
-          baseResourceType,
+          coreMaterialType,
         },
       };
       console.log('@@@@@@@', delay);

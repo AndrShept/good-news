@@ -70,7 +70,7 @@ export type QueueCraftItemJob = {
   payload: {
     heroId: string;
     queueCraftItemId: string;
-    baseResourceType: ResourceType;
+    coreMaterialType: ResourceType;
     completedAt?: string;
     gameItemName?: string;
   };

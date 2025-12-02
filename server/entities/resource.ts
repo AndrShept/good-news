@@ -1,4 +1,4 @@
-import { imageConfig } from '../../frontend/src/lib/config';
+import { imageConfig } from '@/shared/image-config';
 import type { gameItemTable, potionTable } from '../db/schema';
 import type { resourceTable } from '../db/schema/resource-schema';
 

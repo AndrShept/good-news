@@ -1,4 +1,4 @@
-import { imageConfig } from '../../frontend/src/lib/config';
+import { imageConfig } from '@/shared/image-config';
 import type { mapTable } from '../db/schema';
 
 export const mapEntities: Record<string, typeof mapTable.$inferInsert> = {
