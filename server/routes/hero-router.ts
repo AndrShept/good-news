@@ -1222,7 +1222,7 @@ export const heroRouter = new Hono<Context>()
     zValidator(
       'json',
       z.object({
-        coreMaterialType: z.enum(resourceTypeEnum.enumValues),
+        coreMaterialType: z.optional(z.enum(resourceTypeEnum.enumValues)),
         buildingType: z.enum(buildingTypeEnum.enumValues),
         craftItemId: z.string(),
       }),
@@ -1241,12 +1241,13 @@ export const heroRouter = new Hono<Context>()
             location: { with: { place: true } },
           },
         }),
-        craftItemService(db).getCraftItem(craftItemId),
-        db.query.resourceTable.findFirst({ where: eq(resourceTable.type, coreMaterialType) }),
+        craftItemService(db).getCraftItem(craftItemId, { with: { gameItem: true } }),
+        coreMaterialType && db.query.resourceTable.findFirst({ where: eq(resourceTable.type, coreMaterialType) }),
       ]);
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      if (hero.location?.place?.buildings?.some((b) => b.type !== craftItem.requiredBuildingType)) {
+      const isNotInsideRequiredBuilding = hero.location?.place?.buildings?.every((b) => b.type !== craftItem.requiredBuildingType);
+      console.log(coreMaterialType);
+      if (isNotInsideRequiredBuilding) {
         throw new HTTPException(400, {
           message: 'You are not inside the required place building.',
           cause: { canShow: true },
@@ -1268,7 +1269,8 @@ export const heroRouter = new Hono<Context>()
           message: 'Action not allowed: hero now is battle',
         });
       }
-      // await itemContainerService(db).checkCraftResources(hero.id, coreMaterialType, craftItem.requiredResources);
+      const requiredResources = craftItemService(db).getRequiredResources(craftItem.gameItem, coreMaterialType);
+      await itemContainerService(db).checkCraftResources(hero.id, requiredResources);
 
       const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
         where: and(eq(queueCraftItemTable.heroId, hero.id), ne(queueCraftItemTable.status, 'FAILED')),

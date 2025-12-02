@@ -30,19 +30,22 @@ export const itemContainerService = (db: TTransaction | TDataBase) => ({
     }
     return itemContainer;
   },
-  async checkCraftResources(heroId: string, baseResourceType: ResourceType, requiredResources: CraftItemRequiredResources[]) {
-    const [craftResource, backpack] = await Promise.all([
-      db.query.resourceTable.findFirst({ where: eq(resourceTable.type, baseResourceType) }),
-      itemContainerService(db).getHeroBackpack(heroId),
-    ]);
+  async checkCraftResources(heroId: string, requiredResources: CraftItemRequiredResources[] | undefined) {
+    const backpack = await itemContainerService(db).getHeroBackpack(heroId);
 
-    if (!craftResource) {
+    if (!requiredResources?.length) {
       throw new HTTPException(404, {
-        message: 'craft resource not found',
+        message: 'requiredResources resource not found',
       });
     }
 
     for (const requiredResource of requiredResources) {
+      const craftResource = await db.query.resourceTable.findFirst({ where: eq(resourceTable.type, requiredResource.type) });
+      if (!craftResource) {
+        throw new HTTPException(404, {
+          message: `not found craftResource`,
+        });
+      }
       const inventoryResources = await db.query.containerSlotTable.findMany({
         where: and(eq(containerSlotTable.gameItemId, craftResource.gameItemId), eq(containerSlotTable.itemContainerId, backpack.id)),
       });

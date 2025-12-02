@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1764167154953,
-      "tag": "0000_majestic_tag",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1764168404359,
-      "tag": "0001_cloudy_satana",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1764185917549,
-      "tag": "0002_careful_excalibur",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1764252630529,
-      "tag": "0003_sticky_martin_li",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1764446835897,
-      "tag": "0004_loose_moondragon",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1764682267314,
-      "tag": "0005_workable_eddie_brock",
+      "when": 1764711501440,
+      "tag": "0000_optimal_vin_gonzales",
       "breakpoints": true
     }
   ]

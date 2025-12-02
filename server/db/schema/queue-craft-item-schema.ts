@@ -12,7 +12,7 @@ export const queueCraftItemTable = pgTable('queue-craft-item', {
   id: uuid().primaryKey().defaultRandom().notNull(),
   jobId: text().notNull(),
   status: queueCraftStatusEnum().notNull(),
-  coreMaterialType: resourceTypeEnum().notNull(),
+  coreMaterialType: resourceTypeEnum(),
   buildingType: buildingTypeEnum().notNull(),
   craftItemId: uuid()
     .references(() => craftItemTable.id, { onDelete: 'cascade' })

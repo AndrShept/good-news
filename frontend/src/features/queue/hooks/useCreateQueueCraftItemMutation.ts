@@ -11,7 +11,7 @@ export const useCreateQueueCraftItemMutation = () => {
   const id = useHeroId();
   const { addQueueCraftItems } = useQueueCraftItem();
   return useMutation({
-    mutationFn: async ({ craftItemId, coreMaterialType }: { craftItemId: string; coreMaterialType: ResourceType }) => {
+    mutationFn: async ({ craftItemId, coreMaterialType }: { craftItemId: string; coreMaterialType: ResourceType | undefined }) => {
       const res = await client.hero[':id'].action['queue-craft'].$post({
         param: {
           id,

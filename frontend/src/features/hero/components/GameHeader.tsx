@@ -5,12 +5,14 @@ import { GroupMenuButton } from '@/features/group/components/GroupMenuButton';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { ContainerUsedSlots } from '@/features/item-container/components/ContainerUsedSlots';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
+import { imageConfig } from '@/shared/image-config';
 import { useBackpack } from '@/store/useBackpack';
+import { useCraftItemStore } from '@/store/useCraftItemStore';
+import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { Link } from '@tanstack/react-router';
 import { memo } from 'react';
 
 import { CharacterPaperdollButton } from './CharacterPaperdollButton';
-import { imageConfig } from '@/shared/image-config';
 
 export const GameHeader = memo(() => {
   const { goldCoins, premiumCoins } = useHero((state) => ({
@@ -20,9 +22,13 @@ export const GameHeader = memo(() => {
   const { backpack } = useHeroBackpack();
   const isOpen = useBackpack((state) => state.isOpen);
   const onOpen = useBackpack((state) => state.onOpen);
+  const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
+  const coreMaterialType = useCraftItemStore((state) => state.coreMaterialType);
 
   return (
     <header className="bg-background/80 backdrop-blur-xs sticky top-0 z-50 mb-3 flex items-center justify-between border-b px-4 py-2">
+      {selectBuilding?.type}
+      {coreMaterialType}
       <section>
         <Link to="/">
           <GameIcon image={imageConfig.icon.ui.logo} />

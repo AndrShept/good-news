@@ -15,11 +15,11 @@ export const CraftButton = ({ craftItem }: Props) => {
     <>
       <Button
         className="w-full"
-        disabled={isPending || !craftItem || !coreMaterialType}
+        disabled={isPending || !craftItem }
         onClick={() =>
           mutate({
             craftItemId: craftItem?.id ?? '',
-            coreMaterialType: coreMaterialType!,
+            coreMaterialType: coreMaterialType ? coreMaterialType : undefined,
           })
         }
       >

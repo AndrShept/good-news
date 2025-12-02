@@ -21,5 +21,5 @@ export const getCraftItemOptions = (buildingType: BuildingType | null | undefine
   queryOptions({
     queryKey: ['craft-item', buildingType],
     queryFn: () => getCraftItem(buildingType!),
-    enabled: (buildingType === 'BLACKSMITH' || buildingType === 'FORGE') && !!buildingType,
+    enabled: (buildingType === 'BLACKSMITH' || buildingType === 'FORGE'),
   });

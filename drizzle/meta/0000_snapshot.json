@@ -1,5 +1,5 @@
 {
-  "id": "a7b989a7-ab57-41d3-9094-87f0fdaf4872",
+  "id": "5dd646f7-de8e-4500-b9a6-ebb998ef6b9e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1047,6 +1047,12 @@
           "notNull": true,
           "default": 0
         },
+        "craftInfo": {
+          "name": "craftInfo",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -2023,9 +2029,16 @@
           "notNull": true,
           "default": 0
         },
-        "baseCraftResource": {
-          "name": "baseCraftResource",
+        "requiredCraftResourceCategory": {
+          "name": "requiredCraftResourceCategory",
           "type": "resource_category_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "requiredBuildingType": {
+          "name": "requiredBuildingType",
+          "type": "building_type_enum",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
@@ -2036,12 +2049,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": 1
-        },
-        "requiredResources": {
-          "name": "requiredResources",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {},
@@ -2090,12 +2097,12 @@
           "primaryKey": false,
           "notNull": true
         },
-        "baseMaterial": {
-          "name": "baseMaterial",
+        "coreMaterialType": {
+          "name": "coreMaterialType",
           "type": "resource_type_enum",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "buildingType": {
           "name": "buildingType",
@@ -2199,6 +2206,7 @@
         "HELMET",
         "CHESTPLATE",
         "LEGS",
+        "BELT",
         "BOOTS",
         "GLOVES",
         "SHIELD"
@@ -2345,7 +2353,13 @@
         "GOLD",
         "MITHRIL",
         "ADAMANTINE",
-        "REGULAR-LEATHER"
+        "REGULAR-LEATHER",
+        "IRON-INGOT",
+        "COPPER-INGOT",
+        "SILVER-INGOT",
+        "GOLD-INGOT",
+        "MITHRIL-INGOT",
+        "ADAMANTINE-INGOT"
       ]
     },
     "public.queue_craft_status_enum": {

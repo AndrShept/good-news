@@ -39,8 +39,8 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
         'opacity-80 saturate-50': isPending,
       })}
     >
-      <GameItemImg className="size-10" image={props.craftItemMap[props.craftItemId].gameItem?.image} />
-      <p className="line-clamp-1 text-sm">{props.craftItemMap[props.craftItemId].gameItem?.name}</p>
+      <GameItemImg className="size-10" image={props.craftItemMap[props.craftItemId]?.gameItem?.image} />
+      <p className="line-clamp-1 text-sm">{props.craftItemMap[props.craftItemId]?.gameItem?.name}</p>
       {props.coreMaterialType && (
         <p className={(cn('text-sm'), materialConfig[props.coreMaterialType]?.color)}>{props.coreMaterialType.toLowerCase()}</p>
       )}

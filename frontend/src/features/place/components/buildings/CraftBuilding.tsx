@@ -10,10 +10,7 @@ import { CraftItemCard } from '../../../craft/components/CraftItemCard';
 import { CraftSidebar } from '../../../craft/components/CraftSidebar';
 import { QueueCraftItemsList } from '../../../queue/components/QueueCraftItemsList';
 
-type Props = {
-  isCraftBuilding: boolean;
-};
-export const CraftBuilding = ({ isCraftBuilding }: Props) => {
+export const CraftBuilding = () => {
   const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
   const { data, isLoading } = useQuery(getCraftItemOptions(selectBuilding?.type));
   const craftItem = useCraftItemStore((state) => state.craftItem);
@@ -23,21 +20,23 @@ export const CraftBuilding = ({ isCraftBuilding }: Props) => {
 
   useEffect(() => {
     setCraftItem(data?.craftItems?.[0]);
-    setCoreMaterial(filteredResourcesBySelectBuilding?.[0].type ?? null);
-  }, [data?.craftItems, filteredResourcesBySelectBuilding, selectBuilding, setCoreMaterial, setCraftItem]);
+    if (selectBuilding?.type === 'BLACKSMITH') {
+      setCoreMaterial(filteredResourcesBySelectBuilding?.[0].type ?? null);
+    } else {
+      setCoreMaterial(null);
+    }
+  }, [data?.craftItems, filteredResourcesBySelectBuilding, selectBuilding]);
   if (isLoading) return <p>...</p>;
   return (
-    <Activity mode={isCraftBuilding ? 'visible' : 'hidden'}>
-      <section className="flex w-full">
-        <CraftSidebar data={data} onSelect={setCraftItem} selectedItemId={craftItem?.id} />
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col p-1">
-          <div className="min-h-0 flex-1">{craftItem && craftItem.gameItem && <CraftItemCard {...craftItem} />}</div>
-          <QueueCraftItemsList />
-          <div className="mx-auto w-[200px] p-3">
-            <CraftButton craftItem={craftItem} />
-          </div>
+    <section className="flex w-full">
+      <CraftSidebar data={data} onSelect={setCraftItem} selectedItemId={craftItem?.id} />
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col p-1">
+        <div className="min-h-0 flex-1">{craftItem && craftItem.gameItem && <CraftItemCard {...craftItem} />}</div>
+        <QueueCraftItemsList />
+        <div className="mx-auto w-[200px] p-3">
+          <CraftButton craftItem={craftItem} />
         </div>
-      </section>
-    </Activity>
+      </div>
+    </section>
   );
 };

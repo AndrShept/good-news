@@ -23,6 +23,7 @@ export const CraftSidebar = memo(({ data, onSelect, selectedItemId }: Props) => 
       <ul className="text-muted-foreground flex flex-col gap-0.5">
         {data?.craftItems.map((craftItem) => (
           <div
+          key={craftItem.id}
             className={cn('', {
               'bg-secondary/30 text-primary': selectedItemId === craftItem.id,
             })}

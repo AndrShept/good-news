@@ -26,10 +26,10 @@ export interface ICraftConfig {
   MISC: Record<string, CraftItemRequiredResources[]>;
 }
 
-export const craftConfig = {
+export const craftConfig: ICraftConfig = {
   WEAPON: {
     broadsword: {
-      'IRON-INGOT': [{ type: 'IRON', quantity: 10 }],
+      'IRON-INGOT': [{ type: 'IRON-INGOT', quantity: 10 }],
       'COPPER-INGOT': [{ type: 'COPPER', quantity: 10 }],
       'SILVER-INGOT': [{ type: 'SILVER', quantity: 10 }],
       'GOLD-INGOT': [{ type: 'GOLD', quantity: 10 }],
@@ -73,8 +73,7 @@ export const craftConfig = {
     'gold ingot': [{ type: 'GOLD', quantity: 3 }],
     'mithril ingot': [{ type: 'MITHRIL', quantity: 3 }],
     'adamantine ingot': [{ type: 'ADAMANTINE', quantity: 3 }],
-    
   },
   POTION: {},
   MISC: {},
-} as const satisfies ICraftConfig;
+};

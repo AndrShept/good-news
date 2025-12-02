@@ -14,12 +14,14 @@ export const SelectedBuildingPage = ({ place }: Props) => {
   const isMagicShop = selectBuilding?.type === 'MAGIC-SHOP';
   const isTemple = selectBuilding?.type === 'TEMPLE';
   const isCraftBuilding = selectBuilding?.type === 'BLACKSMITH' || selectBuilding?.type === 'FORGE';
+  // const isCraftBuilding = useSelectBuildingStore((state) => state.isCraftBuilding);
+  // const canCraft = isCraftBuilding();
   return (
     <section className="flex flex-1 p-1.5">
       {!selectBuilding && <p>{place?.name}</p>}
       {isMagicShop && <MagicShop />}
       {isTemple && <Temple />}
-      <CraftBuilding isCraftBuilding={isCraftBuilding} />
+      {isCraftBuilding && <CraftBuilding />}
     </section>
   );
 };

@@ -4,6 +4,7 @@ import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack
 import { cn } from '@/lib/utils';
 import { ResourceType } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
+import { useEffect } from 'react';
 
 import { useCraftItem } from '../hooks/useCraftItem';
 
@@ -12,6 +13,7 @@ export const SelectBaseResource = () => {
   const { calculateSumBackpackResource } = useHeroBackpack();
   const { filteredResourcesBySelectBuilding } = useCraftItem();
   const sumResourceQuantity = calculateSumBackpackResource(filteredResourcesBySelectBuilding);
+
   return (
     <>
       <Select defaultValue={filteredResourcesBySelectBuilding?.[0].type} onValueChange={(type: ResourceType) => setCoreMaterial(type)}>
