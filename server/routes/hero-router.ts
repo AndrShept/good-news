@@ -1233,7 +1233,7 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const { craftItemId, coreMaterialType, buildingType } = c.req.valid('json');
 
-      const [hero, craftItem, coreMaterial] = await Promise.all([
+      const [hero, craftItem, coreMaterial, backpack] = await Promise.all([
         heroService(db).getHero(id, {
           with: {
             action: true,
@@ -1243,6 +1243,7 @@ export const heroRouter = new Hono<Context>()
         }),
         craftItemService(db).getCraftItem(craftItemId, { with: { gameItem: true } }),
         coreMaterialType && db.query.resourceTable.findFirst({ where: eq(resourceTable.type, coreMaterialType) }),
+        itemContainerService(db).getHeroBackpack(id),
       ]);
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
       const isNotInsideRequiredBuilding = hero.location?.place?.buildings?.every((b) => b.type !== craftItem.requiredBuildingType);
@@ -1270,7 +1271,7 @@ export const heroRouter = new Hono<Context>()
         });
       }
       const requiredResources = craftItemService(db).getRequiredResources(craftItem.gameItem, coreMaterialType);
-      await itemContainerService(db).checkCraftResources(hero.id, requiredResources);
+      await itemContainerService(db).checkCraftResources( backpack.id, requiredResources);
 
       const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
         where: and(eq(queueCraftItemTable.heroId, hero.id), ne(queueCraftItemTable.status, 'FAILED')),

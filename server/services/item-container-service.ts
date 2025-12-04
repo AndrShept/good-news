@@ -30,9 +30,7 @@ export const itemContainerService = (db: TTransaction | TDataBase) => ({
     }
     return itemContainer;
   },
-  async checkCraftResources(heroId: string, requiredResources: CraftItemRequiredResources[] | undefined) {
-    const backpack = await itemContainerService(db).getHeroBackpack(heroId);
-
+  async checkCraftResources( backpackId: string, requiredResources: CraftItemRequiredResources[] | undefined) {
     if (!requiredResources?.length) {
       throw new HTTPException(404, {
         message: 'requiredResources resource not found',
@@ -47,7 +45,7 @@ export const itemContainerService = (db: TTransaction | TDataBase) => ({
         });
       }
       const inventoryResources = await db.query.containerSlotTable.findMany({
-        where: and(eq(containerSlotTable.gameItemId, craftResource.gameItemId), eq(containerSlotTable.itemContainerId, backpack.id)),
+        where: and(eq(containerSlotTable.gameItemId, craftResource.gameItemId), eq(containerSlotTable.itemContainerId, backpackId)),
       });
 
       const totalOwnedQuantity = inventoryResources.reduce((acc, item) => acc + item.quantity, 0);
@@ -60,9 +58,6 @@ export const itemContainerService = (db: TTransaction | TDataBase) => ({
       }
     }
 
-    return {
-      backpack,
-    };
   },
   async getHeroItemContainerByType(
     heroId: string,
