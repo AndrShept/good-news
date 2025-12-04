@@ -131,7 +131,7 @@ export const actionQueueListeners = () => {
   });
 
   queueEvents.on('failed', async ({ jobId, failedReason }) => {
-    console.error('actionQueueListeners queueEvents ERROR!!! ', failedReason);
+    console.error('actionQueueListeners queueEvents ERROR ', failedReason);
 
     const jobData = await actionQueue.getJob(jobId);
     switch (jobData?.data?.jobName) {

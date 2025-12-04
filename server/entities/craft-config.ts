@@ -49,7 +49,7 @@ export const craftConfig: ICraftConfig = {
     'simple gloves': {
       'IRON-INGOT': [{ type: 'IRON', quantity: 5 }],
       'COPPER-INGOT': [
-        { type: 'COPPER', quantity: 5 },
+        { type: 'COPPER-INGOT', quantity: 5 },
         { type: 'REGULAR-LEATHER', quantity: 3 },
       ],
       'SILVER-INGOT': [{ type: 'SILVER', quantity: 5 }],
