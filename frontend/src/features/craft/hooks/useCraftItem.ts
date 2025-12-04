@@ -42,15 +42,13 @@ export const useCraftItem = () => {
   );
 
   const getRequiredResources = (gameItem: GameItem | undefined | null) => {
-    if (!gameItem || !coreMaterialType) return undefined;
+    if (!gameItem) return;
 
     const { type, name } = gameItem;
 
-    if (type === 'ARMOR') {
-      return data?.requiredResourceCraft?.[type][name][coreMaterialType];
-    }
+    if (type === 'ARMOR' || type === 'WEAPON') {
+      if (!coreMaterialType) return;
 
-    if (type === 'WEAPON') {
       return data?.requiredResourceCraft?.[type][name][coreMaterialType];
     }
     return data?.requiredResourceCraft?.[type][name];

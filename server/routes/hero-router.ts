@@ -1233,7 +1233,7 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const { craftItemId, coreMaterialType, buildingType } = c.req.valid('json');
 
-      const [hero, craftItem, resource] = await Promise.all([
+      const [hero, craftItem, coreMaterial] = await Promise.all([
         heroService(db).getHero(id, {
           with: {
             action: true,
@@ -1246,14 +1246,14 @@ export const heroRouter = new Hono<Context>()
       ]);
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
       const isNotInsideRequiredBuilding = hero.location?.place?.buildings?.every((b) => b.type !== craftItem.requiredBuildingType);
-      console.log(coreMaterialType);
       if (isNotInsideRequiredBuilding) {
         throw new HTTPException(400, {
           message: 'You are not inside the required place building.',
           cause: { canShow: true },
         });
       }
-      if (resource?.category !== craftItem.requiredCraftResourceCategory) {
+
+      if (coreMaterial && coreMaterial?.category !== craftItem.requiredCraftResourceCategory) {
         throw new HTTPException(400, {
           message: 'Invalid base resource for this craft item.',
           cause: { canShow: true },

@@ -1,4 +1,4 @@
-import type { CraftItem, GameItem, ResourceType } from '@/shared/types';
+import type { CraftItem, CraftItemRequiredResources, GameItem, ResourceType } from '@/shared/types';
 import { and, eq } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
@@ -22,15 +22,13 @@ export const craftItemService = (db: TTransaction | TDataBase) => ({
   },
 
   getRequiredResources(gameItem: GameItem | undefined | null, coreMaterialType: ResourceType | undefined) {
-    if (!gameItem || !coreMaterialType) return undefined;
+    if (!gameItem) return;
 
     const { type, name } = gameItem;
 
-    if (type === 'ARMOR') {
-      return craftConfig[type][name][coreMaterialType];
-    }
+    if (type === 'ARMOR' || type === 'WEAPON') {
+      if (!coreMaterialType) return;
 
-    if (type === 'WEAPON') {
       return craftConfig[type][name][coreMaterialType];
     }
     return craftConfig[type][name];

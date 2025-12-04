@@ -17,6 +17,7 @@ export const CraftItemCard = (props: Props) => {
   const coreMaterialType = useCraftItemStore((state) => state.coreMaterialType);
 
   const requiredResources = getRequiredResources(props.gameItem);
+  console.log(requiredResources)
   return (
     <ScrollArea className="h-full">
       <div className="flex flex-1 flex-col items-center text-center">
@@ -33,7 +34,7 @@ export const CraftItemCard = (props: Props) => {
             <span className="text-muted-foreground">skill:</span>
             <span>{props.requiredLevel}</span>
           </div>
-          <div className="space-x-1">
+        <div className="space-x-1">
             <span className="text-muted-foreground">craft time:</span>
             <span>{formatDurationFromSeconds(props.craftTime / 1000)}</span>
           </div>
