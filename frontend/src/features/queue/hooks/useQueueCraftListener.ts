@@ -19,10 +19,9 @@ export const useQueueCraftListener = () => {
   const setGameMessage = useSetGameMessage();
   useEffect(() => {
     const listener = async (data: QueueCraftItemSocketData) => {
-      console.error('FRONT', data);
       switch (data.type) {
         case 'QUEUE_CRAFT_ITEM_COMPLETE':
-          removeQueueCraftItems(data.payload.queueItemCraftId);
+          removeQueueCraftItems(data.payload.queueItemCraftId, data.payload.buildingType);
 
           await queryClient.invalidateQueries({
             queryKey: getItemContainerOptions(heroId, backpackId).queryKey,
@@ -31,7 +30,7 @@ export const useQueueCraftListener = () => {
 
           break;
         case 'QUEUE_CRAFT_ITEM_STATUS_UPDATE':
-          updateQueueCraftItems(data.payload.queueItemCraftId, {
+          updateQueueCraftItems(data.payload.queueItemCraftId, data.payload.buildingType, {
             status: data.payload.status,
             completedAt: data.payload.completedAt,
           });

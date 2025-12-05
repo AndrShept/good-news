@@ -1,6 +1,6 @@
 import type { GameMessageType } from '../frontend/src/store/useGameMessages';
 import type { BuffCreateJob, QueueCraftItemJob, RegenHealthJob, RegenManaJob, WalkMapJob, WalkPlaceJob } from './job-types';
-import type { GameItem, Location, QueueCraftStatusType } from './types';
+import type { BuildingType, GameItem, Location, QueueCraftStatusType } from './types';
 
 export type SocketGroupResponse = {
   message: string;
@@ -53,11 +53,11 @@ export type HeroOnlineData = {
 export type QueueCraftItemSocketData =
   | {
       type: 'QUEUE_CRAFT_ITEM_COMPLETE';
-      payload: { queueItemCraftId: string; gameItemName: string };
+      payload: { queueItemCraftId: string; gameItemName: string; buildingType: BuildingType };
     }
   | {
       type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE';
-      payload: { queueItemCraftId: string; status: QueueCraftStatusType; completedAt: string };
+      payload: { queueItemCraftId: string; status: QueueCraftStatusType; completedAt: string; buildingType: BuildingType };
     };
 
 export type SelfMessageData = { message: string; type: GameMessageType };

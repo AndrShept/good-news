@@ -73,5 +73,6 @@ export type QueueCraftItemJob = {
     coreMaterialType?: ResourceType;
     completedAt?: string;
     gameItemName?: string;
+    buildingType: BuildingType;
   };
 };

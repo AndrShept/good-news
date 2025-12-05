@@ -42,7 +42,7 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
       <GameItemImg className="size-10" image={props.craftItemMap[props.craftItemId]?.gameItem?.image} />
       <p className="line-clamp-1 text-sm">{props.craftItemMap[props.craftItemId]?.gameItem?.name}</p>
       {props.coreMaterialType && (
-        <p className={(cn('text-sm'), materialConfig[props.coreMaterialType]?.color)}>{props.coreMaterialType.toLowerCase()}</p>
+        <p className={(cn('text-xs'), materialConfig[props.coreMaterialType]?.color)}>{props.coreMaterialType.toLowerCase()}</p>
       )}
       <p
         className={cn('text-sm', {
@@ -62,7 +62,7 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
       </p>
       <button
         disabled={isPending}
-        onClick={() => mutate(props.id)}
+        onClick={() => mutate({ queueCraftItemId: props.id, buildingType: props.buildingType })}
         className={cn('absolute inset-0 hidden items-center justify-center bg-black/90 group-hover:flex')}
       >
         <X size={30} className="text-red-500" />

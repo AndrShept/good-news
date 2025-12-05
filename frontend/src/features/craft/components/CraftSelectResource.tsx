@@ -12,7 +12,7 @@ export const SelectBaseResource = () => {
   const setCoreMaterial = useCraftItemStore((state) => state.setCoreMaterial);
   const { calculateSumBackpackResource } = useHeroBackpack();
   const { filteredResourcesBySelectBuilding } = useCraftItem();
-  const sumResourceQuantity = calculateSumBackpackResource(filteredResourcesBySelectBuilding);
+  const sumResourceQuantity = calculateSumBackpackResource(filteredResourcesBySelectBuilding?.map((item) => item.type));
 
   return (
     <>

@@ -1,6 +1,6 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { client } from '@/lib/utils';
-import { ErrorResponse } from '@/shared/types';
+import { BuildingType, ErrorResponse } from '@/shared/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { useQueueCraftItem } from './useQueueCraftItem';
@@ -9,11 +9,11 @@ export const useDeleteQueueCraftItemMutation = () => {
   const id = useHeroId();
   const { removeQueueCraftItems } = useQueueCraftItem();
   return useMutation({
-    mutationFn: async (queueCraftItemId: string) => {
+    mutationFn: async (removeData: { queueCraftItemId: string; buildingType: BuildingType }) => {
       const res = await client.hero[':id'].action['queue-craft'][':queueCraftItemId'].$delete({
         param: {
           id,
-          queueCraftItemId,
+          queueCraftItemId: removeData.queueCraftItemId,
         },
       });
       if (!res.ok) {
@@ -22,8 +22,8 @@ export const useDeleteQueueCraftItemMutation = () => {
       }
       return await res.json();
     },
-    onSuccess: (_, queueCraftItemId) => {
-      removeQueueCraftItems(queueCraftItemId);
+    onSuccess: (_, { buildingType, queueCraftItemId }) => {
+      removeQueueCraftItems(queueCraftItemId, buildingType);
     },
   });
 };

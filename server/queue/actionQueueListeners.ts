@@ -89,6 +89,7 @@ export const actionQueueListeners = () => {
           payload: {
             queueItemCraftId: jobData.payload.queueCraftItemId,
             gameItemName: jobData.payload.gameItemName ?? '',
+            buildingType: jobData.payload.buildingType,
           },
         };
 
@@ -98,6 +99,7 @@ export const actionQueueListeners = () => {
             queueItemCraftId: jobData.payload.queueCraftItemId,
             status: 'PROGRESS',
             completedAt: jobData.payload.completedAt ?? '',
+            buildingType: jobData.payload.buildingType,
           },
         };
         io.to(jobData.payload.heroId).emit(socketEvents.queueCraft(), updateData);
@@ -123,6 +125,7 @@ export const actionQueueListeners = () => {
             status: 'PROGRESS',
             queueItemCraftId: progressData.payload.queueCraftItemId,
             completedAt: progressData.payload.completedAt ?? '',
+            buildingType: progressData.payload.buildingType,
           },
         };
         io.to(progressData.payload.heroId).emit(socketEvents.queueCraft(), updateQueueCraftDataProgress);
@@ -146,6 +149,7 @@ export const actionQueueListeners = () => {
             status: 'FAILED',
             queueItemCraftId: jobData.data.payload.queueCraftItemId,
             completedAt: jobData.data.payload.completedAt ?? new Date().toISOString(),
+            buildingType: jobData.data.payload.buildingType,
           },
         };
 

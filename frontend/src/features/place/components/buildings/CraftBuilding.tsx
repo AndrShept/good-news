@@ -2,7 +2,7 @@ import { useCraftItem } from '@/features/craft/hooks/useCraftItem';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQuery } from '@tanstack/react-query';
-import { Activity, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { getCraftItemOptions } from '../../../craft/api/get-craft-item';
 import { CraftButton } from '../../../craft/components/CraftButton';
@@ -32,9 +32,11 @@ export const CraftBuilding = () => {
       <CraftSidebar data={data} onSelect={setCraftItem} selectedItemId={craftItem?.id} />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col p-1">
         <div className="min-h-0 flex-1">{craftItem && craftItem.gameItem && <CraftItemCard {...craftItem} />}</div>
+
         <QueueCraftItemsList />
+
         <div className="mx-auto w-[200px] p-3">
-          <CraftButton craftItem={craftItem} />
+          <CraftButton craftItem={craftItem} buildingType={selectBuilding?.type} />
         </div>
       </div>
     </section>

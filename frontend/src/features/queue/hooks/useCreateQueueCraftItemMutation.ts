@@ -1,17 +1,23 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { client } from '@/lib/utils';
-import { ErrorResponse, ResourceType } from '@/shared/types';
-import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
+import { BuildingType, ErrorResponse, ResourceType } from '@/shared/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { useQueueCraftItem } from './useQueueCraftItem';
 
 export const useCreateQueueCraftItemMutation = () => {
-  const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
   const id = useHeroId();
   const { addQueueCraftItems } = useQueueCraftItem();
   return useMutation({
-    mutationFn: async ({ craftItemId, coreMaterialType }: { craftItemId: string; coreMaterialType: ResourceType | undefined }) => {
+    mutationFn: async ({
+      craftItemId,
+      coreMaterialType,
+      buildingType,
+    }: {
+      craftItemId: string;
+      coreMaterialType: ResourceType | undefined;
+      buildingType: BuildingType;
+    }) => {
       const res = await client.hero[':id'].action['queue-craft'].$post({
         param: {
           id,
@@ -19,7 +25,7 @@ export const useCreateQueueCraftItemMutation = () => {
         json: {
           craftItemId,
           coreMaterialType,
-          buildingType: selectBuilding!.type,
+          buildingType,
         },
       });
       if (!res.ok) {
@@ -30,7 +36,7 @@ export const useCreateQueueCraftItemMutation = () => {
     },
     onSuccess: ({ data }) => {
       if (data) {
-        addQueueCraftItems(data);
+        addQueueCraftItems(data.buildingType, data);
       }
     },
   });

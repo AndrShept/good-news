@@ -14,11 +14,8 @@ export const QueueCraftItemsList = () => {
   const { data: queueCraftItems } = useQuery(getQueueCraftItemOptions(heroId, selectBuilding?.type));
   if (!queueCraftItems?.length) return;
   return (
-    <ScrollArea className="pb-2">
-      <ul className="flex gap-2 py-2">
-        {queueCraftItems?.map((queueItem) => <QueueCraftItemCard key={queueItem.id} {...queueItem} craftItemMap={craftItemMap} />)}
-      </ul>
-      <ScrollBar orientation="horizontal" />
-    </ScrollArea>
+    <ul className="flex  flex-wrap gap-2 py-2">
+      {queueCraftItems?.map((queueItem) => <QueueCraftItemCard key={queueItem.id} {...queueItem} craftItemMap={craftItemMap} />)}
+    </ul>
   );
 };

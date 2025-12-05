@@ -54,10 +54,15 @@ export const useCraftItem = () => {
     return data?.requiredResourceCraft?.[type][name];
   };
 
+  const allResourcesByType = useMemo(() => {
+    return data?.resources?.map((resource) => resource.type);
+  }, [data?.resources]);
+
   return {
     craftItemMap,
     resourceMap,
     getRequiredResources,
     filteredResourcesBySelectBuilding,
+    allResourcesByType,
   };
 };

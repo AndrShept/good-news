@@ -8,15 +8,15 @@ export const useHeroBackpack = () => {
   const backpackId = useGetBackpackId();
   const backpack = useItemContainer(backpackId);
   const calculateSumBackpackResource = useMemo(
-    () => (resources: Resource[] | undefined) => {
+    () => (resources: ResourceType[] | undefined) => {
       const result: Partial<Record<ResourceType, number>> = {};
 
       if (!backpack?.containerSlots?.length) return;
       if (!resources?.length) return;
       for (const resource of resources) {
         for (const backpackItem of backpack.containerSlots) {
-          if (backpackItem?.gameItem?.resource?.type === resource.type) {
-            result[resource.type] = (result[resource.type] ?? 0) + backpackItem.quantity;
+          if (backpackItem?.gameItem?.resource?.type === resource) {
+            result[resource] = (result[resource] ?? 0) + backpackItem.quantity;
           }
         }
       }

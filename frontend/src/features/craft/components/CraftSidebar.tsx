@@ -17,20 +17,19 @@ export const CraftSidebar = memo(({ data, onSelect, selectedItemId }: Props) => 
 
   const canShowSelectResource = selectBuilding?.type === 'BLACKSMITH';
 
-
   return (
     <aside className="flex w-full max-w-[150px] flex-col md:max-w-[200px]">
-      <ul className="text-muted-foreground flex flex-col gap-0.5">
+      <ul className="text-muted-foreground/60 flex flex-col gap-0.5 hover:cursor-default">
         {data?.craftItems.map((craftItem) => (
-          <div
-          key={craftItem.id}
-            className={cn('', {
-              'bg-secondary/30 text-primary': selectedItemId === craftItem.id,
+          <li
+            key={craftItem.id}
+            className={cn('px-1.5 py-0.5', {
+              'bg-secondary/50 text-primary': selectedItemId === craftItem.id,
             })}
             onClick={() => onSelect(craftItem)}
           >
             {craftItem.gameItem?.name}
-          </div>
+          </li>
         ))}
       </ul>
       <div className="mt-auto">{canShowSelectResource && <SelectBaseResource />}</div>

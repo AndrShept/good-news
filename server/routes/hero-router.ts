@@ -1271,7 +1271,7 @@ export const heroRouter = new Hono<Context>()
         });
       }
       const requiredResources = craftItemService(db).getRequiredResources(craftItem.gameItem, coreMaterialType);
-      await itemContainerService(db).checkCraftResources( backpack.id, requiredResources);
+      await itemContainerService(db).checkCraftResources(backpack.id, requiredResources);
 
       const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
         where: and(eq(queueCraftItemTable.heroId, hero.id), ne(queueCraftItemTable.status, 'FAILED')),
@@ -1297,7 +1297,7 @@ export const heroRouter = new Hono<Context>()
         .insert(queueCraftItemTable)
         .values({
           heroId: hero.id,
-          buildingType,
+          buildingType: craftItem.requiredBuildingType,
           jobId,
           coreMaterialType,
           status: !lastItem ? 'PROGRESS' : 'PENDING',
@@ -1311,6 +1311,7 @@ export const heroRouter = new Hono<Context>()
           heroId: hero.id,
           queueCraftItemId: newQueueCraftItem.id,
           coreMaterialType,
+          buildingType: craftItem.requiredBuildingType
         },
       };
       console.log('@@@@@@@', delay);
@@ -1369,7 +1370,12 @@ export const heroRouter = new Hono<Context>()
 
         const updateData: QueueCraftItemSocketData = {
           type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
-          payload: { queueItemCraftId: next.id, status: 'PROGRESS', completedAt: next.completedAt ?? '' },
+          payload: {
+            queueItemCraftId: next.id,
+            status: 'PROGRESS',
+            completedAt: next.completedAt ?? '',
+            buildingType: deletedItem.buildingType,
+          },
         };
         io.to(hero.id).emit(socketEvents.queueCraft(), updateData);
       }
