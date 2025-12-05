@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
 import { materialConfig } from '@/lib/config';
 import { cn, formatDurationFromSeconds } from '@/lib/utils';
-import {  CraftItem } from '@/shared/types';
+import { CraftItem } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 
 import { useCraftItem } from '../hooks/useCraftItem';
@@ -14,11 +14,10 @@ import { useCraftItem } from '../hooks/useCraftItem';
 type Props = CraftItem;
 
 export const CraftItemCard = (props: Props) => {
-  const { resourceMap, getRequiredResources, allResourcesByType } = useCraftItem();
+  const { resourceMap, getRequiredResources } = useCraftItem();
   const coreMaterialType = useCraftItemStore((state) => state.coreMaterialType);
-  const { calculateSumBackpackResource } = useHeroBackpack();
+  const { resourceCountInBackpack } = useHeroBackpack();
   const requiredResources = getRequiredResources(props.gameItem);
-  const dsad = calculateSumBackpackResource(allResourcesByType);
   return (
     <ScrollArea className="h-full">
       <div className="flex flex-1 flex-col items-center text-center">
@@ -47,7 +46,7 @@ export const CraftItemCard = (props: Props) => {
               <GameItemImg className="size-9" image={resourceMap?.[resource.type].image} />
               <p
                 className={cn('', {
-                  'text-red-500': (dsad?.[resource.type] ?? 0) < resource.quantity,
+                  'text-red-500': (resourceCountInBackpack?.[resource.type] ?? 0) < resource.quantity,
                 })}
               >
                 x{resource.quantity}

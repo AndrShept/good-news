@@ -4,15 +4,13 @@ import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack
 import { cn } from '@/lib/utils';
 import { ResourceType } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
-import { useEffect } from 'react';
 
 import { useCraftItem } from '../hooks/useCraftItem';
 
 export const SelectBaseResource = () => {
   const setCoreMaterial = useCraftItemStore((state) => state.setCoreMaterial);
-  const { calculateSumBackpackResource } = useHeroBackpack();
   const { filteredResourcesBySelectBuilding } = useCraftItem();
-  const sumResourceQuantity = calculateSumBackpackResource(filteredResourcesBySelectBuilding?.map((item) => item.type));
+  const { resourceCountInBackpack } = useHeroBackpack();
 
   return (
     <>
@@ -27,10 +25,10 @@ export const SelectBaseResource = () => {
               <p className="truncate">{resource.gameItem?.name}</p>
               <p
                 className={cn('font-semibold text-green-500', {
-                  'text-red-500': !sumResourceQuantity?.[resource.type],
+                  'text-red-500': !resourceCountInBackpack?.[resource.type],
                 })}
               >
-                {sumResourceQuantity?.[resource.type] ?? 0}
+                {resourceCountInBackpack?.[resource.type] ?? 0}
               </p>
             </SelectItem>
           ))}
