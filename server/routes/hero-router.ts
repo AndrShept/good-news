@@ -1253,6 +1253,12 @@ export const heroRouter = new Hono<Context>()
           cause: { canShow: true },
         });
       }
+      if (backpack.usedSlots >= backpack.maxSlots) {
+        throw new HTTPException(400, {
+          message: 'Inventory is full',
+          cause: { canShow: true },
+        });
+      }
 
       if (coreMaterial && coreMaterial?.category !== craftItem.requiredCraftResourceCategory) {
         throw new HTTPException(400, {
@@ -1260,16 +1266,7 @@ export const heroRouter = new Hono<Context>()
           cause: { canShow: true },
         });
       }
-      if (hero.action?.type !== 'IDLE') {
-        throw new HTTPException(409, {
-          message: 'Your hero is busy now',
-        });
-      }
-      if (hero.isInBattle) {
-        throw new HTTPException(409, {
-          message: 'Action not allowed: hero now is battle',
-        });
-      }
+
       const requiredResources = craftItemService(db).getRequiredResources(craftItem.gameItem, coreMaterialType);
       await itemContainerService(db).checkCraftResources(backpack.id, requiredResources);
 
@@ -1311,7 +1308,7 @@ export const heroRouter = new Hono<Context>()
           heroId: hero.id,
           queueCraftItemId: newQueueCraftItem.id,
           coreMaterialType,
-          buildingType: craftItem.requiredBuildingType
+          buildingType: craftItem.requiredBuildingType,
         },
       };
       console.log('@@@@@@@', delay);

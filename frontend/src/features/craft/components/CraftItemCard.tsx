@@ -4,7 +4,6 @@ import { ModifierInfoCard } from '@/components/ModifierInfoCard';
 import { WeaponInfo } from '@/components/WeaponInfo';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
-import { materialConfig } from '@/lib/config';
 import { cn, formatDurationFromSeconds } from '@/lib/utils';
 import { CraftItem } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
