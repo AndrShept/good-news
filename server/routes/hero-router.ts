@@ -1273,8 +1273,21 @@ export const heroRouter = new Hono<Context>()
       const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
         where: and(eq(queueCraftItemTable.heroId, hero.id), ne(queueCraftItemTable.status, 'FAILED')),
       });
+      if (heroQueueCraftItems.length >= hero.maxQueueCraftCount) {
+        throw new HTTPException(400, {
+          message: 'Craft queue limit has been reached.',
+          cause: { canShow: true },
+        });
+      }
 
       const lastItem = heroQueueCraftItems.at(-1);
+
+      if (lastItem && lastItem?.buildingType !== craftItem.requiredBuildingType) {
+        throw new HTTPException(400, {
+          message: 'You can only queue items from the same building type.',
+          cause: { canShow: true },
+        });
+      }
 
       let delay = craftItem.craftTime;
 

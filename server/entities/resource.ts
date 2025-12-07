@@ -6,11 +6,11 @@ export const resourceEntities = [
   {
     id: '0199df54-be65-7db2-af0a-1002d323d64d',
     name: 'iron ore',
-    image: imageConfig.icon.RESOURCES.IRON,
+    image: imageConfig.icon.RESOURCES['IRON-ORE'],
     type: 'RESOURCES',
     resource: {
       gameItemId: '',
-      type: 'IRON',
+      type: 'IRON-ORE',
       category: 'ORE',
       rarity: 'COMMON',
     },
@@ -19,11 +19,11 @@ export const resourceEntities = [
   {
     id: '0199df74-c722-7695-96d9-59a701689d03',
     name: 'copper ore',
-    image: imageConfig.icon.RESOURCES.COPPER,
+    image: imageConfig.icon.RESOURCES['COPPER-ORE'],
     type: 'RESOURCES',
     resource: {
       gameItemId: '',
-      type: 'COPPER',
+      type: 'COPPER-ORE',
       category: 'ORE',
       rarity: 'COMMON',
     },
@@ -32,11 +32,11 @@ export const resourceEntities = [
   {
     id: '019ac735-a9c0-7e79-98cb-e392af762b03',
     name: 'silver ore',
-    image: imageConfig.icon.RESOURCES.SILVER,
+    image: imageConfig.icon.RESOURCES['SILVER-ORE'],
     type: 'RESOURCES',
     resource: {
       gameItemId: '',
-      type: 'SILVER',
+      type: 'SILVER-ORE',
       category: 'ORE',
       rarity: 'COMMON',
     },
@@ -45,11 +45,11 @@ export const resourceEntities = [
   {
     id: '019ac738-6ec9-7763-b633-d5ed4046b6f0',
     name: 'gold ore',
-    image: imageConfig.icon.RESOURCES.GOLD,
+    image: imageConfig.icon.RESOURCES['GOLD-ORE'],
     type: 'RESOURCES',
     resource: {
       gameItemId: '',
-      type: 'GOLD',
+      type: 'GOLD-ORE',
       category: 'ORE',
       rarity: 'COMMON',
     },
@@ -58,11 +58,11 @@ export const resourceEntities = [
   {
     id: '019ac738-e2f2-79a0-9f96-968231e0853e',
     name: 'mithril ore',
-    image: imageConfig.icon.RESOURCES.MITHRIL,
+    image: imageConfig.icon.RESOURCES['MITHRIL-ORE'],
     type: 'RESOURCES',
     resource: {
       gameItemId: '',
-      type: 'MITHRIL',
+      type: 'MITHRIL-ORE',
       category: 'ORE',
       rarity: 'RARE',
     },
@@ -71,11 +71,11 @@ export const resourceEntities = [
   {
     id: '019ac739-be74-7813-9a75-8e8b0710a51e',
     name: 'adamantine ore',
-    image: imageConfig.icon.RESOURCES.ADAMANTINE,
+    image: imageConfig.icon.RESOURCES['ADAMANTINE-ORE'],
     type: 'RESOURCES',
     resource: {
       gameItemId: '',
-      type: 'ADAMANTINE',
+      type: 'ADAMANTINE-ORE',
       category: 'ORE',
       rarity: 'EPIC',
     },

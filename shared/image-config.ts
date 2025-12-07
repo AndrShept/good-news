@@ -83,12 +83,12 @@ export const imageConfig = {
     },
     RESOURCES: {
       //ORE
-      IRON: '/sprites/icons/resources/ores/iron-ore.png',
-      COPPER: '/sprites/icons/resources/ores/copper-ore.png',
-      SILVER: '/sprites/icons/resources/ores/silver-ore.png',
-      GOLD: '/sprites/icons/resources/ores/gold-ore.png',
-      MITHRIL: '/sprites/icons/resources/ores/mithril-ore.png',
-      ADAMANTINE: '/sprites/icons/resources/ores/adamantine-ore.png',
+      'IRON-ORE': '/sprites/icons/resources/ores/iron-ore.png',
+      'COPPER-ORE': '/sprites/icons/resources/ores/copper-ore.png',
+      'SILVER-ORE': '/sprites/icons/resources/ores/silver-ore.png',
+      'GOLD-ORE': '/sprites/icons/resources/ores/gold-ore.png',
+      'MITHRIL-ORE': '/sprites/icons/resources/ores/mithril-ore.png',
+      'ADAMANTINE-ORE': '/sprites/icons/resources/ores/adamantine-ore.png',
 
       //INGOT
       'IRON-INGOT': '/sprites/icons/resources/ingots/iron-ingot.png',

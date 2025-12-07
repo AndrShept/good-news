@@ -24,6 +24,7 @@ export const heroTable = pgTable('hero', {
   isInBattle: boolean().default(false).notNull(),
   isInDungeon: boolean().default(false).notNull(),
   isOnline: boolean().default(true).notNull(),
+  maxQueueCraftCount: integer().default(4).notNull(),
 
   freeStatPoints: integer().default(10).notNull(),
 

@@ -18,6 +18,8 @@ const ingots = resourceEntities.filter(isIngot);
 const names = ingots.map((i) => i.name);
 export type IngotName = (typeof names)[number];
 
+const tet = {}
+
 export interface ICraftConfig {
   WEAPON: Record<string, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;
   ARMOR: Record<string, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;
@@ -26,53 +28,55 @@ export interface ICraftConfig {
   MISC: Record<string, CraftItemRequiredResources[]>;
 }
 
+
+
 export const craftConfig: ICraftConfig = {
   WEAPON: {
     broadsword: {
       'IRON-INGOT': [{ type: 'IRON-INGOT', quantity: 10 }],
-      'COPPER-INGOT': [{ type: 'COPPER', quantity: 10 }],
-      'SILVER-INGOT': [{ type: 'SILVER', quantity: 10 }],
-      'GOLD-INGOT': [{ type: 'GOLD', quantity: 10 }],
-      'MITHRIL-INGOT': [{ type: 'MITHRIL', quantity: 10 }],
-      'ADAMANTINE-INGOT': [{ type: 'ADAMANTINE', quantity: 10 }],
+      'COPPER-INGOT': [{ type: 'COPPER-INGOT', quantity: 10 }],
+      'SILVER-INGOT': [{ type: 'SILVER-INGOT', quantity: 10 }],
+      'GOLD-INGOT': [{ type: 'GOLD-INGOT', quantity: 10 }],
+      'MITHRIL-INGOT': [{ type: 'MITHRIL-INGOT', quantity: 10 }],
+      'ADAMANTINE-INGOT': [{ type: 'ADAMANTINE-INGOT', quantity: 10 }],
     },
     kryss: {
-      'IRON-INGOT': [{ type: 'IRON', quantity: 10 }],
-      'COPPER-INGOT': [{ type: 'COPPER', quantity: 10 }],
-      'SILVER-INGOT': [{ type: 'SILVER', quantity: 10 }],
-      'GOLD-INGOT': [{ type: 'GOLD', quantity: 10 }],
-      'MITHRIL-INGOT': [{ type: 'MITHRIL', quantity: 10 }],
-      'ADAMANTINE-INGOT': [{ type: 'ADAMANTINE', quantity: 10 }],
+      'IRON-INGOT': [{ type: 'IRON-INGOT', quantity: 10 }],
+      'COPPER-INGOT': [{ type: 'COPPER-INGOT', quantity: 10 }],
+      'SILVER-INGOT': [{ type: 'SILVER-INGOT', quantity: 10 }],
+      'GOLD-INGOT': [{ type: 'GOLD-INGOT', quantity: 10 }],
+      'MITHRIL-INGOT': [{ type: 'MITHRIL-INGOT', quantity: 10 }],
+      'ADAMANTINE-INGOT': [{ type: 'ADAMANTINE-INGOT', quantity: 10 }],
     },
   },
   ARMOR: {
     'simple gloves': {
-      'IRON-INGOT': [{ type: 'IRON', quantity: 5 }],
+      'IRON-INGOT': [{ type: 'IRON-INGOT', quantity: 5 }],
       'COPPER-INGOT': [
         { type: 'COPPER-INGOT', quantity: 5 },
         { type: 'REGULAR-LEATHER', quantity: 3 },
       ],
-      'SILVER-INGOT': [{ type: 'SILVER', quantity: 5 }],
-      'GOLD-INGOT': [{ type: 'GOLD', quantity: 5 }],
-      'MITHRIL-INGOT': [{ type: 'MITHRIL', quantity: 5 }],
-      'ADAMANTINE-INGOT': [{ type: 'ADAMANTINE', quantity: 5 }],
+      'SILVER-INGOT': [{ type: 'SILVER-INGOT', quantity: 5 }],
+      'GOLD-INGOT': [{ type: 'GOLD-INGOT', quantity: 5 }],
+      'MITHRIL-INGOT': [{ type: 'MITHRIL-INGOT', quantity: 5 }],
+      'ADAMANTINE-INGOT': [{ type: 'ADAMANTINE-INGOT', quantity: 5 }],
     },
     'plate armor': {
-      'IRON-INGOT': [{ type: 'IRON', quantity: 10 }],
-      'COPPER-INGOT': [{ type: 'COPPER', quantity: 10 }],
-      'SILVER-INGOT': [{ type: 'SILVER', quantity: 10 }],
-      'GOLD-INGOT': [{ type: 'GOLD', quantity: 10 }],
-      'MITHRIL-INGOT': [{ type: 'MITHRIL', quantity: 10 }],
-      'ADAMANTINE-INGOT': [{ type: 'ADAMANTINE', quantity: 10 }],
+      'IRON-INGOT': [{ type: 'IRON-INGOT', quantity: 10 }],
+      'COPPER-INGOT': [{ type: 'COPPER-INGOT', quantity: 10 }],
+      'SILVER-INGOT': [{ type: 'SILVER-INGOT', quantity: 10 }],
+      'GOLD-INGOT': [{ type: 'GOLD-INGOT', quantity: 10 }],
+      'MITHRIL-INGOT': [{ type: 'MITHRIL-INGOT', quantity: 10 }],
+      'ADAMANTINE-INGOT': [{ type: 'ADAMANTINE-INGOT', quantity: 10 }],
     },
   },
   RESOURCES: {
-    'iron ingot': [{ type: 'IRON', quantity: 3 }],
-    'copper ingot': [{ type: 'COPPER', quantity: 3 }],
-    'silver ingot': [{ type: 'SILVER', quantity: 3 }],
-    'gold ingot': [{ type: 'GOLD', quantity: 3 }],
-    'mithril ingot': [{ type: 'MITHRIL', quantity: 3 }],
-    'adamantine ingot': [{ type: 'ADAMANTINE', quantity: 3 }],
+    'iron ingot': [{ type: 'IRON-ORE', quantity: 3 }],
+    'copper ingot': [{ type: 'COPPER-ORE', quantity: 3 }],
+    'silver ingot': [{ type: 'SILVER-ORE', quantity: 3 }],
+    'gold ingot': [{ type: 'GOLD-ORE', quantity: 3 }],
+    'mithril ingot': [{ type: 'MITHRIL-ORE', quantity: 3 }],
+    'adamantine ingot': [{ type: 'ADAMANTINE-ORE', quantity: 3 }],
   },
   POTION: {},
   MISC: {},

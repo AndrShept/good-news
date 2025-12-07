@@ -5,7 +5,7 @@ import { boolean, integer, json, jsonb, pgEnum, pgTable, text, timestamp, uuid }
 import { gameItemTable } from './game-item-schema';
 import { modifierTable } from './modifier-schema';
 
-const ores = ['IRON', 'COPPER', 'SILVER', 'GOLD', 'MITHRIL', 'ADAMANTINE'] as const;
+const ores = ['IRON-ORE', 'COPPER-ORE', 'SILVER-ORE', 'GOLD-ORE', 'MITHRIL-ORE', 'ADAMANTINE-ORE'] as const;
 const leathers = ['REGULAR-LEATHER'] as const;
 const ingots = ['IRON-INGOT', 'COPPER-INGOT', 'SILVER-INGOT', 'GOLD-INGOT', 'MITHRIL-INGOT', 'ADAMANTINE-INGOT'] as const;
 
