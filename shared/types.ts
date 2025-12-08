@@ -21,6 +21,8 @@ import {
   placeTable,
   potionTable,
   pvpModeTypeEnum,
+  skillTable,
+  skillsTypeEnum,
   weaponTable,
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
@@ -168,6 +170,7 @@ export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[numb
 export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
 export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number];
 export type BuildingType = (typeof buildingTypeEnum.enumValues)[number];
+export type SkillType = (typeof skillsTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
@@ -232,6 +235,12 @@ export type CraftItem = typeof craftItemTable.$inferSelect & {
 
 export type CraftInfo = { baseResourceCategory: ResourceCategoryType; requiredBuildingType: BuildingType; craftTIme: number };
 export type CraftItemRequiredResources = { type: ResourceType; quantity: number };
+export type CraftItemRequiredSkills = { type: SkillType; level: number };
+
+export type CraftItemRequirement = {
+  resources: CraftItemRequiredResources[];
+  skills: CraftItemRequiredSkills[];
+};
 
 export type GroupCraftItem = { itemType: GameItemType; subgroups: { subtype: WeaponType; items: CraftItem[] }[] };
 
@@ -255,6 +264,10 @@ export type Hero = InferSelectModel<typeof heroTable> & {
   itemContainers?: { id: string; type: ItemContainerType }[];
 };
 export type Buff = typeof buffTable.$inferSelect;
+
+export type Skill = typeof skillTable.$inferSelect & {
+  hero?: Hero | null;
+};
 
 export type IPosition = {
   x: number;

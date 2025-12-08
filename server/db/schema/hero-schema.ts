@@ -11,6 +11,7 @@ import { itemContainerTable } from './item-container-schema';
 import { locationTable } from './location-schema';
 import { modifierTable } from './modifier-schema';
 import { queueCraftItemTable } from './queue-craft-item-schema';
+import { skillTable } from './skill-schema';
 import { stateTable } from './state-schema';
 
 export const heroTable = pgTable('hero', {
@@ -70,5 +71,6 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
   equipments: many(equipmentTable),
   queueCraftItems: many(queueCraftItemTable),
   buffs: many(buffTable),
+  skills: many(skillTable),
   itemContainers: many(itemContainerTable),
 }));

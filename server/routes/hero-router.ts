@@ -1,3 +1,4 @@
+import { calculate } from '@/shared/calculate';
 import { BASE_STATS, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
 import {
   type QueueCraftItemJob,
@@ -68,16 +69,7 @@ import { buffTable } from '../db/schema/buff-schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
 import { getHeroStatsWithModifiers } from '../lib/getHeroStatsWithModifiers';
 import { heroOnline } from '../lib/heroOnline';
-import {
-  calculateManaRegenTime,
-  calculateWalkTime,
-  generateRandomUuid,
-  getTileExists,
-  jobQueueId,
-  setSqlNow,
-  setSqlNowByInterval,
-  verifyHeroOwnership,
-} from '../lib/utils';
+import { generateRandomUuid, getTileExists, jobQueueId, setSqlNow, setSqlNowByInterval, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
@@ -752,7 +744,7 @@ export const heroRouter = new Hono<Context>()
 
       const jobId = hero.id;
       const sumDex = (hero.modifier?.dexterity ?? 0) + hero.stat.dexterity;
-      const delay = calculateWalkTime(sumDex);
+      const delay = calculate.walkTime(sumDex);
       await db
         .update(actionTable)
         .set({
@@ -861,7 +853,7 @@ export const heroRouter = new Hono<Context>()
 
       const jobId = hero.id;
       const sumDex = (hero.modifier?.dexterity ?? 0) + hero.stat.dexterity;
-      const delay = calculateWalkTime(sumDex);
+      const delay = calculate.walkTime(sumDex);
       await db
         .update(actionTable)
         .set({
@@ -1056,7 +1048,7 @@ export const heroRouter = new Hono<Context>()
 
       const jobId = `hero-${hero.id}-regen-health`;
       const { sumStatAndModifier } = await getHeroStatsWithModifiers(db, hero.id);
-      const every = calculateManaRegenTime(sumStatAndModifier.constitution);
+      const every = calculate.manaRegenTime(sumStatAndModifier.constitution);
       console.log('healthTime', every);
       const jobData: RegenHealthJob = {
         jobName: 'REGEN_HEALTH',
@@ -1109,7 +1101,7 @@ export const heroRouter = new Hono<Context>()
 
       const jobId = `hero-${hero.id}-regen-mana`;
       const { sumStatAndModifier } = await getHeroStatsWithModifiers(db, hero.id);
-      const every = calculateManaRegenTime(sumStatAndModifier.intelligence);
+      const every = calculate.manaRegenTime(sumStatAndModifier.intelligence);
       console.log('manaTime', every);
       const jobData: RegenManaJob = {
         jobName: 'REGEN_MANA',

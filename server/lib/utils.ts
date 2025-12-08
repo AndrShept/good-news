@@ -87,13 +87,7 @@ export const rand = (num: number) => {
   return Math.floor(Math.random() * num);
 };
 
-export const calculateWalkTime = (dexterity: number) => {
-  const MIN_WALK_TIME = 2;
-  const dexterityFactor = 100;
 
-  const delay = Math.max(BASE_WALK_TIME / (1 + dexterity / dexterityFactor), MIN_WALK_TIME);
-  return delay;
-};
 
 interface MapLoadInfo {
   jsonUrl: TileMap;
@@ -155,19 +149,3 @@ export const newCombineModifier = <T extends Partial<Modifier> | null | undefine
   return result;
 };
 
-export const calculateMaxValues = (data: { constitution: number; intelligence: number; bonusMaxHealth: number; bonusMaxMana: number }) => {
-  const { constitution, intelligence, bonusMaxHealth, bonusMaxMana } = data;
-  const maxHealth = constitution * HP_MULTIPLIER_COST + bonusMaxHealth;
-  const maxMana = intelligence * MANA_MULTIPLIER_INT + bonusMaxMana;
-
-  return { maxHealth, maxMana };
-};
-
-export const calculateHealthRegenTime = (constitution: number) => {
-  const time = BASE_HEALTH_REGEN_TIME - constitution * 20;
-  return Math.max(1000, time);
-};
-export const calculateManaRegenTime = (intelligence: number) => {
-  const time = BASE_MANA_REGEN_TIME - intelligence * 30;
-  return Math.max(1000, time);
-};

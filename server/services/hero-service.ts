@@ -1,5 +1,6 @@
+import { calculate } from '@/shared/calculate';
 import { type BuffCreateJob, jobName } from '@/shared/job-types';
-import type {  ContainerSlot, Hero, Modifier, OmitModifier } from '@/shared/types';
+import type { ContainerSlot, Hero, Modifier, OmitModifier } from '@/shared/types';
 import { and, eq, sql } from 'drizzle-orm';
 import type {} from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
@@ -7,7 +8,6 @@ import { HTTPException } from 'hono/http-exception';
 import type { TDataBase, TTransaction } from '../db/db';
 import { buffTable, heroTable, modifierTable } from '../db/schema';
 import { getHeroStatsWithModifiers } from '../lib/getHeroStatsWithModifiers';
-import { calculateMaxValues } from '../lib/utils';
 import { actionQueue } from '../queue/actionQueue';
 
 interface IDrinkPotion {
@@ -29,7 +29,7 @@ interface IUpdateHeroMaxValues {
 }
 
 export const heroService = (db: TTransaction | TDataBase) => ({
-  async getHero(id: string, options?:  Parameters<typeof db.query.heroTable.findFirst>[0]): Promise<Hero> {
+  async getHero(id: string, options?: Parameters<typeof db.query.heroTable.findFirst>[0]): Promise<Hero> {
     const hero = await db.query.heroTable.findFirst({
       where: eq(heroTable.id, id),
       ...options,
@@ -43,7 +43,7 @@ export const heroService = (db: TTransaction | TDataBase) => ({
   },
   async updateHeroMaxValues(data: IUpdateHeroMaxValues) {
     const { constitution, heroId, intelligence, bonusMaxHealth, bonusMaxMana } = data;
-    const { maxHealth, maxMana } = calculateMaxValues({ constitution, intelligence, bonusMaxHealth, bonusMaxMana });
+    const { maxHealth, maxMana } = calculate.maxValues({ constitution, intelligence, bonusMaxHealth, bonusMaxMana });
 
     await db
       .update(heroTable)

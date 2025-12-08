@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '../db/db';
 import { gameItemTable, modifierTable, placeTable, resourceTable } from '../db/schema';
 import { resourceEntities } from '../entities/resource';
-import { resourceModifierEntity } from '../entities/resource-modifier';
+import { resourceModifierEntity } from '../config/material-modifier-config';
 
 export const createResource = async () => {
   for (const resource of resourceEntities) {

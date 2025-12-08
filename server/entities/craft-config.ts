@@ -1,4 +1,11 @@
-import type { ArmorType, CraftItemRequiredResources, GameItemType, ResourceType } from '@/shared/types';
+import type {
+  ArmorType,
+  CraftItemRequiredResources,
+  CraftItemRequiredSkills,
+  CraftItemRequirement,
+  GameItemType,
+  ResourceType,
+} from '@/shared/types';
 
 import { armorEntities } from './armor';
 import { resourceEntities } from './resource';
@@ -18,66 +25,162 @@ const ingots = resourceEntities.filter(isIngot);
 const names = ingots.map((i) => i.name);
 export type IngotName = (typeof names)[number];
 
-const tet = {}
-
 export interface ICraftConfig {
-  WEAPON: Record<string, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;
-  ARMOR: Record<string, Partial<Record<ResourceType, CraftItemRequiredResources[]>>>;
-  RESOURCES: Record<string, CraftItemRequiredResources[]>;
-  POTION: Record<string, CraftItemRequiredResources[]>;
-  MISC: Record<string, CraftItemRequiredResources[]>;
+  WEAPON: Record<string, Partial<Record<ResourceType, CraftItemRequirement>>>;
+  ARMOR: Record<string, Partial<Record<ResourceType, CraftItemRequirement>>>;
+  RESOURCES: Record<string, CraftItemRequirement>;
+  POTION: Record<string, CraftItemRequirement>;
+  MISC: Record<string, CraftItemRequirement>;
 }
-
-
 
 export const craftConfig: ICraftConfig = {
   WEAPON: {
     broadsword: {
-      'IRON-INGOT': [{ type: 'IRON-INGOT', quantity: 10 }],
-      'COPPER-INGOT': [{ type: 'COPPER-INGOT', quantity: 10 }],
-      'SILVER-INGOT': [{ type: 'SILVER-INGOT', quantity: 10 }],
-      'GOLD-INGOT': [{ type: 'GOLD-INGOT', quantity: 10 }],
-      'MITHRIL-INGOT': [{ type: 'MITHRIL-INGOT', quantity: 10 }],
-      'ADAMANTINE-INGOT': [{ type: 'ADAMANTINE-INGOT', quantity: 10 }],
+      'IRON-INGOT': {
+        resources: [{ type: 'IRON-INGOT', quantity: 10 }],
+        skills: [{ type: 'BLACKSMITHING', level: 10 }],
+      },
+      'COPPER-INGOT': {
+        resources: [{ type: 'COPPER-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'SILVER-INGOT': {
+        resources: [{ type: 'SILVER-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'GOLD-INGOT': {
+        resources: [{ type: 'GOLD-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'MITHRIL-INGOT': {
+        resources: [{ type: 'MITHRIL-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'ADAMANTINE-INGOT': {
+        resources: [{ type: 'ADAMANTINE-INGOT', quantity: 10 }],
+        skills: [],
+      },
     },
+
     kryss: {
-      'IRON-INGOT': [{ type: 'IRON-INGOT', quantity: 10 }],
-      'COPPER-INGOT': [{ type: 'COPPER-INGOT', quantity: 10 }],
-      'SILVER-INGOT': [{ type: 'SILVER-INGOT', quantity: 10 }],
-      'GOLD-INGOT': [{ type: 'GOLD-INGOT', quantity: 10 }],
-      'MITHRIL-INGOT': [{ type: 'MITHRIL-INGOT', quantity: 10 }],
-      'ADAMANTINE-INGOT': [{ type: 'ADAMANTINE-INGOT', quantity: 10 }],
+      'IRON-INGOT': {
+        resources: [{ type: 'IRON-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'COPPER-INGOT': {
+        resources: [{ type: 'COPPER-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'SILVER-INGOT': {
+        resources: [{ type: 'SILVER-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'GOLD-INGOT': {
+        resources: [{ type: 'GOLD-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'MITHRIL-INGOT': {
+        resources: [{ type: 'MITHRIL-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'ADAMANTINE-INGOT': {
+        resources: [{ type: 'ADAMANTINE-INGOT', quantity: 10 }],
+        skills: [],
+      },
     },
   },
+
   ARMOR: {
     'simple gloves': {
-      'IRON-INGOT': [{ type: 'IRON-INGOT', quantity: 5 }],
-      'COPPER-INGOT': [
-        { type: 'COPPER-INGOT', quantity: 5 },
-        { type: 'REGULAR-LEATHER', quantity: 3 },
-      ],
-      'SILVER-INGOT': [{ type: 'SILVER-INGOT', quantity: 5 }],
-      'GOLD-INGOT': [{ type: 'GOLD-INGOT', quantity: 5 }],
-      'MITHRIL-INGOT': [{ type: 'MITHRIL-INGOT', quantity: 5 }],
-      'ADAMANTINE-INGOT': [{ type: 'ADAMANTINE-INGOT', quantity: 5 }],
+      'IRON-INGOT': {
+        resources: [{ type: 'IRON-INGOT', quantity: 5 }],
+        skills: [],
+      },
+      'COPPER-INGOT': {
+        resources: [
+          { type: 'COPPER-INGOT', quantity: 5 },
+        ],
+        skills: [],
+      },
+      'SILVER-INGOT': {
+        resources: [{ type: 'SILVER-INGOT', quantity: 5 }],
+        skills: [],
+      },
+      'GOLD-INGOT': {
+        resources: [{ type: 'GOLD-INGOT', quantity: 5 }],
+        skills: [],
+      },
+      'MITHRIL-INGOT': {
+        resources: [{ type: 'MITHRIL-INGOT', quantity: 5 }],
+        skills: [],
+      },
+      'ADAMANTINE-INGOT': {
+        resources: [{ type: 'ADAMANTINE-INGOT', quantity: 5 }],
+        skills: [],
+      },
     },
+
     'plate armor': {
-      'IRON-INGOT': [{ type: 'IRON-INGOT', quantity: 10 }],
-      'COPPER-INGOT': [{ type: 'COPPER-INGOT', quantity: 10 }],
-      'SILVER-INGOT': [{ type: 'SILVER-INGOT', quantity: 10 }],
-      'GOLD-INGOT': [{ type: 'GOLD-INGOT', quantity: 10 }],
-      'MITHRIL-INGOT': [{ type: 'MITHRIL-INGOT', quantity: 10 }],
-      'ADAMANTINE-INGOT': [{ type: 'ADAMANTINE-INGOT', quantity: 10 }],
+      'IRON-INGOT': {
+        resources: [{ type: 'IRON-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'COPPER-INGOT': {
+        resources: [{ type: 'COPPER-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'SILVER-INGOT': {
+        resources: [{ type: 'SILVER-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'GOLD-INGOT': {
+        resources: [{ type: 'GOLD-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'MITHRIL-INGOT': {
+        resources: [{ type: 'MITHRIL-INGOT', quantity: 10 }],
+        skills: [],
+      },
+      'ADAMANTINE-INGOT': {
+        resources: [{ type: 'ADAMANTINE-INGOT', quantity: 10 }],
+        skills: [],
+      },
     },
   },
+
   RESOURCES: {
-    'iron ingot': [{ type: 'IRON-ORE', quantity: 3 }],
-    'copper ingot': [{ type: 'COPPER-ORE', quantity: 3 }],
-    'silver ingot': [{ type: 'SILVER-ORE', quantity: 3 }],
-    'gold ingot': [{ type: 'GOLD-ORE', quantity: 3 }],
-    'mithril ingot': [{ type: 'MITHRIL-ORE', quantity: 3 }],
-    'adamantine ingot': [{ type: 'ADAMANTINE-ORE', quantity: 3 }],
+    'iron ingot': {
+      resources: [{ type: 'IRON-ORE', quantity: 3 }],
+      skills: [{ type: 'SMELTING', level: 1 }],
+    },
+
+    'copper ingot': {
+      resources: [{ type: 'COPPER-ORE', quantity: 3 }],
+      skills: [],
+    },
+
+    'silver ingot': {
+      resources: [{ type: 'SILVER-ORE', quantity: 3 }],
+      skills: [],
+    },
+
+    'gold ingot': {
+      resources: [{ type: 'GOLD-ORE', quantity: 3 }],
+      skills: [],
+    },
+
+    'mithril ingot': {
+      resources: [{ type: 'MITHRIL-ORE', quantity: 3 }],
+      skills: [],
+    },
+
+    'adamantine ingot': {
+      resources: [{ type: 'ADAMANTINE-ORE', quantity: 3 }],
+      skills: [],
+    },
   },
+
   POTION: {},
+
   MISC: {},
 };

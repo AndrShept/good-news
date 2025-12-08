@@ -20,3 +20,4 @@ export * from './place-schema';
 export * from './resource-schema';
 export * from './craft-item-schema';
 export * from './queue-craft-item-schema';
+export * from './skill-schema';
