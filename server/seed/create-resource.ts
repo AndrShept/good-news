@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '../db/db';
 import { gameItemTable, modifierTable, placeTable, resourceTable } from '../db/schema';
 import { resourceEntities } from '../entities/resource';
-import { resourceModifierEntity } from '../config/material-modifier-config';
+
 
 export const createResource = async () => {
   for (const resource of resourceEntities) {
@@ -24,7 +24,7 @@ export const createResource = async () => {
         gameItemId: resource.id!,
       })
       .returning({ resourceId: resourceTable.id });
-    await db.insert(modifierTable).values({ ...resourceModifierEntity[resource.resource.type], resourceId });
+    // await db.insert(modifierTable).values({ ...resourceModifierEntity[resource.resource.type], resourceId });
   }
   console.log('✔ resource create');
   return;

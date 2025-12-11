@@ -32,6 +32,7 @@ import { equipmentTable, slotEnum } from '../server/db/schema/equipment-schema';
 import {
   accessoryTable,
   armorSlotEnum,
+  armorTypeEnum,
   gameItemEnum,
   gameItemTable,
   weaponHandEnum,
@@ -39,7 +40,15 @@ import {
 } from '../server/db/schema/game-item-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { queueCraftItemTable, queueCraftStatusEnum } from '../server/db/schema/queue-craft-item-schema';
-import type { rarityEnum, resourceCategoryEnum, resourceTable, resourceTypeEnum } from '../server/db/schema/resource-schema';
+import type {
+  ingotTypeEnum,
+  leatherTypeEnum,
+  oreTypeEnum,
+  rarityEnum,
+  resourceCategoryEnum,
+  resourceTable,
+  resourceTypeEnum,
+} from '../server/db/schema/resource-schema';
 import { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
 import { tileTable, tileTypeEnum } from '../server/db/schema/tile-schema';
 import type { Layer } from './json-types';
@@ -157,7 +166,8 @@ export type GetPostsData = InferResponseType<typeof client.post.$get>;
 
 export type EquipmentSlotType = (typeof slotEnum.enumValues)[number];
 export type GameItemType = (typeof gameItemEnum.enumValues)[number];
-export type ArmorType = (typeof armorSlotEnum.enumValues)[number];
+export type ArmorSlotType = (typeof armorSlotEnum.enumValues)[number];
+export type ArmorType = (typeof armorTypeEnum.enumValues)[number];
 export type RarityType = (typeof rarityEnum.enumValues)[number];
 export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
@@ -166,6 +176,9 @@ export type TileType = (typeof tileTypeEnum.enumValues)[number];
 export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
 export type StateType = (typeof stateTypeEnum.enumValues)[number];
 export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];
+export type OreType = (typeof oreTypeEnum.enumValues)[number];
+export type LeatherType = (typeof leatherTypeEnum.enumValues)[number];
+export type IngotType = (typeof ingotTypeEnum.enumValues)[number];
 export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[number];
 export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
 export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number];
@@ -233,13 +246,14 @@ export type CraftItem = typeof craftItemTable.$inferSelect & {
   gameItem?: GameItem | null;
 };
 
-export type CraftInfo = { baseResourceCategory: ResourceCategoryType; requiredBuildingType: BuildingType; craftTIme: number };
-export type CraftItemRequiredResources = { type: ResourceType; quantity: number };
+export type CraftInfo = { baseResourceCategory: ResourceCategoryType; requiredBuildingType: BuildingType };
+export type CraftItemRequiredResources<T = ResourceType> = { type: T; quantity: number };
 export type CraftItemRequiredSkills = { type: SkillType; level: number };
 
-export type CraftItemRequirement = {
-  resources: CraftItemRequiredResources[];
+export type CraftItemRequirement<T extends IngotType | LeatherType | OreType = ResourceType> = {
+  resources: CraftItemRequiredResources<T>[];
   skills: CraftItemRequiredSkills[];
+  craftTime: number;
 };
 
 export type GroupCraftItem = { itemType: GameItemType; subgroups: { subtype: WeaponType; items: CraftItem[] }[] };

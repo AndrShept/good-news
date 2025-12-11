@@ -1,14 +1,21 @@
-import type { OmitModifier, ResourceType } from '@/shared/types';
+import type { ArmorType, IngotType, LeatherType, OmitModifier, ResourceType, WeaponType } from '@/shared/types';
 
-export const materialModifierConfig: Partial<Record<ResourceType, Partial<OmitModifier>>> = {
-  // INGOT
-  'IRON-INGOT': {},
-  'COPPER-INGOT': { defense: 10 },
-  'SILVER-INGOT': { magicResistance: 10 },
-  'GOLD-INGOT': { dexterity: 10 },
-  'MITHRIL-INGOT': { intelligence: 10 },
-  'ADAMANTINE-INGOT': { constitution: 10 },
+export interface IMaterialModifierConfig {
+  WEAPON: Record<WeaponType, Record<IngotType, Partial<OmitModifier>>>;
+  ARMOR: Record<ArmorType, Record<IngotType | LeatherType, Partial<OmitModifier>>>;
+}
 
-  //LEATHER
-  'REGULAR-LEATHER': {},
+export const materialModifierConfig: IMaterialModifierConfig = {
+  WEAPON: {
+    DAGGER: {
+      'IRON-INGOT': {},
+      'SILVER-INGOT': {},
+      'GOLD-INGOT': undefined,
+      'MITHRIL-INGOT': undefined,
+      'ADAMANTINE-INGOT': undefined,
+    },
+    SWORD: undefined,
+    AXE: undefined,
+    STAFF: undefined,
+  },
 };

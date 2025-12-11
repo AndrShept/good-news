@@ -13,11 +13,8 @@ export const craftItemTable = pgTable('craft-item', {
     .references(() => gameItemTable.id, { onDelete: 'cascade' })
     .notNull(),
 
-  craftTime: integer().default(0).notNull(),
   requiredCraftResourceCategory: resourceCategoryEnum().notNull(),
   requiredBuildingType: buildingTypeEnum().notNull(),
-  requiredLevel: integer().default(1).notNull(),
-  // requiredResources: jsonb().$type<CraftItemRequiredResources[]>().notNull(),
 });
 
 export const craftTableRelations = relations(craftItemTable, ({ one }) => ({

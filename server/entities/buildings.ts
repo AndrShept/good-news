@@ -1,6 +1,6 @@
+import { imageConfig } from '@/shared/image-config';
 import type { Building, BuildingType } from '@/shared/types';
 
-import { imageConfig } from '../../frontend/src/lib/config';
 
 export const buildingEntities: Record<BuildingType, Building> = {
   'MAGIC-SHOP': {

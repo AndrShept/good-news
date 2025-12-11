@@ -4,7 +4,7 @@ import { ModifierInfoCard } from '@/components/ModifierInfoCard';
 import { WeaponInfo } from '@/components/WeaponInfo';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
-import { cn, formatDurationFromSeconds } from '@/lib/utils';
+import { capitalize, cn, formatDurationFromSeconds } from '@/lib/utils';
 import { CraftItem } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 
@@ -13,10 +13,10 @@ import { useCraftItem } from '../hooks/useCraftItem';
 type Props = CraftItem;
 
 export const CraftItemCard = (props: Props) => {
-  const { resourceMap, getRequiredResources } = useCraftItem();
+  const { resourceMap, getCraftItemRequirement } = useCraftItem();
   const coreMaterialType = useCraftItemStore((state) => state.coreMaterialType);
   const { resourceCountInBackpack } = useHeroBackpack();
-  const requiredResources = getRequiredResources(props.gameItem);
+  const requirement = getCraftItemRequirement(props.gameItem, undefined);
   return (
     <ScrollArea className="h-full">
       <div className="flex flex-1 flex-col items-center text-center">
@@ -27,20 +27,25 @@ export const CraftItemCard = (props: Props) => {
         <p className="text-muted-foreground/30 capitalize">{props?.gameItem?.type.toLocaleLowerCase()}</p>
         {props?.gameItem?.weapon && <WeaponInfo {...props.gameItem.weapon} />}
         {props?.gameItem?.armor && <ArmorInfo {...props.gameItem.armor} />}
-        <h2 className="my-1 text-xl text-yellow-300">Craft Info:</h2>
+        <h2 className="my-1.5 text-xl text-yellow-300">Craft Info:</h2>
         <div>
+          <ul className="flex items-center gap-1">
+            {requirement?.skills?.map((skill) => (
+              <li key={skill.type} className="flex items-center gap-1">
+                <span className="text-muted-foreground">{capitalize(skill.type)}: </span>
+                <span>{skill.level}</span>
+              </li>
+            ))}
+          </ul>
+
           <div className="space-x-1">
-            <span className="text-muted-foreground">skill:</span>
-            <span>{props.requiredLevel}</span>
-          </div>
-          <div className="space-x-1">
-            <span className="text-muted-foreground">craft time:</span>
-            <span>{formatDurationFromSeconds(props.craftTime / 1000)}</span>
+            <span className="text-muted-foreground">Craft time:</span>
+            <span>{formatDurationFromSeconds((requirement?.craftTime ?? 0) / 1000)}</span>
           </div>
           {coreMaterialType && <ModifierInfoCard modifier={resourceMap?.[coreMaterialType].modifier} />}
         </div>
         <ul className="mt-3 flex items-center gap-1">
-          {requiredResources?.map((resource) => (
+          {requirement?.resources?.map((resource) => (
             <li key={resource.type} className="flex items-center gap-1">
               <GameItemImg className="size-9" image={resourceMap?.[resource.type].image} />
               <p

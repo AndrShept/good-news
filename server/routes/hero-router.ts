@@ -1259,8 +1259,8 @@ export const heroRouter = new Hono<Context>()
         });
       }
 
-      const requiredResources = craftItemService(db).getRequiredResources(craftItem.gameItem, coreMaterialType);
-      await itemContainerService(db).checkCraftResources(backpack.id, requiredResources);
+      const requirement = craftItemService(db).getCraftItemRequirement(craftItem.gameItem, coreMaterialType);
+      await itemContainerService(db).checkCraftResources(backpack.id, requirement?.resources);
 
       const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
         where: and(eq(queueCraftItemTable.heroId, hero.id), ne(queueCraftItemTable.status, 'FAILED')),
@@ -1280,8 +1280,12 @@ export const heroRouter = new Hono<Context>()
           cause: { canShow: true },
         });
       }
-
-      let delay = craftItem.craftTime;
+      if (!requirement?.craftTime) {
+        throw new HTTPException(404, {
+          message: 'craft time not found',
+        });
+      }
+      let delay = requirement.craftTime;
 
       if (lastItem) {
         const now = Date.now();
@@ -1289,7 +1293,7 @@ export const heroRouter = new Hono<Context>()
 
         const remainingTime = Math.max(0, completedAt - now);
 
-        delay = remainingTime + craftItem.craftTime;
+        delay = remainingTime + requirement.craftTime;
       }
 
       const completedAt = new Date(Date.now() + delay).toISOString();
@@ -1343,7 +1347,7 @@ export const heroRouter = new Hono<Context>()
         heroService(db).getHero(id),
         db.query.queueCraftItemTable.findMany({
           where: eq(queueCraftItemTable.heroId, id),
-          with: { craftItem: true },
+          with: { craftItem: { with: { gameItem: true } } },
         }),
       ]);
 
@@ -1390,7 +1394,12 @@ export const heroRouter = new Hono<Context>()
       }
 
       for (const item of pendingJobs) {
-        delayAccumulator += item.craftItem.craftTime;
+        const requirement = craftItemService(db).getCraftItemRequirement(item.craftItem.gameItem, item.coreMaterialType);
+        if (!requirement?.craftTime) {
+          console.error('FOR CRAFT ITEM NOT FOUND');
+          continue;
+        }
+        delayAccumulator += requirement.craftTime;
 
         const job = await actionQueue.getJob(item.jobId);
         if (job) {

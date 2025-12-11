@@ -93,7 +93,7 @@ export const resourceEntities = [
       rarity: 'COMMON',
     },
     craftInfo: {
-      craftTIme: 7_000,
+      
       baseResourceCategory: 'ORE',
       requiredBuildingType: 'FORGE',
     },
@@ -110,7 +110,6 @@ export const resourceEntities = [
       rarity: 'COMMON',
     },
     craftInfo: {
-      craftTIme: 7_000,
       baseResourceCategory: 'ORE',
       requiredBuildingType: 'FORGE',
     },
@@ -127,7 +126,6 @@ export const resourceEntities = [
       rarity: 'COMMON',
     },
     craftInfo: {
-      craftTIme: 7_000,
       baseResourceCategory: 'ORE',
       requiredBuildingType: 'FORGE',
     },
@@ -144,7 +142,6 @@ export const resourceEntities = [
       rarity: 'COMMON',
     },
     craftInfo: {
-      craftTIme: 7_000,
       baseResourceCategory: 'ORE',
       requiredBuildingType: 'FORGE',
     },
@@ -161,7 +158,6 @@ export const resourceEntities = [
       rarity: 'COMMON',
     },
     craftInfo: {
-      craftTIme: 7_000,
       baseResourceCategory: 'ORE',
       requiredBuildingType: 'FORGE',
     },
@@ -178,7 +174,6 @@ export const resourceEntities = [
       rarity: 'COMMON',
     },
     craftInfo: {
-      craftTIme: 7_000,
       baseResourceCategory: 'ORE',
       requiredBuildingType: 'FORGE',
     },

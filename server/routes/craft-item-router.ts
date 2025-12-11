@@ -16,7 +16,7 @@ import { z } from 'zod';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { buildingTypeEnum, craftItemTable } from '../db/schema';
-import { type ICraftConfig, craftConfig } from '../entities/craft-config';
+import { type ICraftConfig, craftConfig } from '../config/craft-config';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const craftItemRouter = new Hono<Context>().get(
@@ -38,7 +38,7 @@ export const craftItemRouter = new Hono<Context>().get(
         modifier: true,
       },
     });
-    const requiredResourceCraft = craftConfig;
+  
 
     if (buildingType === 'FORGE') {
       const forgeItems = await db.query.craftItemTable.findMany({
@@ -46,10 +46,10 @@ export const craftItemRouter = new Hono<Context>().get(
         with: { gameItem: { with: { resource: true } } },
       });
 
-      return c.json<SuccessResponse<{ craftItems: CraftItem[]; resources: Resource[]; requiredResourceCraft: ICraftConfig }>>({
+      return c.json<SuccessResponse<{ craftItems: CraftItem[]; resources: Resource[]; craftConfig: ICraftConfig }>>({
         message: 'craft item fetched!',
         success: true,
-        data: { craftItems: forgeItems, resources, requiredResourceCraft },
+        data: { craftItems: forgeItems, resources, craftConfig },
       });
     }
 
@@ -60,10 +60,10 @@ export const craftItemRouter = new Hono<Context>().get(
       },
     });
 
-    return c.json<SuccessResponse<{ craftItems: CraftItem[]; resources: Resource[]; requiredResourceCraft: ICraftConfig }>>({
+    return c.json<SuccessResponse<{ craftItems: CraftItem[]; resources: Resource[]; craftConfig: ICraftConfig }>>({
       message: 'craft item fetched!',
       success: true,
-      data: { craftItems, resources, requiredResourceCraft },
+      data: { craftItems, resources, craftConfig },
     });
   },
 );

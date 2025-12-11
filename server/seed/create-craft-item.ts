@@ -3,8 +3,8 @@ import { eq } from 'drizzle-orm';
 import { db } from '../db/db';
 import { craftItemTable } from '../db/schema';
 import { armorEntities } from '../entities/armor';
-import { weaponEntities } from '../entities/weapon';
 import { resourceEntities } from '../entities/resource';
+import { weaponEntities } from '../entities/weapon';
 
 export const createCraftItem = async () => {
   // const weapons = Object.values(weaponEntities);
@@ -15,7 +15,6 @@ export const createCraftItem = async () => {
     if (findCraftItem || !weapon.craftInfo) continue;
     await db.insert(craftItemTable).values({
       gameItemId: weapon.id,
-      craftTime: weapon.craftInfo.craftTIme,
       requiredCraftResourceCategory: weapon.craftInfo.baseResourceCategory,
       requiredBuildingType: weapon.craftInfo.requiredBuildingType,
     });
@@ -25,7 +24,6 @@ export const createCraftItem = async () => {
     if (findCraftItem || !armor.craftInfo) continue;
     await db.insert(craftItemTable).values({
       gameItemId: armor.id,
-      craftTime: armor.craftInfo.craftTIme,
       requiredCraftResourceCategory: armor.craftInfo.baseResourceCategory,
       requiredBuildingType: armor.craftInfo.requiredBuildingType,
     });
@@ -35,7 +33,6 @@ export const createCraftItem = async () => {
     if (findCraftItem || !resource.craftInfo) continue;
     await db.insert(craftItemTable).values({
       gameItemId: resource.id,
-      craftTime: resource.craftInfo.craftTIme,
       requiredCraftResourceCategory: resource.craftInfo.baseResourceCategory,
       requiredBuildingType: resource.craftInfo.requiredBuildingType,
     });

@@ -1,4 +1,4 @@
-import type { ArmorType, ResourceType, WeaponType } from './types';
+import type { ArmorSlotType, ArmorType, ResourceType, WeaponType } from './types';
 
 export const imageConfig = {
   icon: {
@@ -52,7 +52,7 @@ export const imageConfig = {
       GLOVES: '/sprites/icons/armor/gloves.png',
       HELMET: '/sprites/icons/armor/helmet.png',
       SHIELD: '/sprites/icons/armor/shield.png',
-    } as Record<ArmorType, string>,
+    } as Record<ArmorSlotType, string>,
     ACCESSORY: {
       AMULET: '/sprites/icons/accessory/amulet.png',
       RING: '/sprites/icons/accessory/ring.png',
