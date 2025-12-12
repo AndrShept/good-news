@@ -8,7 +8,7 @@ export const slotEnum = pgEnum('equipment_slot_enum', [
   'RIGHT_HAND',
   'LEFT_HAND',
   'HELMET',
-  'CHESTPLATE',
+  'CHEST',
   'LEGS',
   'BOOTS',
   'GLOVES',

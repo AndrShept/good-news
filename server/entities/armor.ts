@@ -12,10 +12,12 @@ export const armorEntities = [
       defense: 20,
       evasion: -20,
       magicResistance: 5,
-      slot: 'CHESTPLATE',
+      maxHealth: 0,
+      maxMana: 0,
+      slot: 'CHEST',
+      type: 'PLATE',
     },
     craftInfo: {
-      craftTIme: 10_000,
       baseResourceCategory: 'INGOT',
       requiredBuildingType: 'BLACKSMITH',
     },
@@ -31,13 +33,14 @@ export const armorEntities = [
       evasion: 0,
       magicResistance: 0,
       defense: 6,
+      maxHealth: 0,
+      maxMana: 0,
       slot: 'GLOVES',
+      type: 'PLATE',
     },
     craftInfo: {
-      craftTIme: 10_000,
       baseResourceCategory: 'INGOT',
       requiredBuildingType: 'BLACKSMITH',
     },
   },
- 
 ] as const satisfies Array<typeof gameItemTable.$inferInsert & { armor: typeof armorTable.$inferInsert }>;

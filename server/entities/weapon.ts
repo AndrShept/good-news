@@ -18,7 +18,6 @@ export const weaponEntities = [
       physCritChance: 10,
     },
     craftInfo: {
-      craftTIme: 10_000,
       baseResourceCategory: 'INGOT',
       requiredBuildingType: 'BLACKSMITH',
     },
@@ -39,7 +38,6 @@ export const weaponEntities = [
       physHitChance: 20,
     },
     craftInfo: {
-      craftTIme: 10_000,
       baseResourceCategory: 'INGOT',
       requiredBuildingType: 'BLACKSMITH',
     },

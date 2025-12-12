@@ -58,7 +58,6 @@ export const craftRouter = new Hono<Context>()
       const resources = await db.query.resourceTable.findMany({
         with: {
           gameItem: true,
-          modifier: true,
         },
       });
 

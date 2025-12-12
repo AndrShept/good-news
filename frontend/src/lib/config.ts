@@ -108,8 +108,8 @@ export const BASE_EQUIPMENTS_IMAGE: EquipmentImage[] = [
   },
   {
     id: 2,
-    slot: 'CHESTPLATE',
-    image: imageConfig.icon.ARMOR.CHESTPLATE,
+    slot: 'CHEST',
+    image: imageConfig.icon.ARMOR.CHEST,
   },
 
   {

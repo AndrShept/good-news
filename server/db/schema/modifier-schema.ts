@@ -39,9 +39,9 @@ export const modifierTable = pgTable('modifier', {
   heroId: uuid().references(() => heroTable.id, {
     onDelete: 'cascade',
   }),
-  resourceId: uuid().references(() => resourceTable.id, {
-    onDelete: 'cascade',
-  }),
+  // resourceId: uuid().references(() => resourceTable.id, {
+  //   onDelete: 'cascade',
+  // }),
 
   createdAt: timestamp('created_at', {
     withTimezone: true,
@@ -56,8 +56,8 @@ export const modifierRelations = relations(modifierTable, ({ one }) => ({
     fields: [modifierTable.heroId],
     references: [heroTable.id],
   }),
-  resource: one(resourceTable, {
-    fields: [modifierTable.resourceId],
-    references: [resourceTable.id],
-  }),
+  // resource: one(resourceTable, {
+  //   fields: [modifierTable.resourceId],
+  //   references: [resourceTable.id],
+  // }),
 }));

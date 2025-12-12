@@ -41,5 +41,5 @@ export const resourceTableRelations = relations(resourceTable, ({ one, many }) =
     references: [gameItemTable.id],
   }),
 
-  modifier: one(modifierTable),
+  // modifier: one(modifierTable),
 }));

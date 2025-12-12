@@ -11,10 +11,11 @@ export const Route = createFileRoute('/game')({
   component: GameRouteComponent,
 
   beforeLoad: async ({ context }) => {
-    const auth = await context.queryClient.ensureQueryData(getUserQueryOptions());
-    const hero = await context.queryClient.ensureQueryData(getHeroOptions());
-    const craftData = await context.queryClient.ensureQueryData(getCraftDataOptions());
-    console.log('craftData', craftData);
+    const [auth, hero] = await Promise.all([
+      context.queryClient.ensureQueryData(getUserQueryOptions()),
+      context.queryClient.ensureQueryData(getHeroOptions()),
+      context.queryClient.ensureQueryData(getCraftDataOptions()),
+    ]);
     if (!auth) {
       throw redirect({ to: '/auth/sign-in' });
     }
