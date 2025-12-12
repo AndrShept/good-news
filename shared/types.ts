@@ -35,6 +35,7 @@ import {
   armorTypeEnum,
   gameItemEnum,
   gameItemTable,
+  shieldTable,
   weaponHandEnum,
   weaponTypeEnum,
 } from '../server/db/schema/game-item-schema';
@@ -235,6 +236,7 @@ export type ContainerSlot = typeof containerSlotTable.$inferSelect & {
 
 export type Weapon = typeof weaponTable.$inferSelect;
 export type Armor = typeof armorTable.$inferSelect;
+export type Shield = typeof shieldTable.$inferSelect;
 export type Potion = typeof potionTable.$inferSelect;
 export type Accessory = typeof accessoryTable.$inferSelect;
 export type Resource = typeof resourceTable.$inferSelect & {
@@ -262,6 +264,7 @@ export type GameItem = InferSelectModel<typeof gameItemTable> & {
   craftInfo?: CraftInfo | null;
   weapon?: Weapon | null;
   armor?: Armor | null;
+  shield?: Shield | null;
   potion?: Potion | null;
   accessory?: Accessory | null;
   resource?: Resource | null;
@@ -293,7 +296,7 @@ export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>;
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];
 export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
 
-export type ApiGetCraftItemResponse = InferResponseType<(typeof client)['craft-item'][':buildingType']['$get']>['data'];
+export type ApiGetCraftItemResponse = InferResponseType<(typeof client)['craft']['items'][':buildingType']['$get']>['data'];
 
 export type IHeroStat = {
   strength: number;

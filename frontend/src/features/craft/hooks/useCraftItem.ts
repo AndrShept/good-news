@@ -4,20 +4,21 @@ import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
+import { getCraftDataOptions } from '../api/get-craft-data';
 import { getCraftItemOptions } from '../api/get-craft-item';
 
 export const useCraftItem = () => {
   const queryClient = useQueryClient();
   const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
-  const data = queryClient.getQueryData(getCraftItemOptions(selectBuilding?.type).queryKey);
-  const coreMaterialType = useCraftItemStore((state) => state.coreMaterialType);
+  const craftData = queryClient.getQueryData(getCraftDataOptions().queryKey);
+  const craftItems = queryClient.getQueryData(getCraftItemOptions(selectBuilding?.type).queryKey);
   const filteredResourcesBySelectBuilding = useMemo(() => {
-    return data?.resources.filter((r) => r.category === selectBuilding?.workingResourceCategory);
-  }, [data?.resources, selectBuilding?.workingResourceCategory]);
+    return craftData?.resources.filter((r) => r.category === selectBuilding?.workingResourceCategory);
+  }, [craftData?.resources, selectBuilding?.workingResourceCategory]);
   const craftItemMap = useMemo(() => {
-    if (!data) return {};
+    if (!craftItems) return {};
 
-    return data.craftItems.reduce(
+    return craftItems.reduce(
       (acc, item) => {
         if (!item) return acc;
         acc[item.id] = item;
@@ -25,11 +26,11 @@ export const useCraftItem = () => {
       },
       {} as Record<string, CraftItem>,
     );
-  }, [data]);
+  }, [craftItems]);
 
   const resourceMap = useMemo(
     () =>
-      data?.resources?.reduce(
+      craftData?.resources?.reduce(
         (acc, item) => {
           if (!item?.gameItem) return acc;
           const typedKey = item.type as ResourceType;
@@ -38,10 +39,10 @@ export const useCraftItem = () => {
         },
         {} as Record<ResourceType, { image: string; modifier: Modifier | null }>,
       ),
-    [data?.resources],
+    [craftData?.resources],
   );
 
-  function getCraftItemRequirement(gameItem: GameItem | undefined | null, coreMaterialType: ResourceType | undefined | null) {
+  const getCraftItemRequirement = (gameItem: GameItem | undefined | null, coreMaterialType: ResourceType | undefined | null) => {
     if (!gameItem) return;
 
     const { type, name, armor, weapon } = gameItem;
@@ -53,7 +54,7 @@ export const useCraftItem = () => {
         return;
       }
 
-      return data?.craftConfig[type][weapon.weaponType][coreMaterialType as IngotType];
+      return craftData?.craftConfig[type][weapon.weaponType][coreMaterialType as IngotType];
     }
     if (type === 'ARMOR') {
       if (!coreMaterialType) return;
@@ -62,14 +63,14 @@ export const useCraftItem = () => {
         return;
       }
 
-      return data?.craftConfig[type][armor.type][coreMaterialType as LeatherType | IngotType];
+      return craftData?.craftConfig[type][armor.type][coreMaterialType as LeatherType | IngotType];
     }
-    return data?.craftConfig[type][name];
-  }
+    return craftData?.craftConfig[type][name];
+  };
 
   const allResourcesByType = useMemo(() => {
-    return data?.resources?.map((resource) => resource.type);
-  }, [data?.resources]);
+    return craftData?.resources?.map((resource) => resource.type);
+  }, [craftData?.resources]);
 
   return {
     craftItemMap,

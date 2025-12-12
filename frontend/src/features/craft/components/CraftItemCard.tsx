@@ -16,7 +16,7 @@ export const CraftItemCard = (props: Props) => {
   const { resourceMap, getCraftItemRequirement } = useCraftItem();
   const coreMaterialType = useCraftItemStore((state) => state.coreMaterialType);
   const { resourceCountInBackpack } = useHeroBackpack();
-  const requirement = getCraftItemRequirement(props.gameItem, undefined);
+  const requirement = getCraftItemRequirement(props.gameItem, coreMaterialType);
   return (
     <ScrollArea className="h-full">
       <div className="flex flex-1 flex-col items-center text-center">

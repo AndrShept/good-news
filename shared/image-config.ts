@@ -48,7 +48,7 @@ export const imageConfig = {
     ARMOR: {
       BOOTS: '/sprites/icons/armor/boots.png',
       BELT: '/sprites/icons/armor/belt.png',
-      CHESTPLATE: '/sprites/icons/armor/chest.png',
+      CHEST: '/sprites/icons/armor/chest.png',
       GLOVES: '/sprites/icons/armor/gloves.png',
       HELMET: '/sprites/icons/armor/helmet.png',
       SHIELD: '/sprites/icons/armor/shield.png',

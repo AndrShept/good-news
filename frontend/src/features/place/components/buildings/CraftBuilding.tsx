@@ -1,35 +1,36 @@
+import { getCraftItemOptions } from '@/features/craft/api/get-craft-item';
+import { CraftButton } from '@/features/craft/components/CraftButton';
+import { CraftItemCard } from '@/features/craft/components/CraftItemCard';
+import { CraftSidebar } from '@/features/craft/components/CraftSidebar';
 import { useCraftItem } from '@/features/craft/hooks/useCraftItem';
+import { QueueCraftItemsList } from '@/features/queue/components/QueueCraftItemsList';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
-import { getCraftItemOptions } from '../../../craft/api/get-craft-item';
-import { CraftButton } from '../../../craft/components/CraftButton';
-import { CraftItemCard } from '../../../craft/components/CraftItemCard';
-import { CraftSidebar } from '../../../craft/components/CraftSidebar';
-import { QueueCraftItemsList } from '../../../queue/components/QueueCraftItemsList';
+
 
 export const CraftBuilding = () => {
   const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
-  const { data, isLoading } = useQuery(getCraftItemOptions(selectBuilding?.type));
+  const { data: craftItems, isLoading } = useQuery(getCraftItemOptions(selectBuilding?.type));
   const craftItem = useCraftItemStore((state) => state.craftItem);
   const setCraftItem = useCraftItemStore((state) => state.setCraftItem);
   const setCoreMaterial = useCraftItemStore((state) => state.setCoreMaterial);
   const { filteredResourcesBySelectBuilding } = useCraftItem();
 
   useEffect(() => {
-    setCraftItem(data?.craftItems?.[0]);
+    setCraftItem(craftItems?.[0]);
     if (selectBuilding?.type === 'BLACKSMITH') {
       setCoreMaterial(filteredResourcesBySelectBuilding?.[0].type ?? null);
     } else {
       setCoreMaterial(null);
     }
-  }, [data?.craftItems, filteredResourcesBySelectBuilding, selectBuilding]);
+  }, [craftItems, filteredResourcesBySelectBuilding, selectBuilding?.type]);
   if (isLoading) return <p>...</p>;
   return (
     <section className="flex w-full">
-      <CraftSidebar data={data} onSelect={setCraftItem} selectedItemId={craftItem?.id} />
+      <CraftSidebar craftItems={craftItems} onSelect={setCraftItem} selectedItemId={craftItem?.id} />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col p-1">
         <div className="min-h-0 flex-1">{craftItem && craftItem.gameItem && <CraftItemCard {...craftItem} />}</div>
 

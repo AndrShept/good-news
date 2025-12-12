@@ -38,6 +38,7 @@ export type IngotName = (typeof ingotNames)[number];
 export interface ICraftConfig {
   WEAPON: Record<WeaponType, Record<IngotType, CraftItemRequirement<IngotType>>>;
   ARMOR: Record<ArmorType, Record<LeatherType | IngotType, CraftItemRequirement<LeatherType | IngotType>>>;
+  SHIELD: Record<string, CraftItemRequirement>;
   RESOURCES: Record<string, CraftItemRequirement>;
   POTION: Record<string, CraftItemRequirement>;
   MISC: Record<string, CraftItemRequirement>;
@@ -165,6 +166,7 @@ export const craftConfig: ICraftConfig = {
     LEATHER: undefined,
     CLOTH: undefined,
   },
+  SHIELD: {},
 
   RESOURCES: {
     'iron ingot': {

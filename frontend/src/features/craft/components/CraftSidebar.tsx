@@ -1,18 +1,17 @@
 import { cn } from '@/lib/utils';
-import { ApiGetCraftItemResponse, ArmorType, CraftItem, WeaponType } from '@/shared/types';
+import { CraftItem } from '@/shared/types';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
-import { memo, useEffect } from 'react';
+import { memo } from 'react';
 
-import { useCraftItem } from '../hooks/useCraftItem';
 import { SelectBaseResource } from './CraftSelectResource';
 
 interface Props {
-  data: ApiGetCraftItemResponse;
+  craftItems: CraftItem[] | undefined;
   onSelect: (item: CraftItem) => void;
   selectedItemId: string | undefined;
 }
 
-export const CraftSidebar = memo(({ data, onSelect, selectedItemId }: Props) => {
+export const CraftSidebar = memo(({ craftItems, onSelect, selectedItemId }: Props) => {
   const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
 
   const canShowSelectResource = selectBuilding?.type === 'BLACKSMITH';
@@ -20,7 +19,7 @@ export const CraftSidebar = memo(({ data, onSelect, selectedItemId }: Props) => 
   return (
     <aside className="flex w-full max-w-[150px] flex-col md:max-w-[200px]">
       <ul className="text-muted-foreground/60 flex flex-col gap-0.5 hover:cursor-default">
-        {data?.craftItems.map((craftItem) => (
+        {craftItems?.map((craftItem) => (
           <li
             key={craftItem.id}
             className={cn('px-1.5 py-0.5', {

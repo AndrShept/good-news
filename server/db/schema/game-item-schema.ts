@@ -8,8 +8,8 @@ import { armorMaterialCraftTypeEnum, ingotTypeEnum, resourceCategoryEnum, resour
 
 export const gameItemEnum = pgEnum('game_item_enum', ['WEAPON', 'ARMOR', 'SHIELD', 'POTION', 'RESOURCES', 'MISC']);
 
-export const armorTypeEnum = pgEnum('armor_type_enum', ['PLATE', 'MAIL', 'LEATHER', 'CLOTH', 'SHIELD']);
-export const armorSlotEnum = pgEnum('armor_slot_enum', ['HELMET', 'CHEST', 'LEGS', 'BELT', 'BOOTS', 'GLOVES']);
+export const armorTypeEnum = pgEnum('armor_type_enum', ['PLATE', 'MAIL', 'LEATHER', 'CLOTH']);
+export const armorSlotEnum = pgEnum('armor_slot_enum', ['HELMET', 'CHEST', 'LEGS', 'BELT', 'BOOTS', 'GLOVES' , 'SHIELD']);
 export const accessorySlotEnum = pgEnum('accessory_slot_enum', ['RING', 'AMULET']);
 
 export const weaponTypeEnum = pgEnum('weapon_type_enum', ['DAGGER', 'SWORD', 'AXE', 'STAFF']);
@@ -38,6 +38,7 @@ export const gameItemRelations = relations(gameItemTable, ({ one, many }) => ({
   containerSlots: many(containerSlotTable),
   weapon: one(weaponTable),
   armor: one(armorTable),
+  shield: one(shieldTable),
   potion: one(potionTable),
   accessory: one(accessoryTable),
   resource: one(resourceTable),

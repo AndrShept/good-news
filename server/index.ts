@@ -22,7 +22,7 @@ import { sessionHandler } from './middleware/sessionHandler';
 import { actionQueueListeners } from './queue/actionQueueListeners';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
-import { craftItemRouter } from './routes/craft-item-router';
+import { craftRouter } from './routes/craft-router';
 import { groupRouter } from './routes/group-router';
 import { heroRouter } from './routes/hero-router';
 import { mapRouter } from './routes/map-router';
@@ -48,7 +48,7 @@ const routes = app
   .route('/map', mapRouter)
   .route('/place', placeRouter)
   .route('/tile', tileRouter)
-  .route('/craft-item', craftItemRouter);
+  .route('/craft', craftRouter);
 
 app.onError((err, c) => {
   // Обробка помилки підключення до бази даних

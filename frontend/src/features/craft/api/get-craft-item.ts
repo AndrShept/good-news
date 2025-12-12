@@ -4,7 +4,7 @@ import { queryOptions } from '@tanstack/react-query';
 
 export const getCraftItem = async (buildingType: BuildingType) => {
   try {
-    const res = await client['craft-item'][':buildingType'].$get({
+    const res = await client['craft']['items'][':buildingType'].$get({
       param: { buildingType },
     });
     const data = await res.json();
