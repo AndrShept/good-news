@@ -5,7 +5,7 @@ export const skillExpConfig = {
     difficultyMultiplier: 1.6,
   },
   BLACKSMITHING: {
-    difficultyMultiplier: 1.8,
+    difficultyMultiplier: 1.9,
   },
   MINING: {
     difficultyMultiplier: 1.5,
@@ -15,7 +15,7 @@ export const skillExpConfig = {
   },
 } as const satisfies Record<SkillType, { difficultyMultiplier: number }>;
 
-export const skillXpRewards: Record<RarityType, number> = {
+export const rarityXpRewards: Record<RarityType, number> = {
   COMMON: 10,
   MAGIC: 20,
   EPIC: 40,

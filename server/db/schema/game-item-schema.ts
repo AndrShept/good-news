@@ -51,7 +51,7 @@ export const weaponTable = pgTable('weapon', {
   gameItemId: uuid()
     .references(() => gameItemTable.id, {
       onDelete: 'cascade',
-    })
+    }) 
     .notNull(),
 
   weaponType: weaponTypeEnum().notNull(),

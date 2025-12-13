@@ -61,6 +61,8 @@ import {
   placeTable,
   resourceTable,
   resourceTypeEnum,
+  skillTable,
+  skillsTypeEnum,
   slotEnum,
   stateTable,
   stateTypeEnum,
@@ -79,6 +81,7 @@ import { equipmentService } from '../services/equipment-service';
 import { heroService } from '../services/hero-service';
 import { itemContainerService } from '../services/item-container-service';
 import { queueCraftItemService } from '../services/queue-craft-item-service';
+import { capitalize } from '../../frontend/src/lib/utils';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -207,8 +210,17 @@ export const heroRouter = new Hono<Context>()
         type: 'BACKPACK',
         heroId: newHero.id,
       });
+      for (const skill of skillsTypeEnum.enumValues) {
+        await tx.insert(skillTable).values({
+            heroId: newHero.id,
+            name: capitalize(skill),
+            type: skill
+        });
+      }
+
       return newHero;
     });
+
     return c.json<SuccessResponse>({ message: 'hero created!', success: true });
   })
   .put(

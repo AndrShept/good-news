@@ -8,10 +8,12 @@ export const skillsTypeEnum = pgEnum('skill_type_enum', ['BLACKSMITHING', 'MININ
 export const skillTable = pgTable('skill', {
   id: uuid().primaryKey().defaultRandom().notNull(),
   name: text().notNull(),
-  type: skillsTypeEnum(),
-  level: integer().notNull().default(1),
+  type: skillsTypeEnum().notNull(),
+  level: integer().notNull().default(0),
   currentExperience: integer().notNull().default(0),
-  heroId: uuid().references(() => heroTable.id, { onDelete: 'cascade' }),
+  heroId: uuid()
+    .references(() => heroTable.id, { onDelete: 'cascade' })
+    .notNull(),
   createdAt: timestamp('created_at', {
     mode: 'string',
     withTimezone: true,

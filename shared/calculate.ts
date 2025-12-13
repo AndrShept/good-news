@@ -1,4 +1,6 @@
+import { skillExpConfig } from '../server/config/skill-exp-config';
 import { BASE_HEALTH_REGEN_TIME, BASE_MANA_REGEN_TIME, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from './constants';
+import type { SkillType } from './types';
 
 export const calculate = {
   walkTime(dexterity: number) {
@@ -25,17 +27,5 @@ export const calculate = {
     return Math.max(1000, time);
   },
 
-  getExpSkillToNextLevel(skillLevel: number, difficultyMultiplier: number) {
-    return Math.floor(100 * Math.pow(skillLevel, difficultyMultiplier));
-  },
-
-  getCraftSkillXp(skillLevel: number, difficultyMultiplier: number, rarityBaseXp: number) {
-    // Чим більший skillLevel — тим повільніша прокачка
-    const difficultyScale = Math.pow(skillLevel, difficultyMultiplier);
-
-    // Фінальний XP за крафт
-    const xp = rarityBaseXp / (1 + difficultyScale / 50);
-
-    return Math.floor(xp);
-  },
+ 
 };
