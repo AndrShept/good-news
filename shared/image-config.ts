@@ -1,4 +1,4 @@
-import type { ArmorSlotType, ArmorType, ResourceType, WeaponType } from './types';
+import type { ArmorSlotType, ArmorType, ResourceType, SkillType, WeaponType } from './types';
 
 export const imageConfig = {
   icon: {
@@ -29,6 +29,13 @@ export const imageConfig = {
       refresh: '/sprites/icons/ui/refresh.png',
       settings: '/sprites/icons/ui/settings.png',
     },
+    skill: {
+      BLACKSMITHING: '/sprites/icons/skills/blacksmithing.png',
+      ALCHEMY: '/sprites/icons/skills/alchemy.png',
+      MINING: '/sprites/icons/skills/mining.png',
+      SMELTING: '/sprites/icons/skills/smelting.png',
+      TAILORING: '/sprites/icons/skills/tailoring.png',
+    } as Record<SkillType, string>,
     place: {
       mine: '/sprites/icons/places/mine.png',
       solmer: '/sprites/icons/places/solmer.webp',

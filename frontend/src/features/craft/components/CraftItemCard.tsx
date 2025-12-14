@@ -4,6 +4,7 @@ import { ModifierInfoCard } from '@/components/ModifierInfoCard';
 import { WeaponInfo } from '@/components/WeaponInfo';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
+import { useSkill } from '@/features/skill/hooks/useSkill';
 import { capitalize, cn, formatDurationFromSeconds } from '@/lib/utils';
 import { CraftItem } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
@@ -17,6 +18,7 @@ export const CraftItemCard = (props: Props) => {
   const coreMaterialType = useCraftItemStore((state) => state.coreMaterialType);
   const { resourceCountInBackpack } = useHeroBackpack();
   const requirement = getCraftItemRequirement(props.gameItem, coreMaterialType);
+  const { skillMap } = useSkill();
   return (
     <ScrollArea className="h-full">
       <div className="flex flex-1 flex-col items-center text-center">
@@ -31,7 +33,12 @@ export const CraftItemCard = (props: Props) => {
         <div>
           <ul className="flex items-center gap-1">
             {requirement?.skills?.map((skill) => (
-              <li key={skill.type} className="flex items-center gap-1">
+              <li
+                key={skill.type}
+                className={cn('flex items-center gap-1', {
+                  'text-red-500': (skillMap?.[skill.type].level ?? 0) < skill.level,
+                })}
+              >
                 <span className="text-muted-foreground">{capitalize(skill.type)}: </span>
                 <span>{skill.level}</span>
               </li>

@@ -3,7 +3,7 @@ import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-
 
 import { heroTable } from './hero-schema';
 
-export const skillsTypeEnum = pgEnum('skill_type_enum', ['BLACKSMITHING', 'MINING', 'SMELTING', 'ALCHEMY']);
+export const skillsTypeEnum = pgEnum('skill_type_enum', ['BLACKSMITHING', 'MINING', 'SMELTING', 'ALCHEMY', 'TAILORING']);
 
 export const skillTable = pgTable('skill', {
   id: uuid().primaryKey().defaultRandom().notNull(),

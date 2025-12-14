@@ -30,7 +30,7 @@ export const itemContainerService = (db: TTransaction | TDataBase) => ({
     }
     return itemContainer;
   },
-  async checkCraftResources( backpackId: string, requiredResources: CraftItemRequiredResources[] | undefined) {
+  async checkCraftResources(backpackId: string, requiredResources: CraftItemRequiredResources[] | undefined) {
     if (!requiredResources?.length) {
       throw new HTTPException(404, {
         message: 'requiredResources resource not found',
@@ -52,12 +52,11 @@ export const itemContainerService = (db: TTransaction | TDataBase) => ({
 
       if (totalOwnedQuantity < requiredResource.quantity) {
         throw new HTTPException(409, {
-          message: `Not enough resources ${requiredResource.type.toLowerCase()} to craft this item`,
+          message: `Not enough resources ${requiredResource.type.toLowerCase().replace('-', ' ')} to craft this item`,
           cause: { canShow: true },
         });
       }
     }
-
   },
   async getHeroItemContainerByType(
     heroId: string,

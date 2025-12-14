@@ -83,6 +83,7 @@ import { equipmentService } from '../services/equipment-service';
 import { heroService } from '../services/hero-service';
 import { itemContainerService } from '../services/item-container-service';
 import { queueCraftItemService } from '../services/queue-craft-item-service';
+import { skillService } from '../services/skill-service';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -1274,7 +1275,7 @@ export const heroRouter = new Hono<Context>()
 
       const requirement = craftItemService(db).getCraftItemRequirement(craftItem.gameItem, coreMaterialType);
       await itemContainerService(db).checkCraftResources(backpack.id, requirement?.resources);
-
+      await skillService(db).checkSkillRequirement(hero.id, requirement?.skills);
       const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
         where: and(eq(queueCraftItemTable.heroId, hero.id), ne(queueCraftItemTable.status, 'FAILED')),
       });
