@@ -26,6 +26,7 @@ import {
   type GameItemType,
   type Hero,
   type QueueCraftItem,
+  type Skill,
   type SuccessResponse,
   type TItemContainer,
   type WeaponHandType,
@@ -41,6 +42,7 @@ import { z } from 'zod';
 
 import { io } from '..';
 import { HeroIcon } from '../../frontend/src/components/game-icons/HeroIcon';
+import { capitalize } from '../../frontend/src/lib/utils';
 import type { GameMessageType } from '../../frontend/src/store/useGameMessages';
 import { socketEvents } from '../../shared/socket-events';
 import type { Context } from '../context';
@@ -81,7 +83,6 @@ import { equipmentService } from '../services/equipment-service';
 import { heroService } from '../services/hero-service';
 import { itemContainerService } from '../services/item-container-service';
 import { queueCraftItemService } from '../services/queue-craft-item-service';
-import { capitalize } from '../../frontend/src/lib/utils';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -212,9 +213,9 @@ export const heroRouter = new Hono<Context>()
       });
       for (const skill of skillsTypeEnum.enumValues) {
         await tx.insert(skillTable).values({
-            heroId: newHero.id,
-            name: capitalize(skill),
-            type: skill
+          heroId: newHero.id,
+          name: capitalize(skill),
+          type: skill,
         });
       }
 
@@ -1424,4 +1425,21 @@ export const heroRouter = new Hono<Context>()
         success: true,
       });
     },
-  );
+  )
+  .get('/:id/skills', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
+    const user = c.get('user');
+    const { id } = c.req.valid('param');
+
+    const hero = await heroService(db).getHero(id);
+    const skills = await db.query.skillTable.findMany({
+      where: eq(skillTable.heroId, hero.id),
+    });
+
+    verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+    return c.json<SuccessResponse<Skill[]>>({
+      message: 'skills fetched',
+      success: true,
+      data: skills,
+    });
+  });

@@ -9,7 +9,7 @@ export const skillTable = pgTable('skill', {
   id: uuid().primaryKey().defaultRandom().notNull(),
   name: text().notNull(),
   type: skillsTypeEnum().notNull(),
-  level: integer().notNull().default(0),
+  level: integer().notNull().default(1),
   currentExperience: integer().notNull().default(0),
   heroId: uuid()
     .references(() => heroTable.id, { onDelete: 'cascade' })

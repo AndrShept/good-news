@@ -166,7 +166,9 @@ export const craftConfig: ICraftConfig = {
     LEATHER: undefined,
     CLOTH: undefined,
   },
-  SHIELD: {},
+  SHIELD : {
+
+  },
 
   RESOURCES: {
     'iron ingot': {

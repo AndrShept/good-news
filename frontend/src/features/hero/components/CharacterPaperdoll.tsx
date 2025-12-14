@@ -8,6 +8,7 @@ import { useHeroStateMutation } from '../hooks/useHeroStateMutation';
 import { CharacterModifier } from './CharacterModifier';
 import { CharacterStat } from './CharacterStat';
 import { Paperdoll } from './Paperdoll';
+import { Skills } from '@/features/skill/components/Skills';
 
 export const CharacterPaperdoll = () => {
   const hero = useHero((state) => ({
@@ -42,7 +43,7 @@ export const CharacterPaperdoll = () => {
           <CharacterStat freeStatPoints={hero.freeStatPoints} heroStat={hero.stat} modifier={hero.modifier} />
           <CharacterModifier {...hero.modifier!} />
         </div>
-
+        <Skills />
         <ItemContainer {...backpack!} />
       </div>
     </section>

@@ -13,20 +13,7 @@ export const skillService = (db: TTransaction | TDataBase) => ({
 
     return skills;
   },
-  getExpSkillToNextLevel(skillType: SkillType, skillLevel: number) {
-    return Math.floor(100 * Math.pow(skillLevel, skillExpConfig[skillType].difficultyMultiplier));
-  },
 
-  getCraftSkillXp(skillType: SkillType, skillLevel: number, coreMaterialRarity: RarityType) {
-    // Чим більший skillLevel — тим повільніша прокачка
-    const rarityBaseXp = rarityXpRewards[coreMaterialRarity];
-    const difficultyScale = Math.pow(skillLevel, skillExpConfig[skillType].difficultyMultiplier);
-
-    // Фінальний XP за крафт
-    const xp = rarityBaseXp / (1 + difficultyScale / 50);
-
-    return Math.floor(xp);
-  },
   async setCurrentExp(skillType: SkillType, skillLevel: number, heroId: string, expQuantity: number) {
     const result = {
       isLevelUp: false,
@@ -40,7 +27,7 @@ export const skillService = (db: TTransaction | TDataBase) => ({
       })
       .where(and(eq(skillTable.type, skillType), eq(skillTable.heroId, heroId)))
       .returning({ currentExperience: skillTable.currentExperience });
-    const nextLevelExp = this.getExpSkillToNextLevel(skillType, skillLevel);
+    const nextLevelExp = calculate.getExpSkillToNextLevel(skillType, skillLevel);
 
     if (newExpQuantity.currentExperience >= nextLevelExp) {
       const [returningLevel] = await db
@@ -53,7 +40,7 @@ export const skillService = (db: TTransaction | TDataBase) => ({
         .returning({ level: skillTable.level });
       level = returningLevel.level;
       result.isLevelUp = true;
-      result.message = `Congratulations your skill ${skillType.toLowerCase()} gain to level ${level}`;
+      result.message = `Your skill ${skillType.toLowerCase()} gain to level ${level}`;
     }
 
     return result;

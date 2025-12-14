@@ -1,6 +1,6 @@
-import { skillExpConfig } from '../server/config/skill-exp-config';
+import { rarityXpRewards, skillExpConfig } from '../server/config/skill-exp-config';
 import { BASE_HEALTH_REGEN_TIME, BASE_MANA_REGEN_TIME, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from './constants';
-import type { SkillType } from './types';
+import type { RarityType, SkillType } from './types';
 
 export const calculate = {
   walkTime(dexterity: number) {
@@ -27,5 +27,18 @@ export const calculate = {
     return Math.max(1000, time);
   },
 
- 
+  getExpSkillToNextLevel(skillType: SkillType, skillLevel: number) {
+    return Math.floor(100 * Math.pow(skillLevel, skillExpConfig[skillType].difficultyMultiplier));
+  },
+
+  getCraftSkillXp(skillType: SkillType, skillLevel: number, coreMaterialRarity: RarityType) {
+    // Чим більший skillLevel — тим повільніша прокачка
+    const rarityBaseXp = rarityXpRewards[coreMaterialRarity];
+    const difficultyScale = Math.pow(skillLevel, skillExpConfig[skillType].difficultyMultiplier);
+
+    // Фінальний XP за крафт
+    const xp = rarityBaseXp / (1 + difficultyScale / 50);
+
+    return Math.floor(xp);
+  },
 };
