@@ -1,4 +1,5 @@
-import type { ArmorSlotType, ArmorType, ResourceType, SkillType, WeaponType } from './types';
+import type { ArmorSlotType, ResourceType, SkillType, WeaponType } from '../types';
+
 
 export const imageConfig = {
   icon: {

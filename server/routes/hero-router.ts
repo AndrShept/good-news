@@ -1247,7 +1247,7 @@ export const heroRouter = new Hono<Context>()
             location: { with: { place: true } },
           },
         }),
-        craftItemService(db).getCraftItem(craftItemId, { with: { gameItem: true } }),
+        craftItemService(db).getCraftItem(craftItemId, { with: { gameItem: { with: { weapon: true, armor: true, shield: true } } } }),
         coreMaterialType && db.query.resourceTable.findFirst({ where: eq(resourceTable.type, coreMaterialType) }),
         itemContainerService(db).getHeroBackpack(id),
       ]);

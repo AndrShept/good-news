@@ -1,5 +1,5 @@
 import { GameIcon } from '@/components/GameIcon';
-import { imageConfig } from '@/shared/image-config';
+import { imageConfig } from '@/shared/config/image-config';
 
 interface Props {
   usedSlots: number;

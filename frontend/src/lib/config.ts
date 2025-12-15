@@ -1,4 +1,4 @@
-import { imageConfig } from '@/shared/image-config';
+import { imageConfig } from '@/shared/config/image-config';
 import { ArmorType, EquipmentSlotType, ResourceCategoryType, ResourceType, WeaponType } from '@/shared/types';
 
 export const parentVariants = {

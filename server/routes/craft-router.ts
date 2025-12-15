@@ -5,7 +5,7 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
-import { type ICraftConfig, craftConfig } from '../config/craft-config';
+import { type ICraftConfig, craftConfig } from '../../shared/config/craft-config';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { buildingTypeEnum, craftItemTable } from '../db/schema';

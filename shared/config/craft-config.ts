@@ -9,9 +9,9 @@ import type {
   WeaponType,
 } from '@/shared/types';
 
-import { armorEntities } from '../entities/armor';
-import { resourceEntities } from '../entities/resource';
-import { weaponEntities } from '../entities/weapon';
+import { armorEntities } from '../../server/entities/armor';
+import { resourceEntities } from '../../server/entities/resource';
+import { weaponEntities } from '../../server/entities/weapon';
 
 function isIngot(
   r: (typeof resourceEntities)[number],

@@ -1,7 +1,6 @@
 import { GameIcon } from '@/components/GameIcon';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { capitalize, cn } from '@/lib/utils';
-import { imageConfig } from '@/shared/image-config';
 import { Place } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
@@ -10,6 +9,7 @@ import { useMediaQuery } from 'usehooks-ts';
 
 import { useLeavePlace } from '../hooks/useLeavePlace';
 import { PlaceSidebarButton } from './PlaceSidebarButton';
+import { imageConfig } from '@/shared/config/image-config';
 
 interface Props {
   place: Place | undefined;

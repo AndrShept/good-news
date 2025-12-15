@@ -39,6 +39,8 @@ export const GameMessage = memo(() => {
                 'text-green-400': message.type === 'SUCCESS',
                 'text-muted-foreground': message.type === 'INFO',
                 'text-yellow-400': message.type === 'WARNING',
+                'text-blue-400': message.type === 'SKILL_EXP',
+                'text-purple-500': message.type === 'LEVEL_EXP',
               })}
             >
               <time className="text-primary">{getTimeFns(message.createdAt!)}</time>

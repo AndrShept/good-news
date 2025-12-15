@@ -1,8 +1,18 @@
-import type { CraftItem, CraftItemRequiredResources, GameItem, IngotType, LeatherType, ResourceType } from '@/shared/types';
+import { materialModifierConfig } from '@/shared/config/material-modifier-config';
+import type {
+  ArmorType,
+  CraftItem,
+  CraftItemRequiredResources,
+  GameItem,
+  GameItemType,
+  IngotType,
+  LeatherType,
+  ResourceType,
+} from '@/shared/types';
 import { and, eq } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
-import { craftConfig } from '../config/craft-config';
+import { craftConfig } from '../../shared/config/craft-config';
 import type { TDataBase, TTransaction } from '../db/db';
 import { containerSlotTable, craftItemTable, resourceTable } from '../db/schema';
 import { itemContainerService } from './item-container-service';
@@ -45,5 +55,32 @@ export const craftItemService = (db: TTransaction | TDataBase) => ({
       return craftConfig[type][armor.type][coreMaterialType as LeatherType | IngotType];
     }
     return craftConfig[type][name];
+  },
+  getMaterialModifier(gameItem: GameItem | undefined | null, coreMaterialType: IngotType | LeatherType | undefined) {
+    if (!gameItem) return;
+    if (!coreMaterialType) {
+      console.error('getMaterialModifier coreMaterialType not found ');
+      return;
+    }
+
+    const { type, name, armor, weapon } = gameItem;
+
+    if (type === 'WEAPON') {
+      if (!weapon) {
+        console.error('getCraftItemRequirement gameItem.weapon not found ');
+        return;
+      }
+
+      return materialModifierConfig[type][coreMaterialType as IngotType];
+    }
+    if (type === 'ARMOR') {
+      if (!armor) {
+        console.error('getCraftItemRequirement gameItem.armor not found ');
+        return;
+      }
+
+      return materialModifierConfig['ARMOR'][armor.type][coreMaterialType];
+    }
+    return materialModifierConfig[type][coreMaterialType];
   },
 });

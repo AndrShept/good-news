@@ -3,7 +3,6 @@ import type { CraftItemRequiredSkills, RarityType, ResourceType, Skill, SkillTyp
 import { and, eq, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
-import { rarityXpRewards, skillExpConfig } from '../config/skill-exp-config';
 import type { TDataBase, TTransaction } from '../db/db';
 import { skillTable } from '../db/schema';
 
@@ -36,6 +35,7 @@ export const skillService = (db: TTransaction | TDataBase) => ({
       .where(and(eq(skillTable.type, skillType), eq(skillTable.heroId, heroId)))
       .returning({ currentExperience: skillTable.currentExperience });
     const nextLevelExp = calculate.getExpSkillToNextLevel(skillType, skillLevel);
+    result.message = `You gained ${expQuantity} crafting EXP.`;
 
     if (newExpQuantity.currentExperience >= nextLevelExp) {
       const [returningLevel] = await db
@@ -48,9 +48,8 @@ export const skillService = (db: TTransaction | TDataBase) => ({
         .returning({ level: skillTable.level });
       level = returningLevel.level;
       result.isLevelUp = true;
-      result.message = `Your skill ${skillType.toLowerCase()} gain to level ${level}`;
+      result.message = `Congratulation !!! Your skill ${skillType.toLowerCase()} gain to level ${level}`;
     }
-
     return result;
   },
 
@@ -62,7 +61,7 @@ export const skillService = (db: TTransaction | TDataBase) => ({
     for (const skill of craftItemSkillReq) {
       const findSkill = await this.getSkill(heroId, skill.type);
       if (findSkill.level < skill.level) {
-        throw new HTTPException(400, {
+        throw new HTTPException(409, {
           message: `Your ${skill.type.toLowerCase()} skill is too low. You need at least level ${skill.level}. `,
           cause: { canShow: true },
         });

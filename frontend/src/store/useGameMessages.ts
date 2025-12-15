@@ -5,11 +5,13 @@ export const gameMessageObj = {
   warning: 'WARNING',
   error: 'ERROR',
   success: 'SUCCESS',
+  skillExp: 'SKILL_EXP',
+  levelExp: 'LEVEL_EXP',
 } as const;
 
 export const gameMessageValues = Object.values(gameMessageObj);
 
-export type GameMessageType = typeof gameMessageValues[number]
+export type GameMessageType = (typeof gameMessageValues)[number];
 export interface IGameMessage {
   text: string;
   data?: { gameItemName: string; quantity?: number };

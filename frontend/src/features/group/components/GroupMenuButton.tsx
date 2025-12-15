@@ -11,7 +11,7 @@ import React, { useCallback, useState } from 'react';
 import { CreateGroupButton } from './CreateGroupButton';
 import { GroupAvailableHeroesList } from './GroupAvailableHeroesList';
 import { GroupMembersList } from './GroupMembersList';
-import { imageConfig } from '@/shared/image-config';
+import { imageConfig } from '@/shared/config/image-config';
 
 export const GroupMenuButton = () => {
   const [searchTerm, setSearchTerm] = useState('');

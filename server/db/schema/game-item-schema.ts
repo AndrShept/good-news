@@ -4,12 +4,12 @@ import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-
 
 import type { buffTable } from './buff-schema';
 import { containerSlotTable } from './container-slot-schema';
-import { armorMaterialCraftTypeEnum, ingotTypeEnum, resourceCategoryEnum, resourceTable } from './resource-schema';
+import { armorMaterialCraftTypeEnum, ingotTypeEnum, resourceCategoryEnum, resourceTable, resourceTypeEnum } from './resource-schema';
 
 export const gameItemEnum = pgEnum('game_item_enum', ['WEAPON', 'ARMOR', 'SHIELD', 'POTION', 'RESOURCES', 'MISC']);
 
 export const armorTypeEnum = pgEnum('armor_type_enum', ['PLATE', 'MAIL', 'LEATHER', 'CLOTH']);
-export const armorSlotEnum = pgEnum('armor_slot_enum', ['HELMET', 'CHEST', 'LEGS', 'BELT', 'BOOTS', 'GLOVES' , 'SHIELD']);
+export const armorSlotEnum = pgEnum('armor_slot_enum', ['HELMET', 'CHEST', 'LEGS', 'BELT', 'BOOTS', 'GLOVES', 'SHIELD']);
 export const accessorySlotEnum = pgEnum('accessory_slot_enum', ['RING', 'AMULET']);
 
 export const weaponTypeEnum = pgEnum('weapon_type_enum', ['DAGGER', 'SWORD', 'AXE', 'STAFF']);
@@ -20,7 +20,7 @@ export const potionTypeEnum = pgEnum('potion_type_enum', ['BUFF', 'RESTORE']);
 
 export const gameItemTable = pgTable('game_item', {
   id: uuid().primaryKey().notNull(),
-
+  coreMaterial: resourceTypeEnum(),
   type: gameItemEnum().notNull(),
   name: text().notNull(),
   image: text().notNull(),
@@ -47,11 +47,10 @@ export const gameItemRelations = relations(gameItemTable, ({ one, many }) => ({
 //WEAPON
 export const weaponTable = pgTable('weapon', {
   id: uuid().primaryKey().defaultRandom().notNull(),
-  material: ingotTypeEnum(),
   gameItemId: uuid()
     .references(() => gameItemTable.id, {
       onDelete: 'cascade',
-    }) 
+    })
     .notNull(),
 
   weaponType: weaponTypeEnum().notNull(),
@@ -81,7 +80,6 @@ export const weaponTableRelations = relations(weaponTable, ({ one }) => ({
 //ARMOR
 export const armorTable = pgTable('armor', {
   id: uuid().primaryKey().defaultRandom().notNull(),
-  material: armorMaterialCraftTypeEnum(),
   slot: armorSlotEnum().notNull(),
   type: armorTypeEnum().notNull(),
   defense: integer().notNull(),
@@ -106,7 +104,6 @@ export const armorTableRelations = relations(armorTable, ({ one }) => ({
 //SHIELD
 export const shieldTable = pgTable('shield', {
   id: uuid().primaryKey().defaultRandom().notNull(),
-  material: ingotTypeEnum(),
   slot: armorSlotEnum().notNull(),
   defense: integer().notNull(),
   magicResistance: integer().notNull(),

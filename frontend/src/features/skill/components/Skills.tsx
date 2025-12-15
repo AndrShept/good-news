@@ -1,10 +1,10 @@
 import { GameIcon } from '@/components/GameIcon';
 import { BorderBeam } from '@/components/ui/border-beam';
 import { Progress } from '@/components/ui/progress';
-import { imageConfig } from '@/shared/image-config';
 import { SkillType } from '@/shared/types';
 
 import { useSkill } from '../hooks/useSkill';
+import { imageConfig } from '@/shared/config/image-config';
 
 const skillIcon: Record<SkillType, string> = {
   BLACKSMITHING: imageConfig.icon.skill.BLACKSMITHING,

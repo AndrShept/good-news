@@ -71,6 +71,7 @@ export type QueueCraftItemJob = {
     heroId: string;
     queueCraftItemId: string;
     coreMaterialType?: ResourceType;
+    craftExpMessage?: string;
     completedAt?: string;
     gameItemName?: string;
     buildingType: BuildingType;

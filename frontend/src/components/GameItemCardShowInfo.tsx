@@ -1,5 +1,7 @@
 import { ShopBuyButton } from '@/features/shop/components/ShopBuyButton';
+import { materialConfig } from '@/lib/config';
 import { cn } from '@/lib/utils';
+import { imageConfig } from '@/shared/config/image-config';
 import { GameItem } from '@/shared/types';
 import { memo } from 'react';
 
@@ -8,38 +10,52 @@ import { GameIcon } from './GameIcon';
 import { GameItemImg } from './GameItemImg';
 import { PotionInfo } from './PotionInfo';
 import { WeaponInfo } from './WeaponInfo';
-import { imageConfig } from '@/shared/image-config';
 
 interface Props extends GameItem {
   isShowPrice?: boolean;
   isShowBuyButton?: boolean;
 }
 export const GameItemCardShowInfo = memo(
-  ({ image, name, type, id, price, potion, weapon, armor, resource, accessory, isShowBuyButton = false, isShowPrice = false }: Props) => {
+  ({
+  
+    isShowBuyButton = false,
+    isShowPrice = false,
+    ...props
+  }: Props) => {
     return (
       <article className={cn('flex flex-col gap-4 rounded border p-4 text-start')}>
         <section className="flex gap-4">
-          <GameItemImg className="size-10" image={image} />
+          <GameItemImg className="size-10" image={props.image} />
 
           <div className="flex flex-col">
-            <h3 className="line-clamp-2 capitalize">{name}</h3>
-            <p className="text-muted-foreground/30 capitalize">{type.toLocaleLowerCase()}</p>
+            <h3 className="line-clamp-2 capitalize text-base">{props.name}</h3>
+            {props.coreMaterial && (
+              <div>
+                <span>material: </span>
+                <span className={cn(materialConfig[props.coreMaterial]?.color)}>{props.coreMaterial?.split('-')[0]}</span>
+              </div>
+            )}
 
-            {potion && <PotionInfo {...potion} />}
-            {weapon && <WeaponInfo {...weapon} />}
-            {armor && <ArmorInfo {...armor} />}
+            <p className="text-muted-foreground/30 capitalize">{props.type.toLocaleLowerCase()}</p>
+
+            {props.potion && <PotionInfo {...props.potion} />}
+            {props.weapon && <WeaponInfo {...props.weapon} />}
+            {props.armor && <ArmorInfo {...props.armor} />}
+
+            <p></p>
+          
           </div>
         </section>
         <div className="mt-auto flex justify-between">
           {isShowPrice && (
             <div className="flex items-center gap-0.5">
               <GameIcon image={imageConfig.icon.ui.gold} />
-              <span className="text-muted-foreground text-xs">{price}</span>
+              <span className="text-muted-foreground text-xs">{props.price}</span>
             </div>
           )}
           {isShowBuyButton && (
             <div>
-              <ShopBuyButton gameItemId={id} />
+              <ShopBuyButton gameItemId={props.id} />
             </div>
           )}
         </div>

@@ -88,6 +88,7 @@ export const actionQueueListeners = () => {
           type: 'QUEUE_CRAFT_ITEM_COMPLETE',
           payload: {
             queueItemCraftId: jobData.payload.queueCraftItemId,
+            craftExpMessage: jobData.payload.craftExpMessage ?? '',
             gameItemName: jobData.payload.gameItemName ?? '',
             buildingType: jobData.payload.buildingType,
           },

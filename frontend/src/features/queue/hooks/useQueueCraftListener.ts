@@ -2,6 +2,7 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { getItemContainerOptions } from '@/features/item-container/api/get-item-container';
 import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
+import { getSkillsOptions } from '@/features/skill/api/get-skills';
 import { QueueCraftItemSocketData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useSetGameMessage } from '@/store/useGameMessages';
@@ -26,7 +27,13 @@ export const useQueueCraftListener = () => {
           await queryClient.invalidateQueries({
             queryKey: getItemContainerOptions(heroId, backpackId).queryKey,
           });
+          await queryClient.invalidateQueries({
+            queryKey: getSkillsOptions(heroId).queryKey,
+          });
           setGameMessage({ type: 'SUCCESS', text: 'You create new item', data: { gameItemName: data.payload.gameItemName } });
+          if (data.payload.craftExpMessage) {
+            setGameMessage({ type: 'SKILL_EXP', text: data.payload.craftExpMessage });
+          }
 
           break;
         case 'QUEUE_CRAFT_ITEM_STATUS_UPDATE':
