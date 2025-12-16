@@ -9,9 +9,6 @@ export interface IMaterialModifierConfig {
     LEATHER: Record<LeatherType, Partial<OmitModifier>>;
     CLOTH: Record<LeatherType, Partial<OmitModifier>>;
   };
-  MISC: {};
-  POTION: {};
-  RESOURCES: {};
 }
 
 export const materialModifierConfig: IMaterialModifierConfig = {
@@ -51,9 +48,8 @@ export const materialModifierConfig: IMaterialModifierConfig = {
     LEATHER: {
       'REGULAR-LEATHER': {},
     },
-    CLOTH: { 'REGULAR-LEATHER': {} },
+    CLOTH: {
+      'REGULAR-LEATHER': {},
+    },
   },
-  MISC: {},
-  POTION: {},
-  RESOURCES: {},
 };

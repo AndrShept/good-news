@@ -42,6 +42,7 @@ import {
 import { postTable } from '../server/db/schema/posts-schema';
 import type { queueCraftItemTable, queueCraftStatusEnum } from '../server/db/schema/queue-craft-item-schema';
 import type {
+  coreMaterialTypeEnum,
   ingotTypeEnum,
   leatherTypeEnum,
   oreTypeEnum,
@@ -180,6 +181,7 @@ export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];
 export type OreType = (typeof oreTypeEnum.enumValues)[number];
 export type LeatherType = (typeof leatherTypeEnum.enumValues)[number];
 export type IngotType = (typeof ingotTypeEnum.enumValues)[number];
+export type CoreMaterialType = (typeof coreMaterialTypeEnum.enumValues)[number];
 export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[number];
 export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
 export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number];

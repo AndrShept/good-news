@@ -1,5 +1,4 @@
 import { CraftItem, GameItem, IngotType, LeatherType, Modifier, ResourceType } from '@/shared/types';
-import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -68,6 +67,41 @@ export const useCraftItem = () => {
     return craftData?.craftConfig[type][name];
   };
 
+  const getMaterialModifier = (gameItem: GameItem, coreMaterialType: IngotType | LeatherType | undefined | null) => {
+    if (!coreMaterialType) {
+      console.error('getMaterialModifier coreMaterialType not found ');
+      return;
+    }
+
+    const { type, armor, weapon } = gameItem;
+
+    if (type === 'WEAPON') {
+      if (!weapon) {
+        console.error('getMaterialModifier gameItem.weapon not found ');
+        return;
+      }
+
+      return craftData?.materialModifierConfig[type][coreMaterialType as IngotType];
+    }
+    if (type === 'ARMOR') {
+      if (!armor) {
+        console.error('getMaterialModifier gameItem.armor not found ');
+        return;
+      }
+      const armorType = armor.type;
+      if (armorType === 'PLATE' || armorType === 'MAIL') {
+        return craftData?.materialModifierConfig.ARMOR[armorType][coreMaterialType as IngotType];
+      }
+
+      if (armorType === 'LEATHER' || armorType === 'CLOTH') {
+        return craftData?.materialModifierConfig.ARMOR[armorType][coreMaterialType as LeatherType];
+      }
+    }
+    if (type === 'SHIELD') {
+      return craftData?.materialModifierConfig[type][coreMaterialType as IngotType];
+    }
+  };
+
   const allResourcesByType = useMemo(() => {
     return craftData?.resources?.map((resource) => resource.type);
   }, [craftData?.resources]);
@@ -76,6 +110,7 @@ export const useCraftItem = () => {
     craftItemMap,
     resourceMap,
     getCraftItemRequirement,
+    getMaterialModifier,
     filteredResourcesBySelectBuilding,
     allResourcesByType,
   };

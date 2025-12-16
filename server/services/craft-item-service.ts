@@ -31,9 +31,8 @@ export const craftItemService = (db: TTransaction | TDataBase) => ({
     return craftItem;
   },
 
-  getCraftItemRequirement(gameItem: GameItem | undefined | null, coreMaterialType: ResourceType | undefined | null) {
-    if (!gameItem) return;
-
+  getCraftItemRequirement(gameItem: GameItem , coreMaterialType: ResourceType | undefined | null) {
+   
     const { type, name, armor, weapon } = gameItem;
 
     if (type === 'WEAPON') {
@@ -56,18 +55,18 @@ export const craftItemService = (db: TTransaction | TDataBase) => ({
     }
     return craftConfig[type][name];
   },
-  getMaterialModifier(gameItem: GameItem | undefined | null, coreMaterialType: IngotType | LeatherType | undefined) {
-    if (!gameItem) return;
+  getMaterialModifier(gameItem: GameItem , coreMaterialType: IngotType | LeatherType | undefined) {
+    
     if (!coreMaterialType) {
       console.error('getMaterialModifier coreMaterialType not found ');
       return;
     }
 
-    const { type, name, armor, weapon } = gameItem;
+    const { type, armor, weapon } = gameItem;
 
     if (type === 'WEAPON') {
       if (!weapon) {
-        console.error('getCraftItemRequirement gameItem.weapon not found ');
+        console.error('getMaterialModifier gameItem.weapon not found ');
         return;
       }
 
@@ -75,12 +74,20 @@ export const craftItemService = (db: TTransaction | TDataBase) => ({
     }
     if (type === 'ARMOR') {
       if (!armor) {
-        console.error('getCraftItemRequirement gameItem.armor not found ');
+        console.error('getMaterialModifier gameItem.armor not found ');
         return;
       }
+      const armorType = armor.type;
+      if (armorType === 'PLATE' || armorType === 'MAIL') {
+        return materialModifierConfig.ARMOR[armorType][coreMaterialType as IngotType];
+      }
 
-      return materialModifierConfig['ARMOR'][armor.type][coreMaterialType];
+      if (armorType === 'LEATHER' || armorType === 'CLOTH') {
+        return materialModifierConfig.ARMOR[armorType][coreMaterialType as LeatherType];
+      }
     }
-    return materialModifierConfig[type][coreMaterialType];
+    if (type === 'SHIELD') {
+      return materialModifierConfig[type][coreMaterialType as IngotType];
+    }
   },
 });

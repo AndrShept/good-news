@@ -17,14 +17,14 @@ export const createResource = async () => {
       ...resource,
     });
 
-    const [{ resourceId }] = await db
+    await db
       .insert(resourceTable)
       .values({
         ...resource.resource,
         gameItemId: resource.id!,
       })
       .returning({ resourceId: resourceTable.id });
-    // await db.insert(modifierTable).values({ ...resourceModifierEntity[resource.resource.type], resourceId });
+
   }
   console.log('✔ resource create');
   return;

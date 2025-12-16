@@ -6,6 +6,7 @@ import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
 import { type ICraftConfig, craftConfig } from '../../shared/config/craft-config';
+import { type IMaterialModifierConfig, materialModifierConfig } from '../../shared/config/material-modifier-config';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { buildingTypeEnum, craftItemTable } from '../db/schema';
@@ -61,10 +62,12 @@ export const craftRouter = new Hono<Context>()
         },
       });
 
-      return c.json<SuccessResponse<{ resources: Resource[]; craftConfig: ICraftConfig }>>({
-        message: 'craft item fetched!',
-        success: true,
-        data: { resources, craftConfig },
-      });
+      return c.json<SuccessResponse<{ resources: Resource[]; craftConfig: ICraftConfig; materialModifierConfig: IMaterialModifierConfig }>>(
+        {
+          message: 'craft item fetched!',
+          success: true,
+          data: { resources, craftConfig, materialModifierConfig },
+        },
+      );
     },
   );

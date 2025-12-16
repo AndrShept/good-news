@@ -37,11 +37,12 @@ export const queueCraftItemService = (db: TTransaction | TDataBase) => ({
       .where(eq(queueCraftItemTable.id, queueCraftItemId));
   },
 
-  async setNextQueueCraftItem(heroId: string): Promise<QueueCraftItem> {
+  async setNextQueueCraftItem(heroId: string): Promise<QueueCraftItem | undefined> {
     const next = await this.getQueueCraftItemByStatus(heroId, 'PENDING', {
       with: { craftItem: { with: { gameItem: true } } },
     });
-    const requirement = craftItemService(db).getCraftItemRequirement(next.craftItem?.gameItem, next.coreMaterialType);
+    if (!next) return;
+    const requirement = craftItemService(db).getCraftItemRequirement(next.craftItem?.gameItem!, next.coreMaterialType);
 
     const completedAt = new Date(Date.now() + (requirement?.craftTime ?? 0)).toISOString();
 

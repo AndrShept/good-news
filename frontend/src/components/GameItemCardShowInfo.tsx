@@ -1,3 +1,4 @@
+import { useCraftItem } from '@/features/craft/hooks/useCraftItem';
 import { ShopBuyButton } from '@/features/shop/components/ShopBuyButton';
 import { materialConfig } from '@/lib/config';
 import { cn } from '@/lib/utils';
@@ -15,51 +16,47 @@ interface Props extends GameItem {
   isShowPrice?: boolean;
   isShowBuyButton?: boolean;
 }
-export const GameItemCardShowInfo = memo(
-  ({
-  
-    isShowBuyButton = false,
-    isShowPrice = false,
-    ...props
-  }: Props) => {
-    return (
-      <article className={cn('flex flex-col gap-4 rounded border p-4 text-start')}>
-        <section className="flex gap-4">
-          <GameItemImg className="size-10" image={props.image} />
+export const GameItemCardShowInfo = memo(({ isShowBuyButton = false, isShowPrice = false, ...props }: Props) => {
+  const { getMaterialModifier } = useCraftItem();
+  const modifier = getMaterialModifier(props, props.coreMaterial);
 
-          <div className="flex flex-col">
-            <h3 className="line-clamp-2 capitalize text-base">{props.name}</h3>
-            {props.coreMaterial && (
-              <div>
-                <span>material: </span>
-                <span className={cn(materialConfig[props.coreMaterial]?.color)}>{props.coreMaterial?.split('-')[0]}</span>
-              </div>
-            )}
+  return (
+    <article className={cn('flex flex-col gap-4 rounded border p-4 text-start')}>
+      <section className="flex gap-4">
+        <GameItemImg className="size-10" image={props.image} />
 
-            <p className="text-muted-foreground/30 capitalize">{props.type.toLocaleLowerCase()}</p>
-
-            {props.potion && <PotionInfo {...props.potion} />}
-            {props.weapon && <WeaponInfo {...props.weapon} />}
-            {props.armor && <ArmorInfo {...props.armor} />}
-
-            <p></p>
-          
-          </div>
-        </section>
-        <div className="mt-auto flex justify-between">
-          {isShowPrice && (
-            <div className="flex items-center gap-0.5">
-              <GameIcon image={imageConfig.icon.ui.gold} />
-              <span className="text-muted-foreground text-xs">{props.price}</span>
-            </div>
-          )}
-          {isShowBuyButton && (
+        <div className="flex flex-col">
+          <h3 className="line-clamp-2 text-base capitalize">{props.name}</h3>
+          {props.coreMaterial && (
             <div>
-              <ShopBuyButton gameItemId={props.id} />
+              <span>material: </span>
+              <span className={cn(materialConfig[props.coreMaterial]?.color)}>{props.coreMaterial?.split('-')[0]}</span>
             </div>
           )}
+
+          <p className="text-muted-foreground/30 capitalize">{props.type.toLocaleLowerCase()}</p>
+
+          {props.potion && <PotionInfo {...props.potion} />}
+          {props.weapon && <WeaponInfo {...props.weapon} />}
+          {props.armor && <ArmorInfo {...props.armor} />}
+
+          <p>MATERIAL MODIFI</p>
+          {JSON.stringify(modifier)}
         </div>
-      </article>
-    );
-  },
-);
+      </section>
+      <div className="mt-auto flex justify-between">
+        {isShowPrice && (
+          <div className="flex items-center gap-0.5">
+            <GameIcon image={imageConfig.icon.ui.gold} />
+            <span className="text-muted-foreground text-xs">{props.price}</span>
+          </div>
+        )}
+        {isShowBuyButton && (
+          <div>
+            <ShopBuyButton gameItemId={props.id} />
+          </div>
+        )}
+      </div>
+    </article>
+  );
+});

@@ -51,6 +51,7 @@ import {
   actionTable,
   buildingTypeEnum,
   containerSlotTable,
+  coreMaterialTypeEnum,
   craftItemTable,
   equipmentTable,
   gameItemEnum,
@@ -1228,7 +1229,7 @@ export const heroRouter = new Hono<Context>()
     zValidator(
       'json',
       z.object({
-        coreMaterialType: z.optional(z.enum(resourceTypeEnum.enumValues)),
+        coreMaterialType: z.optional(z.enum(coreMaterialTypeEnum.enumValues)),
         buildingType: z.enum(buildingTypeEnum.enumValues),
         craftItemId: z.string(),
       }),
@@ -1273,7 +1274,7 @@ export const heroRouter = new Hono<Context>()
         });
       }
 
-      const requirement = craftItemService(db).getCraftItemRequirement(craftItem.gameItem, coreMaterialType);
+      const requirement = craftItemService(db).getCraftItemRequirement(craftItem.gameItem!, coreMaterialType);
       await itemContainerService(db).checkCraftResources(backpack.id, requirement?.resources);
       await skillService(db).checkSkillRequirement(hero.id, requirement?.skills);
       const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
@@ -1387,17 +1388,19 @@ export const heroRouter = new Hono<Context>()
 
       if (!progressJob && pendingJobs.length > 0) {
         const next = await queueCraftItemService(db).setNextQueueCraftItem(hero.id);
-
-        const updateData: QueueCraftItemSocketData = {
-          type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
-          payload: {
-            queueItemCraftId: next.id,
-            status: 'PROGRESS',
-            completedAt: next.completedAt ?? '',
-            buildingType: deletedItem.buildingType,
-          },
-        };
-        io.to(hero.id).emit(socketEvents.queueCraft(), updateData);
+        if (next) {
+          const updateData: QueueCraftItemSocketData = {
+            type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
+            payload: {
+              queueItemCraftId: next.id,
+              status: 'PROGRESS',
+              completedAt: next.completedAt,
+              buildingType: deletedItem.buildingType,
+            },
+          };
+          io.to(hero.id).emit(socketEvents.queueCraft(), updateData);
+         
+        }
       }
 
       let delayAccumulator = 0;

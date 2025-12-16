@@ -17,7 +17,7 @@ export const CraftSidebar = memo(({ craftItems, onSelect, selectedItemId }: Prop
   const canShowSelectResource = selectBuilding?.type === 'BLACKSMITH';
 
   return (
-    <aside className="flex w-full max-w-[150px] flex-col md:max-w-[200px]">
+    <aside className="sticky top-0 flex h-[calc(100%-40px)] w-full max-w-[150px] flex-col md:max-w-[200px]">
       <ul className="text-muted-foreground/60 flex flex-col gap-0.5 hover:cursor-default">
         {craftItems?.map((craftItem) => (
           <li

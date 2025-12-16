@@ -4,7 +4,7 @@ import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-
 
 import type { buffTable } from './buff-schema';
 import { containerSlotTable } from './container-slot-schema';
-import { armorMaterialCraftTypeEnum, ingotTypeEnum, resourceCategoryEnum, resourceTable, resourceTypeEnum } from './resource-schema';
+import { coreMaterialTypeEnum, ingotTypeEnum, resourceCategoryEnum, resourceTable, resourceTypeEnum } from './resource-schema';
 
 export const gameItemEnum = pgEnum('game_item_enum', ['WEAPON', 'ARMOR', 'SHIELD', 'POTION', 'RESOURCES', 'MISC']);
 
@@ -20,7 +20,7 @@ export const potionTypeEnum = pgEnum('potion_type_enum', ['BUFF', 'RESTORE']);
 
 export const gameItemTable = pgTable('game_item', {
   id: uuid().primaryKey().notNull(),
-  coreMaterial: resourceTypeEnum(),
+  coreMaterial: coreMaterialTypeEnum(),
   type: gameItemEnum().notNull(),
   name: text().notNull(),
   image: text().notNull(),

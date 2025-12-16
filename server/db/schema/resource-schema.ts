@@ -12,8 +12,9 @@ const ingotValues = ['IRON-INGOT', 'COPPER-INGOT', 'SILVER-INGOT', 'GOLD-INGOT',
 export const ingotTypeEnum = pgEnum('ingot_type_enum', [...ingotValues]);
 export const oreTypeEnum = pgEnum('ore_type_enum', [...oreValues]);
 export const leatherTypeEnum = pgEnum('leather_type_enum', [...leatherValues]);
+
 export const resourceTypeEnum = pgEnum('resource_type_enum', [...oreValues, ...leatherValues, ...ingotValues]);
-export const armorMaterialCraftTypeEnum = pgEnum('armor_material_craft_enum', [...leatherValues, ...ingotValues]);
+export const coreMaterialTypeEnum = pgEnum('core_material_enum', [...leatherValues, ...ingotValues]);
 export const resourceCategoryEnum = pgEnum('resource_category_enum', ['ORE', 'WOOD', 'HERB', 'LEATHER', 'INGOT']);
 export const rarityEnum = pgEnum('rarity_enum', ['COMMON', 'MAGIC', 'EPIC', 'RARE', 'LEGENDARY']);
 
