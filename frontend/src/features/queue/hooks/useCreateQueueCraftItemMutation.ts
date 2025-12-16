@@ -1,6 +1,6 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { client } from '@/lib/utils';
-import { BuildingType, ErrorResponse, ResourceType } from '@/shared/types';
+import { BuildingType, CoreMaterialType, ErrorResponse, ResourceType } from '@/shared/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { useQueueCraftItem } from './useQueueCraftItem';
@@ -15,7 +15,7 @@ export const useCreateQueueCraftItemMutation = () => {
       buildingType,
     }: {
       craftItemId: string;
-      coreMaterialType: ResourceType | undefined;
+      coreMaterialType: CoreMaterialType | undefined;
       buildingType: BuildingType;
     }) => {
       const res = await client.hero[':id'].action['queue-craft'].$post({

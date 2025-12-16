@@ -1,50 +1,21 @@
-import { cn, modifierChangeName } from '@/lib/utils';
-import { Weapon } from '@/shared/types';
+import { cn, getModifiers } from '@/lib/utils';
+import { OmitModifier, Weapon } from '@/shared/types';
 
 import { Separator } from './ui/separator';
 
-type Props = Weapon;
+interface Props {
+  weapon: Weapon;
+  coreMaterialModifier?: Partial<OmitModifier>;
+}
 
-export const WeaponInfo = (props: Props) => {
-  const baseModifier = [
-    {
-      name: modifierChangeName('physDamage'),
-      value: props.physDamage,
-    },
-    {
-      name: modifierChangeName('physHitChance'),
-      value: props.physHitChance,
-    },
-    {
-      name: modifierChangeName('physCritChance'),
-      value: props.physCritChance,
-    },
-    {
-      name: modifierChangeName('physCritPower'),
-      value: props.physCritPower,
-    },
-    {
-      name: modifierChangeName('spellDamage'),
-      value: props.spellDamage,
-    },
-    {
-      name: modifierChangeName('spellHitChance'),
-      value: props.spellHitChance,
-    },
-    {
-      name: modifierChangeName('spellCritChance'),
-      value: props.spellCritChance,
-    },
-    {
-      name: modifierChangeName('spellCritPower'),
-      value: props.spellCritPower,
-    },
-  ];
+export const WeaponInfo = ({ weapon, coreMaterialModifier }: Props) => {
+  const modifiers = getModifiers(weapon, coreMaterialModifier ?? {} );
+
   return (
     <section className="flex flex-col gap-2">
       <div>
-        <p className="text-muted-foreground/30">{props.weaponHand.toLocaleLowerCase()}</p>
-        <p className="text-muted-foreground/30">{props.weaponType.toLocaleLowerCase()}</p>
+        <p className="text-muted-foreground/30">{weapon.weaponHand.toLocaleLowerCase()}</p>
+        <p className="text-muted-foreground/30">{weapon.weaponType.toLocaleLowerCase()}</p>
       </div>
 
       <div>
@@ -52,11 +23,11 @@ export const WeaponInfo = (props: Props) => {
         <div className="space-x-1">
           <span className="text-muted-foreground">Damage:</span>
           <span className="text-yellow-300">
-            {props.minDamage} - {props.maxDamage}
+            {weapon.minDamage} - {weapon.maxDamage}
           </span>
         </div>
         <ul>
-          {baseModifier.map((modifier) => {
+          {modifiers.map((modifier) => {
             if (!modifier.value) return;
             return (
               <li key={modifier.name} className="flex items-center gap-1">

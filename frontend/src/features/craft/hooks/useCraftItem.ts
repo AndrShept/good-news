@@ -1,4 +1,4 @@
-import { CraftItem, GameItem, IngotType, LeatherType, Modifier, ResourceType } from '@/shared/types';
+import {  CraftItem, GameItem, IngotType, LeatherType, Modifier, ResourceType } from '@/shared/types';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';

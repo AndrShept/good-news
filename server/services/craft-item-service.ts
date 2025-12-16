@@ -31,8 +31,7 @@ export const craftItemService = (db: TTransaction | TDataBase) => ({
     return craftItem;
   },
 
-  getCraftItemRequirement(gameItem: GameItem , coreMaterialType: ResourceType | undefined | null) {
-   
+  getCraftItemRequirement(gameItem: GameItem, coreMaterialType: ResourceType | undefined | null) {
     const { type, name, armor, weapon } = gameItem;
 
     if (type === 'WEAPON') {
@@ -55,8 +54,7 @@ export const craftItemService = (db: TTransaction | TDataBase) => ({
     }
     return craftConfig[type][name];
   },
-  getMaterialModifier(gameItem: GameItem , coreMaterialType: IngotType | LeatherType | undefined) {
-    
+  getMaterialModifier(gameItem: GameItem, coreMaterialType: IngotType | LeatherType | undefined | null) {
     if (!coreMaterialType) {
       console.error('getMaterialModifier coreMaterialType not found ');
       return;

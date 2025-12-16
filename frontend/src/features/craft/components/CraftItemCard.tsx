@@ -27,8 +27,8 @@ export const CraftItemCard = (props: Props) => {
         </div>
         <GameItemImg className="md:size-15 size-10" image={props?.gameItem?.image} />
         <p className="text-muted-foreground/30 capitalize">{props?.gameItem?.type.toLocaleLowerCase()}</p>
-        {props?.gameItem?.weapon && <WeaponInfo {...props.gameItem.weapon} />}
-        {props?.gameItem?.armor && <ArmorInfo {...props.gameItem.armor} />}
+        {props?.gameItem?.weapon && <WeaponInfo weapon={props.gameItem.weapon} />}
+        {props?.gameItem?.armor && <ArmorInfo armor={props.gameItem.armor} />}
         <h2 className="my-1.5 text-xl text-yellow-300">Craft Info:</h2>
         <div>
           <ul className="flex items-center gap-1">

@@ -1,34 +1,24 @@
-import { capitalize, cn, modifierChangeName } from '@/lib/utils';
-import { Armor } from '@/shared/types';
+import { capitalize, cn, getModifiers } from '@/lib/utils';
+import { Armor, OmitModifier } from '@/shared/types';
 
 import { Separator } from './ui/separator';
 
-type Props = Armor;
+interface Props {
+  armor: Armor;
+  coreMaterialModifier?: Partial<OmitModifier>;
+}
 
-export const ArmorInfo = ({ defense, evasion, magicResistance, slot }: Props) => {
-  const baseModifier = [
-    {
-      name: modifierChangeName('defense'),
-      value: defense,
-    },
-    {
-      name: modifierChangeName('evasion'),
-      value: evasion,
-    },
-    {
-      name: modifierChangeName('magicResistance'),
-      value: magicResistance,
-    },
-  ];
+export const ArmorInfo = ({ armor, coreMaterialModifier }: Props) => {
+  const modifiers = getModifiers(armor, coreMaterialModifier ?? {});
   return (
     <section className="flex flex-col gap-2">
-      <p className="text-muted-foreground/30">{capitalize(slot)}</p>
+      <p className="text-muted-foreground/30">{capitalize(armor.slot)}</p>
       <div className="space-y-1">
         <div>
           <Separator className="mb-2" />
 
           <ul>
-            {baseModifier.map((modifier) => {
+            {modifiers.map((modifier) => {
               if (!modifier.value) return;
               return (
                 <li key={modifier.name} className="flex items-center gap-1">
