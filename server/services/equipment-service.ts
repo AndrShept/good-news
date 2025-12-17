@@ -83,6 +83,9 @@ export const equipmentService = (db: TTransaction | TDataBase) => ({
     if (item.type === 'ARMOR') {
       return item.armor?.slot === 'SHIELD' ? 'LEFT_HAND' : item.armor?.slot;
     }
+    if (item.type === 'SHIELD') {
+      return 'LEFT_HAND';
+    }
     if (item.type === 'WEAPON') {
       const isTwoHanded = item.weapon?.weaponHand === 'TWO_HANDED';
       const isOneHanded = item.weapon?.weaponHand === 'ONE_HANDED';

@@ -1,4 +1,5 @@
-import {  CraftItem, GameItem, IngotType, LeatherType, Modifier, ResourceType } from '@/shared/types';
+import { ShieldNameType } from '@/shared/config/craft-config';
+import { CraftItem, GameItem, IngotType, LeatherType, Modifier, ResourceType } from '@/shared/types';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -63,6 +64,11 @@ export const useCraftItem = () => {
       }
 
       return craftData?.craftConfig[type][armor.type][coreMaterialType as LeatherType | IngotType];
+    }
+    if (type === 'SHIELD') {
+      if (!coreMaterialType) return;
+
+      return craftData?.craftConfig[type][name as ShieldNameType][coreMaterialType as IngotType];
     }
     return craftData?.craftConfig[type][name];
   };

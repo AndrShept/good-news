@@ -10,6 +10,7 @@ import { ArmorInfo } from './ArmorInfo';
 import { GameIcon } from './GameIcon';
 import { GameItemImg } from './GameItemImg';
 import { PotionInfo } from './PotionInfo';
+import { ShieldInfo } from './ShieldInfo';
 import { WeaponInfo } from './WeaponInfo';
 
 interface Props extends GameItem {
@@ -39,6 +40,7 @@ export const GameItemCardShowInfo = memo(({ isShowBuyButton = false, isShowPrice
           {props.potion && <PotionInfo {...props.potion} />}
           {props.weapon && <WeaponInfo weapon={props.weapon} coreMaterialModifier={coreMaterialModifier} />}
           {props.armor && <ArmorInfo armor={props.armor} coreMaterialModifier={coreMaterialModifier} />}
+          {props.shield && <ShieldInfo shield={props.shield} coreMaterialModifier={coreMaterialModifier} />}
         </div>
       </section>
       <div className="mt-auto flex justify-between">

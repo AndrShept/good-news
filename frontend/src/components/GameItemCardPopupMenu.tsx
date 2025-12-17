@@ -19,7 +19,9 @@ interface Props {
 }
 export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type, itemContainerId }: Props) => {
   const heroId = useHeroId();
-  const isCanEquip = (gameItem.type === 'WEAPON' || gameItem.type === 'ARMOR') && type !== 'EQUIP';
+  const isCanEquip =
+    (gameItem.type === 'WEAPON' || gameItem.type === 'ARMOR' || gameItem.type === 'SHIELD' || gameItem.type === 'ACCESSORY') &&
+    type !== 'EQUIP';
   const isPotionItem = gameItem.type === 'POTION';
   const equipItemMutation = useEquipItem();
   const unEquipItemMutation = useUnEquipItem();

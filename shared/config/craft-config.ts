@@ -11,6 +11,7 @@ import type {
 
 import { armorEntities } from '../../server/entities/armor';
 import { resourceEntities } from '../../server/entities/resource';
+import { shieldEntities } from '../../server/entities/shield';
 import { weaponEntities } from '../../server/entities/weapon';
 
 function isIngot(
@@ -29,19 +30,22 @@ function isLeather(
 
 const weaponNames = weaponEntities.map((weapon) => weapon.name);
 const armorNames = armorEntities.map((armor) => armor.name);
+const shieldNames = shieldEntities.map((shield) => shield.name);
 const ingotNames = resourceEntities.filter(isIngot).map((i) => i.name);
 
 export type WeaponNameType = (typeof weaponNames)[number];
 export type ArmorNameType = (typeof armorNames)[number];
+export type ShieldNameType = (typeof shieldNames)[number];
 export type IngotName = (typeof ingotNames)[number];
 
 export interface ICraftConfig {
   WEAPON: Record<WeaponType, Record<IngotType, CraftItemRequirement<IngotType>>>;
   ARMOR: Record<ArmorType, Record<LeatherType | IngotType, CraftItemRequirement<LeatherType | IngotType>>>;
-  SHIELD: Record<string, CraftItemRequirement>;
+  SHIELD: Record<ShieldNameType, Record<IngotType, CraftItemRequirement<IngotType>>>;
   RESOURCES: Record<string, CraftItemRequirement>;
   POTION: Record<string, CraftItemRequirement>;
   MISC: Record<string, CraftItemRequirement>;
+  ACCESSORY: Record<string, CraftItemRequirement>;
 }
 
 export const craftConfig: ICraftConfig = {
@@ -166,8 +170,35 @@ export const craftConfig: ICraftConfig = {
     LEATHER: undefined,
     CLOTH: undefined,
   },
-  SHIELD : {
-
+  SHIELD: {
+    'regular shield': {
+      'IRON-INGOT': { craftTime: 13_000, resources: [{ type: 'IRON-INGOT', quantity: 10 }], skills: [{ type: 'BLACKSMITHING', level: 1 }] },
+      'COPPER-INGOT': {
+        craftTime: 10_000,
+        resources: [{ type: 'COPPER-INGOT', quantity: 10 }],
+        skills: [{ type: 'BLACKSMITHING', level: 1 }],
+      },
+      'SILVER-INGOT': {
+        craftTime: 10_000,
+        resources: [{ type: 'SILVER-INGOT', quantity: 10 }],
+        skills: [{ type: 'BLACKSMITHING', level: 1 }],
+      },
+      'GOLD-INGOT': {
+        craftTime: 10_000,
+        resources: [{ type: 'GOLD-INGOT', quantity: 10 }],
+        skills: [{ type: 'BLACKSMITHING', level: 1 }],
+      },
+      'MITHRIL-INGOT': {
+        craftTime: 10_000,
+        resources: [{ type: 'MITHRIL-INGOT', quantity: 10 }],
+        skills: [{ type: 'BLACKSMITHING', level: 1 }],
+      },
+      'ADAMANTINE-INGOT': {
+        craftTime: 10_000,
+        resources: [{ type: 'ADAMANTINE-INGOT', quantity: 10 }],
+        skills: [{ type: 'BLACKSMITHING', level: 1 }],
+      },
+    },
   },
 
   RESOURCES: {

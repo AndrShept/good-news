@@ -72,7 +72,6 @@ import {
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
-import { getHeroStatsWithModifiers } from '../lib/getHeroStatsWithModifiers';
 import { heroOnline } from '../lib/heroOnline';
 import { generateRandomUuid, getTileExists, jobQueueId, setSqlNow, setSqlNowByInterval, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
@@ -111,6 +110,7 @@ export const heroRouter = new Hono<Context>()
                   accessory: true,
                   armor: true,
                   weapon: true,
+                  shield: true,
                 },
               },
             },
@@ -327,7 +327,7 @@ export const heroRouter = new Hono<Context>()
             containerSlots: {
               orderBy: asc(containerSlotTable.createdAt),
               with: {
-                gameItem: { with: { weapon: true, armor: true, accessory: true, potion: true, resource: true } },
+                gameItem: { with: { weapon: true, armor: true, accessory: true, shield: true, potion: true, resource: true } },
               },
             },
           },
@@ -414,7 +414,10 @@ export const heroRouter = new Hono<Context>()
         heroService(db).getHero(id),
         itemContainerService(db).getHeroBackpack(id),
       ]);
-      const isEquipment = inventoryItem?.gameItem?.type === 'ARMOR' || inventoryItem?.gameItem?.type === 'WEAPON';
+      const isEquipment =
+        inventoryItem?.gameItem?.type === 'ARMOR' ||
+        inventoryItem?.gameItem?.type === 'WEAPON' ||
+        inventoryItem?.gameItem?.type === 'SHIELD';
 
       if (!isEquipment) {
         throw new HTTPException(403, {
@@ -428,7 +431,6 @@ export const heroRouter = new Hono<Context>()
       }
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
-
       const slot = await equipmentService(db).getEquipSlot({
         itemContainerId: itemContainer.id,
         item: inventoryItem.gameItem,
@@ -496,14 +498,15 @@ export const heroRouter = new Hono<Context>()
       const heroBackpack = await itemContainerService(db).getHeroBackpack(hero.id);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: heroBackpack.heroId, heroId: hero.id });
-
-      await equipmentService(db).unEquipItem({
-        equipmentItemId: equipmentItem.id,
-        gameItemId: equipmentItem.gameItemId,
-        heroId: hero.id,
-        maxSlots: heroBackpack.maxSlots,
-        usedSlots: heroBackpack.usedSlots,
-        itemContainerId: heroBackpack.id,
+      await db.transaction(async (tx) => {
+        await equipmentService(tx).unEquipItem({
+          equipmentItemId: equipmentItem.id,
+          gameItemId: equipmentItem.gameItemId,
+          heroId: hero.id,
+          maxSlots: heroBackpack.maxSlots,
+          usedSlots: heroBackpack.usedSlots,
+          itemContainerId: heroBackpack.id,
+        });
       });
 
       return c.json<SuccessResponse<Equipment>>(
@@ -1062,7 +1065,7 @@ export const heroRouter = new Hono<Context>()
       }
 
       const jobId = `hero-${hero.id}-regen-health`;
-      const { sumStatAndModifier } = await getHeroStatsWithModifiers(db, hero.id);
+      const { sumStatAndModifier } = await heroService(db).getHeroStatsWithModifiers(hero.id);
       const every = calculate.manaRegenTime(sumStatAndModifier.constitution);
       console.log('healthTime', every);
       const jobData: RegenHealthJob = {
@@ -1115,7 +1118,7 @@ export const heroRouter = new Hono<Context>()
       }
 
       const jobId = `hero-${hero.id}-regen-mana`;
-      const { sumStatAndModifier } = await getHeroStatsWithModifiers(db, hero.id);
+      const { sumStatAndModifier } = await heroService(db).getHeroStatsWithModifiers(hero.id);
       const every = calculate.manaRegenTime(sumStatAndModifier.intelligence);
       console.log('manaTime', every);
       const jobData: RegenManaJob = {
@@ -1275,6 +1278,7 @@ export const heroRouter = new Hono<Context>()
       }
 
       const requirement = craftItemService(db).getCraftItemRequirement(craftItem.gameItem!, coreMaterialType);
+      console.log('@@@@@', requirement);
       await itemContainerService(db).checkCraftResources(backpack.id, requirement?.resources);
       await skillService(db).checkSkillRequirement(hero.id, requirement?.skills);
       const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
@@ -1399,7 +1403,6 @@ export const heroRouter = new Hono<Context>()
             },
           };
           io.to(hero.id).emit(socketEvents.queueCraft(), updateData);
-         
         }
       }
 

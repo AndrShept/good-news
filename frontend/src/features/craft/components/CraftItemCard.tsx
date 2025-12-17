@@ -1,6 +1,7 @@
 import { ArmorInfo } from '@/components/ArmorInfo';
 import { GameItemImg } from '@/components/GameItemImg';
 import { ModifierInfoCard } from '@/components/ModifierInfoCard';
+import { ShieldInfo } from '@/components/ShieldInfo';
 import { WeaponInfo } from '@/components/WeaponInfo';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
@@ -29,6 +30,7 @@ export const CraftItemCard = (props: Props) => {
         <p className="text-muted-foreground/30 capitalize">{props?.gameItem?.type.toLocaleLowerCase()}</p>
         {props?.gameItem?.weapon && <WeaponInfo weapon={props.gameItem.weapon} />}
         {props?.gameItem?.armor && <ArmorInfo armor={props.gameItem.armor} />}
+        {props?.gameItem?.shield && <ShieldInfo shield={props.gameItem.shield} />}
         <h2 className="my-1.5 text-xl text-yellow-300">Craft Info:</h2>
         <div>
           <ul className="flex items-center gap-1">

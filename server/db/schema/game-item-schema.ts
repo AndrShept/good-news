@@ -6,7 +6,7 @@ import type { buffTable } from './buff-schema';
 import { containerSlotTable } from './container-slot-schema';
 import { coreMaterialTypeEnum, ingotTypeEnum, resourceCategoryEnum, resourceTable, resourceTypeEnum } from './resource-schema';
 
-export const gameItemEnum = pgEnum('game_item_enum', ['WEAPON', 'ARMOR', 'SHIELD', 'POTION', 'RESOURCES', 'MISC']);
+export const gameItemEnum = pgEnum('game_item_enum', ['WEAPON', 'ARMOR', 'SHIELD', 'POTION', 'RESOURCES', 'MISC' , 'ACCESSORY']);
 
 export const armorTypeEnum = pgEnum('armor_type_enum', ['PLATE', 'MAIL', 'LEATHER', 'CLOTH']);
 export const armorSlotEnum = pgEnum('armor_slot_enum', ['HELMET', 'CHEST', 'LEGS', 'BELT', 'BOOTS', 'GLOVES', 'SHIELD']);

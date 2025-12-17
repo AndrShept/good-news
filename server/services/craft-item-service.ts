@@ -12,7 +12,7 @@ import type {
 import { and, eq } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
-import { craftConfig } from '../../shared/config/craft-config';
+import { type ShieldNameType, craftConfig } from '../../shared/config/craft-config';
 import type { TDataBase, TTransaction } from '../db/db';
 import { containerSlotTable, craftItemTable, resourceTable } from '../db/schema';
 import { itemContainerService } from './item-container-service';
@@ -52,11 +52,15 @@ export const craftItemService = (db: TTransaction | TDataBase) => ({
 
       return craftConfig[type][armor.type][coreMaterialType as LeatherType | IngotType];
     }
+    if (type === 'SHIELD') {
+      if (!coreMaterialType) return;
+
+      return craftConfig[type][name as ShieldNameType][coreMaterialType as IngotType];
+    }
     return craftConfig[type][name];
   },
   getMaterialModifier(gameItem: GameItem, coreMaterialType: IngotType | LeatherType | undefined | null) {
     if (!coreMaterialType) {
-      console.error('getMaterialModifier coreMaterialType not found ');
       return;
     }
 

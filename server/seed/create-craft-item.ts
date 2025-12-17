@@ -5,6 +5,7 @@ import { craftItemTable } from '../db/schema';
 import { armorEntities } from '../entities/armor';
 import { resourceEntities } from '../entities/resource';
 import { weaponEntities } from '../entities/weapon';
+import { shieldEntities } from '../entities/shield';
 
 export const createCraftItem = async () => {
   // const weapons = Object.values(weaponEntities);
@@ -26,6 +27,15 @@ export const createCraftItem = async () => {
       gameItemId: armor.id,
       requiredCraftResourceCategory: armor.craftInfo.baseResourceCategory,
       requiredBuildingType: armor.craftInfo.requiredBuildingType,
+    });
+  }
+  for (const shield of shieldEntities) {
+    const findCraftItem = await db.query.craftItemTable.findFirst({ where: eq(craftItemTable.gameItemId, shield.id) });
+    if (findCraftItem || !shield.craftInfo) continue;
+    await db.insert(craftItemTable).values({
+      gameItemId: shield.id,
+      requiredCraftResourceCategory: shield.craftInfo.baseResourceCategory,
+      requiredBuildingType: shield.craftInfo.requiredBuildingType,
     });
   }
   for (const resource of resourceEntities) {
