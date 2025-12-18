@@ -1278,7 +1278,6 @@ export const heroRouter = new Hono<Context>()
       }
 
       const requirement = craftItemService(db).getCraftItemRequirement(craftItem.gameItem!, coreMaterialType);
-      console.log('@@@@@', requirement);
       await itemContainerService(db).checkCraftResources(backpack.id, requirement?.resources);
       await skillService(db).checkSkillRequirement(hero.id, requirement?.skills);
       const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({

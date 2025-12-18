@@ -74,6 +74,7 @@ export type QueueCraftItemJob = {
     craftExpMessage?: string;
     completedAt?: string;
     gameItemName?: string;
+    isLuckyCraft?: boolean;
     buildingType: BuildingType;
   };
 };

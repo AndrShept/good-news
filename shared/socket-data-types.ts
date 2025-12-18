@@ -53,7 +53,13 @@ export type HeroOnlineData = {
 export type QueueCraftItemSocketData =
   | {
       type: 'QUEUE_CRAFT_ITEM_COMPLETE';
-      payload: { queueItemCraftId: string; gameItemName: string; craftExpMessage: string; buildingType: BuildingType };
+      payload: {
+        queueItemCraftId: string;
+        gameItemName: string;
+        craftExpMessage: string;
+        buildingType: BuildingType;
+        isLuckyCraft: boolean;
+      };
     }
   | {
       type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE';

@@ -90,6 +90,7 @@ export const actionQueueListeners = () => {
             queueItemCraftId: jobData.payload.queueCraftItemId,
             craftExpMessage: jobData.payload.craftExpMessage ?? '',
             gameItemName: jobData.payload.gameItemName ?? '',
+            isLuckyCraft: jobData.payload.isLuckyCraft ?? false,
             buildingType: jobData.payload.buildingType,
           },
         };

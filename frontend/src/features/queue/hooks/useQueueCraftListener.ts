@@ -32,7 +32,10 @@ export const useQueueCraftListener = () => {
           });
           setGameMessage({ type: 'SUCCESS', text: 'You create new item', data: { gameItemName: data.payload.gameItemName } });
           if (data.payload.craftExpMessage) {
-            setGameMessage({ type: 'SKILL_EXP', text: data.payload.craftExpMessage });
+            setGameMessage({
+              type: 'SKILL_EXP',
+              text: data.payload.isLuckyCraft ? `${data.payload.craftExpMessage} 🔥` : data.payload.craftExpMessage,
+            });
           }
 
           break;
