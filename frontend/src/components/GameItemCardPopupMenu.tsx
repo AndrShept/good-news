@@ -68,9 +68,9 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type, i
       },
     );
   };
-  const onDeleteInventoryItem = () => {
-    deleteInventoryItemMutation.mutate({ containerSlotId: id });
-    onClose();
+  const onDeleteInventoryItem = async () => {
+    await deleteInventoryItemMutation.mutateAsync({ containerSlotId: id });
+    // onClose();
   };
   return (
     <section className="space-y-1 p-1">
@@ -103,7 +103,7 @@ export const GameItemCardPopupMenu = ({ gameItem, id, quantity, onClose, type, i
             </Button>
           </ConfirmPopover.Trigger>
           <ConfirmPopover.Content>
-            <ConfirmPopover.Title className="text-rose-500">Are you sure you want to delete item?</ConfirmPopover.Title>
+            <ConfirmPopover.Title className="text-red-500">Are you sure you want to delete item?</ConfirmPopover.Title>
             <ConfirmPopover.Message className="inline-flex">
               <p className="font-semibold">
                 {gameItem?.name}

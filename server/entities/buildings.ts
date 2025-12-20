@@ -1,8 +1,7 @@
-import { imageConfig } from '@/shared/image-config';
+import { imageConfig } from '@/shared/config/image-config';
 import type { Building, BuildingType } from '@/shared/types';
 
-
-export const buildingEntities: Record<BuildingType, Building> = {
+export const buildingEntities = {
   'MAGIC-SHOP': {
     id: '0198c15a-149a-7cb5-bbf2-bf8ddd2c9f98',
     name: 'Magic Shop',
@@ -29,4 +28,10 @@ export const buildingEntities: Record<BuildingType, Building> = {
     workingResourceCategory: 'ORE',
     image: imageConfig.icon.building.forge,
   },
-} as const;
+  BANK: {
+    id: '019b3361-12c8-7a81-b6e4-731ffb190e16',
+    name: 'Bank',
+    type: 'BANK',
+    image: imageConfig.icon.ui.chest,
+  },
+} as const satisfies Record<BuildingType, Building>;

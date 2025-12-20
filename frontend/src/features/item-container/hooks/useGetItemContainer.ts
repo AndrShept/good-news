@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getItemContainerOptions } from '../api/get-item-container';
 
-export const useItemContainer = <T = TItemContainer>(
+export const useGetItemContainer = <T = TItemContainer>(
   itemContainerId: string,
   fn?: (data: TItemContainer | undefined) => T,
 ): T | undefined => {

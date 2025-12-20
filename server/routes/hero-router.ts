@@ -115,7 +115,7 @@ export const heroRouter = new Hono<Context>()
               },
             },
           },
-          itemContainers: { columns: { id: true, type: true } },
+          itemContainers: { columns: { id: true, type: true, name: true } },
           queueCraftItems: true,
           state: true,
           location: {
@@ -211,6 +211,11 @@ export const heroRouter = new Hono<Context>()
       await tx.insert(itemContainerTable).values({
         name: 'Main Backpack',
         type: 'BACKPACK',
+        heroId: newHero.id,
+      });
+      await tx.insert(itemContainerTable).values({
+        name: '1',
+        type: 'BANK',
         heroId: newHero.id,
       });
       for (const skill of skillsTypeEnum.enumValues) {
@@ -1447,5 +1452,23 @@ export const heroRouter = new Hono<Context>()
       message: 'skills fetched',
       success: true,
       data: skills,
+    });
+  })
+  .post('/:id/container/create', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
+    const user = c.get('user');
+    const { id } = c.req.valid('param');
+
+    const hero = await heroService(db).getHero(id);
+    const count = await db.$count(itemContainerTable, and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.type, 'BANK')));
+    verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+    await db.insert(itemContainerTable).values({
+      heroId: hero.id,
+      type: 'BANK',
+      name: `${count + 1}`,
+    });
+
+    return c.json<SuccessResponse>({
+      message: 'bank container create!',
+      success: true,
     });
   });

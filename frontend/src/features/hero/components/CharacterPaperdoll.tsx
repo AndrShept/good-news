@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { ItemContainer } from '@/features/item-container/components/ItemContainer';
-import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
+import { HeroBackpack } from '@/features/item-container/components/HeroBackpack';
+
 import { LucideStepBack } from 'lucide-react';
 
 import { useHero } from '../hooks/useHero';
@@ -8,7 +8,6 @@ import { useHeroStateMutation } from '../hooks/useHeroStateMutation';
 import { CharacterModifier } from './CharacterModifier';
 import { CharacterStat } from './CharacterStat';
 import { Paperdoll } from './Paperdoll';
-import { Skills } from '@/features/skill/components/Skills';
 
 export const CharacterPaperdoll = () => {
   const hero = useHero((state) => ({
@@ -30,7 +29,6 @@ export const CharacterPaperdoll = () => {
   }));
   const { mutate, isPending } = useHeroStateMutation();
 
-  const { backpack } = useHeroBackpack();
   return (
     <section className="flex flex-col gap-1">
       <Button variant="outline" disabled={isPending} onClick={() => mutate('IDLE')} className="ml-auto w-fit">
@@ -43,8 +41,7 @@ export const CharacterPaperdoll = () => {
           <CharacterStat freeStatPoints={hero.freeStatPoints} heroStat={hero.stat} modifier={hero.modifier} />
           <CharacterModifier {...hero.modifier!} />
         </div>
-        <Skills />
-        <ItemContainer {...backpack!} />
+        <HeroBackpack />
       </div>
     </section>
   );

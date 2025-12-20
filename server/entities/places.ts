@@ -1,6 +1,6 @@
+import { imageConfig } from '@/shared/config/image-config';
 import type { Building, Place } from '@/shared/types';
 
-import { imageConfig } from '../../frontend/src/lib/config';
 import { buildingEntities } from './buildings';
 
 export const placeEntities: Place[] = [
@@ -11,7 +11,13 @@ export const placeEntities: Place[] = [
     image: imageConfig.icon.place.solmer,
     x: 7,
     y: 7,
-    buildings: [buildingEntities['MAGIC-SHOP'], buildingEntities.TEMPLE, buildingEntities.BLACKSMITH, buildingEntities.FORGE],
+    buildings: [
+      buildingEntities['MAGIC-SHOP'],
+      buildingEntities.TEMPLE,
+      buildingEntities.BLACKSMITH,
+      buildingEntities.FORGE,
+      buildingEntities.BANK,
+    ],
     mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
     createdAt: new Date().toISOString(),
   },

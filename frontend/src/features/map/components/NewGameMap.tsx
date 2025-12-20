@@ -10,7 +10,7 @@ import { useScaleMap } from '../hooks/useScaleMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
 import { HeroActionsBar } from './HeroActionsBar';
 import { HeroTile } from './HeroTile';
-import { LocationHeroes } from './LocationHeroes';
+import { LocationHeroesList } from './LocationHeroesList';
 import { MovableTile } from './MovableTile';
 import { PlaceTile } from './PlaceTile';
 
@@ -50,10 +50,10 @@ export const NewGameMap = () => {
   console.log('MAP PAGE RENDER');
   return (
     <section className="flex gap-2">
-      <div className="flex gap-2 w-full">
+      <div className="flex w-full gap-2">
         <div className="flex w-[130px] flex-col gap-2">
           <HeroActionsBar canFish={canFish} isHeroOnTownTile={isHeroOnTownTile} heroActionType={hero.actionType} />
-          <LocationHeroes locationHeroes={heroesAtHeroPos} />
+          <LocationHeroesList locationHeroes={heroesAtHeroPos} />
         </div>
 
         <div

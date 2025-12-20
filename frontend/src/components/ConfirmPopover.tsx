@@ -2,18 +2,33 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { CheckIcon, X } from 'lucide-react';
-import { Dispatch, HTMLAttributes, ReactNode, SetStateAction, createContext, useContext, useState } from 'react';
+import {
+  Dispatch,
+  HTMLAttributes,
+  ReactNode,
+  SetStateAction,
+  TransitionStartFunction,
+  createContext,
+  useContext,
+  useState,
+  useTransition,
+} from 'react';
+
+import { AcceptButton } from './AcceptButton';
+import { CancelButton } from './CancelButton';
 
 interface Props {
   children: ReactNode;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   setIsShow?: Dispatch<SetStateAction<boolean>>;
 }
 interface ConfirmPopoverContextProps {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   setIsShow: Dispatch<SetStateAction<boolean>> | undefined;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
+  isPending: boolean;
+  startTransition: TransitionStartFunction;
 }
 
 interface ConfirmPopoverCompound {
@@ -36,8 +51,9 @@ const useConfirmPopover = () => {
 
 export const ConfirmPopover: React.FC<Props> & ConfirmPopoverCompound = ({ children, onConfirm, setIsShow }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
   return (
-    <ConfirmPopoverContext.Provider value={{ isOpen, setIsOpen, onConfirm, setIsShow }}>
+    <ConfirmPopoverContext.Provider value={{ isOpen, setIsOpen, onConfirm, setIsShow, isPending, startTransition }}>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         {children}
       </Popover>
@@ -46,35 +62,30 @@ export const ConfirmPopover: React.FC<Props> & ConfirmPopoverCompound = ({ child
 };
 ConfirmPopover.Content = ({ children, side }) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { setIsOpen, onConfirm, setIsShow } = useConfirmPopover();
+  const { setIsOpen, onConfirm, setIsShow, isPending, startTransition } = useConfirmPopover();
 
   return (
     <PopoverContent side={side} className="flex flex-col gap-4 text-sm">
       {children}
       <section className="ml-auto flex gap-1">
-        <Button
+        <CancelButton
+          disabled={isPending}
           onClick={() => {
             setIsOpen(false);
             setIsShow?.(false);
           }}
-          size={'icon'}
-          variant={'outline'}
-          className="size-10 hover:text-red-500"
-        >
-          <X className="size-5" />
-        </Button>
-        <Button
+        />
+
+        <AcceptButton
+          disabled={isPending}
           onClick={() => {
-            onConfirm();
-            setIsOpen(false);
-            setIsShow?.(false);
+            startTransition(async () => {
+              await onConfirm();
+              setIsOpen(false);
+              setIsShow?.(false);
+            });
           }}
-          size={'icon'}
-          variant={'secondary'}
-          className="size-10 hover:text-green-500"
-        >
-          <CheckIcon className="size-5" />
-        </Button>
+        />
       </section>
     </PopoverContent>
   );

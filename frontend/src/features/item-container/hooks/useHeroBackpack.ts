@@ -1,13 +1,16 @@
 import { useCraftItem } from '@/features/craft/hooks/useCraftItem';
+import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { Resource, ResourceType } from '@/shared/types';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
+import { getItemContainerOptions } from '../api/get-item-container';
 import { useGetBackpackId } from './useGetBackpackId';
-import { useItemContainer } from './useItemContainer';
 
 export const useHeroBackpack = () => {
   const backpackId = useGetBackpackId();
-  const backpack = useItemContainer(backpackId);
+  const heroId = useHeroId();
+  const { data: backpack, isLoading } = useQuery(getItemContainerOptions(heroId, backpackId));
   const { allResourcesByType } = useCraftItem();
   const resourceCountInBackpack = useMemo(() => {
     const result: Partial<Record<ResourceType, number>> = {};
@@ -27,5 +30,6 @@ export const useHeroBackpack = () => {
     resourceCountInBackpack,
     backpack,
     backpackId,
+    isLoading,
   };
 };

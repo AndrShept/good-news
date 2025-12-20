@@ -8,7 +8,7 @@ export const itemContainerTypeEnum = pgEnum('item_container_type_enum', ['BACKPA
 
 export const itemContainerTable = pgTable('item_container', {
   id: uuid().defaultRandom().primaryKey(),
-  heroId: uuid().references(() => heroTable.id, { onDelete: 'cascade' }),
+  heroId: uuid().notNull().references(() => heroTable.id, { onDelete: 'cascade' }),
   type: itemContainerTypeEnum().notNull(),
   name: text().notNull(),
   usedSlots: integer().default(0).notNull(),

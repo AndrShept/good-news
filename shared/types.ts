@@ -280,7 +280,7 @@ export type Hero = InferSelectModel<typeof heroTable> & {
   state?: State;
   equipments?: Equipment[];
   queueCraftItems?: QueueCraftItem[];
-  itemContainers?: { id: string; type: ItemContainerType }[];
+  itemContainers?: { id: string; type: ItemContainerType; name: string }[];
 };
 export type Buff = typeof buffTable.$inferSelect;
 

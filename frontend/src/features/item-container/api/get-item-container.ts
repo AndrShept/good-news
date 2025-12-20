@@ -1,5 +1,4 @@
 import { client } from '@/lib/utils';
-import { ItemContainerType } from '@/shared/types';
 import { queryOptions } from '@tanstack/react-query';
 
 export const getItemContainer = async (id: string, itemContainerId: string) => {

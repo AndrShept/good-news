@@ -6,7 +6,7 @@ import { locationTable } from './location-schema';
 import { mapTable } from './map-schema';
 
 export const placeTypeEnum = pgEnum('place_type_enum', ['TOWN', 'DUNGEON', 'MINE']);
-export const buildingTypeEnum = pgEnum('building_type_enum', ['MAGIC-SHOP', 'TEMPLE', 'BLACKSMITH', 'FORGE']);
+export const buildingTypeEnum = pgEnum('building_type_enum', ['MAGIC-SHOP', 'TEMPLE', 'BLACKSMITH', 'FORGE','BANK']);
 
 export const placeTable = pgTable('place', {
   id: uuid().primaryKey().defaultRandom(),

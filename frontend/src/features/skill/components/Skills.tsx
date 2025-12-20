@@ -1,10 +1,10 @@
 import { GameIcon } from '@/components/GameIcon';
-import { BorderBeam } from '@/components/ui/border-beam';
 import { Progress } from '@/components/ui/progress';
+import { imageConfig } from '@/shared/config/image-config';
 import { SkillType } from '@/shared/types';
 
 import { useSkill } from '../hooks/useSkill';
-import { imageConfig } from '@/shared/config/image-config';
+import { SkillSkeleton } from './SkillSkeleton';
 
 const skillIcon: Record<SkillType, string> = {
   BLACKSMITHING: imageConfig.icon.skill.BLACKSMITHING,
@@ -17,12 +17,10 @@ const skillIcon: Record<SkillType, string> = {
 export const Skills = () => {
   const { skillNextExpMap, skills, isLoading } = useSkill();
 
-  if (isLoading) return <div>skills...</div>;
-
   return (
-    <ul className="flex flex-col gap-2">
+    <ul className="mx-auto flex flex-wrap gap-2 p-3">
       {skills?.map((skill) => (
-        <li key={skill.id} className="border-muted relative flex h-fit items-center gap-4 overflow-hidden rounded-xl border px-4 py-2">
+        <li key={skill.id} className="border-muted h-22 relative flex w-48 items-center gap-4 overflow-hidden rounded-xl border px-4 py-2">
           <div className="text-2xl font-semibold">{skill.level}</div>
           <div className="flex w-full flex-col gap-2">
             <div className="inline-flex justify-between gap-1 text-[15px]">
@@ -43,7 +41,7 @@ export const Skills = () => {
               </div>
             </div>
           </div>
-          <BorderBeam size={120} duration={100} colorFrom={'#11111'} colorTo="#818182" />
+          {/* <BorderBeam size={120} duration={100} colorFrom={'#11111'} colorTo="#818182" /> */}
         </li>
       ))}
     </ul>

@@ -10,7 +10,7 @@ export const Game = () => {
     <>
       <div className="mx-auto flex size-full max-w-7xl flex-col">
         <GameHeader />
-        <div className="mx-auto flex min-h-[calc(100vh-315px)] w-full flex-1 ">
+        <div className="mx-auto flex items-start min-h-[calc(100vh-315px)] w-full flex-1">
           <Outlet />
         </div>
         <div className="sticky bottom-0 z-10">

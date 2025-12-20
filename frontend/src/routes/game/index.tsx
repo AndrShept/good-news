@@ -3,6 +3,7 @@ import { CharacterPaperdoll } from '@/features/hero/components/CharacterPaperdol
 import { useHero } from '@/features/hero/hooks/useHero';
 import { NewGameMap } from '@/features/map/components/NewGameMap';
 import { Place } from '@/features/place/components/Place';
+import { Skills } from '@/features/skill/components/Skills';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/game/')({
@@ -22,12 +23,14 @@ function RouteComponent() {
     mapId: state?.data?.location?.mapId,
   }));
   const isCharacter = type === 'CHARACTER';
-  const isPlace = !!placeId && !isCharacter && !currentBuilding;
-  const isMap = !isCharacter && !!mapId;
+  const isSkills = type === 'SKILLS';
+  const isPlace = !!placeId && !isCharacter && !isSkills && !currentBuilding;
+  const isMap = !isCharacter && !isSkills && !!mapId;
 
   return (
     <>
       {isCharacter && <CharacterPaperdoll />}
+      {isSkills && <Skills />}
       {isPlace && <Place />}
       {isMap && <NewGameMap />}
     </>

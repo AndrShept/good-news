@@ -1,7 +1,6 @@
 import { useHero } from '@/features/hero/hooks/useHero';
-import { LocationHeroes } from '@/features/map/components/LocationHeroes';
-import { useQueries, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { LocationHeroesList } from '@/features/map/components/LocationHeroesList';
+import { useQuery } from '@tanstack/react-query';
 
 import { getPlaceOptions } from '../api/get-place';
 import { getPlaceHeroesLocationOptions } from '../api/get-place-heroes';
@@ -10,17 +9,15 @@ import { SelectedBuildingPage } from './SelectedBuildingPage';
 
 export const Place = () => {
   const placeId = useHero((state) => state?.data?.location?.placeId ?? '');
-  const result = useQueries({ queries: [getPlaceOptions(placeId), getPlaceHeroesLocationOptions(placeId)] });
-  const place = result[0].data;
-  const townLocationHeroes = result[1].data;
-  const isLoading = result.some((r) => r.isLoading);
+  const placeData = useQuery(getPlaceOptions(placeId));
+  const locationHeroesData = useQuery(getPlaceHeroesLocationOptions(placeId));
 
-  if (isLoading) return <p>LOADING TOWN...</p>;
+  if (placeData.isLoading) return <p>LOADING ...</p>;
   return (
     <section className="mx-auto flex w-full">
-      <PlaceSidebar place={place}  />
-      <SelectedBuildingPage place={place}  />
-      <LocationHeroes locationHeroes={townLocationHeroes} />
+      <PlaceSidebar place={placeData.data} />
+      <SelectedBuildingPage place={placeData.data} />
+      <LocationHeroesList isLoading={locationHeroesData.isLoading} locationHeroes={locationHeroesData.data} />
     </section>
   );
 };
