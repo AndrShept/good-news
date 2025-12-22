@@ -42,6 +42,7 @@ export const heroService = (db: TTransaction | TDataBase) => ({
     }
     return hero;
   },
+
   async updateHeroMaxValues(data: IUpdateHeroMaxValues) {
     const { constitution, heroId, intelligence, bonusMaxHealth, bonusMaxMana } = data;
     const { maxHealth, maxMana } = calculate.maxValues({ constitution, intelligence, bonusMaxHealth, bonusMaxMana });
@@ -111,6 +112,17 @@ export const heroService = (db: TTransaction | TDataBase) => ({
       .update(heroTable)
       .set({ goldCoins: sql`${heroTable.goldCoins} - ${amount}` })
       .where(eq(heroTable.id, heroId));
+  },
+  async spendPremCoin(heroId: string, amount: number, heroCurrentPremCoin: number) {
+    if (heroCurrentPremCoin < amount)
+      throw new HTTPException(422, { message: 'You don’t have enough premium coin', cause: { canShow: true } });
+    const [newValue] = await db
+      .update(heroTable)
+      .set({ premiumCoins: sql`${heroTable.premiumCoins} - ${amount}` })
+      .where(eq(heroTable.id, heroId))
+      .returning({ premiumCoins: heroTable.premiumCoins });
+
+    return newValue.premiumCoins;
   },
 
   async drinkPotion({ currentHealth, currentMana, heroId, inventoryItemPotion, isBuffPotion, maxHealth, maxMana }: IDrinkPotion) {

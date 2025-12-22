@@ -15,5 +15,6 @@ export const BASE_WALK_TIME = 10000;
 export const HP_MULTIPLIER_COST = 10;
 export const MANA_MULTIPLIER_INT = 15;
 
+export const DEFAULT_ITEM_STACK = 20;
 
-export const DEFAULT_ITEM_STACK = 20
+export const BANK_CONTAINER_COST = 100;

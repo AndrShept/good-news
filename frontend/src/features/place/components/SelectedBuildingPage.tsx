@@ -17,11 +17,11 @@ export const SelectedBuildingPage = ({ place }: Props) => {
   const isBank = selectBuilding?.type === 'BANK';
   const isCraftBuilding = selectBuilding?.type === 'BLACKSMITH' || selectBuilding?.type === 'FORGE';
   return (
-    <section className="flex flex-1 p-1.5">
+    <section className="flex min-w-0 flex-1 p-1.5">
       {!selectBuilding && <p>{place?.name}</p>}
       {isMagicShop && <MagicShop />}
       {isTemple && <Temple />}
-      {isBank && <Bank />}
+      {isBank && <Bank place={place} />}
       {isCraftBuilding && <CraftBuilding />}
     </section>
   );

@@ -2,11 +2,12 @@ import type { Building } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { boolean, integer, jsonb, pgEnum, pgTable, primaryKey, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
+import { itemContainerTable } from './item-container-schema';
 import { locationTable } from './location-schema';
 import { mapTable } from './map-schema';
 
 export const placeTypeEnum = pgEnum('place_type_enum', ['TOWN', 'DUNGEON', 'MINE']);
-export const buildingTypeEnum = pgEnum('building_type_enum', ['MAGIC-SHOP', 'TEMPLE', 'BLACKSMITH', 'FORGE','BANK']);
+export const buildingTypeEnum = pgEnum('building_type_enum', ['MAGIC-SHOP', 'TEMPLE', 'BLACKSMITH', 'FORGE', 'BANK']);
 
 export const placeTable = pgTable('place', {
   id: uuid().primaryKey().defaultRandom(),
@@ -27,6 +28,7 @@ export const placeTable = pgTable('place', {
 
 export const placeTableRelations = relations(placeTable, ({ many, one }) => ({
   heroesLocation: many(locationTable),
+  itemContainers: many(itemContainerTable),
   map: one(mapTable, {
     fields: [placeTable.mapId],
     references: [mapTable.id],

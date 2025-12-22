@@ -13,33 +13,47 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { imageConfig } from '@/shared/config/image-config';
+import { BANK_CONTAINER_COST } from '@/shared/constants';
 import { Plus } from 'lucide-react';
+import { useState } from 'react';
 
-export const CreateBankItemContainer = () => {
+import { useCreateBankItemContainerMutation } from '../hooks/useCreateBankItemContainerMutation';
+
+type Props = {
+  placeName: string;
+};
+export const CreateBankItemContainer = ({ placeName }: Props) => {
+  const { mutateAsync, isPending } = useCreateBankItemContainerMutation();
+  const [isShow, setIsShow] = useState(false);
+
+  const onClick = async () => {
+    await mutateAsync();
+    setIsShow(false);
+  };
   return (
-    <Dialog>
-      <DialogTrigger>
+    <Dialog open={isShow} onOpenChange={setIsShow}>
+      <DialogTrigger asChild>
         <Button variant="outline" size="icon">
-          {/* <Plus /> */}
           <GameIcon image={imageConfig.icon.ui.prem} />
         </Button>
       </DialogTrigger>
       <DialogContent className="rounded sm:max-w-[400px]">
+       
         <DialogHeader>
           <DialogTitle>Are you sure?</DialogTitle>
           <DialogDescription>
-            Purchase Additional Bank Slot? This will unlock a new permanent storage slot in your Bank Box.
+            This will permanently unlock a new storage slot in your Bank Box in <span className="text-yellow-400">{placeName}</span>
           </DialogDescription>
-          <div className="mx-auto flex gap-1 text-yellow-400">
-            <span className="text-center">This will cost 100</span>
+          <div className="mx-auto flex gap-1 text-red-400">
+            <span className="text-center">This will cost {BANK_CONTAINER_COST}</span>
             <GameIcon image={imageConfig.icon.ui.prem} />
           </div>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <CancelButton />
+            <CancelButton disabled={isPending} />
           </DialogClose>
-          <AcceptButton />
+          <AcceptButton disabled={isPending} onClick={onClick} />
         </DialogFooter>
       </DialogContent>
     </Dialog>

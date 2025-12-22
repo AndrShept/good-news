@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import React from 'react';
 
 export const ItemContainerSkeleton = () => {
-  const items = Array.from({ length: 30 }, (_, idx) => idx);
+  const items = Array.from({ length: 40 }, (_, idx) => idx);
   return (
     <>
       {items.map((item) => (

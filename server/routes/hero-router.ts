@@ -1,5 +1,5 @@
 import { calculate } from '@/shared/calculate';
-import { BASE_STATS, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
+import { BANK_CONTAINER_COST, BASE_STATS, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
 import {
   type QueueCraftItemJob,
   type RegenHealthJob,
@@ -115,8 +115,8 @@ export const heroRouter = new Hono<Context>()
               },
             },
           },
-          itemContainers: { columns: { id: true, type: true, name: true } },
           queueCraftItems: true,
+          itemContainers: { columns: { id: true, type: true, name: true }, where: eq(itemContainerTable.type, 'BACKPACK') },
           state: true,
           location: {
             with: {
@@ -132,8 +132,9 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
-
-      await heroOnline(hero.id);
+      if (!hero.isOnline) {
+        await heroOnline(hero.id);
+      }
 
       return c.json<SuccessResponse<Hero>>({
         success: true,
@@ -167,6 +168,14 @@ export const heroRouter = new Hono<Context>()
     const heroExist = await db.query.heroTable.findFirst({
       where: eq(heroTable.userId, userId),
     });
+    const place = await db.query.placeTable.findFirst({
+      where: eq(placeTable.name, 'Solmer Town'),
+    });
+    if (!place) {
+      throw new HTTPException(404, {
+        message: 'place not found',
+      });
+    }
 
     if (heroExist) {
       throw new HTTPException(409, {
@@ -174,14 +183,6 @@ export const heroRouter = new Hono<Context>()
       });
     }
     await db.transaction(async (tx) => {
-      const place = await tx.query.placeTable.findFirst({
-        where: eq(placeTable.name, 'Solmer Town'),
-      });
-      if (!place) {
-        throw new HTTPException(404, {
-          message: 'place not found',
-        });
-      }
       const characterImage = '/sprites/new/newb-mage.webp';
       const [newHero] = await tx
         .insert(heroTable)
@@ -217,6 +218,7 @@ export const heroRouter = new Hono<Context>()
         name: '1',
         type: 'BANK',
         heroId: newHero.id,
+        placeId: place.id,
       });
       for (const skill of skillsTypeEnum.enumValues) {
         await tx.insert(skillTable).values({
@@ -1441,7 +1443,12 @@ export const heroRouter = new Hono<Context>()
     const user = c.get('user');
     const { id } = c.req.valid('param');
 
-    const hero = await heroService(db).getHero(id);
+    const hero = await heroService(db).getHero(id, {
+      columns: {
+        id: true,
+        userId: true,
+      },
+    });
     const skills = await db.query.skillTable.findMany({
       where: eq(skillTable.heroId, hero.id),
     });
@@ -1454,21 +1461,56 @@ export const heroRouter = new Hono<Context>()
       data: skills,
     });
   })
-  .post('/:id/container/create', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
+  .get('/:id/item-container', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
+    const user = c.get('user');
+    const { id } = c.req.valid('param');
+    const hero = await heroService(db).getHero(id, {
+      with: {
+        location: { columns: { placeId: true } },
+      },
+      columns: {
+        id: true,
+        userId: true,
+      },
+    });
+    const itemContainers = await db.query.itemContainerTable.findMany({
+      where: and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.placeId, hero.location?.placeId!)),
+    });
+
+    verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+    return c.json<SuccessResponse<TItemContainer[]>>({
+      message: 'bank containers fetched',
+      success: true,
+      data: itemContainers,
+    });
+  })
+  .post('/:id/item-container/create', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
     const user = c.get('user');
     const { id } = c.req.valid('param');
 
-    const hero = await heroService(db).getHero(id);
+    const hero = await heroService(db).getHero(id, {
+      with: {
+        location: { columns: { placeId: true } },
+      },
+    });
     const count = await db.$count(itemContainerTable, and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.type, 'BANK')));
     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-    await db.insert(itemContainerTable).values({
-      heroId: hero.id,
-      type: 'BANK',
-      name: `${count + 1}`,
+
+    const newPremiumCoinsValue = await db.transaction(async (tx) => {
+      await tx.insert(itemContainerTable).values({
+        heroId: hero.id,
+        placeId: hero.location?.placeId,
+        type: 'BANK',
+        name: `${count + 1}`,
+      });
+      const premiumCoins = await heroService(tx).spendPremCoin(hero.id, BANK_CONTAINER_COST, hero.premiumCoins);
+      return premiumCoins;
     });
 
-    return c.json<SuccessResponse>({
+    return c.json<SuccessResponse<{ newPremiumCoinsValue: number }>>({
       message: 'bank container create!',
       success: true,
+      data: {newPremiumCoinsValue},
     });
   });
