@@ -22,7 +22,7 @@ import { useCreateBankItemContainerMutation } from '../hooks/useCreateBankItemCo
 type Props = {
   placeName: string;
 };
-export const CreateBankItemContainer = ({ placeName }: Props) => {
+export const CreateBankItemContainerModal = ({ placeName }: Props) => {
   const { mutateAsync, isPending } = useCreateBankItemContainerMutation();
   const [isShow, setIsShow] = useState(false);
 
@@ -38,14 +38,14 @@ export const CreateBankItemContainer = ({ placeName }: Props) => {
         </Button>
       </DialogTrigger>
       <DialogContent className="rounded sm:max-w-[400px]">
-       
         <DialogHeader>
           <DialogTitle>Are you sure?</DialogTitle>
           <DialogDescription>
-            This will permanently unlock a new storage slot in your Bank Box in <span className="text-yellow-400">{placeName}</span>
+            This will permanently unlock a new storage slot in your Bank Box in <span className="text-blue-400">{placeName}</span>
           </DialogDescription>
-          <div className="mx-auto flex gap-1 text-red-400">
-            <span className="text-center">This will cost {BANK_CONTAINER_COST}</span>
+          <div className="mx-auto flex gap-1">
+            <span className="text-center text-red-400">This will cost </span>
+            <span className="text-center">{BANK_CONTAINER_COST} </span>
             <GameIcon image={imageConfig.icon.ui.prem} />
           </div>
         </DialogHeader>

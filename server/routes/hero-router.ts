@@ -1475,6 +1475,7 @@ export const heroRouter = new Hono<Context>()
     });
     const itemContainers = await db.query.itemContainerTable.findMany({
       where: and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.placeId, hero.location?.placeId!)),
+      orderBy: asc(itemContainerTable.createdAt),
     });
 
     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
@@ -1511,6 +1512,37 @@ export const heroRouter = new Hono<Context>()
     return c.json<SuccessResponse<{ newPremiumCoinsValue: number }>>({
       message: 'bank container create!',
       success: true,
-      data: {newPremiumCoinsValue},
+      data: { newPremiumCoinsValue },
     });
-  });
+  })
+  .put(
+    '/:id/item-container/:itemContainerId',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string(), itemContainerId: z.string() })),
+    zValidator('json', z.object({ name: z.string() })),
+    async (c) => {
+      const user = c.get('user');
+      const { id, itemContainerId } = c.req.valid('param');
+      const { name } = c.req.valid('json');
+
+      const [hero, itemContainer] = await Promise.all([
+        heroService(db).getHero(id, {
+          columns: { id: true, userId: true },
+        }),
+        itemContainerService(db).getItemContainerById(itemContainerId),
+      ]);
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id, heroId: hero.id, containerHeroId: itemContainer.heroId });
+
+      await db
+        .update(itemContainerTable)
+        .set({
+          name,
+        })
+        .where(eq(itemContainerTable.id, itemContainerId));
+
+      return c.json<SuccessResponse>({
+        message: 'bank container name changed!',
+        success: true,
+      });
+    },
+  );

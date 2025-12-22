@@ -1,4 +1,5 @@
 import { Spinner } from '@/components/Spinner';
+import { ModalProvider } from '@/components/providers/ModalProvider';
 import { CharacterPaperdoll } from '@/features/hero/components/CharacterPaperdoll';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { NewGameMap } from '@/features/map/components/NewGameMap';
@@ -33,6 +34,7 @@ function RouteComponent() {
       {isSkills && <Skills />}
       {isPlace && <Place />}
       {isMap && <NewGameMap />}
+      <ModalProvider />
     </>
   );
 }

@@ -53,7 +53,7 @@ export const NewGameMap = () => {
       <div className="flex w-full gap-2">
         <div className="flex w-[130px] flex-col gap-2">
           <HeroActionsBar canFish={canFish} isHeroOnTownTile={isHeroOnTownTile} heroActionType={hero.actionType} />
-          <LocationHeroesList locationHeroes={heroesAtHeroPos} />
+          <LocationHeroesList locationHeroes={heroesAtHeroPos} isLoading={isLoading} />
         </div>
 
         <div

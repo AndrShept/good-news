@@ -4,7 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { getBankItemContainersOptions } from '@/features/item-container/api/get-bank-item-containers';
 import { BankItemContainer } from '@/features/item-container/components/BankItemContainer';
-import { CreateBankItemContainer } from '@/features/item-container/components/CreateBankItemContainer';
+import { BankItemContainerTabMenu } from '@/features/item-container/components/BankItemContainerTabMenu';
+import { CreateBankItemContainerModal } from '@/features/item-container/components/CreateBankItemContainerModal';
 import { capitalize } from '@/lib/utils';
 import { Place } from '@/shared/types';
 import { useQuery } from '@tanstack/react-query';
@@ -18,19 +19,21 @@ export const Bank = ({ place }: Props) => {
   const { data: itemContainers, isLoading } = useQuery(getBankItemContainersOptions(heroId));
   if (isLoading) return <Spinner size={'sm'} />;
   return (
-    <section className="mx-auto flex w-full max-w-[600px] flex-col gap-0.5">
-      <h2 className="text-center text-xl text-yellow-300">{capitalize(place?.name)} bank</h2>
+    <section className="mx-auto flex w-full max-w-[600px] flex-col">
+      <h2 className="mb-2 text-center text-xl text-blue-400">{capitalize(place?.name)} bank</h2>
 
-      <Tabs className="" defaultValue={itemContainers?.[0]?.id}>
+      <Tabs defaultValue={itemContainers?.[0]?.id}>
         <ScrollArea className="w-full pb-2">
-          <TabsList className="bg-background h-10">
+          <TabsList className="bg-background h-10 gap-0.5">
             {itemContainers?.map((container) => (
-              <TabsTrigger key={container.id} value={container.id} className="flex-none whitespace-nowrap">
-                {container.name}
-                asdsad
-              </TabsTrigger>
+              <div key={container.id} className="group flex h-10 items-center">
+                <TabsTrigger value={container.id}>{container.name}</TabsTrigger>
+                <div className="opacity-0 group-hover:opacity-100">
+                  <BankItemContainerTabMenu id={container.id} />
+                </div>
+              </div>
             ))}
-            <CreateBankItemContainer placeName={place?.name ?? ''} />
+            <CreateBankItemContainerModal placeName={place?.name ?? ''} />
           </TabsList>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>

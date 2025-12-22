@@ -1,0 +1,40 @@
+import { useModalStore } from '@/store/useModalStore';
+import { ColorPicker, useColor } from 'react-color-palette';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
+import 'react-color-palette/css';
+
+import { AcceptButton } from '../AcceptButton';
+import { CancelButton } from '../CancelButton';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
+
+export const ChangeColorBankTabModal = () => {
+  const { modalData, setModalData } = useModalStore();
+  const isOpen = modalData?.type === 'BANK_CHANGE_COLOR';
+  const isPending = false;
+  const [color, setColor] = useColor('#561ecb');
+  const handleSubmit = async () => {
+    // await mutateAsync({ itemContainerId: modalData?.id ?? '', name: data.name });
+    console.log('color', color);
+    console.log('modalData', modalData);
+    setModalData(null);
+  };
+  return (
+    <Dialog open={isOpen} onOpenChange={() => setModalData(null)}>
+      <DialogContent className="rounded sm:max-w-[400px]">
+        <DialogHeader>
+          <DialogTitle>Color Bank Container</DialogTitle>
+          <DialogDescription>Change a color for this bank container. You can change the name at any time.</DialogDescription>
+          <ColorPicker color={color} onChange={setColor} />
+        </DialogHeader>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <CancelButton disabled={isPending} />
+          </DialogClose>
+          <AcceptButton disabled={isPending} onClick={handleSubmit} />
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
