@@ -11,14 +11,13 @@ interface Props extends TItemContainer {
   isLoading: boolean;
 }
 
-export const ItemContainer = memo(({ containerSlots, maxSlots, name, usedSlots, isLoading }: Props) => {
+export const ItemContainer = memo(({ containerSlots, maxSlots,  usedSlots, isLoading }: Props) => {
   const items = useCreateContainerSlots(maxSlots, containerSlots);
   return (
     <section className="flex w-full flex-col gap-0.5">
       {!isLoading && (
         <div className="flex items-center gap-2">
           <ContainerUsedSlots maxSlots={maxSlots} usedSlots={usedSlots} iconSize="size-6" />
-          <p className='whitespace-nowrap truncate'>{name}</p>
         </div>
       )}
       <ul className="flex w-full flex-wrap gap-1">

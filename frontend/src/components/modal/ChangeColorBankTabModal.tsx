@@ -23,8 +23,8 @@ export const ChangeColorBankTabModal = () => {
       <DialogContent className="rounded sm:max-w-[400px]">
         <DialogHeader>
           <DialogTitle>Color Bank Container</DialogTitle>
-          <DialogDescription>Change a color for this bank container. You can change the name at any time.</DialogDescription>
-          <ColorPicker color={color} onChange={setColor} />
+          <DialogDescription>Change a color for this bank container. You can change the color at any time.</DialogDescription>
+          <ColorPicker hideInput={["rgb", "hsv"]} color={color} onChange={setColor} />
         </DialogHeader>
 
         <DialogFooter>
