@@ -1,10 +1,10 @@
 import { client } from '@/lib/utils';
-import { ErrorResponse } from '@/shared/types';
+import { ErrorResponse, TItemContainer } from '@/shared/types';
 
-export const changeNameItemContainer = async (heroId: string, itemContainerId: string, name: string) => {
+export const changeNameItemContainer = async (heroId: string, itemContainerId: string, data: { name?: string; color?: string }) => {
   const res = await client.hero[':id']['item-container'][':itemContainerId'].$put({
     param: { id: heroId, itemContainerId },
-    json: { name },
+    json: { ...data },
   });
   if (!res.ok) {
     const err = (await res.json()) as unknown as ErrorResponse;

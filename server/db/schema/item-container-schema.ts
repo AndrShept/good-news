@@ -15,6 +15,7 @@ export const itemContainerTable = pgTable('item_container', {
   placeId: uuid().references(() => placeTable.id),
   type: itemContainerTypeEnum().notNull(),
   name: text().notNull(),
+  color: text(),
   usedSlots: integer().default(0).notNull(),
   maxSlots: integer().default(40).notNull(),
   createdAt: timestamp({ mode: 'string' }).defaultNow().notNull(),

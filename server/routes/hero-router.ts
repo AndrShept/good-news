@@ -1519,12 +1519,11 @@ export const heroRouter = new Hono<Context>()
     '/:id/item-container/:itemContainerId',
     loggedIn,
     zValidator('param', z.object({ id: z.string(), itemContainerId: z.string() })),
-    zValidator('json', z.object({ name: z.string() })),
+    zValidator('json', z.object({ name: z.string().optional(), color: z.string().optional() })),
     async (c) => {
       const user = c.get('user');
       const { id, itemContainerId } = c.req.valid('param');
-      const { name } = c.req.valid('json');
-
+      const data = c.req.valid('json');
       const [hero, itemContainer] = await Promise.all([
         heroService(db).getHero(id, {
           columns: { id: true, userId: true },
@@ -1536,12 +1535,12 @@ export const heroRouter = new Hono<Context>()
       await db
         .update(itemContainerTable)
         .set({
-          name,
+          ...data,
         })
         .where(eq(itemContainerTable.id, itemContainerId));
 
       return c.json<SuccessResponse>({
-        message: 'bank container name changed!',
+        message: 'bank container changed!',
         success: true,
       });
     },

@@ -23,20 +23,24 @@ export const Bank = ({ place }: Props) => {
       <h2 className="mb-2 text-center text-xl text-blue-400">{capitalize(place?.name)} bank</h2>
 
       <Tabs defaultValue={itemContainers?.[0]?.id}>
-        <ScrollArea className="w-full pb-2">
-          <TabsList className="bg-background h-10 gap-0.5">
-            {itemContainers?.map((container) => (
-              <div key={container.id} className="group flex h-10 items-center">
-                <TabsTrigger value={container.id}>{container.name}</TabsTrigger>
-                <div className="opacity-0 group-hover:opacity-100">
-                  <BankItemContainerTabMenu id={container.id} />
+        <div className="flex w-full items-center">
+          <ScrollArea className="w-full pb-2">
+            <TabsList className="bg-background h-10 gap-0.5">
+              {itemContainers?.map((container) => (
+                <div key={container.id} className="group flex h-10 items-center">
+                  <TabsTrigger className="rounded" style={{ backgroundColor: container.color ?? undefined }} value={container.id}>
+                    {container.name}
+                  </TabsTrigger>
+                  <div className="opacity-0 group-hover:opacity-100">
+                    <BankItemContainerTabMenu id={container.id} />
+                  </div>
                 </div>
-              </div>
-            ))}
-            <CreateBankItemContainerModal placeName={place?.name ?? ''} />
-          </TabsList>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+              ))}
+            </TabsList>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+          <CreateBankItemContainerModal placeName={place?.name ?? ''} />
+        </div>
 
         {itemContainers?.map((container) => (
           <TabsContent key={container.id} value={container.id}>

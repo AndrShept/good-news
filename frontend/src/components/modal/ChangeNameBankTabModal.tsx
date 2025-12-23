@@ -1,5 +1,5 @@
 import { InputForm } from '@/features/item-container/components/InputForm';
-import { useBankItemContainerChangeNameMutation } from '@/features/item-container/hooks/useBankItemContainerChangeNameMutation';
+import { useBankItemContainerChangeMutation } from '@/features/item-container/hooks/useBankItemContainerChangeMutation';
 import { useModalStore } from '@/store/useModalStore';
 
 import { AcceptButton } from '../AcceptButton';
@@ -9,9 +9,9 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 export const ChangeNameBankTabModal = () => {
   const { modalData, setModalData } = useModalStore();
   const isOpen = modalData?.type === 'BANK_CHANGE_NAME';
-  const { mutateAsync, isPending } = useBankItemContainerChangeNameMutation();
+  const { mutateAsync, isPending } = useBankItemContainerChangeMutation();
   const handleSubmit = async (data: { name: string }) => {
-    await mutateAsync({ itemContainerId: modalData?.id ?? '', name: data.name });
+    await mutateAsync({ itemContainerId: modalData?.id ?? '', data });
     setModalData(null);
   };
   return (

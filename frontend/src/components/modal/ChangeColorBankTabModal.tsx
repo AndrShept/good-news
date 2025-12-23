@@ -1,3 +1,4 @@
+import { useBankItemContainerChangeMutation } from '@/features/item-container/hooks/useBankItemContainerChangeMutation';
 import { useModalStore } from '@/store/useModalStore';
 import { ColorPicker, useColor } from 'react-color-palette';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -10,13 +11,11 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 
 export const ChangeColorBankTabModal = () => {
   const { modalData, setModalData } = useModalStore();
+  const { mutateAsync, isPending } = useBankItemContainerChangeMutation();
   const isOpen = modalData?.type === 'BANK_CHANGE_COLOR';
-  const isPending = false;
   const [color, setColor] = useColor('#561ecb');
   const handleSubmit = async () => {
-    // await mutateAsync({ itemContainerId: modalData?.id ?? '', name: data.name });
-    console.log('color', color);
-    console.log('modalData', modalData);
+    await mutateAsync({ itemContainerId: modalData?.id ?? '', data: { color: color.hex } });
     setModalData(null);
   };
   return (

@@ -1,15 +1,15 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { changeNameItemContainer } from '../api/change-name-item-container';
+import { changeNameItemContainer } from '../api/change-item-container';
 import { getBankItemContainersOptions } from '../api/get-bank-item-containers';
 
-export const useBankItemContainerChangeNameMutation = () => {
+export const useBankItemContainerChangeMutation = () => {
   const heroId = useHeroId();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemContainerId, name }: { itemContainerId: string; name: string }) =>
-      changeNameItemContainer(heroId, itemContainerId, name),
+    mutationFn: ({ itemContainerId, data }: { itemContainerId: string; data: { name?: string; color?: string } }) =>
+      changeNameItemContainer(heroId, itemContainerId, data),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: getBankItemContainersOptions(heroId).queryKey });
     },
