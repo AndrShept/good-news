@@ -11,7 +11,7 @@ export const BankItemContainerTabMenu = ({ id }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <EllipsisVerticalIcon className="size-5" />
+        <EllipsisVerticalIcon className="size-5.5 opacity-0 mx-1  group-hover:opacity-100" />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => setModalData({ id, type: 'BANK_CHANGE_NAME' })}>Change name</DropdownMenuItem>

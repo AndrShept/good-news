@@ -42,9 +42,7 @@ export const Bank = ({ place }: Props) => {
                 >
                   {container.name}
                 </TabsTrigger>
-                <div className="opacity-0 group-hover:opacity-100">
                   <BankItemContainerTabMenu id={container.id} />
-                </div>
               </div>
             ))}
             <CreateBankItemContainerModal placeName={place?.name ?? ''} />
