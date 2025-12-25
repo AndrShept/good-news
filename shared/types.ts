@@ -23,6 +23,7 @@ import {
   pvpModeTypeEnum,
   skillTable,
   skillsTypeEnum,
+  tileTypeEnum,
   weaponTable,
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
@@ -52,7 +53,6 @@ import type {
   resourceTypeEnum,
 } from '../server/db/schema/resource-schema';
 import { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
-import { tileTable, tileTypeEnum } from '../server/db/schema/tile-schema';
 import type { Layer } from './json-types';
 
 export type SuccessResponse<T = undefined> = {
@@ -174,8 +174,8 @@ export type RarityType = (typeof rarityEnum.enumValues)[number];
 export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
 export type ActionType = (typeof actionTypeEnum.enumValues)[number];
-export type TileType = (typeof tileTypeEnum.enumValues)[number];
 export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
+export type TileType = (typeof tileTypeEnum.enumValues)[number];
 export type StateType = (typeof stateTypeEnum.enumValues)[number];
 export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];
 export type OreType = (typeof oreTypeEnum.enumValues)[number];
@@ -218,12 +218,7 @@ export type Map = typeof mapTable.$inferSelect & {
   places?: Place[];
   layers?: Layer[];
 };
-export type Tile = typeof tileTable.$inferSelect & {
-  map?: Map;
-  place?: Place;
-  location?: Location;
-};
-export type TilesGrid = (Tile | null)[][];
+
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'heroId' | 'resourceId'>;
 
 export type Equipment = typeof equipmentTable.$inferSelect & {

@@ -5,6 +5,7 @@ import { locationTable } from './location-schema';
 import { placeTable } from './place-schema';
 
 export const pvpModeTypeEnum = pgEnum('pvp_type_enum', ['PVE', 'PVP']);
+export const tileTypeEnum = pgEnum('tile_type_enum', ['OBJECT', 'WATER', 'HERO', 'TOWN', 'GROUND']);
 
 export const mapTable = pgTable('map', {
   id: uuid().primaryKey().notNull(),

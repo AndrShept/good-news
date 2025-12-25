@@ -6,7 +6,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const formSchema = z.object({
-  name: z.string().min(2, 'name must be at least 2 characters.').max(32, 'name must be at most 15 characters.'),
+  name: z.string().min(1, 'name must be at least 1 characters.').max(32, 'name must be at most 15 characters.'),
 });
 
 interface Props {
