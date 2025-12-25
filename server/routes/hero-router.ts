@@ -48,7 +48,6 @@ import { socketEvents } from '../../shared/socket-events';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import {
-  actionTable,
   buildingTypeEnum,
   containerSlotTable,
   coreMaterialTypeEnum,
@@ -67,7 +66,6 @@ import {
   skillTable,
   skillsTypeEnum,
   slotEnum,
-  stateTable,
   stateTypeEnum,
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
@@ -98,11 +96,7 @@ export const heroRouter = new Hono<Context>()
         with: {
           modifier: true,
           group: true,
-          action: {
-            extras: {
-              timeRemaining: sql<number>`EXTRACT(EPOCH FROM ${actionTable.completedAt} - NOW())::INT`.as('timeRemaining'),
-            },
-          },
+
           equipments: {
             with: {
               gameItem: {
@@ -117,7 +111,6 @@ export const heroRouter = new Hono<Context>()
           },
           queueCraftItems: true,
           itemContainers: { columns: { id: true, type: true, name: true }, where: eq(itemContainerTable.type, 'BACKPACK') },
-          state: true,
           location: {
             with: {
               place: true,
@@ -203,12 +196,8 @@ export const heroRouter = new Hono<Context>()
         heroId: newHero.id,
       });
       await tx.insert(locationTable).values({ placeId: place.id, heroId: newHero.id, x: place.x, y: place.y });
-      await tx.insert(actionTable).values({
-        completedAt: setSqlNow(),
-        type: 'IDLE',
-        heroId: newHero.id,
-      });
-      await tx.insert(stateTable).values({ type: 'IDLE', heroId: newHero.id });
+
+
       await tx.insert(itemContainerTable).values({
         name: 'Main Backpack',
         type: 'BACKPACK',
@@ -603,7 +592,7 @@ export const heroRouter = new Hono<Context>()
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
-      if (hero.isInBattle) {
+      if (hero.state === 'BATTLE') {
         throw new HTTPException(403, { message: 'You cannot use potions during battle.', cause: { canShow: true } });
       }
       if (isFullHealth && isHealthPotion && !isBuffPotion && !isRestorePotion) {
@@ -665,27 +654,16 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const hero = await heroService(db).getHero(id, {
-        with: {
-          action: { columns: { id: true } },
-        },
-      });
+      const hero = await heroService(db).getHero(id);
 
-      if (!hero.action?.id) {
-        throw new HTTPException(404, {
-          message: 'action id not found',
-        });
-      }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       await db
-        .update(actionTable)
+        .update(heroTable)
         .set({
-          startedAt: new Date().toISOString(),
-          completedAt: new Date().toISOString(),
-          type: 'IDLE',
+          state: 'IDLE',
         })
-        .where(eq(actionTable.id, hero.action.id));
+        .where(eq(heroTable.id, hero.id));
 
       const jobId = hero.id;
       await actionQueue.remove(jobId);
@@ -728,79 +706,7 @@ export const heroRouter = new Hono<Context>()
       });
     },
   )
-  .post(
-    '/:id/action/walk-place',
-    loggedIn,
-    zValidator('param', z.object({ id: z.string() })),
-    zValidator(
-      'json',
-      z.object({
-        buildingType: z.enum(buildingTypeEnum.enumValues),
-      }),
-    ),
-    async (c) => {
-      const user = c.get('user');
-      const { id } = c.req.valid('param');
-      const { buildingType } = c.req.valid('json');
-      const hero = await heroService(db).getHero(id, {
-        with: {
-          modifier: { columns: { dexterity: true } },
-          location: { with: { place: true }, columns: { id: true } },
-          action: { columns: { id: true } },
-        },
-      });
 
-      if (!hero.action?.id) {
-        throw new HTTPException(404, {
-          message: 'action id not found',
-        });
-      }
-      if (!hero.location?.id) {
-        throw new HTTPException(404, {
-          message: 'location id not found',
-        });
-      }
-      if (!hero.location?.place?.id) {
-        throw new HTTPException(403, {
-          message: 'Missing townId: hero is not assigned to a town',
-        });
-      }
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      const jobId = hero.id;
-      const sumDex = (hero.modifier?.dexterity ?? 0) + hero.stat.dexterity;
-      const delay = calculate.walkTime(sumDex);
-      await db
-        .update(actionTable)
-        .set({
-          startedAt: new Date().toISOString(),
-          completedAt: new Date(Date.now() + delay).toISOString(),
-          type: 'WALK',
-        })
-        .where(eq(actionTable.id, hero.action.id));
-      const jobData: WalkPlaceJob = {
-        jobName: 'WALK_PLACE',
-        payload: {
-          actionId: hero.action.id,
-          locationId: hero.location.id,
-          heroId: hero.id,
-          type: 'IDLE',
-          buildingType,
-        },
-      };
-      await actionQueue.remove(jobId);
-      await actionQueue.add(jobName['walk-place'], jobData, {
-        delay,
-        jobId,
-        removeOnComplete: true,
-      });
-
-      return c.json<SuccessResponse>({
-        message: 'action start',
-        success: true,
-      });
-    },
-  )
   .post(
     '/:id/action/walk-map',
     loggedIn,
@@ -816,8 +722,8 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
       const targetPos = c.req.valid('json');
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.id, id),
+
+      const hero = await heroService(db).getHero(id, {
         with: {
           modifier: {
             columns: {
@@ -825,20 +731,9 @@ export const heroRouter = new Hono<Context>()
             },
           },
           location: { with: { map: true } },
-          action: { columns: { id: true } },
         },
       });
 
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
-        });
-      }
-      if (!hero.action) {
-        throw new HTTPException(404, {
-          message: 'hero action not found',
-        });
-      }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       const MAP_WIDTH = hero.location?.map?.width ?? 0;
@@ -880,18 +775,15 @@ export const heroRouter = new Hono<Context>()
       const sumDex = (hero.modifier?.dexterity ?? 0) + hero.stat.dexterity;
       const delay = calculate.walkTime(sumDex);
       await db
-        .update(actionTable)
+        .update(heroTable)
         .set({
-          startedAt: new Date().toISOString(),
-          completedAt: new Date(Date.now() + delay).toISOString(),
-          type: 'WALK',
+          state: 'WALK',
         })
-        .where(eq(actionTable.id, hero.action?.id!));
+        .where(eq(heroTable.id, hero.id));
       const jobData: WalkMapJob = {
         jobName: 'WALK_MAP',
         payload: {
           heroId: hero.id,
-          actionId: hero.action.id,
           newPosition: targetPos,
           mapId: hero.location.mapId ?? '',
         },
@@ -920,7 +812,6 @@ export const heroRouter = new Hono<Context>()
       const hero = await heroService(db).getHero(id, {
         with: {
           location: true,
-          action: true,
         },
       });
 
@@ -931,7 +822,7 @@ export const heroRouter = new Hono<Context>()
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      if (hero.action?.type !== 'IDLE') {
+      if (hero.state !== 'IDLE') {
         throw new HTTPException(409, {
           message: 'Hero is currently busy with another action',
         });
@@ -986,13 +877,12 @@ export const heroRouter = new Hono<Context>()
       const hero = await heroService(db).getHero(id, {
         with: {
           location: { with: { hero: true } },
-          action: true,
         },
       });
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      if (hero.action?.type !== 'IDLE') {
+      if (hero.state !== 'IDLE') {
         throw new HTTPException(409, {
           message: 'Hero is currently busy with another action',
         });
@@ -1060,7 +950,7 @@ export const heroRouter = new Hono<Context>()
 
       const isFullHealth = hero.currentHealth >= hero.maxHealth;
 
-      if (hero.isInBattle) {
+      if (hero.state === 'BATTLE') {
         throw new HTTPException(403, {
           message: 'hero is a battle',
         });
@@ -1113,7 +1003,7 @@ export const heroRouter = new Hono<Context>()
 
       const isFullMana = hero.currentMana >= hero.maxMana;
 
-      if (hero.isInBattle) {
+      if (hero.state === 'BATTLE') {
         throw new HTTPException(403, {
           message: 'hero is a battle',
         });
@@ -1162,41 +1052,16 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const { type } = c.req.valid('json');
 
-      const hero = await heroService(db).getHero(id, {
-        with: {
-          action: true,
-          state: { columns: { id: true } },
-        },
-      });
-
-      if (!hero.action) {
-        throw new HTTPException(404, {
-          message: 'hero action not found',
-        });
-      }
-      if (!hero.state?.id) {
-        throw new HTTPException(404, {
-          message: 'state id not found',
-        });
-      }
+      const hero = await heroService(db).getHero(id);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-      if (hero.action.type !== 'IDLE') {
-        throw new HTTPException(409, {
-          message: 'Your hero is busy now',
-        });
-      }
-      if (hero.isInBattle) {
-        throw new HTTPException(409, {
-          message: 'Action not allowed: hero now is battle',
-        });
-      }
+
       await db
-        .update(stateTable)
+        .update(heroTable)
         .set({
-          type,
+          state: type,
         })
-        .where(eq(stateTable.id, hero.state.id));
+        .where(eq(heroTable.id, hero.id));
 
       return c.json<SuccessResponse>({
         message: 'state changed',
@@ -1253,8 +1118,6 @@ export const heroRouter = new Hono<Context>()
       const [hero, craftItem, coreMaterial, backpack] = await Promise.all([
         heroService(db).getHero(id, {
           with: {
-            action: true,
-            state: { columns: { id: true } },
             location: { with: { place: true } },
           },
         }),
@@ -1378,7 +1241,7 @@ export const heroRouter = new Hono<Context>()
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      if (hero.isInBattle) {
+      if (hero.state === 'BATTLE') {
         throw new HTTPException(409, { message: 'Action not allowed: hero now is battle' });
       }
 

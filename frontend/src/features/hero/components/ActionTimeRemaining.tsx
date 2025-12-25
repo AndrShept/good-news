@@ -9,7 +9,10 @@ import { useActionCancel } from '../hooks/useActionCancel';
 import { useHero } from '../hooks/useHero';
 
 export const ActionTimeRemaining = () => {
-  const action = useHero((state) => state?.data?.action);
+  const action = {
+    timeRemaining: 8000,
+    completedAt: new Date(Date.now() + 8000).toISOString(),
+  };
   const [seconds, setSeconds] = useState(0);
   const time = useTime();
   const totalTime = action?.timeRemaining ?? 0;
@@ -37,7 +40,7 @@ export const ActionTimeRemaining = () => {
 
   if (!seconds) return;
   return (
-    <section className="max-w-75 top-0 mx-auto my-2 w-full ">
+    <section className="max-w-75 top-0 mx-auto my-2 w-full">
       <div className="flex w-full items-center justify-center gap-1">
         <WalkIcon className="size-12 shrink-0" />
         <div className="border-background ring-accent relative flex h-8 w-full overflow-hidden rounded border-2 ring-1">

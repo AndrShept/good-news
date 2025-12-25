@@ -5,15 +5,14 @@ import { useEffect } from 'react';
 import { useHero } from './useHero';
 
 export const useRegeneration = () => {
-  const { currentHealth, currentMana, id, maxHealth, maxMana, stat, modifier, isBattle } = useHero((state) => ({
-    currentHealth: state?.data?.currentHealth ?? 0,
-    currentMana: state?.data?.currentMana ?? 0,
-    maxHealth: state?.data?.maxHealth ?? 0,
-    maxMana: state?.data?.maxMana ?? 0,
-    id: state?.data?.id ?? '',
-    stat: state?.data?.stat,
-    modifier: state?.data?.modifier,
-    isBattle: state?.data?.isInBattle,
+  const { currentHealth, currentMana, id, maxHealth, maxMana, stat, modifier } = useHero((data) => ({
+    currentHealth: data?.currentHealth ?? 0,
+    currentMana: data?.currentMana ?? 0,
+    maxHealth: data?.maxHealth ?? 0,
+    maxMana: data?.maxMana ?? 0,
+    id: data?.id ?? '',
+    stat: data?.stat,
+    modifier: data?.modifier,
   }));
   const isFullHealth = currentHealth >= maxHealth;
   const isFullMana = currentMana >= maxMana;
@@ -34,19 +33,19 @@ export const useRegeneration = () => {
   });
   useEffect(() => {
     if (
-      (!isFullHealth && !mutationHealth.isPending && !isBattle) ||
-      (!isFullHealth && !mutationHealth.isPending && !isBattle && (stat?.constitution || modifier?.constitution))
+      (!isFullHealth && !mutationHealth.isPending) ||
+      (!isFullHealth && !mutationHealth.isPending  && (stat?.constitution || modifier?.constitution))
     ) {
       mutationHealth.mutate();
     }
-  }, [isFullHealth, modifier?.constitution, stat?.constitution, isBattle]);
+  }, [isFullHealth, modifier?.constitution, stat?.constitution]);
 
   useEffect(() => {
     if (
-      (!isFullMana && !mutationMana.isPending && !isBattle) ||
-      (!isFullMana && !mutationMana.isPending && !isBattle && (stat?.intelligence || modifier?.intelligence))
+      (!isFullMana && !mutationMana.isPending ) ||
+      (!isFullMana && !mutationMana.isPending  && (stat?.intelligence || modifier?.intelligence))
     ) {
       mutationMana.mutate();
     }
-  }, [isFullMana, modifier?.intelligence, stat?.intelligence, isBattle]);
+  }, [isFullMana, modifier?.intelligence, stat?.intelligence]);
 };

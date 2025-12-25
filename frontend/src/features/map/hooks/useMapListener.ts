@@ -12,7 +12,7 @@ import { useMapHeroesUpdate } from './useMapHeroesUpdate';
 
 export const useMapListener = () => {
   const setGameMessage = useGameMessages((state) => state.setGameMessage);
-  const mapId = useHero((state) => state?.data?.location?.mapId ?? '');
+  const mapId = useHero((data) => data?.location?.mapId ?? '');
   const id = useHeroId();
   const { socket } = useSocket();
   const { updateHero } = useHeroUpdate();
@@ -38,7 +38,7 @@ export const useMapListener = () => {
               type: 'SUCCESS',
               text: `You have entered a town.`,
             });
-            updateHero({ action: { type: 'IDLE' }, location: { mapId: null, placeId: data.payload.placeId } });
+            updateHero({ state: 'IDLE', location: { mapId: null, placeId: data.payload.placeId } });
           }
           deleteHeroes(data.payload.heroId);
           break;
@@ -55,7 +55,7 @@ export const useMapListener = () => {
               type: 'SUCCESS',
               text: `You have entered tile.`,
             });
-            updateHero({ action: { type: 'IDLE' }, location: { ...data.payload.newPosition } });
+            updateHero({ state: 'IDLE', location: { ...data.payload.newPosition } });
           }
           updateHeroesPos(data.payload.heroId, { ...data.payload.newPosition });
           break;

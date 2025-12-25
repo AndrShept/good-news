@@ -1,20 +1,20 @@
 import { Separator } from '@/components/ui/separator';
-import { ActionType } from '@/shared/types';
 
 import { EnterTownButton } from './EnterTownButton';
 import { FishingButton } from './FishingButton';
+import { StateType } from '@/shared/types';
 
 interface Props {
   isHeroOnTownTile: boolean | undefined;
   canFish: boolean;
-  heroActionType: ActionType;
+  state: StateType;
 }
 
-export const HeroActionsBar = ({ isHeroOnTownTile, canFish, heroActionType }: Props) => {
+export const HeroActionsBar = ({ isHeroOnTownTile, canFish, state }: Props) => {
   return (
     <>
-      {isHeroOnTownTile && <EnterTownButton disabled={heroActionType !== 'IDLE'} />}
-      {canFish && <FishingButton disabled={heroActionType !== 'IDLE'} />}
+      {isHeroOnTownTile && <EnterTownButton disabled={state !== 'IDLE'} />}
+      {canFish && <FishingButton disabled={state !== 'IDLE'} />}
       {(isHeroOnTownTile || isHeroOnTownTile) && <Separator />}
     </>
   );

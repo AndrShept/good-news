@@ -5,6 +5,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { getCraftDataOptions } from '@/features/craft/api/get-craft-data';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { useHero } from '@/features/hero/hooks/useHero';
+import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/game')({
@@ -32,7 +33,7 @@ export const Route = createFileRoute('/game')({
 function GameRouteComponent() {
   const auth = useAuth();
   const user = auth ? { id: auth.id, username: auth.username } : undefined;
-  const heroId = useHero((state) => state?.data?.id ?? '');
+  const heroId = useHeroId();
 
   return (
     <SocketProvider user={user} heroId={heroId}>

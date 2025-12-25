@@ -12,7 +12,7 @@ import { usePlaceHeroesUpdate } from './usePlaceHeroesUpdate';
 
 export const usePlaceListener = () => {
   const setGameMessage = useSetGameMessage();
-  const placeId = useHero((state) => state?.data?.location?.placeId ?? '');
+  const placeId = useHero((data) => data?.location?.placeId ?? '');
   const id = useHeroId();
   const { socket } = useSocket();
   const { updateHero } = useHeroUpdate();
@@ -38,24 +38,11 @@ export const usePlaceListener = () => {
               type: 'SUCCESS',
               text: `You have leave a town.`,
             });
-            updateHero({ action: { type: 'IDLE' }, location: { mapId: data.payload.mapId, placeId: null } });
+            updateHero({ state: 'IDLE', location: { mapId: data.payload.mapId, placeId: null } });
           }
           deleteHeroes(data.payload.heroId);
           break;
-        case 'WALK_PLACE':
-          updateHero({
-            action: {
-              type: 'IDLE',
-            },
-            location: {
-              currentBuilding: data.payload.buildingType,
-            },
-          });
-          setGameMessage({
-            type: 'SUCCESS',
-            text: `You have entered the ${data.payload.buildingType}.`,
-          });
-          break;
+
         case 'HERO_ENTER_PLACE':
           addHeroes(data.payload);
           break;

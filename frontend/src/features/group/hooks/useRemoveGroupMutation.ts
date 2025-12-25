@@ -1,5 +1,4 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { useUpdateHero } from '@/features/hero/hooks/useUpdateHero';
 import { toastError } from '@/lib/utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 

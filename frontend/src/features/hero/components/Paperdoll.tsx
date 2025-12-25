@@ -7,7 +7,7 @@ import { FillBar } from './FillBar';
 
 interface Props {
   avatarImage: string;
-  characterImage: string
+  characterImage: string;
   currentHealth: number;
   maxHealth: number;
   currentMana: number;
@@ -15,8 +15,6 @@ interface Props {
   name: string;
   level: number;
   id: string;
-  maxExperience: number;
-  currentExperience: number;
   equipments: Equipment[];
 }
 
@@ -24,13 +22,11 @@ export const Paperdoll = memo(
   ({
     avatarImage,
     characterImage,
-    currentExperience,
     equipments,
     currentHealth,
     id,
     level,
     currentMana,
-    maxExperience,
     maxHealth,
     maxMana,
     name,
@@ -51,7 +47,7 @@ export const Paperdoll = memo(
         <Equipments characterImage={characterImage} equipments={equipments} />
 
         <div className="mt-auto">
-          <FillBar maxValue={maxExperience} value={currentExperience} type="exp" />
+          <FillBar maxValue={0} value={0} type="exp" />
         </div>
       </section>
     );

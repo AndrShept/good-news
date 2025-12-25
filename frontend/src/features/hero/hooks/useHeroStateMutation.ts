@@ -27,9 +27,7 @@ export const useHeroStateMutation = () => {
 
     onSuccess: (_, type) => {
       updateHero({
-        state: {
-          type,
-        },
+        state: type,
       });
     },
   });

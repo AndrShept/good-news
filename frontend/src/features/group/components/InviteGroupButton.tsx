@@ -15,7 +15,7 @@ import { getGroupAvailableHeroesOptions } from '../api/get-group-available-heroe
 import { getGroupMembersOptions } from '../api/get-group-members';
 
 export const InviteGroupButton = ({ toHeroId, searchTerm }: { toHeroId: string; searchTerm: string }) => {
-  const groupId = useHero((state) => state?.data?.groupId ?? '');
+  const groupId = useHero((data) => data?.groupId ?? '');
   const fromHeroId = useHeroId();
   const queryClient = useQueryClient();
   const { socket } = useSocket();

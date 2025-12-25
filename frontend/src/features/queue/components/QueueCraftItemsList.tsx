@@ -12,7 +12,7 @@ import { QueueCraftItemCard } from './QueueCraftItemCard';
 export const QueueCraftItemsList = () => {
   const { craftItemMap } = useCraftItem();
   const heroId = useHeroId();
-  const maxQueueCraftCount = useHero((state) => state?.data?.maxQueueCraftCount ?? 4);
+  const maxQueueCraftCount = useHero((data) => data?.maxQueueCraftCount ?? 4);
   const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
   const { data: queueCraftItems } = useQuery(getQueueCraftItemOptions(heroId, selectBuilding?.type));
   if (!queueCraftItems?.length) return;

@@ -1,6 +1,5 @@
 import type { ArmorSlotType, ResourceType, SkillType, WeaponType } from '../types';
 
-
 export const imageConfig = {
   icon: {
     ui: {
@@ -29,6 +28,7 @@ export const imageConfig = {
       walk: '/sprites/icons/ui/walk.png',
       refresh: '/sprites/icons/ui/refresh.png',
       settings: '/sprites/icons/ui/settings.png',
+      skill: '/sprites/icons/ui/skill.png',
     },
     skill: {
       BLACKSMITHING: '/sprites/icons/skills/blacksmithing.png',
@@ -36,6 +36,8 @@ export const imageConfig = {
       MINING: '/sprites/icons/skills/mining.png',
       SMELTING: '/sprites/icons/skills/smelting.png',
       TAILORING: '/sprites/icons/skills/tailoring.png',
+      REGENERATION: '/sprites/icons/skills/regeneration.png',
+      MEDITATION: '/sprites/icons/skills/meditation.png',
     } as Record<SkillType, string>,
     place: {
       mine: '/sprites/icons/places/mine.png',

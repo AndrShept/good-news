@@ -15,12 +15,12 @@ import { MovableTile } from './MovableTile';
 import { PlaceTile } from './PlaceTile';
 
 export const NewGameMap = () => {
-  const hero = useHero((state) => ({
-    x: state?.data?.location?.x ?? 0,
-    y: state?.data?.location?.y ?? 0,
-    mapId: state?.data?.location?.mapId ?? '',
-    placeId: state?.data?.location?.placeId ?? '',
-    actionType: state?.data?.action?.type ?? 'IDLE',
+  const hero = useHero((data) => ({
+    x: data?.location?.x ?? 0,
+    y: data?.location?.y ?? 0,
+    mapId: data?.location?.mapId ?? '',
+    placeId: data?.location?.placeId ?? '',
+    state: data?.state ?? 'IDLE',
   }));
 
   const result = useQueries({ queries: [getMapOptions(hero.mapId), getMapHeroesLocationOptions(hero.mapId)] });
@@ -52,7 +52,7 @@ export const NewGameMap = () => {
     <section className="flex gap-2">
       <div className="flex w-full gap-2">
         <div className="flex w-[130px] flex-col gap-2">
-          <HeroActionsBar canFish={canFish} isHeroOnTownTile={isHeroOnTownTile} heroActionType={hero.actionType} />
+          <HeroActionsBar canFish={canFish} isHeroOnTownTile={isHeroOnTownTile} state={hero.state} />
           <LocationHeroesList locationHeroes={heroesAtHeroPos} isLoading={isLoading} />
         </div>
 

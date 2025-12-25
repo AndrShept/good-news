@@ -15,7 +15,7 @@ import { Server } from 'socket.io';
 
 import { type Context } from './context';
 import { db } from './db/db';
-import { actionTable, heroTable } from './db/schema';
+import { heroTable } from './db/schema';
 import { game } from './lib/game';
 import { heroOffline } from './lib/heroOffline';
 import { sessionHandler } from './middleware/sessionHandler';
@@ -112,9 +112,7 @@ export const io = new Server(httpServer, {
 
 await db.update(heroTable).set({
   isOnline: false,
-});
-await db.update(actionTable).set({
-  type: 'IDLE',
+  state: 'IDLE',
 });
 
 io.on('connection', async (socket) => {

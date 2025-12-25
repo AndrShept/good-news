@@ -5,8 +5,6 @@ import { z } from 'zod';
 
 import type { client } from '../frontend/src/lib/utils';
 import {
-  actionTable,
-  actionTypeEnum,
   armorTable,
   buildingTypeEnum,
   containerSlotTable,
@@ -23,6 +21,7 @@ import {
   pvpModeTypeEnum,
   skillTable,
   skillsTypeEnum,
+  stateTypeEnum,
   tileTypeEnum,
   weaponTable,
 } from '../server/db/schema';
@@ -52,14 +51,14 @@ import type {
   resourceTable,
   resourceTypeEnum,
 } from '../server/db/schema/resource-schema';
-import { stateTable, stateTypeEnum } from '../server/db/schema/state-schema';
 import type { Layer } from './json-types';
 
-export type SuccessResponse<T = undefined> = {
+export interface SuccessResponse<T = undefined> {
   success: true;
   message: string;
   data?: T;
-};
+}
+
 export type SocketResponse = {
   success: boolean;
   message: string;
@@ -173,7 +172,6 @@ export type ArmorType = (typeof armorTypeEnum.enumValues)[number];
 export type RarityType = (typeof rarityEnum.enumValues)[number];
 export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
-export type ActionType = (typeof actionTypeEnum.enumValues)[number];
 export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
 export type TileType = (typeof tileTypeEnum.enumValues)[number];
 export type StateType = (typeof stateTypeEnum.enumValues)[number];
@@ -190,8 +188,6 @@ export type SkillType = (typeof skillsTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
-export type State = InferSelectModel<typeof stateTable>;
-export type Action = InferSelectModel<typeof actionTable> & { timeRemaining: number };
 export type Location = InferSelectModel<typeof locationTable> & {
   map?: Map;
   place?: Place;
@@ -270,9 +266,7 @@ export type GameItem = InferSelectModel<typeof gameItemTable> & {
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier?: Modifier;
   group?: Group;
-  action?: Action;
   location?: Location;
-  state?: State;
   equipments?: Equipment[];
   queueCraftItems?: QueueCraftItem[];
   itemContainers?: { id: string; type: ItemContainerType; name: string }[];
@@ -289,7 +283,6 @@ export type IPosition = {
 };
 
 //API RESPONSE
-export type ApiHeroResponse = InferResponseType<typeof client.hero.$get>;
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];
 export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
 

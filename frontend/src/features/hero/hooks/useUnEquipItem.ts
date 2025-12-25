@@ -5,12 +5,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { getHeroOptions } from '../api/get-hero';
 import { unEquipItem } from '../api/un-equip-Item';
-import { useHero } from './useHero';
 
+import { useHeroId } from './useHeroId';
 export const useUnEquipItem = () => {
   const setGameMessage = useSetGameMessage();
   const queryClient = useQueryClient();
-  const heroId = useHero((state) => state?.data?.id ?? '');
+  const heroId = useHeroId();
   const { backpackId } = useHeroBackpack();
   return useMutation({
     mutationFn: unEquipItem,

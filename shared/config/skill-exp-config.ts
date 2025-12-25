@@ -16,6 +16,12 @@ export const skillExpConfig = {
   ALCHEMY: {
     difficultyMultiplier: 2.1,
   },
+  MEDITATION: {
+    difficultyMultiplier: 2.5,
+  },
+  REGENERATION: {
+    difficultyMultiplier: 2.6,
+  },
 } as const satisfies Record<SkillType, { difficultyMultiplier: number }>;
 
 export const rarityXpRewards: Record<RarityType, number> = {

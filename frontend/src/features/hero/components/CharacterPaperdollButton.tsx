@@ -17,10 +17,12 @@ export const CharacterPaperdollButton = ({ type }: Props) => {
     CHARACTER: imageConfig.icon.ARMOR.HELMET,
     SKILLS: imageConfig.icon.ui.book,
     IDLE: '',
+    BATTLE: '',
+    CRAFT: '',
+    WALK: ''
   };
-  const { action, state } = useHero((state) => ({
-    action: state?.data?.action?.type,
-    state: state?.data?.state?.type,
+  const { state } = useHero((data) => ({
+    state: data?.state,
   }));
   const [isPending, startTransition] = useTransition();
   const { mutate } = useHeroStateMutation();
@@ -33,7 +35,7 @@ export const CharacterPaperdollButton = ({ type }: Props) => {
         });
       }}
       size="icon"
-      disabled={isPending || action !== 'IDLE'}
+      disabled={isPending ||( state !== 'IDLE' && state !== 'CHARACTER' )}
       variant={state === type ? 'default' : 'outline'}
     >
       <GameIcon image={icon[type]} />

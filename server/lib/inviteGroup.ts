@@ -18,10 +18,8 @@ const validateGroupMembers = async ({ fromHero, invitedHero }: IValidateGroupMem
   if (invitedHero.groupId) {
     return { message: invitedHero.name + ' is already in a group and cannot be accepted.', success: false };
   }
-  if (invitedHero.isInDungeon) {
-    return { message: invitedHero.name + ' is in dungeon and cannot be accepted.', success: false };
-  }
-  if (invitedHero.isInBattle) {
+
+  if (invitedHero.state === 'BATTLE') {
     return { message: invitedHero.name + ' is in a battle and cannot be accepted.', success: false };
   }
 

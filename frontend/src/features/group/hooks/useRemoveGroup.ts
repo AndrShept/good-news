@@ -1,10 +1,10 @@
-import { useUpdateHero } from '@/features/hero/hooks/useUpdateHero';
+import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
 import { ApiGroupMembersResponse, Hero } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const useRemoveGroup = () => {
   const queryClient = useQueryClient();
-  const { updateHero } = useUpdateHero();
+  const { updateHero } = useHeroUpdate();
   const clearGroupList = () => {
     queryClient.setQueriesData<ApiGroupMembersResponse>(
       {

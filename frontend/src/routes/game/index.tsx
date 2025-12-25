@@ -4,7 +4,6 @@ import { CharacterPaperdoll } from '@/features/hero/components/CharacterPaperdol
 import { useHero } from '@/features/hero/hooks/useHero';
 import { NewGameMap } from '@/features/map/components/NewGameMap';
 import { Place } from '@/features/place/components/Place';
-import { Skills } from '@/features/skill/components/Skills';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/game/')({
@@ -17,21 +16,19 @@ export const Route = createFileRoute('/game/')({
 });
 
 function RouteComponent() {
-  const { currentBuilding, type, mapId, placeId } = useHero((state) => ({
-    currentBuilding: state?.data?.location?.currentBuilding,
-    type: state?.data?.state?.type,
-    placeId: state?.data?.location?.placeId,
-    mapId: state?.data?.location?.mapId,
+  const { currentBuilding, mapId, placeId, state } = useHero((data) => ({
+    currentBuilding: data?.location?.currentBuilding,
+    placeId: data?.location?.placeId,
+    mapId: data?.location?.mapId,
+    state: data?.state,
   }));
-  const isCharacter = type === 'CHARACTER';
-  const isSkills = type === 'SKILLS';
-  const isPlace = !!placeId && !isCharacter && !isSkills && !currentBuilding;
-  const isMap = !isCharacter && !isSkills && !!mapId;
+  const isCharacter = state === 'CHARACTER';
+  const isPlace = !!placeId && !isCharacter  && !currentBuilding;
+  const isMap = !isCharacter  && !!mapId;
 
   return (
     <>
       {isCharacter && <CharacterPaperdoll />}
-      {isSkills && <Skills />}
       {isPlace && <Place />}
       {isMap && <NewGameMap />}
       <ModalProvider />

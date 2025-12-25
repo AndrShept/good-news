@@ -12,22 +12,24 @@ const skillIcon: Record<SkillType, string> = {
   TAILORING: imageConfig.icon.skill.TAILORING,
   MINING: imageConfig.icon.skill.MINING,
   SMELTING: imageConfig.icon.skill.SMELTING,
+  MEDITATION: imageConfig.icon.skill.MEDITATION,
+  REGENERATION: imageConfig.icon.skill.REGENERATION,
 };
 
-export const Skills = () => {
+export const SkillsList = () => {
   const { skillNextExpMap, skills, isLoading } = useSkill();
-
   return (
-    <ul className="mx-auto flex flex-wrap gap-2 p-3">
-      {skills?.map((skill) => (
-        <li key={skill.id} className="border-muted h-22 relative flex w-48 items-center gap-4 overflow-hidden rounded-xl border px-4 py-2">
-          <div className="text-2xl font-semibold">{skill.level}</div>
-          <div className="flex w-full flex-col gap-2">
-            <div className="inline-flex justify-between gap-1 text-[15px]">
-              <div className="inline-flex items-center gap-1">
-                <GameIcon image={skillIcon[skill.type]} />
-                <span className="text-muted-foreground/50">{skill.name}</span>
+    <ul className="grid grid-cols-2 gap-4">
+      {!isLoading ? (
+        skills?.map((skill) => (
+          <li key={skill.id} className="relative flex w-full flex-col gap-1">
+            <div className="inline-flex items-center justify-between gap-1 text-[15px]">
+              <div className="flex w-full max-w-[115x] items-center gap-1">
+                <GameIcon className="size-6" image={skillIcon[skill.type]} />
+                <span className="text-muted-foreground/50 truncate">{skill.name} </span>
               </div>
+
+              <div className="text-base font-semibold">{skill.level}</div>
             </div>
             <div className="relative flex flex-col gap-0.5">
               <Progress
@@ -40,10 +42,11 @@ export const Skills = () => {
                 <span className="text-muted-foreground/30">/{skillNextExpMap?.[skill.type]}</span>
               </div>
             </div>
-          </div>
-          {/* <BorderBeam size={120} duration={100} colorFrom={'#11111'} colorTo="#818182" /> */}
-        </li>
-      ))}
+          </li>
+        ))
+      ) : (
+        <SkillSkeleton />
+      )}
     </ul>
   );
 };

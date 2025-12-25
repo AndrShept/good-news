@@ -17,7 +17,6 @@ export type ActionJobEvent = WalkPlaceJob | WalkMapJob | HeroOfflineJob | BuffCr
 export type WalkPlaceJob = {
   jobName: 'WALK_PLACE';
   payload: {
-    actionId: string;
     locationId: string;
     heroId: string;
     type: 'IDLE';
@@ -28,7 +27,6 @@ export type WalkMapJob = {
   jobName: 'WALK_MAP';
   payload: {
     heroId: string;
-    actionId: string;
     newPosition: IPosition;
     mapId: string;
   };

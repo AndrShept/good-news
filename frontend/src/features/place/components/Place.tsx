@@ -8,7 +8,7 @@ import { PlaceSidebar } from './PlaceSidebar';
 import { SelectedBuildingPage } from './SelectedBuildingPage';
 
 export const Place = () => {
-  const placeId = useHero((state) => state?.data?.location?.placeId ?? '');
+  const placeId = useHero((data) => data?.location?.placeId ?? '');
   const placeData = useQuery(getPlaceOptions(placeId));
   const locationHeroesData = useQuery(getPlaceHeroesLocationOptions(placeId));
 

@@ -10,7 +10,7 @@ interface Props {
 
 export const RemoveGroupButton = ({ groupId }: Props) => {
   const heroId = useHeroId();
-  const leaderId = useHero((state) => state?.data?.group?.leaderId ?? '');
+  const leaderId = useHero((data) => data?.group?.leaderId ?? '');
   const isGroupLeader = leaderId === heroId;
   const { mutate, isPending } = useRemoveGroupMutation();
 

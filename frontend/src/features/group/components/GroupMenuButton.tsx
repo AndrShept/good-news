@@ -16,7 +16,7 @@ import { imageConfig } from '@/shared/config/image-config';
 export const GroupMenuButton = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isShow, setIsShow] = useState(false);
-  const groupId = useHero((state) => state?.data?.groupId);
+  const groupId = useHero((data) => data?.groupId);
   const onSearch = useCallback((value: string) => setSearchTerm(value), []);
   return (
     <Popover open={isShow} onOpenChange={setIsShow}>

@@ -6,12 +6,12 @@ import { useEffect } from 'react';
 
 import { getHeroOptions } from '../api/get-hero';
 import { useBuff } from './useBuff';
-import { useUpdateHero } from './useUpdateHero';
+import { useHeroUpdate } from './useHeroUpdate';
 
 export const useHeroListener = () => {
   const { socket } = useSocket();
   const { removeBuff } = useBuff();
-  const { updateHero } = useUpdateHero();
+  const { updateHero } = useHeroUpdate();
   const queryClient = useQueryClient();
   useEffect(() => {
     const listener = async (data: SelfHeroData) => {

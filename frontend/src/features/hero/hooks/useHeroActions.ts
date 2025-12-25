@@ -8,10 +8,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useHero } from './useHero';
 
 export const useHeroActions = () => {
-  const hero = useHero((state) => ({
-    mapId: state?.data?.location?.mapId ?? '',
-    x: state?.data?.location?.x ?? 0,
-    y: state?.data?.location?.y ?? 0,
+  const hero = useHero((data) => ({
+    mapId: data?.location?.mapId ?? '',
+    x: data?.location?.x ?? 0,
+    y: data?.location?.y ?? 0,
   }));
   const map = useMap({ mapId: hero.mapId });
 

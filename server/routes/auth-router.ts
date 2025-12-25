@@ -55,7 +55,7 @@ export const authRouter = new Hono<Context>()
     await sendEmail({
       to: email,
       subject: 'Реєстрація успішна!',
-      reactElement: SuccessRegister({url: confirmUrl}) ,
+      reactElement: SuccessRegister({ url: confirmUrl }),
     });
 
     return c.json<SuccessResponse>(
@@ -191,6 +191,7 @@ export const authRouter = new Hono<Context>()
       where: eq(userTable.id, userId!),
       columns: { password_hash: false },
     });
+    
     return c.json<SuccessResponse<UserType>>({
       success: true,
       message: 'User fetched',

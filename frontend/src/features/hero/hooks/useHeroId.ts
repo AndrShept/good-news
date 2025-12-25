@@ -5,6 +5,9 @@ import { getHeroOptions } from '../api/get-hero';
 export const useHeroId = () => {
   const queryClient = useQueryClient();
 
-  const data = queryClient.getQueryData(getHeroOptions().queryKey);
-  return data?.data?.id ?? '';
+  const hero = queryClient.getQueryData(getHeroOptions().queryKey);
+  if (!hero) {
+    throw new Error('useHeroId ,hero not found');
+  }
+  return hero.id;
 };

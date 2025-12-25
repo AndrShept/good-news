@@ -12,7 +12,7 @@ import { useRemoveGroup } from './useRemoveGroup';
 
 export const useGroupListener = () => {
   const setGameMessage = useGameMessages((state) => state.setGameMessage);
-  const groupId = useHero((state) => state?.data?.groupId ?? '');
+  const groupId = useHero((data) => data?.groupId ?? '');
   const selfId = useHeroId();
   const { socket } = useSocket();
   const { onRemove } = useRemoveGroup();

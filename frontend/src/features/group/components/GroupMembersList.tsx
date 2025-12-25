@@ -8,9 +8,9 @@ import { GroupSkeleton } from './GroupSkeleton';
 import { RemoveGroupButton } from './RemoveGroupButton';
 
 export const GroupMembersList = memo(() => {
-  const { group, groupId } = useHero((state) => ({
-    groupId: state?.data?.groupId ?? '',
-    group: state?.data?.group,
+  const { group, groupId } = useHero((data) => ({
+    groupId: data?.groupId ?? '',
+    group: data?.group,
   }));
 
   const { data, isLoading } = useQuery(getGroupMembersOptions(groupId));

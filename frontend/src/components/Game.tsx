@@ -14,7 +14,7 @@ export const Game = () => {
           <Outlet />
         </div>
         <div className="sticky bottom-0 z-10">
-          <ActionTimeRemaining />
+          {/* <ActionTimeRemaining /> */}
           <GameMessage />
         </div>
       </div>

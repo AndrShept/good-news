@@ -1,5 +1,5 @@
 import { useSocket } from '@/components/providers/SocketProvider';
-import { useHero } from '@/features/hero/hooks/useHero';
+import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { socketEvents } from '@/shared/socket-events';
 import { useEffect, useRef, useState } from 'react';
 
@@ -9,11 +9,11 @@ type IResponseData = {
   level: number;
   avatarImage: string;
   waitTime: number;
-  groupId: string
+  groupId: string;
 };
 
 export const usePartyInviteListener = () => {
-  const heroId = useHero((state) => state?.data?.id ?? '');
+  const heroId = useHeroId();
   const responseCb = useRef<null | IAcceptGroupCb>(null);
   const responseData = useRef<null | IResponseData>(null);
   const [isShow, setIsShow] = useState(false);

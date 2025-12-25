@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { HeroBackpack } from '@/features/item-container/components/HeroBackpack';
-
 import { LucideStepBack } from 'lucide-react';
 
 import { useHero } from '../hooks/useHero';
@@ -10,22 +9,21 @@ import { CharacterStat } from './CharacterStat';
 import { Paperdoll } from './Paperdoll';
 
 export const CharacterPaperdoll = () => {
-  const hero = useHero((state) => ({
-    id: state?.data?.id ?? '',
-    name: state?.data?.name ?? '',
-    avatarImage: state?.data?.avatarImage ?? '',
-    characterImage: state?.data?.characterImage ?? '',
-    currentExperience: state?.data?.currentExperience ?? 0,
-    maxExperience: state?.data?.maxExperience ?? 0,
-    currentHealth: state?.data?.currentHealth ?? 0,
-    currentMana: state?.data?.currentMana ?? 0,
-    freeStatPoints: state?.data?.freeStatPoints ?? 0,
-    stat: state?.data?.stat,
-    maxHealth: state?.data?.maxHealth ?? 0,
-    maxMana: state?.data?.maxMana ?? 0,
-    level: state?.data?.level ?? 0,
-    modifier: state?.data?.modifier,
-    equipments: state?.data?.equipments ?? [],
+  const hero = useHero((data) => ({
+    id: data?.id ?? '',
+    name: data?.name ?? '',
+    avatarImage: data?.avatarImage ?? '',
+    characterImage: data?.characterImage ?? '',
+    currentHealth: data?.currentHealth ?? 0,
+    currentMana: data?.currentMana ?? 0,
+    freeStatPoints: data?.freeStatPoints ?? 0,
+    stat: data?.stat,
+    maxHealth: data?.maxHealth ?? 0,
+    maxMana: data?.maxMana ?? 0,
+    level: data?.level ?? 0,
+    modifier: data?.modifier,
+    equipments: data?.equipments ?? [],
+    
   }));
   const { mutate, isPending } = useHeroStateMutation();
 
