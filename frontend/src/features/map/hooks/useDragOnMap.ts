@@ -17,6 +17,8 @@ export const useDragOnMap = ({ setIsDragging, setStart }: IUseDragOnMap) => {
     setStart(null);
   };
 
+  
+
   return {
     handleMouseDown,
     handleMouseUp,

@@ -1,12 +1,13 @@
-
 import { Place } from '@/shared/types';
+import { memo } from 'react';
+
 import { TileImg } from './TileImg';
 
 interface Props extends Place {
   TILE_SIZE: number;
 }
 
-export const PlaceTile = ({ TILE_SIZE, image, x, y }: Props) => {
+export const PlaceTile = memo(({ TILE_SIZE, image, x, y }: Props) => {
   return (
     <div
       style={{
@@ -20,4 +21,4 @@ export const PlaceTile = ({ TILE_SIZE, image, x, y }: Props) => {
       <TileImg image={image} />
     </div>
   );
-};
+});

@@ -17,7 +17,12 @@ export const BackpackButton = () => {
             <GameIcon image={imageConfig.icon.ui.backpack} />
           </Button>
         </SheetTrigger>
-        <SheetContent className="w-41 p-1 md:w-full">
+        <SheetContent
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          className="w-41 p-1 md:w-full"
+        >
+          <SheetTitle className="hidden"></SheetTitle>
           <HeroBackpack />
         </SheetContent>
       </Sheet>

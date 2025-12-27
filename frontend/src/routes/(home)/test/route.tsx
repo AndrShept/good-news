@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { NewGameMap } from '@/features/map/components/NewGameMap';
+import { NewGameMap } from '@/features/map/components/GameMapLayout';
 
 export const Route = createFileRoute('/(home)/test')({
   component: RouteComponent,

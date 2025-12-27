@@ -35,4 +35,5 @@ export const heroOffline = async (heroId: string) => {
     jobId,
     removeOnComplete: true,
   });
+  console.log('ACTION ADD');
 };

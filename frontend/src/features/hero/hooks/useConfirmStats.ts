@@ -1,20 +1,19 @@
-import { client, toastError } from '@/lib/utils';
+import { toastError } from '@/lib/utils';
+import { changeStatSchema } from '@/shared/types';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { InferResponseType } from 'hono/client';
 import { z } from 'zod';
 
-import { confirmStats, } from '../api/confirm-stats';
+import { confirmStats } from '../api/confirm-stats';
 import { getHeroOptions } from '../api/get-hero';
-import { changeStatSchema } from '@/shared/types';
+import { useHeroId } from './useHeroId';
 
-type ApiResponseHero = InferResponseType<typeof client.hero.$get>;
 export const useConfirmStats = (data: z.infer<typeof changeStatSchema>) => {
   const queryClient = useQueryClient();
   const setGameMessage = useSetGameMessage();
-  const res = queryClient.getQueryData<ApiResponseHero>(['hero']);
+  const heroId = useHeroId();
   return useMutation({
-    mutationFn: () => confirmStats(res?.data?.id ?? '', data),
+    mutationFn: () => confirmStats(heroId, data),
     onError: () => {
       toastError();
     },

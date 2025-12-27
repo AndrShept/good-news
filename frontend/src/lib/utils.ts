@@ -177,3 +177,21 @@ export function capitalize(text: string | undefined) {
   if (!text) return '';
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 }
+
+export function buildSimplePath(from: IPosition, to: IPosition): IPosition[] {
+  const path: IPosition[] = [];
+
+  let x = from.x;
+  let y = from.y;
+
+  while (x !== to.x || y !== to.y) {
+    if (x < to.x) x++;
+    else if (x > to.x) x--;
+    else if (y < to.y) y++;
+    else if (y > to.y) y--;
+
+    path.push({ x, y });
+  }
+
+  return path;
+}

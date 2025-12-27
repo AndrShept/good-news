@@ -28,12 +28,24 @@ interface IUpdateHeroMaxValues {
   bonusMaxMana: number;
   bonusMaxHealth: number;
 }
-
+type ColumnType = Partial<Record<keyof typeof heroTable.$inferSelect, boolean>>;
 export const heroService = (db: TTransaction | TDataBase) => ({
   async getHero(id: string, options?: Parameters<typeof db.query.heroTable.findFirst>[0]): Promise<Hero> {
     const hero = await db.query.heroTable.findFirst({
       where: eq(heroTable.id, id),
       ...options,
+    });
+    if (!hero) {
+      throw new HTTPException(404, {
+        message: 'hero not found',
+      });
+    }
+    return hero;
+  },
+  async getHeroByColum<T extends ColumnType>(id: string, columns: T) {
+    const hero = await db.query.heroTable.findFirst({
+      where: eq(heroTable.id, id),
+      columns,
     });
     if (!hero) {
       throw new HTTPException(404, {

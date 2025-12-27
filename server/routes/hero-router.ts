@@ -5,7 +5,6 @@ import {
   type RegenHealthJob,
   type RegenManaJob,
   type WalkMapJob,
-  type WalkPlaceJob,
   jobName,
 } from '@/shared/job-types';
 import type {
@@ -125,10 +124,9 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
-      if (!hero.isOnline) {
-        await heroOnline(hero.id);
-      }
-
+      console.log('START HERO ONLINE')
+      await heroOnline(hero.id);
+     console.log('FINICH HERO ONLINE')
       return c.json<SuccessResponse<Hero>>({
         success: true,
         message: 'hero fetched',
@@ -197,7 +195,6 @@ export const heroRouter = new Hono<Context>()
       });
       await tx.insert(locationTable).values({ placeId: place.id, heroId: newHero.id, x: place.x, y: place.y });
 
-
       await tx.insert(itemContainerTable).values({
         name: 'Main Backpack',
         type: 'BACKPACK',
@@ -234,7 +231,7 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const { id } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-      const hero = await heroService(db).getHero(id);
+      const hero = await heroService(db).getHeroByColum(id, { userId: true, id: true, goldCoins: true, level: true });
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
@@ -407,7 +404,7 @@ export const heroRouter = new Hono<Context>()
             gameItem: { with: { weapon: true, armor: true } },
           },
         }),
-        heroService(db).getHero(id),
+        heroService(db).getHeroByColum(id, { id: true, userId: true }),
         itemContainerService(db).getHeroBackpack(id),
       ]);
       const isEquipment =
@@ -488,7 +485,7 @@ export const heroRouter = new Hono<Context>()
       const { id, equipmentItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
       const [hero, equipmentItem] = await Promise.all([
-        heroService(db).getHero(id),
+        heroService(db).getHeroByColum(id, { id: true, userId: true }),
         equipmentService(db).getEquipItem(equipmentItemId, { with: { gameItem: true } }),
       ]);
       const heroBackpack = await itemContainerService(db).getHeroBackpack(hero.id);
@@ -670,38 +667,6 @@ export const heroRouter = new Hono<Context>()
 
       return c.json<SuccessResponse>({
         message: 'action canceled',
-        success: true,
-      });
-    },
-  )
-
-  .post(
-    '/:id/action/back-town-entry',
-    loggedIn,
-    zValidator('param', z.object({ id: z.string() })),
-
-    async (c) => {
-      const user = c.get('user');
-      const { id } = c.req.valid('param');
-      const hero = await heroService(db).getHero(id, {
-        with: { location: { columns: { id: true } } },
-      });
-
-      if (!hero.location?.id) {
-        throw new HTTPException(404, {
-          message: 'location id not found',
-        });
-      }
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-      await db
-        .update(locationTable)
-        .set({
-          currentBuilding: null,
-        })
-        .where(eq(locationTable.id, hero.location.id));
-
-      return c.json<SuccessResponse>({
-        message: 'action updated',
         success: true,
       });
     },
@@ -1052,7 +1017,7 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const { type } = c.req.valid('json');
 
-      const hero = await heroService(db).getHero(id);
+      const hero = await heroService(db).getHeroByColum(id, { id: true, userId: true });
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
@@ -1232,7 +1197,7 @@ export const heroRouter = new Hono<Context>()
       const { id, queueCraftItemId } = c.req.valid('param');
 
       const [hero, queueItems] = await Promise.all([
-        heroService(db).getHero(id),
+        heroService(db).getHeroByColum(id, { id: true, userId: true, state: true }),
         db.query.queueCraftItemTable.findMany({
           where: eq(queueCraftItemTable.heroId, id),
           with: { craftItem: { with: { gameItem: true } } },
@@ -1306,11 +1271,9 @@ export const heroRouter = new Hono<Context>()
     const user = c.get('user');
     const { id } = c.req.valid('param');
 
-    const hero = await heroService(db).getHero(id, {
-      columns: {
-        id: true,
-        userId: true,
-      },
+    const hero = await heroService(db).getHeroByColum(id, {
+      id: true,
+      userId: true,
     });
     const skills = await db.query.skillTable.findMany({
       where: eq(skillTable.heroId, hero.id),
@@ -1336,6 +1299,7 @@ export const heroRouter = new Hono<Context>()
         userId: true,
       },
     });
+
     const itemContainers = await db.query.itemContainerTable.findMany({
       where: and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.placeId, hero.location?.placeId!)),
       orderBy: asc(itemContainerTable.createdAt),

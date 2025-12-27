@@ -2,7 +2,7 @@ import { Spinner } from '@/components/Spinner';
 import { ModalProvider } from '@/components/providers/ModalProvider';
 import { CharacterPaperdoll } from '@/features/hero/components/CharacterPaperdoll';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { NewGameMap } from '@/features/map/components/NewGameMap';
+import { GameMapLayout } from '@/features/map/components/GameMapLayout';
 import { Place } from '@/features/place/components/Place';
 import { createFileRoute } from '@tanstack/react-router';
 
@@ -23,14 +23,14 @@ function RouteComponent() {
     state: data?.state,
   }));
   const isCharacter = state === 'CHARACTER';
-  const isPlace = !!placeId && !isCharacter  && !currentBuilding;
-  const isMap = !isCharacter  && !!mapId;
+  const isPlace = !!placeId && !isCharacter && !currentBuilding;
+  const isMap = !isCharacter && !!mapId;
 
   return (
     <>
       {isCharacter && <CharacterPaperdoll />}
       {isPlace && <Place />}
-      {isMap && <NewGameMap />}
+      {isMap && <GameMapLayout />}
       <ModalProvider />
     </>
   );
