@@ -283,6 +283,7 @@ export type IPosition = {
 };
 
 //API RESPONSE
+
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];
 export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
 

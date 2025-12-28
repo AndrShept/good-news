@@ -27,14 +27,6 @@ export const actionQueueListeners = () => {
     const jobData = returnvalue as unknown as ActionJobEvent;
 
     switch (jobData.jobName) {
-      case 'WALK_PLACE': {
-        const socketData: PlaceUpdateEvent = {
-          payload: jobData.payload,
-          type: 'WALK_PLACE',
-        };
-        io.to(jobData.payload.heroId).emit(socketEvents.placeUpdate(), socketData);
-        break;
-      }
       case 'WALK_MAP': {
         const socketData: MapUpdateEvent = {
           payload: jobData.payload,

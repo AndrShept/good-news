@@ -1,5 +1,5 @@
 import type { GameMessageType } from '../frontend/src/store/useGameMessages';
-import type { BuffCreateJob, QueueCraftItemJob, RegenHealthJob, RegenManaJob, WalkMapJob, WalkPlaceJob } from './job-types';
+import type { BuffCreateJob, QueueCraftItemJob, RegenHealthJob, RegenManaJob, WalkMapJob } from './job-types';
 import type { BuildingType, GameItem, Location, QueueCraftStatusType } from './types';
 
 export type SocketGroupResponse = {
@@ -36,11 +36,7 @@ export type PlaceUpdateEvent =
       type: 'HERO_LEAVE_PLACE';
       payload: { heroId: string; mapId: string };
     }
-  | {
-      type: 'WALK_PLACE';
-      payload: WalkPlaceJob['payload'];
-    };
-
+  
 export type HeroOfflineData = {
   type: 'HERO_OFFLINE';
   payload: { heroId: string; placeId?: string; mapId?: string };

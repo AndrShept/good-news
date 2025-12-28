@@ -13,17 +13,15 @@ export const locationTable = pgTable('location', {
     onDelete: 'set null',
   }),
   mapId: uuid().references(() => mapTable.id, {
-    onDelete: 'cascade',
+    onDelete: 'set null',
   }),
   heroId: uuid()
     .references(() => heroTable.id, {
       onDelete: 'cascade',
     })
     .notNull(),
-
   x: integer().default(0).notNull(),
   y: integer().default(0).notNull(),
-  currentBuilding: text(),
   createdAt: timestamp({
     mode: 'string',
   }).defaultNow(),

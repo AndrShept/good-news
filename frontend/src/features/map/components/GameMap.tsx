@@ -7,7 +7,6 @@ import { useScaleMap } from '../hooks/useScaleMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
 import { HeroTile } from './HeroTile';
 import { MovablePathTile } from './MovablePathTile';
-import { MovingPathInfo } from './MovingPathInfo';
 import { PlaceTile } from './PlaceTile';
 
 interface Props {

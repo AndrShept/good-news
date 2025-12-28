@@ -1,12 +1,6 @@
 import { calculate } from '@/shared/calculate';
 import { BANK_CONTAINER_COST, BASE_STATS, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
-import {
-  type QueueCraftItemJob,
-  type RegenHealthJob,
-  type RegenManaJob,
-  type WalkMapJob,
-  jobName,
-} from '@/shared/job-types';
+import { type QueueCraftItemJob, type RegenHealthJob, type RegenManaJob, type WalkMapJob, jobName } from '@/shared/job-types';
 import type {
   HeroOnlineData,
   MapUpdateEvent,
@@ -33,16 +27,13 @@ import {
   statsSchema,
 } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
-import { randomUUIDv7 } from 'bun';
 import { and, asc, desc, eq, lt, lte, ne, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
 import { io } from '..';
-import { HeroIcon } from '../../frontend/src/components/game-icons/HeroIcon';
 import { capitalize } from '../../frontend/src/lib/utils';
-import type { GameMessageType } from '../../frontend/src/store/useGameMessages';
 import { socketEvents } from '../../shared/socket-events';
 import type { Context } from '../context';
 import { db } from '../db/db';
@@ -50,13 +41,9 @@ import {
   buildingTypeEnum,
   containerSlotTable,
   coreMaterialTypeEnum,
-  craftItemTable,
-  equipmentTable,
-  gameItemEnum,
   gameItemTable,
   heroTable,
   itemContainerTable,
-  itemContainerTypeEnum,
   locationTable,
   modifierTable,
   placeTable,
@@ -70,7 +57,7 @@ import {
 import { buffTable } from '../db/schema/buff-schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
 import { heroOnline } from '../lib/heroOnline';
-import { generateRandomUuid, getTileExists, jobQueueId, setSqlNow, setSqlNowByInterval, verifyHeroOwnership } from '../lib/utils';
+import { generateRandomUuid, getTileExists, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
@@ -124,9 +111,9 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
-      console.log('START HERO ONLINE')
+      console.log('START HERO ONLINE');
       await heroOnline(hero.id);
-     console.log('FINICH HERO ONLINE')
+      console.log('FINICH HERO ONLINE');
       return c.json<SuccessResponse<Hero>>({
         success: true,
         message: 'hero fetched',
@@ -526,8 +513,11 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const { id, containerSlotId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-      const hero = await heroService(db).getHero(id);
-      const containerSlotItem = await containerSlotItemService(db).getContainerSlotItem(containerSlotId, { with: { gameItem: true } });
+      const [hero, containerSlotItem] = await Promise.all([
+        heroService(db).getHeroByColum(id, { id: true, userId: true }),
+        containerSlotItemService(db).getContainerSlotItem(containerSlotId, { with: { gameItem: true } }),
+      ]);
+
       const itemContainer = await itemContainerService(db).getItemContainerById(containerSlotItem.itemContainerId);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
@@ -642,35 +632,6 @@ export const heroRouter = new Hono<Context>()
       data: buffs,
     });
   })
-
-  .post(
-    '/:id/action/cancel',
-    loggedIn,
-    zValidator('param', z.object({ id: z.string() })),
-
-    async (c) => {
-      const user = c.get('user');
-      const { id } = c.req.valid('param');
-      const hero = await heroService(db).getHero(id);
-
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      await db
-        .update(heroTable)
-        .set({
-          state: 'IDLE',
-        })
-        .where(eq(heroTable.id, hero.id));
-
-      const jobId = hero.id;
-      await actionQueue.remove(jobId);
-
-      return c.json<SuccessResponse>({
-        message: 'action canceled',
-        success: true,
-      });
-    },
-  )
 
   .post(
     '/:id/action/walk-map',

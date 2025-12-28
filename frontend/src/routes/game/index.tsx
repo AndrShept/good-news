@@ -16,14 +16,13 @@ export const Route = createFileRoute('/game/')({
 });
 
 function RouteComponent() {
-  const { currentBuilding, mapId, placeId, state } = useHero((data) => ({
-    currentBuilding: data?.location?.currentBuilding,
+  const { mapId, placeId, state } = useHero((data) => ({
     placeId: data?.location?.placeId,
     mapId: data?.location?.mapId,
     state: data?.state,
   }));
   const isCharacter = state === 'CHARACTER';
-  const isPlace = !!placeId && !isCharacter && !currentBuilding;
+  const isPlace = !!placeId && !isCharacter 
   const isMap = !isCharacter && !!mapId;
 
   return (

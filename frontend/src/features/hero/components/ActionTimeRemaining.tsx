@@ -5,7 +5,6 @@ import { useTime, useTransform } from 'motion/react';
 import * as m from 'motion/react-m';
 import { useEffect, useState } from 'react';
 
-import { useActionCancel } from '../hooks/useActionCancel';
 import { useHero } from '../hooks/useHero';
 
 export const ActionTimeRemaining = () => {
@@ -17,7 +16,6 @@ export const ActionTimeRemaining = () => {
   const time = useTime();
   const totalTime = action?.timeRemaining ?? 0;
   const [startTime, setStartTime] = useState(performance.now());
-  const mutation = useActionCancel();
   const width = useTransform(time, [startTime, startTime + totalTime * 1000], ['100%', '0%']);
   useEffect(() => {
     setSeconds(Math.max(action?.timeRemaining ?? 0, 0));
@@ -55,9 +53,9 @@ export const ActionTimeRemaining = () => {
             <p className="">{formatDurationFromSeconds(seconds)}</p>
           </div>
         </div>
-        <Button variant="outline" size="sm" disabled={mutation.isPending} onClick={() => mutation.mutate()}>
+        {/* <Button variant="outline" size="sm" disabled={mutation.isPending} onClick={() => mutation.mutate()}>
           Cancel
-        </Button>
+        </Button> */}
       </div>
       {/* <p className="text-center">moving...</p> */}
     </section>

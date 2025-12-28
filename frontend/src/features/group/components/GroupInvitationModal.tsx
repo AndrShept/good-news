@@ -2,7 +2,7 @@ import { HeroAvatar } from '@/components/HeroAvatar';
 import { TimerBar } from '@/components/TimerBar';
 import { Button } from '@/components/ui/button';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
-import { ApiHeroResponse } from '@/shared/types';
+import { Hero } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import * as m from 'motion/react-m';
 import { useEffect, useRef } from 'react';
@@ -16,12 +16,12 @@ export const GroupInvitationModal = () => {
   const seconds = useRef(0);
   const onAccept = async () => {
     responseCb.current?.({ accept: true });
-    queryClient.setQueriesData<ApiHeroResponse>({ queryKey: getHeroOptions().queryKey }, (oldData) => {
-      if (!oldData || !oldData.data || !responseData.current?.groupId) return;
+    queryClient.setQueriesData<Hero>({ queryKey: getHeroOptions().queryKey }, (oldData) => {
+      if (!oldData || !responseData.current?.groupId) return;
 
       return {
-        ...oldData,
-        data: { ...oldData.data, groupId: responseData.current.groupId },
+      
+        ...oldData, groupId: responseData.current.groupId ,
       };
     });
     onClose();
