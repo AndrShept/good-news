@@ -1,5 +1,6 @@
 import { PropsWithChildren, createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { Socket, io } from 'socket.io-client';
+import {  io } from 'socket.io-client';
+import type{ Socket} from 'socket.io-client';
 
 interface ISocketContext {
   socket: Socket;

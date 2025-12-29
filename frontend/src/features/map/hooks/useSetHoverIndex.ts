@@ -1,4 +1,5 @@
-import { buildSimplePath } from '@/lib/utils';
+import { Layer } from '@/shared/json-types';
+import { buildPathWithObstacles } from '@/shared/utils';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { RefObject, useRef, useState } from 'react';
 
@@ -11,6 +12,7 @@ interface IUseSetHoverIndex {
   MAP_WIDTH: number;
   heroPosX: number;
   heroPosY: number;
+  layers: Layer[];
 }
 
 export const useSetHoverIndex = ({
@@ -22,12 +24,13 @@ export const useSetHoverIndex = ({
   scale,
   heroPosX,
   heroPosY,
+  layers,
 }: IUseSetHoverIndex) => {
   const [start, setStart] = useState<{ x: number; y: number } | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const dragStartedRef = useRef(false);
   const lastTapRef = useRef(0);
-  
+
   const setMovementPathTiles = useMovementPathTileStore((state) => state.setMovementPathTiles);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -74,7 +77,8 @@ export const useSetHoverIndex = ({
 
       const x = hoverIndex % MAP_WIDTH;
       const y = Math.floor(hoverIndex / MAP_WIDTH);
-      const path = buildSimplePath({ x: heroPosX, y: heroPosY }, { x, y });
+
+      const path = buildPathWithObstacles({ x: heroPosX, y: heroPosY }, { x, y }, layers, MAP_WIDTH, MAP_HEIGHT);
       setMovementPathTiles(path);
     }
 

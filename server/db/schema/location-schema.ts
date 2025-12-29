@@ -5,7 +5,6 @@ import { heroTable } from './hero-schema';
 import { mapTable } from './map-schema';
 import { placeTable } from './place-schema';
 
-
 export const locationTable = pgTable('location', {
   id: uuid().primaryKey().defaultRandom(),
 
@@ -22,6 +21,8 @@ export const locationTable = pgTable('location', {
     .notNull(),
   x: integer().default(0).notNull(),
   y: integer().default(0).notNull(),
+  targetX: integer(),
+  targetY: integer(),
   createdAt: timestamp({
     mode: 'string',
   }).defaultNow(),

@@ -7,7 +7,7 @@ import { getMapHeroesLocationOptions } from '../api/get-map-heroes';
 import { useGameMap } from '../hooks/useGameMap';
 import { GameMap } from './GameMap';
 import { HeroActionsBar } from './HeroActionsBar';
-import { LocationHeroesList } from './LocationHeroesList';
+import { HeroSidebarList } from './HeroSidebarList';
 import { MovingPathInfo } from './MovingPathInfo';
 
 export const GameMapLayout = () => {
@@ -18,7 +18,7 @@ export const GameMapLayout = () => {
     state: data?.state ?? 'IDLE',
   }));
 
-  const { data: heroesLocation, isLoading } = useQuery(getMapHeroesLocationOptions(hero.mapId));
+  const { data: mapHeroes, isLoading } = useQuery(getMapHeroesLocationOptions(hero.mapId));
 
   const map = useGameMap({ mapId: hero.mapId });
   const { isHeroOnTownTile, canFish } = useHeroActions({
@@ -27,24 +27,25 @@ export const GameMapLayout = () => {
     map: map.data,
   });
 
-  const heroesAtPosition = useMemo(() => heroesLocation?.filter((p) => p.x === hero.x && p.y === hero.y), [hero.x, hero.y, heroesLocation]);
+  const heroesAtPosition = useMemo(() => mapHeroes?.filter((p) => p.x === hero.x && p.y === hero.y), [hero.x, hero.y, mapHeroes]);
   return (
     <section className="flex w-full flex-col gap-2 p-1 sm:flex-row">
       <aside className="flex w-full max-w-[150px] gap-2 sm:flex-col">
         <HeroActionsBar canFish={canFish} isHeroOnTownTile={isHeroOnTownTile} state={hero.state} />
-        <LocationHeroesList locationHeroes={heroesAtPosition} isLoading={isLoading} />
+        <HeroSidebarList heroes={heroesAtPosition} isLoading={isLoading} />
       </aside>
-      <div className="relative aspect-video w-full overflow-hidden  ">
+      <div className="relative aspect-video w-full overflow-hidden">
         <MovingPathInfo />
         <GameMap
           width={map.data?.width ?? 0}
           height={map.data?.width ?? 0}
+          layers={map.data?.layers ?? []}
           image={map.data?.image ?? ''}
           tileWidth={map.data?.tileWidth ?? 32}
           isLoading={map.isLoading}
           heroPosX={hero.x}
           heroPosY={hero.y}
-          heroesLocation={heroesLocation}
+          mapHeroes={mapHeroes}
           places={map.data?.places}
         />
       </div>

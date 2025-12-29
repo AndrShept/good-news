@@ -1,7 +1,7 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import React from 'react';
 
-export const LocationHeroesSkeleton = () => {
+export const HeroSidebarListSkeleton = () => {
   const items = Array.from({ length: 8 }, (_, idx) => idx);
   return (
     <>

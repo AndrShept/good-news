@@ -5,7 +5,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { LazyMotion, domAnimation } from 'motion/react';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
-import { Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 
 import { ErrorLoadingData } from './components/ErrorLoadingData.tsx';
 import { NotFound } from './components/NotFound.tsx';

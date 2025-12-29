@@ -1,5 +1,5 @@
 import { useHero } from '@/features/hero/hooks/useHero';
-import { LocationHeroesList } from '@/features/map/components/LocationHeroesList';
+import { HeroSidebarList } from '@/features/map/components/HeroSidebarList';
 import { useQuery } from '@tanstack/react-query';
 
 import { getPlaceOptions } from '../api/get-place';
@@ -10,14 +10,14 @@ import { SelectedBuildingPage } from './SelectedBuildingPage';
 export const Place = () => {
   const placeId = useHero((data) => data?.location?.placeId ?? '');
   const placeData = useQuery(getPlaceOptions(placeId));
-  const locationHeroesData = useQuery(getPlaceHeroesLocationOptions(placeId));
+  const placeHeroes = useQuery(getPlaceHeroesLocationOptions(placeId));
 
   if (placeData.isLoading) return <p>LOADING ...</p>;
   return (
     <section className="mx-auto flex w-full">
       <PlaceSidebar place={placeData.data} />
       <SelectedBuildingPage place={placeData.data} />
-      <LocationHeroesList isLoading={locationHeroesData.isLoading} locationHeroes={locationHeroesData.data} />
+      <HeroSidebarList isLoading={placeHeroes.isLoading} heroes={placeHeroes.data} />
     </section>
   );
 };

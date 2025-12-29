@@ -7,10 +7,10 @@ import { format, intervalToDuration } from 'date-fns';
 import { hc } from 'hono/client';
 import { RefObject } from 'react';
 import toast from 'react-hot-toast';
-import { Socket } from 'socket.io-client';
 import { twMerge } from 'tailwind-merge';
 
 import type { ApiRoutes } from '../../../server';
+import type{ Socket } from 'socket.io-client';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -178,20 +178,3 @@ export function capitalize(text: string | undefined) {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 }
 
-export function buildSimplePath(from: IPosition, to: IPosition): IPosition[] {
-  const path: IPosition[] = [];
-
-  let x = from.x;
-  let y = from.y;
-
-  while (x !== to.x || y !== to.y) {
-    if (x < to.x) x++;
-    else if (x > to.x) x--;
-    else if (y < to.y) y++;
-    else if (y > to.y) y--;
-
-    path.push({ x, y });
-  }
-
-  return path;
-}

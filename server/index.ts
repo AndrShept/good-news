@@ -1,4 +1,4 @@
-import type { ErrorResponse } from '@/shared/types';
+import type { ErrorResponse, MapHero } from '@/shared/types';
 import { serve } from '@hono/node-server';
 import { createAdapter } from '@socket.io/redis-adapter';
 import 'dotenv/config';
@@ -8,9 +8,7 @@ import { serveStatic } from 'hono/bun';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
-import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import { Redis } from 'ioredis';
-import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
 
 import { type Context } from './context';
@@ -118,8 +116,10 @@ await db.update(heroTable).set({
 io.on('connection', async (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };
   const { heroId } = socket.handshake.query as { heroId: string };
+
   socket.join(heroId);
-  game({ socket });
+  game(socket);
+
   console.info('connected ' + username);
   socket.on('disconnect', async () => {
     console.info('disconnect ' + username);

@@ -1,13 +1,13 @@
-import type { Location, Map, Place, SuccessResponse } from '@/shared/types';
+import type { HeroSidebarItem, Location, Map, Place, SuccessResponse } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
-import { asc, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { locationTable,  placeTable,  } from '../db/schema';
+import { heroTable, locationTable, placeTable } from '../db/schema';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const placeRouter = new Hono<Context>()
@@ -25,7 +25,6 @@ export const placeRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const place = await db.query.placeTable.findFirst({
         where: eq(placeTable.id, id),
-      
       });
 
       if (!place) {
@@ -61,17 +60,25 @@ export const placeRouter = new Hono<Context>()
         });
       }
 
-      const locationHeroes = await db.query.locationTable.findMany({
-        with: { hero: true },
-        where: eq(locationTable.placeId, id),
-      });
+      const placeHeroes = await db
+        .select({
+          id: heroTable.id,
+          name: heroTable.name,
+          level: heroTable.level,
+          state: heroTable.state,
+          avatarImage: heroTable.avatarImage,
+          // x: locationTable.x,
+          // y: locationTable.y,
+          // placeId: locationTable.placeId,
+        })
+        .from(heroTable)
+        .innerJoin(locationTable, eq(locationTable.heroId, heroTable.id))
+        .where(and(eq(locationTable.placeId, place.id), eq(heroTable.isOnline, true)));
 
-      const onlineLocationHeroes = locationHeroes.filter((l) => l.hero?.isOnline);
-
-      return c.json<SuccessResponse<Location[]>>({
-        message: 'location heroes fetched!',
+      return c.json<SuccessResponse<HeroSidebarItem[]>>({
+        message: 'place heroes fetched!',
         success: true,
-        data: onlineLocationHeroes,
+        data: placeHeroes,
       });
     },
   );

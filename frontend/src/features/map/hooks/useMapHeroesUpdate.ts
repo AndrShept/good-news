@@ -1,6 +1,6 @@
-import { IPosition, Location } from '@/shared/types';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo } from 'react';
+import { ApiGetMapHeroes, MapHero } from '@/shared/types';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 
 import { getMapHeroesLocationOptions } from '../api/get-map-heroes';
 
@@ -8,32 +8,32 @@ export const useMapHeroesUpdate = (mapId: string) => {
   const queryClient = useQueryClient();
 
   const updateHeroesPos = useCallback(
-    (heroId: string, position: IPosition) => {
-      queryClient.setQueriesData<Location[]>({ queryKey: getMapHeroesLocationOptions(mapId).queryKey }, (oldData) => {
+    (heroId: string, data: Partial<MapHero>) => {
+      queryClient.setQueriesData<ApiGetMapHeroes>({ queryKey: getMapHeroesLocationOptions(mapId).queryKey }, (oldData) => {
         if (!oldData) return;
-        return oldData.map((location) => (location.heroId === heroId ? { ...location, ...position } : location));
+        return oldData.map((h) => (heroId === h.id ? { ...h, ...data } : h));
       });
     },
     [mapId],
   );
   const deleteHeroes = useCallback(
     (heroId: string) => {
-      queryClient.setQueriesData<Location[]>({ queryKey: getMapHeroesLocationOptions(mapId).queryKey }, (oldData) => {
+      queryClient.setQueriesData<ApiGetMapHeroes>({ queryKey: getMapHeroesLocationOptions(mapId).queryKey }, (oldData) => {
         if (!oldData) return;
 
-        return oldData.filter((location) => location.heroId !== heroId);
+        return oldData.filter((h) => h.id !== heroId);
       });
     },
     [mapId],
   );
 
   const addHeroes = useCallback(
-    (heroLocation: Location) => {
-      queryClient.setQueriesData<Location[]>({ queryKey: getMapHeroesLocationOptions(mapId).queryKey }, (oldData) => {
+    (hero: MapHero) => {
+      queryClient.setQueriesData<ApiGetMapHeroes>({ queryKey: getMapHeroesLocationOptions(mapId).queryKey }, (oldData) => {
         if (!oldData) return;
-        if (oldData.some((location) => location.id === heroLocation.id)) return;
+        if (oldData.some((h) => h.id === hero.id)) return;
 
-        return [...oldData, heroLocation];
+        return [...oldData, hero];
       });
     },
     [mapId],

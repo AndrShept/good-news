@@ -4,15 +4,17 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { getHeroOptions } from '../api/get-hero';
 import { useHeroId } from './useHeroId';
+import { useHeroUpdate } from './useHeroUpdate';
 
-export const useWalkOnMap = () => {
+export const useWalkMapMutation = () => {
   const id = useHeroId();
   const queryClient = useQueryClient();
+  const { updateHero } = useHeroUpdate();
   return useMutation({
-    mutationFn: async (newPos: IPosition) => {
+    mutationFn: async (targetPos: IPosition) => {
       const res = await client.hero[':id'].action['walk-map'].$post({
         param: { id },
-        json: newPos,
+        json: targetPos,
       });
       const data = await res.json();
       if (!res.ok) {
@@ -21,8 +23,8 @@ export const useWalkOnMap = () => {
 
       return data;
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: getHeroOptions().queryKey });
+    onSuccess: async (_, { x, y }) => {
+      updateHero({ location: { targetX: x, targetY: y } });
     },
   });
 };

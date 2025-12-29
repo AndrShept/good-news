@@ -1,6 +1,7 @@
-import { Location, Place } from '@/shared/types';
+import { Layer } from '@/shared/json-types';
+import { MapHero, Place } from '@/shared/types';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
-import { useRef, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 
 import { useDragOnMap } from '../hooks/useDragOnMap';
 import { useScaleMap } from '../hooks/useScaleMap';
@@ -12,16 +13,17 @@ import { PlaceTile } from './PlaceTile';
 interface Props {
   heroPosX: number;
   heroPosY: number;
-  heroesLocation: Location[] | undefined;
+  mapHeroes: MapHero[] | undefined;
   places: Place[] | undefined;
   tileWidth: number;
   height: number;
   width: number;
   image: string;
   isLoading: boolean;
+  layers: Layer[];
 }
 
-export const GameMap = ({ image, height, tileWidth, width, heroPosX, heroPosY, heroesLocation, places, isLoading }: Props) => {
+export const GameMap = memo(({ image, height, tileWidth, width, heroPosX, heroPosY, mapHeroes, places, isLoading, layers }: Props) => {
   const TILE_SIZE = tileWidth;
   const MAP_HEIGHT = height;
   const MAP_WIDTH = width;
@@ -40,6 +42,7 @@ export const GameMap = ({ image, height, tileWidth, width, heroPosX, heroPosY, h
     TILE_SIZE,
     heroPosX,
     heroPosY,
+    layers,
   });
 
   const { handleMouseDown, handleMouseUp } = useDragOnMap({
@@ -78,7 +81,7 @@ export const GameMap = ({ image, height, tileWidth, width, heroPosX, heroPosY, h
       >
         {places?.map((place) => <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} />)}
 
-        {heroesLocation?.map((location) => <HeroTile key={location.id} {...location} TILE_SIZE={TILE_SIZE} />)}
+        {mapHeroes?.map((hero) => <HeroTile key={hero.id} {...hero} TILE_SIZE={TILE_SIZE} />)}
 
         {movementPathTiles?.map((position) => <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} />)}
 
@@ -98,4 +101,4 @@ export const GameMap = ({ image, height, tileWidth, width, heroPosX, heroPosY, h
       </ul>
     </div>
   );
-};
+});

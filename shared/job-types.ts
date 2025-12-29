@@ -1,7 +1,6 @@
 import type { BuildingType, CoreMaterialType, IPosition, ResourceType } from './types';
 
 export const jobName = {
-  'walk-map': 'WALK_PLACE',
   'hero-offline': 'HERO_OFFLINE',
   'buff-create': 'BUFF_CREATE',
   'regen-health': 'REGEN_HEALTH',
@@ -11,17 +10,10 @@ export const jobName = {
 
 export type JobNameType = (typeof jobName)[keyof typeof jobName];
 
-export type ActionJobEvent =  WalkMapJob | HeroOfflineJob | BuffCreateJob | RegenHealthJob | RegenManaJob | QueueCraftItemJob;
+export type ActionJobEvent =  HeroOfflineJob | BuffCreateJob | RegenHealthJob | RegenManaJob | QueueCraftItemJob;
 
 
-export type WalkMapJob = {
-  jobName: 'WALK_MAP';
-  payload: {
-    heroId: string;
-    newPosition: IPosition;
-    mapId: string;
-  };
-};
+
 export type HeroOfflineJob = {
   jobName: 'HERO_OFFLINE';
   payload: {

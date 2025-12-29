@@ -1,6 +1,6 @@
 import { calculate } from '@/shared/calculate';
 import { BANK_CONTAINER_COST, BASE_STATS, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
-import { type QueueCraftItemJob, type RegenHealthJob, type RegenManaJob, type WalkMapJob, jobName } from '@/shared/job-types';
+import { type QueueCraftItemJob, type RegenHealthJob, type RegenManaJob, jobName } from '@/shared/job-types';
 import type {
   HeroOnlineData,
   MapUpdateEvent,
@@ -18,6 +18,7 @@ import {
   type GameItem,
   type GameItemType,
   type Hero,
+  type PathNode,
   type QueueCraftItem,
   type Skill,
   type SuccessResponse,
@@ -26,6 +27,7 @@ import {
   createHeroSchema,
   statsSchema,
 } from '@/shared/types';
+import { buildPathWithObstacles } from '@/shared/utils';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq, lt, lte, ne, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -33,7 +35,6 @@ import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
 import { io } from '..';
-import { capitalize } from '../../frontend/src/lib/utils';
 import { socketEvents } from '../../shared/socket-events';
 import type { Context } from '../context';
 import { db } from '../db/db';
@@ -56,6 +57,7 @@ import {
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
+import { heroPath } from '../lib/game';
 import { heroOnline } from '../lib/heroOnline';
 import { generateRandomUuid, getTileExists, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
@@ -196,7 +198,7 @@ export const heroRouter = new Hono<Context>()
       for (const skill of skillsTypeEnum.enumValues) {
         await tx.insert(skillTable).values({
           heroId: newHero.id,
-          name: capitalize(skill),
+          name: skill.toLowerCase(),
           type: skill,
         });
       }
@@ -662,65 +664,54 @@ export const heroRouter = new Hono<Context>()
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
+      const heroPos = { x: hero.location?.x ?? 0, y: hero.location?.y ?? 0 };
       const MAP_WIDTH = hero.location?.map?.width ?? 0;
-      const tileIndex = targetPos.y * MAP_WIDTH + targetPos.x;
-      const tileExistMap = getTileExists(hero.location?.mapId ?? '', tileIndex, 'GROUND');
-      const waterTile = getTileExists(hero.location?.mapId ?? '', tileIndex, 'WATER');
-      const objectTile = getTileExists(hero.location?.mapId ?? '', tileIndex, 'OBJECT');
-      if (waterTile) {
-        throw new HTTPException(403, {
-          message: `Movement blocked: tile at (${targetPos.x}, ${targetPos.y}) is WATER.`,
-        });
-      }
-      if (objectTile) {
-        throw new HTTPException(403, {
-          message: `Movement blocked: tile at (${targetPos.x}, ${targetPos.y}) is OBJECT.`,
-        });
-      }
-      if (!tileExistMap) {
-        throw new HTTPException(403, {
-          message: `Tile at position (${targetPos.x}, ${targetPos.y}) does not exist on the map`,
-        });
-      }
+      const MAP_HEIGHT = hero.location?.map?.height ?? 0;
+      // const tileIndex = targetPos.y * MAP_WIDTH + targetPos.x;
+      // const tileExistMap = getTileExists(hero.location?.mapId ?? '', tileIndex, 'GROUND');
+      // const waterTile = getTileExists(hero.location?.mapId ?? '', tileIndex, 'WATER');
+      // const objectTile = getTileExists(hero.location?.mapId ?? '', tileIndex, 'OBJECT');
+      // if (waterTile) {
+      //   throw new HTTPException(403, {
+      //     message: `Movement blocked: tile at (${targetPos.x}, ${targetPos.y}) is WATER.`,
+      //   });
+      // }
+      // if (objectTile) {
+      //   throw new HTTPException(403, {
+      //     message: `Movement blocked: tile at (${targetPos.x}, ${targetPos.y}) is OBJECT.`,
+      //   });
+      // }
+      // if (!tileExistMap) {
+      //   throw new HTTPException(403, {
+      //     message: `Tile at position (${targetPos.x}, ${targetPos.y}) does not exist on the map`,
+      //   });
+      // }
       if (!hero.location) {
         throw new HTTPException(409, {
           message: ' Hero is not on the world map. ',
         });
       }
-      const isMovable =
-        Math.abs(hero.location?.x! - targetPos.x) <= 1 &&
-        Math.abs(hero.location?.y! - targetPos.y) <= 1 &&
-        !(hero.location.x === targetPos.x && hero.location.y === targetPos.y);
-      if (!isMovable) {
+      const paths = buildPathWithObstacles(heroPos, targetPos, hero.location?.map?.layers ?? [], MAP_WIDTH, MAP_HEIGHT);
+      const sumDex = (hero.modifier?.dexterity ?? 0) + hero.stat.dexterity;
+      if (!paths.length) {
         throw new HTTPException(409, {
-          message: ' Hero can only move to an adjacent tile. ',
+          message: ' path not correct ',
         });
       }
-
-      const jobId = hero.id;
-      const sumDex = (hero.modifier?.dexterity ?? 0) + hero.stat.dexterity;
-      const delay = calculate.walkTime(sumDex);
-      await db
-        .update(heroTable)
-        .set({
-          state: 'WALK',
-        })
-        .where(eq(heroTable.id, hero.id));
-      const jobData: WalkMapJob = {
-        jobName: 'WALK_MAP',
-        payload: {
-          heroId: hero.id,
-          newPosition: targetPos,
-          mapId: hero.location.mapId ?? '',
-        },
-      };
-      await actionQueue.remove(jobId);
-      await actionQueue.add(jobName['walk-map'], jobData, {
-        delay,
-        jobId,
-        removeOnComplete: true,
-      });
-
+      const walkTime = calculate.walkTime(sumDex);
+      const now = Date.now();
+      const walkPathWithTime: PathNode[] = paths.map((path, idx) => ({
+        ...path,
+        completedAt: now + walkTime * (idx + 1),
+        mapId: hero.location?.mapId ?? '',
+      }));
+      heroPath.set(hero.id, walkPathWithTime);
+      // await db
+      //   .update(heroTable)
+      //   .set({
+      //     state: 'WALK',
+      //   })
+      //   .where(eq(heroTable.id, hero.id));
       return c.json<SuccessResponse>({
         message: 'walking start',
         success: true,

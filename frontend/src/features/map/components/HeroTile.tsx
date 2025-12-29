@@ -1,14 +1,14 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { Location } from '@/shared/types';
-import React, { memo } from 'react';
+import {  MapHero } from '@/shared/types';
+import { memo } from 'react';
 
 import { TileImg } from './TileImg';
 
-interface Props extends Location {
+interface Props extends MapHero {
   TILE_SIZE: number;
 }
 
-export const HeroTile = memo(function HeroTile({ x, y, hero, TILE_SIZE }: Props) {
+export const HeroTile = memo(function HeroTile({ x, y, id, characterImage, TILE_SIZE }: Props) {
   const heroId = useHeroId();
   return (
     <div
@@ -19,7 +19,7 @@ export const HeroTile = memo(function HeroTile({ x, y, hero, TILE_SIZE }: Props)
         width: TILE_SIZE,
         height: TILE_SIZE,
         filter:
-          heroId === hero?.id
+          heroId === id
             ? `
 
     drop-shadow(0.5px 0 0 rgba(0,0,0,1))
@@ -30,7 +30,7 @@ export const HeroTile = memo(function HeroTile({ x, y, hero, TILE_SIZE }: Props)
             : undefined,
       }}
     >
-      <TileImg image={hero?.characterImage ?? ''} />
+      <TileImg image={characterImage} />
     </div>
   );
 });

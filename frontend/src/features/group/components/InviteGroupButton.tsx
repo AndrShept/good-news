@@ -9,10 +9,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { CheckIcon } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { useSocket } from '../../../components/providers/SocketProvider';
-import { Button } from '../../../components/ui/button';
 import { getGroupAvailableHeroesOptions } from '../api/get-group-available-heroes';
 import { getGroupMembersOptions } from '../api/get-group-members';
+import { Button } from '@/components/ui/button';
+import { useSocket } from '@/components/providers/SocketProvider';
 
 export const InviteGroupButton = ({ toHeroId, searchTerm }: { toHeroId: string; searchTerm: string }) => {
   const groupId = useHero((data) => data?.groupId ?? '');

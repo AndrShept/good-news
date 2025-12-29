@@ -163,6 +163,8 @@ export type PaginatedResponse<T> = {
   data: T;
 } & Omit<SuccessResponse, 'data'>;
 
+export type PathNode = { x: number; y: number; mapId: string; completedAt: number };
+
 export type GetPostsData = InferResponseType<typeof client.post.$get>;
 
 export type EquipmentSlotType = (typeof slotEnum.enumValues)[number];
@@ -271,6 +273,19 @@ export type Hero = InferSelectModel<typeof heroTable> & {
   queueCraftItems?: QueueCraftItem[];
   itemContainers?: { id: string; type: ItemContainerType; name: string }[];
 };
+
+export type HeroSidebarItem = {
+  id: string;
+  name: string;
+  level: number;
+  state: StateType;
+  avatarImage: string;
+};
+export type MapHero = HeroSidebarItem & {
+  characterImage: string;
+  x: number;
+  y: number;
+};
 export type Buff = typeof buffTable.$inferSelect;
 
 export type Skill = typeof skillTable.$inferSelect & {
@@ -285,6 +300,7 @@ export type IPosition = {
 //API RESPONSE
 
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];
+export type ApiGetMapHeroes = InferResponseType<(typeof client.map)[':id']['heroes']['$get']>['data'];
 export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
 
 export type ApiGetCraftItemResponse = InferResponseType<(typeof client)['craft']['items'][':buildingType']['$get']>['data'];

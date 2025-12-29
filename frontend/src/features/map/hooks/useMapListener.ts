@@ -13,10 +13,10 @@ import { useMapHeroesUpdate } from './useMapHeroesUpdate';
 export const useMapListener = () => {
   const setGameMessage = useGameMessages((state) => state.setGameMessage);
   const mapId = useHero((data) => data?.location?.mapId ?? '');
+  const { updateHeroesPos, deleteHeroes, addHeroes } = useMapHeroesUpdate(mapId);
   const id = useHeroId();
   const { socket } = useSocket();
   const { updateHero } = useHeroUpdate();
-  const { updateHeroesPos, deleteHeroes, addHeroes } = useMapHeroesUpdate(mapId);
   const prevMapIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -49,16 +49,7 @@ export const useMapListener = () => {
           addHeroes(data.payload.location);
           break;
 
-        case 'WALK_MAP':
-          if (id === data.payload.heroId) {
-            setGameMessage({
-              type: 'SUCCESS',
-              text: `You have entered tile.`,
-            });
-            updateHero({ state: 'IDLE', location: { ...data.payload.newPosition } });
-          }
-          updateHeroesPos(data.payload.heroId, { ...data.payload.newPosition });
-          break;
+       
         case 'HERO_OFFLINE':
           deleteHeroes(data.payload.heroId);
           break;

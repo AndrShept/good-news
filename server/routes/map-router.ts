@@ -1,5 +1,4 @@
-
-import type { Location, Map, SuccessResponse } from '@/shared/types';
+import type { Location, Map, MapHero, SuccessResponse } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -8,9 +7,9 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import {  locationTable, mapTable } from '../db/schema';
-import { loggedIn } from '../middleware/loggedIn';
+import { heroTable, locationTable, mapTable } from '../db/schema';
 import { getMapJson } from '../lib/utils';
+import { loggedIn } from '../middleware/loggedIn';
 
 export const mapRouter = new Hono<Context>()
   .get(
@@ -66,17 +65,25 @@ export const mapRouter = new Hono<Context>()
         });
       }
 
-      const locationHeroes = await db.query.locationTable.findMany({
-        with: { hero: true },
-        where: eq(locationTable.mapId, id),
-      });
+      const mapHeroes = await db
+        .select({
+          id: heroTable.id,
+          name: heroTable.name,
+          state: heroTable.state,
+          level: heroTable.level,
+          avatarImage: heroTable.avatarImage,
+          characterImage: heroTable.characterImage,
+          x: locationTable.x,
+          y: locationTable.y,
+        })
+        .from(heroTable)
+        .innerJoin(locationTable, eq(locationTable.heroId, heroTable.id))
+        .where(and(eq(locationTable.mapId, map.id), eq(heroTable.isOnline, true)));
 
-      const onlineLocationHeroes = locationHeroes.filter((l) => l.hero?.isOnline);
-
-      return c.json<SuccessResponse<Location[]>>({
-        message: 'location heroes fetched!',
+      return c.json<SuccessResponse<MapHero[]>>({
+        message: 'map sidebar heroes fetched!',
         success: true,
-        data: onlineLocationHeroes,
+        data: mapHeroes,
       });
     },
   );
