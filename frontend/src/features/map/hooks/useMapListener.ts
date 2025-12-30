@@ -49,14 +49,14 @@ export const useMapListener = () => {
           if (id === data.payload.heroId) {
             console.log('');
           }
-          addHeroes(data.payload.location);
+          // addHeroes(data.payload.location);
           break;
 
         case 'HERO_OFFLINE':
           deleteHeroes(data.payload.heroId);
           break;
         case 'HERO_ONLINE': {
-          addHeroes(data.payload);
+          // addHeroes(data.payload);
 
           break;
         }
