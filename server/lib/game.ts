@@ -15,24 +15,26 @@ export const heroPath = new Map<string, PathNode[]>();
 
 const moveTick = (socket: Socket) => {
   const persistQueue: { heroId: string; x: number; y: number }[] = [];
-  setInterval(async () => {
+  setInterval( () => {
     for (const [heroId, path] of heroPath.entries()) {
       if (!path.length) continue;
       const now = Date.now();
       const nextPath = path[0];
+      let lastStep: PathNode | null = null;
       if (nextPath.completedAt <= now) {
         const step = path.shift();
         if (!step) continue;
+        lastStep = step;
         const data: WalkMapData = { heroId, x: step.x, y: step.y };
         io.to(step.mapId).emit(socketEvents.walkMap(), data);
       }
-      if (!path.length) {
+      if (!path.length && lastStep) {
         heroPath.delete(heroId);
 
         persistQueue.push({
           heroId,
-          x: nextPath.x,
-          y: nextPath.y,
+          x: lastStep.x,
+          y: lastStep.y,
         });
       }
     }
