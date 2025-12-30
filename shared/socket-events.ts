@@ -7,8 +7,8 @@ export const socketEvents = {
   groupSysMessages: () => `group:sys-messages`,
   joinRoom: () => `join:room`,
   leaveRoom: () => `leave:room`,
-  walkMap: () => `action:walk-map`,
   mapUpdate: () => `update:map`,
+  walkMap: () => `walk:map`,
   placeUpdate: () => `update:place`,
   queueCraft: () => 'queue:craft',
 };

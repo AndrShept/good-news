@@ -41,7 +41,7 @@ export const mapRouter = new Hono<Context>()
       return c.json<SuccessResponse<Map>>({
         message: 'map fetched!',
         success: true,
-        data: { ...map, layers: mapJson.jsonUrl.layers } as Map,
+        data: { ...map, layers: mapJson.layers } as Map,
       });
     },
   )

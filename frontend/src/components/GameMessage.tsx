@@ -3,8 +3,8 @@ import { useGroupListener } from '@/features/group/hooks/useGroupListener';
 import { useHeroListener } from '@/features/hero/hooks/useHeroListener';
 import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
 import { useSelfMessage } from '@/features/hero/hooks/useSelfMessage';
-import { useWalkMapListener } from '@/features/hero/hooks/useWalkMapListener';
 import { useMapListener } from '@/features/map/hooks/useMapListener';
+import { useWalkMapListener } from '@/features/map/hooks/useWalkMapListener';
 import { usePlaceListener } from '@/features/place/hooks/usePlaceListener';
 import { useQueueCraftListener } from '@/features/queue/hooks/useQueueCraftListener';
 import { cn, getTimeFns } from '@/lib/utils';
@@ -16,12 +16,12 @@ export const GameMessage = memo(() => {
   const ref = useRef<null | HTMLUListElement>(null);
   useGroupListener();
   useMapListener();
+  useWalkMapListener();
   usePlaceListener();
   useRegeneration();
   useSelfMessage();
   useHeroListener();
   useQueueCraftListener();
-  useWalkMapListener();
 
   useEffect(() => {
     ref.current?.lastElementChild?.scrollIntoView({

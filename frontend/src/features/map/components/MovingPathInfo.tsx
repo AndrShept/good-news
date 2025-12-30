@@ -1,10 +1,15 @@
 import { AcceptButton } from '@/components/AcceptButton';
 import { CancelButton } from '@/components/CancelButton';
 import { useWalkMapMutation } from '@/features/hero/hooks/useWalkMapMutation';
+import { StateType } from '@/shared/types';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { memo } from 'react';
 
-export const MovingPathInfo = memo(function MovingPathInfo() {
+type Props = {
+  heroState: StateType;
+};
+
+export const MovingPathInfo = memo(function MovingPathInfo({ heroState }: Props) {
   const { movementPathTiles, setMovementPathTiles } = useMovementPathTileStore();
   const targetPos = movementPathTiles.at(-1);
   const { mutate, isPending } = useWalkMapMutation();
@@ -22,10 +27,13 @@ export const MovingPathInfo = memo(function MovingPathInfo() {
       <p className="text-muted-foreground/50">
         time: <span className="text-primary">{'40sec'}</span>
       </p>
-      <div className="space-x-1">
-        <CancelButton disabled={isPending} onClick={() => setMovementPathTiles([])} className="size-8" />
-        <AcceptButton disabled={isPending} onClick={onCLick} className="size-8 border" />
-      </div>
+      {heroState === 'IDLE' && (
+        <div className="space-x-1">
+          <CancelButton disabled={isPending} onClick={() => setMovementPathTiles([])} className="size-8" />
+          <AcceptButton disabled={isPending} onClick={onCLick} className="size-8 border" />
+        </div>
+      )}
+      {heroState === 'WALK' && <p>moving...</p>}
     </section>
   );
 });

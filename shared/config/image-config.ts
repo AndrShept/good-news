@@ -1,4 +1,4 @@
-import type { ArmorSlotType, ResourceType, SkillType, WeaponType } from '../types';
+import type { ArmorSlotType, ResourceType, SkillType, StateType, WeaponType } from '../types';
 
 export const imageConfig = {
   icon: {
@@ -30,6 +30,11 @@ export const imageConfig = {
       settings: '/sprites/icons/ui/settings.png',
       skill: '/sprites/icons/ui/skill.png',
     },
+    state: {
+      IDLE: '/sprites/icons/state/idle.png',
+      BATTLE: '/sprites/icons/state/battle.png',
+      WALK: '/sprites/icons/state/walk.png',
+    } as Record<StateType, string>,
     skill: {
       BLACKSMITHING: '/sprites/icons/skills/blacksmithing.png',
       ALCHEMY: '/sprites/icons/skills/alchemy.png',

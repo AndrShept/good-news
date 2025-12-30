@@ -11,7 +11,7 @@ export const MovablePathTile = memo(function MovablePathTile({ x, y, TILE_SIZE }
   return (
     <>
       <div
-        className="absolute inline-flex items-center justify-center text-red-500"
+        className="absolute  inline-flex items-center justify-center text-red-500"
         style={{
           left: x * TILE_SIZE,
           top: y * TILE_SIZE,

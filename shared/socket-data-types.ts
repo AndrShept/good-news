@@ -1,6 +1,6 @@
 import type { GameMessageType } from '../frontend/src/store/useGameMessages';
 import type { BuffCreateJob, QueueCraftItemJob, RegenHealthJob, RegenManaJob } from './job-types';
-import type { BuildingType, GameItem, Location, QueueCraftStatusType } from './types';
+import type { BuildingType, GameItem, Location, QueueCraftStatusType, StateType } from './types';
 
 export type SocketGroupResponse = {
   message: string;
@@ -62,8 +62,25 @@ export type SelfMessageData = { message: string; type: GameMessageType };
 
 export type SelfHeroData = BuffCreateJob | RegenHealthJob | RegenManaJob | QueueCraftItemJob;
 
-export type WalkMapData = {
-  x: number;
-  y: number;
-  heroId: string;
+export type WalkMapStartData = {
+  type: 'WALK_MAP_START';
+  payload: {
+    state: StateType;
+    heroId: string;
+  };
+};
+export type WalkMapUpdateData = {
+  type: 'WALK_MAP_UPDATE';
+  payload: {
+    x: number;
+    y: number;
+    heroId: string;
+  };
+};
+export type WalkMapCompleteData = {
+  type: 'WALK_MAP_COMPLETE';
+  payload: {
+    state: StateType;
+    heroId: string;
+  };
 };

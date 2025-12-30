@@ -7,7 +7,7 @@ import { getMapHeroesLocationOptions } from '../api/get-map-heroes';
 export const useMapHeroesUpdate = (mapId: string) => {
   const queryClient = useQueryClient();
 
-  const updateHeroesPos = useCallback(
+  const updateHeroes = useCallback(
     (heroId: string, data: Partial<MapHero>) => {
       queryClient.setQueriesData<ApiGetMapHeroes>({ queryKey: getMapHeroesLocationOptions(mapId).queryKey }, (oldData) => {
         if (!oldData) return;
@@ -40,7 +40,7 @@ export const useMapHeroesUpdate = (mapId: string) => {
   );
 
   return {
-    updateHeroesPos,
+    updateHeroes,
     deleteHeroes,
     addHeroes,
   };

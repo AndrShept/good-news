@@ -1,7 +1,7 @@
 import type { TileType } from './types';
 
 
-export interface TileMap {
+export interface IMapJson {
   compressionlevel: number;
   height: number;
   width: number;
@@ -15,20 +15,17 @@ export interface TileMap {
   tiledversion: string;
   layers: Layer[];
   tilesets: Tileset[];
-
   type: string;
   version: string;
 }
 
 export interface Layer {
-  draworder?: string;
-  id: string;
-  name: TileType;
-  objects: TileObject[];
   data: number[];
   height: number;
+  id: number;
+  name: string;
   opacity: number;
-  type: 'objectgroup' | 'tilelayer';
+  type: string;
   visible: boolean;
   width: number;
   x: number;
@@ -47,16 +44,4 @@ export interface Tileset {
   tilecount: number;
   tileheight: number;
   tilewidth: number;
-}
-export interface TileObject {
-  gid: number;
-  height: number;
-  width: number;
-  id: number;
-  name: TileType;
-  rotation?: number;
-  type?: string;
-  visible: boolean;
-  x: number;
-  y: number;
 }

@@ -1,4 +1,5 @@
 import { Layer } from '@/shared/json-types';
+import { StateType } from '@/shared/types';
 import { buildPathWithObstacles } from '@/shared/utils';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { RefObject, useRef, useState } from 'react';
@@ -12,6 +13,7 @@ interface IUseSetHoverIndex {
   MAP_WIDTH: number;
   heroPosX: number;
   heroPosY: number;
+  heroState: StateType;
   layers: Layer[];
 }
 
@@ -24,6 +26,7 @@ export const useSetHoverIndex = ({
   scale,
   heroPosX,
   heroPosY,
+  heroState,
   layers,
 }: IUseSetHoverIndex) => {
   const [start, setStart] = useState<{ x: number; y: number } | null>(null);
@@ -57,6 +60,7 @@ export const useSetHoverIndex = ({
     const y = Math.floor(relativeY / TILE_SIZE);
 
     if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
+      if(heroState !== 'IDLE') return
       setHoverIndex(y * MAP_WIDTH + x);
     } else {
       setHoverIndex(null);
@@ -70,7 +74,7 @@ export const useSetHoverIndex = ({
 
   const handleTap = () => {
     const now = Date.now();
-
+    if (heroState !== 'IDLE') return;
     if (now - lastTapRef.current < 300) {
       if (dragStartedRef.current) return;
       if (hoverIndex === null) return;

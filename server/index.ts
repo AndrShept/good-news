@@ -14,8 +14,11 @@ import { Server } from 'socket.io';
 import { type Context } from './context';
 import { db } from './db/db';
 import { heroTable } from './db/schema';
-import { game } from './lib/game';
+import { gameLoop } from './lib/gameLoop';
 import { heroOffline } from './lib/heroOffline';
+import { inviteGroup } from './lib/inviteGroup';
+import { joinRoom } from './lib/joinRoom';
+import { leaveRoom } from './lib/leaveRoom';
 import { sessionHandler } from './middleware/sessionHandler';
 import { actionQueueListeners } from './queue/actionQueueListeners';
 import { authRouter } from './routes/auth-router';
@@ -90,18 +93,11 @@ const httpServer = serve({
 
 actionQueueListeners();
 
-const pubClient = new Redis(process.env['REDIS_CLOUD_DATABASE_URL']!);
-const subClient = pubClient.duplicate();
-
-// Або обробити їх підключення/помилки
-pubClient.on('error', (err) => console.log('Redis Pub Client Error', err));
-subClient.on('error', (err) => console.log('Redis Sub Client Error', err));
 export const io = new Server(httpServer, {
   cors: {
     credentials: true,
     origin: process.env['BASE_URL_FRONT'],
   },
-  adapter: createAdapter(pubClient, subClient),
   pingInterval: 30000, // 30 sec
   pingTimeout: 1000 * 60 * 60 * 24, // 24 h
 
@@ -112,18 +108,21 @@ await db.update(heroTable).set({
   isOnline: false,
   state: 'IDLE',
 });
+gameLoop();
 
 io.on('connection', async (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };
   const { heroId } = socket.handshake.query as { heroId: string };
 
   socket.join(heroId);
-  game(socket);
+  inviteGroup(socket);
+  joinRoom(socket);
+  leaveRoom(socket);
 
   console.info('connected ' + username);
-  socket.on('disconnect', async () => {
+  socket.on('disconnect',  () => {
     console.info('disconnect ' + username);
-    await heroOffline(heroId);
+     heroOffline(heroId);
   });
 });
 

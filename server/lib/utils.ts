@@ -1,6 +1,6 @@
 import { BASE_HEALTH_REGEN_TIME, BASE_MANA_REGEN_TIME, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
-import type { TileMap } from '@/shared/json-types';
-import type { Map, Modifier, OmitModifier, TileType} from '@/shared/types';
+import type { IMapJson } from '@/shared/json-types';
+import type { Map, Modifier, OmitModifier, TileType } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
 import { sql } from 'drizzle-orm';
@@ -9,6 +9,7 @@ import nodemailer from 'nodemailer';
 import z from 'zod';
 
 import { mapEntities } from '../entities/map';
+import solmerValley from '../json/solmer-valley.json';
 
 const schema = z.object({
   DATABASE_URL: z.string(),
@@ -87,24 +88,16 @@ export const rand = (num: number) => {
   return Math.floor(Math.random() * num);
 };
 
-
-
-interface MapLoadInfo {
-  jsonUrl: TileMap;
-}
-
 export const getMapJson = (mapId: string) => {
-  const map: Record<string, MapLoadInfo> = {
-    '019a350c-5552-76dd-b6d5-181b473d3128': {
-      jsonUrl: require('../json/solmer-valley.json'),
-    },
+  const map: Record<string, IMapJson> = {
+    '019a350c-5552-76dd-b6d5-181b473d3128': solmerValley,
   };
   return map[mapId];
 };
 
 export const getTileExists = (mapId: string, index: number, tileType: TileType) => {
   const map = getMapJson(mapId);
-  const tiles = map.jsonUrl.layers.find((l) => l.name === tileType);
+  const tiles = map.layers.find((l) => l.name === tileType);
   return tiles?.data[index];
 };
 
@@ -148,4 +141,3 @@ export const newCombineModifier = <T extends Partial<Modifier> | null | undefine
   }
   return result;
 };
-

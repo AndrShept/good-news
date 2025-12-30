@@ -35,7 +35,7 @@ export const GameMapLayout = () => {
         <HeroSidebarList heroes={heroesAtPosition} isLoading={isLoading} />
       </aside>
       <div className="relative aspect-video w-full overflow-hidden">
-        <MovingPathInfo />
+        <MovingPathInfo heroState={hero.state} />
         <GameMap
           width={map.data?.width ?? 0}
           height={map.data?.width ?? 0}
@@ -45,6 +45,7 @@ export const GameMapLayout = () => {
           isLoading={map.isLoading}
           heroPosX={hero.x}
           heroPosY={hero.y}
+          heroState={hero.state}
           mapHeroes={mapHeroes}
           places={map.data?.places}
         />

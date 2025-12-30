@@ -8,6 +8,7 @@ import type {
   QueueCraftItemSocketData,
   SelfHeroData,
   SelfMessageData,
+  WalkMapStartData,
 } from '@/shared/socket-data-types';
 import {
   type Buff,
@@ -57,9 +58,9 @@ import {
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
-import { heroPath } from '../lib/game';
+import { heroPath } from '../lib/gameLoop';
 import { heroOnline } from '../lib/heroOnline';
-import { generateRandomUuid, getTileExists, verifyHeroOwnership } from '../lib/utils';
+import { generateRandomUuid, getMapJson, getTileExists, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
@@ -691,7 +692,8 @@ export const heroRouter = new Hono<Context>()
           message: ' Hero is not on the world map. ',
         });
       }
-      const paths = buildPathWithObstacles(heroPos, targetPos, hero.location?.map?.layers ?? [], MAP_WIDTH, MAP_HEIGHT);
+      const mapJson = getMapJson(hero.location?.mapId ?? '');
+      const paths = buildPathWithObstacles(heroPos, targetPos, mapJson.layers ?? [], MAP_WIDTH, MAP_HEIGHT);
       const sumDex = (hero.modifier?.dexterity ?? 0) + hero.stat.dexterity;
       if (!paths.length) {
         throw new HTTPException(409, {
@@ -705,13 +707,26 @@ export const heroRouter = new Hono<Context>()
         completedAt: now + walkTime * (idx + 1),
         mapId: hero.location?.mapId ?? '',
       }));
+      console.log(hero.location?.map);
+      await db.transaction(async (tx) => {
+        await tx
+          .update(heroTable)
+          .set({
+            state: 'WALK',
+          })
+          .where(eq(heroTable.id, hero.id));
+        await tx.update(locationTable).set({ targetX: targetPos.x, targetY: targetPos.y }).where(eq(locationTable.heroId, hero.id));
+      });
       heroPath.set(hero.id, walkPathWithTime);
-      // await db
-      //   .update(heroTable)
-      //   .set({
-      //     state: 'WALK',
-      //   })
-      //   .where(eq(heroTable.id, hero.id));
+      const socketData: WalkMapStartData = {
+        type: 'WALK_MAP_START',
+        payload: {
+          heroId: hero.id,
+          state: 'WALK',
+        },
+      };
+      io.to(hero.location.mapId!).emit(socketEvents.walkMap(), socketData);
+
       return c.json<SuccessResponse>({
         message: 'walking start',
         success: true,

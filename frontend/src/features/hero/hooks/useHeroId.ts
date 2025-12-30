@@ -7,7 +7,7 @@ export const useHeroId = () => {
 
   const hero = queryClient.getQueryData(getHeroOptions().queryKey);
   if (!hero) {
-    throw new Error('useHeroId ,hero not found');
+    return '';
   }
   return hero.id;
 };
