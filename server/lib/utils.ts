@@ -141,3 +141,7 @@ export const newCombineModifier = <T extends Partial<Modifier> | null | undefine
   }
   return result;
 };
+
+export const delay = (time: number) => {
+  return new Promise((resolve) => setTimeout(resolve, time));
+};

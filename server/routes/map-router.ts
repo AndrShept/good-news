@@ -37,7 +37,7 @@ export const mapRouter = new Hono<Context>()
 
       const mapJson = getMapJson(map.id);
 
-      console.log('GET MAP');
+  
       return c.json<SuccessResponse<Map>>({
         message: 'map fetched!',
         success: true,

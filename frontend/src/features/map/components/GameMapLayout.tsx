@@ -1,7 +1,7 @@
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroActions } from '@/features/hero/hooks/useHeroActions';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { getMapHeroesLocationOptions } from '../api/get-map-heroes';
 import { useGameMap } from '../hooks/useGameMap';
@@ -14,10 +14,11 @@ export const GameMapLayout = () => {
   const hero = useHero((data) => ({
     x: data?.location?.x ?? 0,
     y: data?.location?.y ?? 0,
+    targetX: data?.location?.targetX ?? 0,
+    targetY: data?.location?.targetY ?? 0,
     mapId: data?.location?.mapId ?? '',
     state: data?.state ?? 'IDLE',
   }));
-
   const { data: mapHeroes, isLoading } = useQuery(getMapHeroesLocationOptions(hero.mapId));
 
   const map = useGameMap({ mapId: hero.mapId });
@@ -28,6 +29,7 @@ export const GameMapLayout = () => {
   });
 
   const heroesAtPosition = useMemo(() => mapHeroes?.filter((p) => p.x === hero.x && p.y === hero.y), [hero.x, hero.y, mapHeroes]);
+
   return (
     <section className="flex w-full flex-col gap-2 p-1 sm:flex-row">
       <aside className="flex w-full max-w-[150px] gap-2 sm:flex-col">
@@ -45,6 +47,8 @@ export const GameMapLayout = () => {
           isLoading={map.isLoading}
           heroPosX={hero.x}
           heroPosY={hero.y}
+          heroTargetX={hero.targetX}
+          heroTargetY={hero.targetY}
           heroState={hero.state}
           mapHeroes={mapHeroes}
           places={map.data?.places}

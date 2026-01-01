@@ -58,7 +58,7 @@ import {
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
-import { heroPath } from '../lib/gameLoop';
+import { serverState } from '../game/state/hero-state';
 import { heroOnline } from '../lib/heroOnline';
 import { generateRandomUuid, getMapJson, getTileExists, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
@@ -114,9 +114,20 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
-      console.log('START HERO ONLINE');
       await heroOnline(hero.id);
-      console.log('FINICH HERO ONLINE');
+      const stateHero = serverState.hero.get(hero.id);
+      if (!stateHero) {
+        serverState.hero.set(hero.id, {
+          currentHealth: hero.currentHealth,
+          currentMana: hero.currentMana,
+          maxHealth: hero.maxHealth,
+          maxMana: hero.maxMana,
+          state: hero.state,
+          x: hero.location?.x!,
+          y: hero.location?.y!,
+        });
+      }
+
       return c.json<SuccessResponse<Hero>>({
         success: true,
         message: 'hero fetched',
@@ -707,7 +718,6 @@ export const heroRouter = new Hono<Context>()
         completedAt: now + walkTime * (idx + 1),
         mapId: hero.location?.mapId ?? '',
       }));
-      console.log(hero.location?.map);
       await db.transaction(async (tx) => {
         await tx
           .update(heroTable)
@@ -717,7 +727,10 @@ export const heroRouter = new Hono<Context>()
           .where(eq(heroTable.id, hero.id));
         await tx.update(locationTable).set({ targetX: targetPos.x, targetY: targetPos.y }).where(eq(locationTable.heroId, hero.id));
       });
-      heroPath.set(hero.id, walkPathWithTime);
+      const heroState = serverState.hero.get(hero.id);
+      if (heroState) {
+        heroState.paths = walkPathWithTime;
+      }
       const socketData: WalkMapStartData = {
         type: 'WALK_MAP_START',
         payload: {

@@ -8,13 +8,13 @@ import { serveStatic } from 'hono/bun';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
-import { Redis } from 'ioredis';
 import { Server } from 'socket.io';
 
 import { type Context } from './context';
 import { db } from './db/db';
-import { heroTable } from './db/schema';
-import { gameLoop } from './lib/gameLoop';
+import { heroTable, locationTable } from './db/schema';
+import { gameLoop } from './game/gameLoop';
+import { saveDb } from './game/save-db';
 import { heroOffline } from './lib/heroOffline';
 import { inviteGroup } from './lib/inviteGroup';
 import { joinRoom } from './lib/joinRoom';
@@ -108,6 +108,11 @@ await db.update(heroTable).set({
   isOnline: false,
   state: 'IDLE',
 });
+await db.update(locationTable).set({
+  targetX: null,
+  targetY: null,
+});
+
 gameLoop();
 
 io.on('connection', async (socket) => {
@@ -120,9 +125,10 @@ io.on('connection', async (socket) => {
   leaveRoom(socket);
 
   console.info('connected ' + username);
-  socket.on('disconnect',  () => {
+  socket.on('disconnect', async () => {
     console.info('disconnect ' + username);
-     heroOffline(heroId);
+    heroOffline(heroId);
+
   });
 });
 

@@ -1,12 +1,12 @@
 import { calculate } from '@/shared/calculate';
 import { type BuffCreateJob, jobName } from '@/shared/job-types';
-import type { ContainerSlot, Hero, Modifier, OmitModifier } from '@/shared/types';
+import type { ContainerSlot, Hero, IPosition, Modifier, OmitModifier } from '@/shared/types';
 import { and, eq, sql } from 'drizzle-orm';
 import type {} from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction } from '../db/db';
-import { buffTable, equipmentTable, heroTable, modifierTable } from '../db/schema';
+import { buffTable, equipmentTable, heroTable, locationTable, modifierTable } from '../db/schema';
 import { newCombineModifier } from '../lib/utils';
 import { actionQueue } from '../queue/actionQueue';
 import { craftItemService } from './craft-item-service';
@@ -197,5 +197,19 @@ export const heroService = (db: TTransaction | TDataBase) => ({
         })
         .where(eq(heroTable.id, heroId));
     }
+  },
+
+  async walkMapCOmplete(heroId: string, pos: IPosition) {
+    await db.update(heroTable).set({ state: 'IDLE' }).where(eq(heroTable.id, heroId));
+    const [{ mapId }] = await db
+      .update(locationTable)
+      .set({ x: pos.x, y: pos.y, targetX: null, targetY: null })
+      .where(eq(locationTable.heroId, heroId))
+      .returning({ mapId: locationTable.mapId });
+
+    if (!mapId) {
+      throw new HTTPException(404, { message: 'walkMapCOmplete map id not found' });
+    }
+    return { mapId };
   },
 });
