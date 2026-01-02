@@ -6,25 +6,37 @@ import { HTTPException } from 'hono/http-exception';
 import { io } from '..';
 import { db } from '../db/db';
 import { heroTable, locationTable } from '../db/schema';
+import { serverState } from '../game/state/hero-state';
 import { actionQueue } from '../queue/actionQueue';
 import { jobQueueId } from './utils';
 
 export const heroOnline = async (heroId: string) => {
-  const jobId = jobQueueId.offline(heroId);
-  await actionQueue.remove(jobId);
+  // const jobId = jobQueueId.offline(heroId);
+  // await actionQueue.remove(jobId);
 
-  const location = await db.query.locationTable.findFirst({
-    where: eq(locationTable.heroId, heroId),
-    with: { hero: true },
-  });
-  if (!location) {
-    throw new HTTPException(404, {
-      message: 'location not found',
-    });
-  }
+  // const location = await db.query.locationTable.findFirst({
+  //   where: eq(locationTable.heroId, heroId),
+  //   with: { hero: true },
+  // });
+  // if (!location) {
+  //   throw new HTTPException(404, {
+  //     message: 'location not found',
+  //   });
+  // }
+  const heroState = serverState.hero.get(heroId);
+  if (!heroState) return;
   const socketData: HeroOnlineData = {
     type: 'HERO_ONLINE',
-    payload: location,
+    payload: {
+      id: heroState.id,
+      avatarImage: heroState.avatarImage,
+      characterImage: heroState.characterImage,
+      level: heroState.level,
+      name: heroState.name,
+      state: heroState.state,
+      x: heroState.location.x,
+      y: heroState.location.y,
+    },
   };
 
   await db
@@ -34,10 +46,10 @@ export const heroOnline = async (heroId: string) => {
     })
     .where(eq(heroTable.id, heroId));
 
-  if (location.mapId) {
-    io.to(location.mapId).emit(socketEvents.mapUpdate(), socketData);
+  if (heroState.location.mapId) {
+    io.to(heroState.location.mapId).emit(socketEvents.mapUpdate(), socketData);
   }
-  if (location.placeId) {
-    io.to(location.placeId).emit(socketEvents.placeUpdate(), socketData);
+  if (heroState.location.placeId) {
+    io.to(heroState.location.placeId).emit(socketEvents.placeUpdate(), socketData);
   }
 };

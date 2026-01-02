@@ -23,5 +23,5 @@ export const getMapHeroesLocationOptions = (mapId: string) =>
     queryKey: ['map', mapId, 'heroes'],
     queryFn: () => getMapHeroesLocation(mapId),
     enabled: !!mapId,
-    staleTime: 0
+    staleTime: 0,
   });

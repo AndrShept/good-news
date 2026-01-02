@@ -1,6 +1,6 @@
 import type { GameMessageType } from '../frontend/src/store/useGameMessages';
 import type { BuffCreateJob, QueueCraftItemJob, RegenHealthJob, RegenManaJob } from './job-types';
-import type { BuildingType, GameItem, Location, QueueCraftStatusType, StateType } from './types';
+import type { BuildingType, GameItem, HeroSidebarItem, Location, MapHero, QueueCraftStatusType, StateType } from './types';
 
 export type SocketGroupResponse = {
   message: string;
@@ -20,13 +20,13 @@ export type MapUpdateEvent =
     }
   | {
       type: 'HERO_LEAVE_PLACE';
-      payload: { location: Location; mapId: string; heroId: string };
+      payload: { hero: MapHero; mapId: string; heroId: string };
     };
 
 export type PlaceUpdateEvent =
   | {
       type: 'HERO_ENTER_PLACE';
-      payload: Location;
+      payload: HeroSidebarItem;
     }
   | {
       type: 'HERO_LEAVE_PLACE';
@@ -39,7 +39,7 @@ export type HeroOfflineData = {
 };
 export type HeroOnlineData = {
   type: 'HERO_ONLINE';
-  payload: Location;
+  payload: MapHero;
 };
 
 export type QueueCraftItemSocketData =

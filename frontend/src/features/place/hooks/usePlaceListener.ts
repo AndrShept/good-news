@@ -16,7 +16,7 @@ export const usePlaceListener = () => {
   const id = useHeroId();
   const { socket } = useSocket();
   const { updateHero } = useHeroUpdate();
-  const { addHeroes, deleteHeroes } = usePlaceHeroesUpdate(placeId);
+  const { addHeroes, removeHeroes } = usePlaceHeroesUpdate(placeId);
   const prevTownIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -40,14 +40,14 @@ export const usePlaceListener = () => {
             });
             updateHero({ state: 'IDLE', location: { mapId: data.payload.mapId, placeId: null } });
           }
-          deleteHeroes(data.payload.heroId);
+          removeHeroes(data.payload.heroId);
           break;
 
         case 'HERO_ENTER_PLACE':
           addHeroes(data.payload);
           break;
         case 'HERO_OFFLINE':
-          deleteHeroes(data.payload.heroId);
+          removeHeroes(data.payload.heroId);
           break;
         case 'HERO_ONLINE':
           addHeroes(data.payload);
@@ -59,5 +59,5 @@ export const usePlaceListener = () => {
     return () => {
       socket.off(socketEvents.placeUpdate(), listener);
     };
-  }, [addHeroes, deleteHeroes, id, setGameMessage, socket, updateHero]);
+  }, [addHeroes, id, removeHeroes, setGameMessage, socket, updateHero]);
 };

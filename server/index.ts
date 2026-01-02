@@ -15,6 +15,7 @@ import { db } from './db/db';
 import { heroTable, locationTable } from './db/schema';
 import { gameLoop } from './game/gameLoop';
 import { saveDb } from './game/save-db';
+import { serverState } from './game/state/hero-state';
 import { heroOffline } from './lib/heroOffline';
 import { inviteGroup } from './lib/inviteGroup';
 import { joinRoom } from './lib/joinRoom';
@@ -127,8 +128,11 @@ io.on('connection', async (socket) => {
   console.info('connected ' + username);
   socket.on('disconnect', async () => {
     console.info('disconnect ' + username);
-    heroOffline(heroId);
-
+    const heroState = serverState.hero.get(heroId);
+    if (heroState) {
+      heroState.offlineTimer = Date.now() + 30000;
+    }
+   
   });
 });
 

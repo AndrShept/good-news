@@ -8,6 +8,7 @@ import { z } from 'zod';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { heroTable, locationTable, mapTable } from '../db/schema';
+import { serverState } from '../game/state/hero-state';
 import { getMapJson } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
 
@@ -37,7 +38,6 @@ export const mapRouter = new Hono<Context>()
 
       const mapJson = getMapJson(map.id);
 
-  
       return c.json<SuccessResponse<Map>>({
         message: 'map fetched!',
         success: true,
@@ -80,10 +80,15 @@ export const mapRouter = new Hono<Context>()
         .innerJoin(locationTable, eq(locationTable.heroId, heroTable.id))
         .where(and(eq(locationTable.mapId, map.id), eq(heroTable.isOnline, true)));
 
+      let newHeroesData: MapHero[] = [];
+
+      for (const [heroId, hero] of serverState.hero.entries()) {
+        newHeroesData = mapHeroes.map((h) => (h.id === heroId ? { ...h, x: hero.location.x, y: hero.location.y, state: hero.state,  } : h));
+      }
       return c.json<SuccessResponse<MapHero[]>>({
-        message: 'map sidebar heroes fetched!',
+        message: 'map  heroes fetched!',
         success: true,
-        data: mapHeroes,
+        data: newHeroesData,
       });
     },
   );

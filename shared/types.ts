@@ -301,6 +301,7 @@ export type IPosition = {
 
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];
 export type ApiGetMapHeroes = InferResponseType<(typeof client.map)[':id']['heroes']['$get']>['data'];
+export type ApiGetPlaceHeroes = InferResponseType<(typeof client.place)[':id']['heroes']['$get']>['data'];
 export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
 
 export type ApiGetCraftItemResponse = InferResponseType<(typeof client)['craft']['items'][':buildingType']['$get']>['data'];

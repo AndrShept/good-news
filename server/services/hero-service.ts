@@ -201,15 +201,6 @@ export const heroService = (db: TTransaction | TDataBase) => ({
 
   async walkMapCOmplete(heroId: string, pos: IPosition) {
     await db.update(heroTable).set({ state: 'IDLE' }).where(eq(heroTable.id, heroId));
-    const [{ mapId }] = await db
-      .update(locationTable)
-      .set({ x: pos.x, y: pos.y, targetX: null, targetY: null })
-      .where(eq(locationTable.heroId, heroId))
-      .returning({ mapId: locationTable.mapId });
-
-    if (!mapId) {
-      throw new HTTPException(404, { message: 'walkMapCOmplete map id not found' });
-    }
-    return { mapId };
+    await db.update(locationTable).set({ x: pos.x, y: pos.y, targetX: null, targetY: null }).where(eq(locationTable.heroId, heroId));
   },
 });

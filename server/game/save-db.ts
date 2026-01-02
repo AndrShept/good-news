@@ -1,9 +1,4 @@
-import { socketEvents } from '@/shared/socket-events';
-import { eq } from 'drizzle-orm';
-
-import { io } from '..';
 import { db } from '../db/db';
-import { locationTable } from '../db/schema';
 import { delay } from '../lib/utils';
 import { heroService } from '../services/hero-service';
 import { serverState } from './state/hero-state';
@@ -11,30 +6,22 @@ import { serverState } from './state/hero-state';
 export const saveDb = {
   async walkMapComplete() {
     while (true) {
-      const p = serverState.pathPersistQueue.shift();
-      if (!p) {
-        await delay(200);
-        continue;
+      console.time('DB PATH SAVE ✔');
+      for (const [heroId, pos] of serverState.pathPersistQueue.entries()) {
+        const heroState = serverState.hero.get(heroId);
+        if (!heroState) continue;
+        try {
+          await db.transaction(async (tx) => {
+            await heroService(tx).walkMapCOmplete(heroId, { x: pos.x, y: pos.y });
+            serverState.pathPersistQueue.delete(heroId);
+          });
+        } catch (err) {
+          console.error('Failed to save hero path', heroId, err);
+        }
       }
-      const heroState = serverState.hero.get(p.heroId);
-      if (!heroState) continue;
-      if (!heroState.paths?.length) {
-        const { mapId } = await heroService(db).walkMapCOmplete(p.heroId, { x: p.x, y: p.y });
-        io.to(mapId).emit(socketEvents.walkMap(), {
-          type: 'WALK_MAP_COMPLETE',
-          payload: { heroId: p.heroId, state: 'IDLE' },
-        });
-      } else {
-        await db
-          .update(locationTable)
-          .set({
-            x: p.x,
-            y: p.y,
-          })
-          .where(eq(locationTable.heroId, p.heroId));
-      }
+      console.timeEnd('DB PATH SAVE ✔');
 
-      await delay(1000);
+      await delay(30000);
     }
   },
 };

@@ -8,6 +8,7 @@ import type {
   QueueCraftItemSocketData,
   SelfHeroData,
   SelfMessageData,
+  WalkMapCompleteData,
   WalkMapStartData,
 } from '@/shared/socket-data-types';
 import {
@@ -114,24 +115,64 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
-      await heroOnline(hero.id);
+     
       const stateHero = serverState.hero.get(hero.id);
+
       if (!stateHero) {
         serverState.hero.set(hero.id, {
+          id: hero.id,
+          name: hero.name,
+          level: hero.level,
+          avatarImage: hero.avatarImage,
+          characterImage: hero.characterImage,
           currentHealth: hero.currentHealth,
           currentMana: hero.currentMana,
           maxHealth: hero.maxHealth,
           maxMana: hero.maxMana,
           state: hero.state,
-          x: hero.location?.x!,
-          y: hero.location?.y!,
+          isOnline: hero.isOnline,
+          userId: hero.userId,
+          modifier: hero.modifier!,
+          stat: hero.stat,
+          location: {
+            x: hero.location?.x!,
+            y: hero.location?.y!,
+            targetX: hero.location?.targetX ?? null,
+            targetY: hero.location?.targetY ?? null,
+            mapId: hero.location?.mapId ?? null,
+            placeId: hero.location?.placeId ?? null,
+          },
         });
       }
+      if (stateHero) {
+        stateHero.offlineTimer = undefined;
+        stateHero.isOnline = true;
+      }
+       await heroOnline(hero.id);
+      const returnHeroData = {
+        ...hero,
+
+        currentHealth: stateHero?.currentHealth ?? hero.currentHealth,
+        currentMana: stateHero?.currentMana ?? hero.currentMana,
+        maxHealth: stateHero?.maxHealth ?? hero.maxHealth,
+        maxMana: stateHero?.maxMana ?? hero.maxMana,
+        state: stateHero?.state ?? hero.state,
+        isOnline: stateHero?.isOnline ?? hero.isOnline,
+        modifier: stateHero?.modifier ?? hero.modifier,
+        stat: stateHero?.stat ?? hero.stat,
+        location: {
+          ...hero.location,
+          x: stateHero?.location.x ?? hero.location!.x,
+          y: stateHero?.location.y ?? hero.location!.y,
+          targetX: stateHero?.location.targetX ?? hero.location!.targetX,
+          targetY: stateHero?.location.targetY ?? hero.location!.targetY,
+        },
+      };
 
       return c.json<SuccessResponse<Hero>>({
         success: true,
         message: 'hero fetched',
-        data: hero as Hero,
+        data: returnHeroData as Hero,
       });
     },
   )
@@ -662,86 +703,91 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
       const targetPos = c.req.valid('json');
+      const heroState = serverState.hero.get(id);
 
-      const hero = await heroService(db).getHero(id, {
-        with: {
-          modifier: {
-            columns: {
-              dexterity: true,
-            },
-          },
-          location: { with: { map: true } },
-        },
-      });
-
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      const heroPos = { x: hero.location?.x ?? 0, y: hero.location?.y ?? 0 };
-      const MAP_WIDTH = hero.location?.map?.width ?? 0;
-      const MAP_HEIGHT = hero.location?.map?.height ?? 0;
-      // const tileIndex = targetPos.y * MAP_WIDTH + targetPos.x;
-      // const tileExistMap = getTileExists(hero.location?.mapId ?? '', tileIndex, 'GROUND');
-      // const waterTile = getTileExists(hero.location?.mapId ?? '', tileIndex, 'WATER');
-      // const objectTile = getTileExists(hero.location?.mapId ?? '', tileIndex, 'OBJECT');
-      // if (waterTile) {
-      //   throw new HTTPException(403, {
-      //     message: `Movement blocked: tile at (${targetPos.x}, ${targetPos.y}) is WATER.`,
-      //   });
-      // }
-      // if (objectTile) {
-      //   throw new HTTPException(403, {
-      //     message: `Movement blocked: tile at (${targetPos.x}, ${targetPos.y}) is OBJECT.`,
-      //   });
-      // }
-      // if (!tileExistMap) {
-      //   throw new HTTPException(403, {
-      //     message: `Tile at position (${targetPos.x}, ${targetPos.y}) does not exist on the map`,
-      //   });
-      // }
-      if (!hero.location) {
-        throw new HTTPException(409, {
-          message: ' Hero is not on the world map. ',
-        });
+      if (!heroState) {
+        throw new HTTPException(404, { message: 'hero nof found' });
       }
-      const mapJson = getMapJson(hero.location?.mapId ?? '');
+      verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
+
+      const heroPos = { x: heroState.location.x, y: heroState.location.y };
+      const mapJson = getMapJson(heroState.location.mapId!);
+      const MAP_WIDTH = mapJson.width;
+      const MAP_HEIGHT = mapJson.height;
+
       const paths = buildPathWithObstacles(heroPos, targetPos, mapJson.layers ?? [], MAP_WIDTH, MAP_HEIGHT);
-      const sumDex = (hero.modifier?.dexterity ?? 0) + hero.stat.dexterity;
+      const sumDex = heroState.modifier.dexterity + heroState.stat.dexterity;
+
       if (!paths.length) {
         throw new HTTPException(409, {
           message: ' path not correct ',
         });
       }
+
       const walkTime = calculate.walkTime(sumDex);
       const now = Date.now();
       const walkPathWithTime: PathNode[] = paths.map((path, idx) => ({
         ...path,
         completedAt: now + walkTime * (idx + 1),
-        mapId: hero.location?.mapId ?? '',
+        mapId: heroState.location.mapId ?? '',
       }));
-      await db.transaction(async (tx) => {
-        await tx
-          .update(heroTable)
-          .set({
-            state: 'WALK',
-          })
-          .where(eq(heroTable.id, hero.id));
-        await tx.update(locationTable).set({ targetX: targetPos.x, targetY: targetPos.y }).where(eq(locationTable.heroId, hero.id));
-      });
-      const heroState = serverState.hero.get(hero.id);
-      if (heroState) {
-        heroState.paths = walkPathWithTime;
+
+      const savePosQueue = serverState.pathPersistQueue.get(id);
+      if (savePosQueue) {
+        serverState.pathPersistQueue.delete(id);
       }
+
+      heroState.paths = walkPathWithTime;
+      heroState.state = 'WALK';
+      heroState.location.targetX = targetPos.x;
+      heroState.location.targetY = targetPos.y;
+
       const socketData: WalkMapStartData = {
         type: 'WALK_MAP_START',
         payload: {
-          heroId: hero.id,
+          heroId: id,
           state: 'WALK',
         },
       };
-      io.to(hero.location.mapId!).emit(socketEvents.walkMap(), socketData);
+      io.to(heroState.location.mapId!).emit(socketEvents.walkMap(), socketData);
 
       return c.json<SuccessResponse>({
         message: 'walking start',
+        success: true,
+      });
+    },
+  )
+  .post(
+    '/:id/action/walk-map/cancel',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string() })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const heroState = serverState.hero.get(id);
+
+      if (!heroState) {
+        throw new HTTPException(404, { message: 'hero nof found' });
+      }
+      verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
+
+      serverState.pathPersistQueue.set(id, { x: heroState.location.x, y: heroState.location.y });
+      heroState.paths = [];
+      heroState.state = 'IDLE';
+      heroState.location.targetX = null;
+      heroState.location.targetY = null;
+      const socketData: WalkMapCompleteData = {
+        type: 'WALK_MAP_COMPLETE',
+        payload: {
+          heroId: id,
+          state: 'IDLE',
+        },
+      };
+      io.to(heroState.location.mapId!).emit(socketEvents.walkMap(), socketData);
+
+      return c.json<SuccessResponse>({
+        message: 'walking cancel',
         success: true,
       });
     },
@@ -754,26 +800,20 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const hero = await heroService(db).getHero(id, {
-        with: {
-          location: true,
-        },
-      });
 
-      if (!hero.location) {
-        throw new HTTPException(404, {
-          message: 'hero location not found',
-        });
+      const heroState = serverState.hero.get(id);
+      if (!heroState) {
+        throw new HTTPException(404, { message: 'heroState not found' });
       }
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
 
-      if (hero.state !== 'IDLE') {
+      if (heroState.state !== 'IDLE') {
         throw new HTTPException(409, {
           message: 'Hero is currently busy with another action',
         });
       }
-      const heroPosX = hero.location?.x;
-      const heroPosY = hero.location?.y;
+      const heroPosX = heroState.location.x;
+      const heroPosY = heroState.location.y;
       const place = await db.query.placeTable.findFirst({
         where: and(eq(placeTable.x, heroPosX), eq(placeTable.y, heroPosY)),
       });
@@ -789,21 +829,31 @@ export const heroRouter = new Hono<Context>()
           mapId: null,
           placeId: place.id,
         })
-        .where(eq(locationTable.heroId, hero.id));
+        .where(eq(locationTable.heroId, id));
 
+      heroState.location.mapId = null;
+      heroState.location.placeId = place.id;
+
+      const socketPlaceData: PlaceUpdateEvent = {
+        type: 'HERO_ENTER_PLACE',
+        payload: {
+          id: heroState.id,
+          avatarImage: heroState.avatarImage,
+          level: heroState.level,
+          name: heroState.name,
+          state: heroState.state,
+        },
+      };
       const socketMapData: MapUpdateEvent = {
         type: 'HERO_ENTER_PLACE',
         payload: {
           placeId: place.id,
-          heroId: hero.id,
+          heroId: id,
         },
       };
-      const socketTownData: PlaceUpdateEvent = {
-        type: 'HERO_ENTER_PLACE',
-        payload: { ...hero.location, hero: hero as Hero },
-      };
-      io.to(hero.location.mapId!).emit(socketEvents.mapUpdate(), socketMapData);
-      io.to(place.id).emit(socketEvents.placeUpdate(), socketTownData);
+
+      io.to(place.mapId).emit(socketEvents.mapUpdate(), socketMapData);
+      io.to(place.id).emit(socketEvents.placeUpdate(), socketPlaceData);
 
       return c.json<SuccessResponse>({
         message: 'enter town success',
@@ -819,26 +869,23 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const hero = await heroService(db).getHero(id, {
-        with: {
-          location: { with: { hero: true } },
-        },
-      });
 
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      if (hero.state !== 'IDLE') {
+      const heroState = serverState.hero.get(id);
+      if (!heroState) {
+        throw new HTTPException(404, { message: 'heroState not found' });
+      }
+      if (!heroState.location.placeId) {
+        throw new HTTPException(404, { message: 'heroState.location.placeId not found' });
+      }
+      if (heroState.state !== 'IDLE') {
         throw new HTTPException(409, {
           message: 'Hero is currently busy with another action',
         });
       }
-      if (!hero.location?.placeId) {
-        throw new HTTPException(403, {
-          message: 'Missing placeId: hero is not assigned to a place',
-        });
-      }
+      verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
+
       const place = await db.query.placeTable.findFirst({
-        where: eq(placeTable.id, hero.location.placeId),
+        where: eq(placeTable.id, heroState.location.placeId),
       });
       if (!place) {
         throw new HTTPException(404, {
@@ -854,20 +901,33 @@ export const heroRouter = new Hono<Context>()
           y: place.y,
           placeId: null,
         })
-        .where(eq(locationTable.heroId, hero.id));
+        .where(eq(locationTable.heroId, id));
+      heroState.location.mapId = place.mapId;
+      heroState.location.placeId = null;
+      heroState.location.x = place.x;
+      heroState.location.y = place.y;
 
       const socketMapData: MapUpdateEvent = {
         type: 'HERO_LEAVE_PLACE',
         payload: {
-          heroId: hero.id,
+          heroId: id,
           mapId: place.mapId,
-          location: hero.location,
+          hero: {
+            id: heroState.id,
+            name: heroState.name,
+            avatarImage: heroState.avatarImage,
+            characterImage: heroState.characterImage,
+            level: heroState.level,
+            state: heroState.state,
+            x: heroState.location.x,
+            y: heroState.location.y,
+          },
         },
       };
       const socketTownData: PlaceUpdateEvent = {
         type: 'HERO_LEAVE_PLACE',
         payload: {
-          heroId: hero.id,
+          heroId: id,
           mapId: place.mapId,
         },
       };

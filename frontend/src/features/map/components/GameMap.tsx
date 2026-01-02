@@ -73,7 +73,6 @@ export const GameMap = memo(
 
     useEffect(() => {
       if (heroTargetY  && layers.length) {
-        console.log('GOGOGOG');
         const path = buildPathWithObstacles(
           { x: heroPosX, y: heroPosY },
           { x: heroTargetX, y: heroTargetY },

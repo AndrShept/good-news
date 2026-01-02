@@ -1,7 +1,7 @@
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroActions } from '@/features/hero/hooks/useHeroActions';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 
 import { getMapHeroesLocationOptions } from '../api/get-map-heroes';
 import { useGameMap } from '../hooks/useGameMap';

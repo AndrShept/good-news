@@ -1,30 +1,39 @@
 import { type HeroOfflineJob, jobName } from '@/shared/job-types';
+import { socketEvents } from '@/shared/socket-events';
 import { eq } from 'drizzle-orm';
 
+import { io } from '..';
 import { db } from '../db/db';
 import { locationTable } from '../db/schema';
+import { serverState } from '../game/state/hero-state';
 import { actionQueue } from '../queue/actionQueue';
 import { jobQueueId } from './utils';
 
 export const heroOffline = async (heroId: string) => {
-  const location = await db.query.locationTable.findFirst({
-    where: eq(locationTable.heroId, heroId),
-  });
-  const jobId = jobQueueId.offline(heroId);
-
-  const jobData: HeroOfflineJob = {
+  // const location = await db.query.locationTable.findFirst({
+  //   where: eq(locationTable.heroId, heroId),
+  // });
+  // const jobId = jobQueueId.offline(heroId);
+  const heroState = serverState.hero.get(heroId);
+  if (!heroState) return;
+  const socketData: HeroOfflineJob = {
     jobName: 'HERO_OFFLINE',
     payload: {
       heroId,
-      mapId: location?.mapId ?? '',
-      placeId: location?.placeId ?? '',
+      mapId: heroState.location.mapId ?? '',
+      placeId: heroState.location.placeId ?? '',
     },
   };
-  actionQueue.remove(jobId);
-  actionQueue.add(jobName['hero-offline'], jobData, {
-    delay: 10_000,
-    jobId,
-    removeOnComplete: true,
-  });
-  console.log('OFFLINE ACTION ADD');
+  if (heroState.location.mapId) {
+    io.to(heroState.location.mapId).emit(socketEvents.mapUpdate(), socketData);
+  }
+  if (heroState.location.placeId) {
+    io.to(heroState.location.placeId).emit(socketEvents.placeUpdate(), socketData);
+  }
+  // actionQueue.remove(jobId);
+  // actionQueue.add(jobName['hero-offline'], jobData, {
+  //   delay: 10_000,
+  //   jobId,
+  //   removeOnComplete: true,
+  // });
 };

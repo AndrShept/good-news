@@ -1,4 +1,4 @@
-import { Location } from '@/shared/types';
+import { ApiGetPlaceHeroes, HeroSidebarItem } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
@@ -7,31 +7,31 @@ import { getPlaceHeroesLocationOptions } from '../api/get-place-heroes';
 export const usePlaceHeroesUpdate = (placeId: string) => {
   const queryClient = useQueryClient();
 
-  const deleteHeroes = useCallback(
+  const removeHeroes = useCallback(
     (heroId: string) => {
-      queryClient.setQueriesData<Location[]>({ queryKey: getPlaceHeroesLocationOptions(placeId).queryKey }, (oldData) => {
+      queryClient.setQueriesData<ApiGetPlaceHeroes>({ queryKey: getPlaceHeroesLocationOptions(placeId).queryKey }, (oldData) => {
         if (!oldData) return;
 
-        return oldData.filter((location) => location.heroId !== heroId);
+        return oldData.filter((h) => h.id !== heroId);
       });
     },
     [placeId],
   );
 
   const addHeroes = useCallback(
-    (heroLocation: Location) => {
-      queryClient.setQueriesData<Location[]>({ queryKey: getPlaceHeroesLocationOptions(placeId).queryKey }, (oldData) => {
+    (hero: HeroSidebarItem) => {
+      queryClient.setQueriesData<ApiGetPlaceHeroes>({ queryKey: getPlaceHeroesLocationOptions(placeId).queryKey }, (oldData) => {
         if (!oldData) return;
-        if (oldData.some((location) => location.id === heroLocation.id)) return;
+        if (oldData.some((h) => h.id === hero.id)) return;
 
-        return [...oldData, heroLocation];
+        return [...oldData, hero];
       });
     },
     [placeId],
   );
 
   return {
-    deleteHeroes,
+    removeHeroes,
     addHeroes,
   };
 };
