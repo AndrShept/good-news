@@ -49,7 +49,6 @@ import {
   itemContainerTable,
   locationTable,
   modifierTable,
-  placeTable,
   resourceTable,
   resourceTypeEnum,
   skillTable,
@@ -59,9 +58,11 @@ import {
 } from '../db/schema';
 import { buffTable } from '../db/schema/buff-schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
+import { mapEntities } from '../entities/map';
+import { placeEntities } from '../entities/places';
 import { serverState } from '../game/state/hero-state';
 import { heroOnline } from '../lib/heroOnline';
-import { generateRandomUuid, getMapJson, getTileExists, verifyHeroOwnership } from '../lib/utils';
+import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
@@ -86,7 +87,7 @@ export const heroRouter = new Hono<Context>()
         with: {
           modifier: true,
           group: true,
-
+          location: true,
           equipments: {
             with: {
               gameItem: {
@@ -101,11 +102,6 @@ export const heroRouter = new Hono<Context>()
           },
           queueCraftItems: true,
           itemContainers: { columns: { id: true, type: true, name: true }, where: eq(itemContainerTable.type, 'BACKPACK') },
-          location: {
-            with: {
-              place: true,
-            },
-          },
         },
       });
 
@@ -115,7 +111,7 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
-     
+
       const stateHero = serverState.hero.get(hero.id);
 
       if (!stateHero) {
@@ -134,6 +130,9 @@ export const heroRouter = new Hono<Context>()
           userId: hero.userId,
           modifier: hero.modifier!,
           stat: hero.stat,
+          goldCoins: hero.goldCoins,
+          maxQueueCraftCount: hero.maxQueueCraftCount,
+          premiumCoins: hero.premiumCoins,
           location: {
             x: hero.location?.x!,
             y: hero.location?.y!,
@@ -148,7 +147,7 @@ export const heroRouter = new Hono<Context>()
         stateHero.offlineTimer = undefined;
         stateHero.isOnline = true;
       }
-       await heroOnline(hero.id);
+      await heroOnline(hero.id);
       const returnHeroData = {
         ...hero,
 
@@ -201,9 +200,7 @@ export const heroRouter = new Hono<Context>()
     const heroExist = await db.query.heroTable.findFirst({
       where: eq(heroTable.userId, userId),
     });
-    const place = await db.query.placeTable.findFirst({
-      where: eq(placeTable.name, 'Solmer Town'),
-    });
+    const place = placeEntities.find((p) => p.name === 'Solmer Town');
     if (!place) {
       throw new HTTPException(404, {
         message: 'place not found',
@@ -703,19 +700,18 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
       const targetPos = c.req.valid('json');
-      const heroState = serverState.hero.get(id);
+      const heroState = serverState.getHeroState(id);
 
-      if (!heroState) {
-        throw new HTTPException(404, { message: 'hero nof found' });
-      }
       verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
 
       const heroPos = { x: heroState.location.x, y: heroState.location.y };
-      const mapJson = getMapJson(heroState.location.mapId!);
-      const MAP_WIDTH = mapJson.width;
-      const MAP_HEIGHT = mapJson.height;
+      const map = mapEntities.find((m) => m.id === heroState.location.mapId);
+      if (!map) throw new HTTPException(404, { message: 'map not found' });
 
-      const paths = buildPathWithObstacles(heroPos, targetPos, mapJson.layers ?? [], MAP_WIDTH, MAP_HEIGHT);
+      const MAP_WIDTH = map.width;
+      const MAP_HEIGHT = map.height;
+
+      const paths = buildPathWithObstacles(heroPos, targetPos, map.layers, MAP_WIDTH, MAP_HEIGHT);
       const sumDex = heroState.modifier.dexterity + heroState.stat.dexterity;
 
       if (!paths.length) {
@@ -801,10 +797,7 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
 
-      const heroState = serverState.hero.get(id);
-      if (!heroState) {
-        throw new HTTPException(404, { message: 'heroState not found' });
-      }
+      const heroState = serverState.getHeroState(id);
       verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
 
       if (heroState.state !== 'IDLE') {
@@ -814,9 +807,7 @@ export const heroRouter = new Hono<Context>()
       }
       const heroPosX = heroState.location.x;
       const heroPosY = heroState.location.y;
-      const place = await db.query.placeTable.findFirst({
-        where: and(eq(placeTable.x, heroPosX), eq(placeTable.y, heroPosY)),
-      });
+      const place = placeEntities.find((p) => p.x === heroPosX && p.y === heroPosY);
       if (!place) {
         throw new HTTPException(404, {
           message: 'place not found',
@@ -884,9 +875,7 @@ export const heroRouter = new Hono<Context>()
       }
       verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
 
-      const place = await db.query.placeTable.findFirst({
-        where: eq(placeTable.id, heroState.location.placeId),
-      });
+      const place = placeEntities.find((p) => p.id === heroState.location.placeId);
       if (!place) {
         throw new HTTPException(404, {
           message: 'place not found',
@@ -1119,19 +1108,15 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
       const { craftItemId, coreMaterialType, buildingType } = c.req.valid('json');
-
-      const [hero, craftItem, coreMaterial, backpack] = await Promise.all([
-        heroService(db).getHero(id, {
-          with: {
-            location: { with: { place: true } },
-          },
-        }),
+      const hero = serverState.getHeroState(id);
+      const [craftItem, coreMaterial, backpack] = await Promise.all([
         craftItemService(db).getCraftItem(craftItemId, { with: { gameItem: { with: { weapon: true, armor: true, shield: true } } } }),
         coreMaterialType && db.query.resourceTable.findFirst({ where: eq(resourceTable.type, coreMaterialType) }),
         itemContainerService(db).getHeroBackpack(id),
       ]);
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-      const isNotInsideRequiredBuilding = hero.location?.place?.buildings?.every((b) => b.type !== craftItem.requiredBuildingType);
+      const place = placeEntities.find((p) => p.id === hero.location.placeId);
+      const isNotInsideRequiredBuilding = place?.buildings?.every((b) => b.type !== craftItem.requiredBuildingType);
       if (isNotInsideRequiredBuilding) {
         throw new HTTPException(400, {
           message: 'You are not inside the required place building.',

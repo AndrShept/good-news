@@ -5,106 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1765145376150,
-      "tag": "0000_tense_night_nurse",
+      "when": 1767472550675,
+      "tag": "0000_high_cerebro",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1765310528974,
-      "tag": "0001_curious_killraven",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1765401519790,
-      "tag": "0002_curved_jazinda",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1765530447607,
-      "tag": "0003_nice_dagger",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1765545406687,
-      "tag": "0004_past_sage",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1765659371373,
-      "tag": "0005_milky_blacklash",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1765828541418,
-      "tag": "0006_fearless_betty_brant",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1765889685435,
-      "tag": "0007_previous_marauders",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1766347390155,
-      "tag": "0008_sudden_champions",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1766347826995,
-      "tag": "0009_tired_speed",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1766493549853,
-      "tag": "0010_light_matthew_murdock",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "7",
-      "when": 1766665096940,
-      "tag": "0011_minor_professor_monster",
-      "breakpoints": true
-    },
-    {
-      "idx": 12,
-      "version": "7",
-      "when": 1766703685903,
-      "tag": "0012_naive_lockheed",
-      "breakpoints": true
-    },
-    {
-      "idx": 13,
-      "version": "7",
-      "when": 1766872245467,
-      "tag": "0013_quiet_katie_power",
-      "breakpoints": true
-    },
-    {
-      "idx": 14,
-      "version": "7",
-      "when": 1767037506464,
-      "tag": "0014_silent_umar",
+      "when": 1767475852802,
+      "tag": "0001_careless_lightspeed",
       "breakpoints": true
     }
   ]

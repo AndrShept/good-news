@@ -13,16 +13,11 @@ import {
   heroTable,
   itemContainerTable,
   itemContainerTypeEnum,
-  locationTable,
-  mapTable,
   modifierTable,
-  placeTable,
   potionTable,
-  pvpModeTypeEnum,
   skillTable,
   skillsTypeEnum,
   stateTypeEnum,
-  tileTypeEnum,
   weaponTable,
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
@@ -39,6 +34,7 @@ import {
   weaponHandEnum,
   weaponTypeEnum,
 } from '../server/db/schema/game-item-schema';
+import type { locationTable } from '../server/db/schema/location-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { queueCraftItemTable, queueCraftStatusEnum } from '../server/db/schema/queue-craft-item-schema';
 import type {
@@ -174,8 +170,6 @@ export type ArmorType = (typeof armorTypeEnum.enumValues)[number];
 export type RarityType = (typeof rarityEnum.enumValues)[number];
 export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
-export type PvpModeType = (typeof pvpModeTypeEnum.enumValues)[number];
-export type TileType = (typeof tileTypeEnum.enumValues)[number];
 export type StateType = (typeof stateTypeEnum.enumValues)[number];
 export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];
 export type OreType = (typeof oreTypeEnum.enumValues)[number];
@@ -185,24 +179,32 @@ export type CoreMaterialType = (typeof coreMaterialTypeEnum.enumValues)[number];
 export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[number];
 export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
 export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number];
-export type BuildingType = (typeof buildingTypeEnum.enumValues)[number];
 export type SkillType = (typeof skillsTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
-export type Location = InferSelectModel<typeof locationTable> & {
-  map?: Map;
-  place?: Place;
-  hero?: Hero;
-};
-
+export type TLocation = typeof locationTable.$inferSelect;
 export type QueueCraftItem = typeof queueCraftItemTable.$inferSelect & {
   craftItem?: CraftItem | null;
 };
 
-export type Place = InferSelectModel<typeof placeTable> & {
-  buildings?: Building[] | null;
+export const placeValues = ['TOWN', 'DUNGEON', 'MINE'] as const;
+export type PlaceType = (typeof placeValues)[number];
+
+export type TPlace = {
+  id: string;
+  type: PlaceType;
+  name: string;
+  image: string;
+  x: number;
+  y: number;
+  mapId: string;
+  buildings: Building[];
 };
+
+// export const buildingValues = ['MAGIC-SHOP', 'TEMPLE', 'BLACKSMITH', 'FORGE', 'BANK'] as const;
+export const tileTypeValues = ['OBJECT', 'WATER', 'GROUND'] as const;
+export type BuildingType = (typeof buildingTypeEnum.enumValues)[number];
 
 export type Building = {
   id: string;
@@ -212,9 +214,18 @@ export type Building = {
   image: string;
 };
 
-export type Map = typeof mapTable.$inferSelect & {
-  places?: Place[];
-  layers?: Layer[];
+export type TileType = (typeof tileTypeValues)[number];
+
+export type TMap = {
+  id: string;
+  width: number;
+  height: number;
+  tileHeight: number;
+  tileWidth: number;
+  image: string;
+  name: string;
+  places: TPlace[];
+  layers: Layer[];
 };
 
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'heroId' | 'resourceId'>;
@@ -267,8 +278,8 @@ export type GameItem = InferSelectModel<typeof gameItemTable> & {
 
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier?: Modifier;
+  location?: TLocation;
   group?: Group;
-  location?: Location;
   equipments?: Equipment[];
   queueCraftItems?: QueueCraftItem[];
   itemContainers?: { id: string; type: ItemContainerType; name: string }[];

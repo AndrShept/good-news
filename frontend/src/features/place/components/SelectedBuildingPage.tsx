@@ -1,13 +1,14 @@
-import { Place } from '@/shared/types';
+
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 
 import { Bank } from './buildings/Bank';
 import { CraftBuilding } from './buildings/CraftBuilding';
 import { MagicShop } from './buildings/MagicShop';
 import { Temple } from './buildings/Temple';
+import { TPlace } from '@/shared/types';
 
 type Props = {
-  place: Place | undefined | null;
+  place: TPlace | undefined | null;
 };
 
 export const SelectedBuildingPage = ({ place }: Props) => {

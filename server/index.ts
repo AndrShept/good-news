@@ -12,7 +12,7 @@ import { Server } from 'socket.io';
 
 import { type Context } from './context';
 import { db } from './db/db';
-import { heroTable, locationTable } from './db/schema';
+import { heroTable } from './db/schema';
 import { gameLoop } from './game/gameLoop';
 import { saveDb } from './game/save-db';
 import { serverState } from './game/state/hero-state';
@@ -31,6 +31,7 @@ import { mapRouter } from './routes/map-router';
 import { placeRouter } from './routes/place-router';
 import { postRouter } from './routes/post-router';
 import { shopRouter } from './routes/shop-router';
+import { locationTable } from './db/schema/location-schema';
 
 const app = new Hono<Context>();
 
@@ -108,6 +109,7 @@ export const io = new Server(httpServer, {
 await db.update(heroTable).set({
   isOnline: false,
   state: 'IDLE',
+
 });
 await db.update(locationTable).set({
   targetX: null,

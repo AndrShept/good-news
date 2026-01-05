@@ -1,9 +1,9 @@
 import { relations } from 'drizzle-orm';
 import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
-import { craftItemTable } from './craft-item-schema';
+import { buildingTypeEnum, craftItemTable } from './craft-item-schema';
 import { heroTable } from './hero-schema';
-import { buildingTypeEnum } from './place-schema';
+
 import { resourceTypeEnum } from './resource-schema';
 
 export const queueCraftStatusEnum = pgEnum('queue_craft_status_enum', ['PENDING', 'PROGRESS', 'COMPLETE', 'FAILED']);

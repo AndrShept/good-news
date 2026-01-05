@@ -1,5 +1,5 @@
 import { Layer } from '@/shared/json-types';
-import { MapHero, Place, StateType } from '@/shared/types';
+import { MapHero, TPlace, StateType } from '@/shared/types';
 import { buildPathWithObstacles } from '@/shared/utils';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { memo, useEffect, useRef, useState } from 'react';
@@ -18,7 +18,7 @@ interface Props {
   heroTargetY: number;
   heroState: StateType;
   mapHeroes: MapHero[] | undefined;
-  places: Place[] | undefined;
+  places: TPlace[] | undefined;
   tileWidth: number;
   height: number;
   width: number;

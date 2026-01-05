@@ -7,6 +7,7 @@ import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction } from '../db/db';
 import { buffTable, equipmentTable, heroTable, locationTable, modifierTable } from '../db/schema';
+import { serverState } from '../game/state/hero-state';
 import { newCombineModifier } from '../lib/utils';
 import { actionQueue } from '../queue/actionQueue';
 import { craftItemService } from './craft-item-service';
@@ -120,10 +121,13 @@ export const heroService = (db: TTransaction | TDataBase) => ({
   },
   async spendGold(heroId: string, amount: number, heroCurrentGold: number) {
     if (heroCurrentGold < amount) throw new HTTPException(422, { message: 'You don’t have enough gold', cause: { canShow: true } });
-    await db
+    const [newValue] = await db
       .update(heroTable)
       .set({ goldCoins: sql`${heroTable.goldCoins} - ${amount}` })
-      .where(eq(heroTable.id, heroId));
+      .where(eq(heroTable.id, heroId))
+      .returning({ goldCoins: heroTable.goldCoins });
+    const heroState = serverState.getHeroState(heroId);
+    heroState.goldCoins = newValue.goldCoins;
   },
   async spendPremCoin(heroId: string, amount: number, heroCurrentPremCoin: number) {
     if (heroCurrentPremCoin < amount)
@@ -133,7 +137,8 @@ export const heroService = (db: TTransaction | TDataBase) => ({
       .set({ premiumCoins: sql`${heroTable.premiumCoins} - ${amount}` })
       .where(eq(heroTable.id, heroId))
       .returning({ premiumCoins: heroTable.premiumCoins });
-
+    const heroState = serverState.getHeroState(heroId);
+    heroState.premiumCoins = newValue.premiumCoins;
     return newValue.premiumCoins;
   },
 

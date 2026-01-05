@@ -7,12 +7,12 @@ import { BankItemContainer } from '@/features/item-container/components/BankItem
 import { BankItemContainerTabMenu } from '@/features/item-container/components/BankItemContainerTabMenu';
 import { CreateBankItemContainerModal } from '@/features/item-container/components/CreateBankItemContainerModal';
 import { capitalize, cn } from '@/lib/utils';
-import { Place } from '@/shared/types';
+import { TPlace } from '@/shared/types';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
 type Props = {
-  place: Place | undefined | null;
+  place: TPlace | undefined | null;
 };
 
 export const Bank = ({ place }: Props) => {

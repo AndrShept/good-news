@@ -1,6 +1,6 @@
 import { BASE_HEALTH_REGEN_TIME, BASE_MANA_REGEN_TIME, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
 import type { IMapJson } from '@/shared/json-types';
-import type { Map, Modifier, OmitModifier, TileType } from '@/shared/types';
+import type { Modifier, OmitModifier, TileType } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
 import { sql } from 'drizzle-orm';
@@ -88,16 +88,9 @@ export const rand = (num: number) => {
   return Math.floor(Math.random() * num);
 };
 
-export const getMapJson = (mapId: string) => {
-  const map: Record<string, IMapJson> = {
-    '019a350c-5552-76dd-b6d5-181b473d3128': solmerValley,
-  };
-  return map[mapId];
-};
-
 export const getTileExists = (mapId: string, index: number, tileType: TileType) => {
-  const map = getMapJson(mapId);
-  const tiles = map.layers.find((l) => l.name === tileType);
+  const map = mapEntities.find((m) => m.id === mapId);
+  const tiles = map?.layers.find((l) => l.name === tileType);
   return tiles?.data[index];
 };
 

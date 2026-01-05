@@ -1,4 +1,3 @@
-import type { TileType } from './types';
 
 
 export interface IMapJson {

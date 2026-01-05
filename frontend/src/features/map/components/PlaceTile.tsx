@@ -1,9 +1,9 @@
-import { Place } from '@/shared/types';
+import { TPlace } from '@/shared/types';
 import { memo } from 'react';
 
 import { TileImg } from './TileImg';
 
-interface Props extends Place {
+interface Props extends TPlace {
   TILE_SIZE: number;
 }
 

@@ -12,8 +12,7 @@ export * from './item-container-schema';
 export * from './buff-schema';
 export * from './group-schema';
 export * from './location-schema';
-export * from './map-schema';
-export * from './place-schema';
+
 export * from './resource-schema';
 export * from './craft-item-schema';
 export * from './queue-craft-item-schema';

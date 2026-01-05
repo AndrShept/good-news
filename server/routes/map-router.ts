@@ -1,4 +1,4 @@
-import type { Location, Map, MapHero, SuccessResponse } from '@/shared/types';
+import type { MapHero, SuccessResponse, TMap } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -7,9 +7,9 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { heroTable, locationTable, mapTable } from '../db/schema';
+import { heroTable, locationTable } from '../db/schema';
+import { mapEntities } from '../entities/map';
 import { serverState } from '../game/state/hero-state';
-import { getMapJson } from '../lib/utils';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const mapRouter = new Hono<Context>()
@@ -26,22 +26,18 @@ export const mapRouter = new Hono<Context>()
     async (c) => {
       const { id } = c.req.valid('param');
 
-      const map = await db.query.mapTable.findFirst({
-        where: eq(mapTable.id, id),
-        with: { places: true },
-      });
+      const map = mapEntities.find((m) => m.id === id);
       if (!map) {
         throw new HTTPException(404, {
           message: 'map not found',
         });
       }
 
-      const mapJson = getMapJson(map.id);
 
-      return c.json<SuccessResponse<Map>>({
+      return c.json<SuccessResponse<TMap>>({
         message: 'map fetched!',
         success: true,
-        data: { ...map, layers: mapJson.layers } as Map,
+        data: map,
       });
     },
   )
@@ -56,9 +52,7 @@ export const mapRouter = new Hono<Context>()
     ),
     async (c) => {
       const { id } = c.req.valid('param');
-      const map = await db.query.mapTable.findFirst({
-        where: eq(mapTable.id, id),
-      });
+      const map = mapEntities.find((m) => m.id === id);
       if (!map) {
         throw new HTTPException(404, {
           message: 'map not found',
@@ -83,7 +77,7 @@ export const mapRouter = new Hono<Context>()
       let newHeroesData: MapHero[] = [];
 
       for (const [heroId, hero] of serverState.hero.entries()) {
-        newHeroesData = mapHeroes.map((h) => (h.id === heroId ? { ...h, x: hero.location.x, y: hero.location.y, state: hero.state,  } : h));
+        newHeroesData = mapHeroes.map((h) => (h.id === heroId ? { ...h, x: hero.location.x, y: hero.location.y, state: hero.state } : h));
       }
       return c.json<SuccessResponse<MapHero[]>>({
         message: 'map  heroes fetched!',

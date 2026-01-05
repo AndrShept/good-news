@@ -1,11 +1,11 @@
 import { getTilesAroundHero } from '@/lib/utils';
-import { Map } from '@/shared/types';
+import { TMap } from '@/shared/types';
 import { useMemo } from 'react';
 
 interface Props {
   heroPosX: number;
   heroPosY: number;
-  map: Map | undefined;
+  map: TMap | undefined;
 }
 
 export const useHeroActions = ({ heroPosX, heroPosY, map }: Props) => {

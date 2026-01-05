@@ -1,5 +1,5 @@
 {
-  "id": "5de9da21-925d-43f4-91ed-a28487ca9036",
+  "id": "db60fb66-73a6-44d6-8aef-0006f60d8280",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -234,20 +234,6 @@
           "notNull": true,
           "default": 0
         },
-        "isInBattle": {
-          "name": "isInBattle",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "isInDungeon": {
-          "name": "isInDungeon",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
         "isOnline": {
           "name": "isOnline",
           "type": "boolean",
@@ -261,6 +247,14 @@
           "primaryKey": false,
           "notNull": true,
           "default": 4
+        },
+        "state": {
+          "name": "state",
+          "type": "state_type_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'IDLE'"
         },
         "freeStatPoints": {
           "name": "freeStatPoints",
@@ -296,20 +290,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": 0
-        },
-        "currentExperience": {
-          "name": "currentExperience",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "maxExperience": {
-          "name": "maxExperience",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 100
         },
         "stat": {
           "name": "stat",
@@ -551,12 +531,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "resourceId": {
-          "name": "resourceId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -573,19 +547,6 @@
           "tableTo": "hero",
           "columnsFrom": [
             "heroId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "modifier_resourceId_resource_id_fk": {
-          "name": "modifier_resourceId_resource_id_fk",
-          "tableFrom": "modifier",
-          "tableTo": "resource",
-          "columnsFrom": [
-            "resourceId"
           ],
           "columnsTo": [
             "id"
@@ -971,6 +932,13 @@
           "primaryKey": false,
           "notNull": true
         },
+        "type": {
+          "name": "type",
+          "type": "armor_type_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
         "defense": {
           "name": "defense",
           "type": "integer",
@@ -985,6 +953,18 @@
         },
         "evasion": {
           "name": "evasion",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "maxHealth": {
+          "name": "maxHealth",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "maxMana": {
+          "name": "maxMana",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -1027,6 +1007,13 @@
           "type": "uuid",
           "primaryKey": true,
           "notNull": true
+        },
+        "coreMaterial": {
+          "name": "coreMaterial",
+          "type": "core_material_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
         },
         "type": {
           "name": "type",
@@ -1118,6 +1105,83 @@
         "potion_gameItemId_game_item_id_fk": {
           "name": "potion_gameItemId_game_item_id_fk",
           "tableFrom": "potion",
+          "tableTo": "game_item",
+          "columnsFrom": [
+            "gameItemId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.shield": {
+      "name": "shield",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "slot": {
+          "name": "slot",
+          "type": "armor_slot_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "defense": {
+          "name": "defense",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "magicResistance": {
+          "name": "magicResistance",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evasion": {
+          "name": "evasion",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "maxHealth": {
+          "name": "maxHealth",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "maxMana": {
+          "name": "maxMana",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gameItemId": {
+          "name": "gameItemId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "shield_gameItemId_game_item_id_fk": {
+          "name": "shield_gameItemId_game_item_id_fk",
+          "tableFrom": "shield",
           "tableTo": "game_item",
           "columnsFrom": [
             "gameItemId"
@@ -1345,6 +1409,12 @@
           "name": "heroId",
           "type": "uuid",
           "primaryKey": false,
+          "notNull": true
+        },
+        "placeId": {
+          "name": "placeId",
+          "type": "text",
+          "primaryKey": false,
           "notNull": false
         },
         "type": {
@@ -1359,6 +1429,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "usedSlots": {
           "name": "usedSlots",
@@ -1532,412 +1608,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.action": {
-      "name": "action",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "type": {
-          "name": "type",
-          "type": "action_type_enum",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "heroId": {
-          "name": "heroId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "started_at": {
-          "name": "started_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "completed_at": {
-          "name": "completed_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "action_heroId_hero_id_fk": {
-          "name": "action_heroId_hero_id_fk",
-          "tableFrom": "action",
-          "tableTo": "hero",
-          "columnsFrom": [
-            "heroId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.location": {
-      "name": "location",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "placeId": {
-          "name": "placeId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "mapId": {
-          "name": "mapId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "heroId": {
-          "name": "heroId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "x": {
-          "name": "x",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "y": {
-          "name": "y",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "currentBuilding": {
-          "name": "currentBuilding",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "location_placeId_place_id_fk": {
-          "name": "location_placeId_place_id_fk",
-          "tableFrom": "location",
-          "tableTo": "place",
-          "columnsFrom": [
-            "placeId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        },
-        "location_mapId_map_id_fk": {
-          "name": "location_mapId_map_id_fk",
-          "tableFrom": "location",
-          "tableTo": "map",
-          "columnsFrom": [
-            "mapId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "location_heroId_hero_id_fk": {
-          "name": "location_heroId_hero_id_fk",
-          "tableFrom": "location",
-          "tableTo": "hero",
-          "columnsFrom": [
-            "heroId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.state": {
-      "name": "state",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "type": {
-          "name": "type",
-          "type": "state_type_enum",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "heroId": {
-          "name": "heroId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "state_heroId_hero_id_fk": {
-          "name": "state_heroId_hero_id_fk",
-          "tableFrom": "state",
-          "tableTo": "hero",
-          "columnsFrom": [
-            "heroId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.tile": {
-      "name": "tile",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "type": {
-          "name": "type",
-          "type": "tile_type_enum",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.map": {
-      "name": "map",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "width": {
-          "name": "width",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "height": {
-          "name": "height",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "tileHeight": {
-          "name": "tileHeight",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "tileWidth": {
-          "name": "tileWidth",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "image": {
-          "name": "image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pvpMode": {
-          "name": "pvpMode",
-          "type": "pvp_type_enum",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.place": {
-      "name": "place",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "type": {
-          "name": "type",
-          "type": "place_type_enum",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "image": {
-          "name": "image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "x": {
-          "name": "x",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "y": {
-          "name": "y",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "mapId": {
-          "name": "mapId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "buildings": {
-          "name": "buildings",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "place_mapId_map_id_fk": {
-          "name": "place_mapId_map_id_fk",
-          "tableFrom": "place",
-          "tableTo": "map",
-          "columnsFrom": [
-            "mapId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.resource": {
       "name": "resource",
       "schema": "",
@@ -2029,13 +1699,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "craftTime": {
-          "name": "craftTime",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
         "requiredCraftResourceCategory": {
           "name": "requiredCraftResourceCategory",
           "type": "resource_category_enum",
@@ -2049,13 +1712,6 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
-        },
-        "requiredLevel": {
-          "name": "requiredLevel",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 1
         }
       },
       "indexes": {},
@@ -2201,7 +1857,7 @@
           "type": "skill_type_enum",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "level": {
           "name": "level",
@@ -2221,7 +1877,7 @@
           "name": "heroId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -2255,6 +1911,17 @@
     }
   },
   "enums": {
+    "public.state_type_enum": {
+      "name": "state_type_enum",
+      "schema": "public",
+      "values": [
+        "CHARACTER",
+        "IDLE",
+        "BATTLE",
+        "CRAFT",
+        "WALK"
+      ]
+    },
     "public.equipment_slot_enum": {
       "name": "equipment_slot_enum",
       "schema": "public",
@@ -2262,7 +1929,7 @@
         "RIGHT_HAND",
         "LEFT_HAND",
         "HELMET",
-        "CHESTPLATE",
+        "CHEST",
         "LEGS",
         "BOOTS",
         "GLOVES",
@@ -2285,12 +1952,22 @@
       "schema": "public",
       "values": [
         "HELMET",
-        "CHESTPLATE",
+        "CHEST",
         "LEGS",
         "BELT",
         "BOOTS",
         "GLOVES",
         "SHIELD"
+      ]
+    },
+    "public.armor_type_enum": {
+      "name": "armor_type_enum",
+      "schema": "public",
+      "values": [
+        "PLATE",
+        "MAIL",
+        "LEATHER",
+        "CLOTH"
       ]
     },
     "public.game_item_enum": {
@@ -2299,9 +1976,11 @@
       "values": [
         "WEAPON",
         "ARMOR",
+        "SHIELD",
         "POTION",
         "RESOURCES",
-        "MISC"
+        "MISC",
+        "ACCESSORY"
       ]
     },
     "public.potion_type_enum": {
@@ -2346,60 +2025,48 @@
         "NEGATIVE"
       ]
     },
-    "public.action_type_enum": {
-      "name": "action_type_enum",
+    "public.core_material_enum": {
+      "name": "core_material_enum",
       "schema": "public",
       "values": [
-        "WALK",
-        "CRAFT",
-        "IDLE"
+        "REGULAR-LEATHER",
+        "IRON-INGOT",
+        "COPPER-INGOT",
+        "SILVER-INGOT",
+        "GOLD-INGOT",
+        "MITHRIL-INGOT",
+        "ADAMANTINE-INGOT"
       ]
     },
-    "public.state_type_enum": {
-      "name": "state_type_enum",
+    "public.ingot_type_enum": {
+      "name": "ingot_type_enum",
       "schema": "public",
       "values": [
-        "CHARACTER",
-        "SKILLS",
-        "IDLE"
+        "IRON-INGOT",
+        "COPPER-INGOT",
+        "SILVER-INGOT",
+        "GOLD-INGOT",
+        "MITHRIL-INGOT",
+        "ADAMANTINE-INGOT"
       ]
     },
-    "public.tile_type_enum": {
-      "name": "tile_type_enum",
+    "public.leather_type_enum": {
+      "name": "leather_type_enum",
       "schema": "public",
       "values": [
-        "OBJECT",
-        "WATER",
-        "HERO",
-        "TOWN",
-        "GROUND"
+        "REGULAR-LEATHER"
       ]
     },
-    "public.pvp_type_enum": {
-      "name": "pvp_type_enum",
+    "public.ore_type_enum": {
+      "name": "ore_type_enum",
       "schema": "public",
       "values": [
-        "PVE",
-        "PVP"
-      ]
-    },
-    "public.building_type_enum": {
-      "name": "building_type_enum",
-      "schema": "public",
-      "values": [
-        "MAGIC-SHOP",
-        "TEMPLE",
-        "BLACKSMITH",
-        "FORGE"
-      ]
-    },
-    "public.place_type_enum": {
-      "name": "place_type_enum",
-      "schema": "public",
-      "values": [
-        "TOWN",
-        "DUNGEON",
-        "MINE"
+        "IRON-ORE",
+        "COPPER-ORE",
+        "SILVER-ORE",
+        "GOLD-ORE",
+        "MITHRIL-ORE",
+        "ADAMANTINE-ORE"
       ]
     },
     "public.rarity_enum": {
@@ -2443,6 +2110,17 @@
         "ADAMANTINE-INGOT"
       ]
     },
+    "public.building_type_enum": {
+      "name": "building_type_enum",
+      "schema": "public",
+      "values": [
+        "MAGIC-SHOP",
+        "TEMPLE",
+        "BLACKSMITH",
+        "FORGE",
+        "BANK"
+      ]
+    },
     "public.queue_craft_status_enum": {
       "name": "queue_craft_status_enum",
       "schema": "public",
@@ -2460,7 +2138,10 @@
         "BLACKSMITHING",
         "MINING",
         "SMELTING",
-        "ALCHEMY"
+        "ALCHEMY",
+        "TAILORING",
+        "REGENERATION",
+        "MEDITATION"
       ]
     }
   },

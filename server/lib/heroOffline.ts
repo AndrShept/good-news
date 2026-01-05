@@ -3,8 +3,7 @@ import { socketEvents } from '@/shared/socket-events';
 import { eq } from 'drizzle-orm';
 
 import { io } from '..';
-import { db } from '../db/db';
-import { locationTable } from '../db/schema';
+
 import { serverState } from '../game/state/hero-state';
 import { actionQueue } from '../queue/actionQueue';
 import { jobQueueId } from './utils';

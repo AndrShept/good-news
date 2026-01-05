@@ -1,4 +1,4 @@
-import type { HeroSidebarItem, Location, Map, Place, SuccessResponse } from '@/shared/types';
+import type { HeroSidebarItem, SuccessResponse, TPlace } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -7,7 +7,8 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { heroTable, locationTable, placeTable } from '../db/schema';
+import { heroTable, locationTable } from '../db/schema';
+import { placeEntities } from '../entities/places';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const placeRouter = new Hono<Context>()
@@ -23,17 +24,14 @@ export const placeRouter = new Hono<Context>()
 
     async (c) => {
       const { id } = c.req.valid('param');
-      const place = await db.query.placeTable.findFirst({
-        where: eq(placeTable.id, id),
-      });
-
+      const place = placeEntities.find((p) => p.id === id);
       if (!place) {
         throw new HTTPException(404, {
           message: 'place not found',
         });
       }
 
-      return c.json<SuccessResponse<Place>>({
+      return c.json<SuccessResponse<TPlace>>({
         message: 'place fetched!',
         success: true,
         data: place,
@@ -51,9 +49,7 @@ export const placeRouter = new Hono<Context>()
     ),
     async (c) => {
       const { id } = c.req.valid('param');
-      const place = await db.query.placeTable.findFirst({
-        where: eq(placeTable.id, id),
-      });
+      const place = placeEntities.find((p) => p.id === id);
       if (!place) {
         throw new HTTPException(404, {
           message: 'place not found',

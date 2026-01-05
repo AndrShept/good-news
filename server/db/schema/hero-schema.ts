@@ -1,4 +1,4 @@
-import type { IHeroStat } from '@/shared/types';
+import type { IHeroStat, TLocation } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { boolean, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
@@ -32,6 +32,7 @@ export const heroTable = pgTable('hero', {
   maxHealth: integer().default(0).notNull(),
   maxMana: integer().default(0).notNull(),
   stat: jsonb('stat').$type<IHeroStat>().notNull(),
+
 
   groupId: uuid().references(() => groupTable.id, {
     onDelete: 'set null',

@@ -1,15 +1,20 @@
 import { imageConfig } from '@/shared/config/image-config';
-import type { mapTable } from '../db/schema';
+import type { TMap } from '@/shared/types';
 
-export const mapEntities: Record<string, typeof mapTable.$inferInsert> = {
-  '019a350c-5552-76dd-b6d5-181b473d3128': {
+import solverValley from '../json/solmer-valley.json';
+import { placeEntities } from './places';
+
+
+export const mapEntities: TMap[] = [
+  {
     id: '019a350c-5552-76dd-b6d5-181b473d3128',
-    height: 1,
-    width: 1,
-    tileHeight: 32,
-    tileWidth: 32,
-    image: imageConfig.bg.map.SolmereValley,
     name: 'Solmere Valley',
-    pvpMode: 'PVE',
+    height: solverValley.height,
+    width: solverValley.width,
+    tileHeight: solverValley.tileheight,
+    tileWidth: solverValley.tilewidth,
+    image: imageConfig.bg.map.SolmereValley,
+    layers: solverValley.layers,
+    places: placeEntities.filter((p) => p.mapId === '019a350c-5552-76dd-b6d5-181b473d3128'),
   },
-};
+];

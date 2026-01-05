@@ -1,10 +1,12 @@
 import type { CraftItemRequiredResources, ResourceType } from '@/shared/types';
 import { relations } from 'drizzle-orm';
-import { integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core';
+import { integer, jsonb, pgEnum, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 import { gameItemTable } from './game-item-schema';
-import { buildingTypeEnum } from './place-schema';
 import { resourceCategoryEnum } from './resource-schema';
+
+export const buildingTypeEnum = pgEnum('building_type_enum', ['MAGIC-SHOP', 'TEMPLE', 'BLACKSMITH', 'FORGE', 'BANK'] );
+
 
 export const craftItemTable = pgTable('craft-item', {
   id: uuid().primaryKey().defaultRandom().notNull(),
