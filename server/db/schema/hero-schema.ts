@@ -3,8 +3,7 @@ import { relations } from 'drizzle-orm';
 import { boolean, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { userTable } from './auth-schema';
-import { buffTable } from './buff-schema';
-import { equipmentTable } from './equipment-schema';
+import { buffInstanceTable } from './buff-instance-schema';
 import { groupTable } from './group-schema';
 import { itemContainerTable } from './item-container-schema';
 import { locationTable } from './location-schema';
@@ -32,7 +31,6 @@ export const heroTable = pgTable('hero', {
   maxHealth: integer().default(0).notNull(),
   maxMana: integer().default(0).notNull(),
   stat: jsonb('stat').$type<IHeroStat>().notNull(),
-
 
   groupId: uuid().references(() => groupTable.id, {
     onDelete: 'set null',
@@ -62,9 +60,9 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
     fields: [heroTable.userId],
     references: [userTable.id],
   }),
-  equipments: many(equipmentTable),
+
   queueCraftItems: many(queueCraftItemTable),
-  buffs: many(buffTable),
+  buffs: many(buffInstanceTable),
   skills: many(skillTable),
   itemContainers: many(itemContainerTable),
 }));

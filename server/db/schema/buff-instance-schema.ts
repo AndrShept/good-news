@@ -2,20 +2,19 @@ import type { OmitModifier } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
+import { buffTemplateTable } from './buff-template-schema';
 import { heroTable } from './hero-schema';
 
-export const buffTypeEnum = pgEnum('buff_type_enum', ['POSITIVE', 'NEGATIVE']);
-
-export const buffTable = pgTable('buff', {
+export const buffInstanceTable = pgTable('buff_instance', {
   id: uuid().primaryKey().defaultRandom().notNull(),
-  name: text().notNull(),
-  image: text().notNull(),
-  gameItemId: text().notNull(),
-  duration: integer().notNull(),
-  type: buffTypeEnum().notNull(),
-  modifier: jsonb('modifier').$type<Partial<OmitModifier>>().notNull(),
-  heroId: uuid()
+
+  ownerHeroId: uuid()
     .references(() => heroTable.id, {
+      onDelete: 'cascade',
+    })
+    .notNull(),
+  buffTemplateId: uuid()
+    .references(() => buffTemplateTable.id, {
       onDelete: 'cascade',
     })
     .notNull(),
@@ -26,15 +25,19 @@ export const buffTable = pgTable('buff', {
   })
     .notNull()
     .defaultNow(),
-  completedAt: timestamp('completed_at', {
+  expiresAt: timestamp('expires_at', {
     withTimezone: true,
     mode: 'string',
   }).notNull(),
 });
 
-export const buffRelations = relations(buffTable, ({ one }) => ({
+export const buffInstanceRelations = relations(buffInstanceTable, ({ one }) => ({
   hero: one(heroTable, {
-    fields: [buffTable.heroId],
+    fields: [buffInstanceTable.ownerHeroId],
     references: [heroTable.id],
+  }),
+  buffTemplate: one(buffTemplateTable, {
+    fields: [buffInstanceTable.buffTemplateId],
+    references: [buffTemplateTable.id],
   }),
 }));

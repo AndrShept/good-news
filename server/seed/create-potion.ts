@@ -1,19 +1,17 @@
+import { eq } from 'drizzle-orm';
+import { potionTemplate } from '../data/potion-template';
 import { db } from '../db/db';
-import { gameItemTable, potionTable } from '../db/schema';
-import { potionEntities } from '../entities/potions';
+import { itemTemplateTable } from '../db/schema';
 
-export const createPotions = async () => {
-  const potions = Object.values(potionEntities);
-  for (const potion of potions) {
-    await db.insert(gameItemTable).values(potion);
-    await db.insert(potionTable).values({
-      type: potion.potion.type,
-      gameItemId: potion.id,
-      buffInfo: { ...potion.potion.buffInfo!, gameItemId: potion.id },
-      restore: potion.potion.restore,
+export const createPotion = async () => {
+  for (const potion of potionTemplate) {
+    const findOne = await db.query.itemTemplateTable.findFirst({ where: eq(itemTemplateTable.id, potion.id) });
+    if (findOne) continue;
+    await db.insert(itemTemplateTable).values({
+      ...potion,
     });
   }
   console.log('✔ potions create');
   return;
 };
-createPotions();
+createPotion();

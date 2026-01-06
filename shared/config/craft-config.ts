@@ -1,37 +1,30 @@
-import type {
-  ArmorSlotType,
-  ArmorType,
-  CraftItemRequirement,
-  GameItemType,
-  IngotType,
-  LeatherType,
-  ResourceType,
-  WeaponType,
-} from '@/shared/types';
+import type { ArmorCategoryType, ArmorType, CraftItemRequirement, IngotType, LeatherType, ResourceType, WeaponType } from '@/shared/types';
 
-import { armorEntities } from '../../server/entities/armor';
-import { resourceEntities } from '../../server/entities/resource';
-import { shieldEntities } from '../../server/entities/shield';
-import { weaponEntities } from '../../server/entities/weapon';
+import { armorTemplate } from '../../server/data/armor-template';
+import { resourceTemplate } from '../../server/data/resource-template';
+import { shieldTemplate } from '../../server/data/shield-template';
+import { weaponTemplate } from '../../server/data/weapon-template';
 
 function isIngot(
-  r: (typeof resourceEntities)[number],
-): r is Extract<(typeof resourceEntities)[number], { resource: { category: 'INGOT' } }> {
-  return r.resource.category === 'INGOT';
+  r: (typeof resourceTemplate)[number],
+): r is Extract<(typeof resourceTemplate)[number], { resourceInfo: { category: 'INGOT' } }> {
+  return r.resourceInfo.category === 'INGOT';
 }
-function isOre(r: (typeof resourceEntities)[number]): r is Extract<(typeof resourceEntities)[number], { resource: { category: 'ORE' } }> {
-  return r.resource.category === 'ORE';
+function isOre(
+  r: (typeof resourceTemplate)[number],
+): r is Extract<(typeof resourceTemplate)[number], { resourceInfo: { category: 'ORE' } }> {
+  return r.resourceInfo.category === 'ORE';
 }
 function isLeather(
-  r: (typeof resourceEntities)[number],
-): r is Extract<(typeof resourceEntities)[number], { resource: { category: 'LEATHER' } }> {
-  return r.resource.category === 'LEATHER';
+  r: (typeof resourceTemplate)[number],
+): r is Extract<(typeof resourceTemplate)[number], { resourceInfo: { category: 'LEATHER' } }> {
+  return r.resourceInfo.category === 'LEATHER';
 }
 
-const weaponNames = weaponEntities.map((weapon) => weapon.name);
-const armorNames = armorEntities.map((armor) => armor.name);
-const shieldNames = shieldEntities.map((shield) => shield.name);
-const ingotNames = resourceEntities.filter(isIngot).map((i) => i.name);
+const weaponNames = weaponTemplate.map((weapon) => weapon.name);
+const armorNames = armorTemplate.map((armor) => armor.name);
+const shieldNames = shieldTemplate.map((shield) => shield.name);
+const ingotNames = resourceTemplate.filter(isIngot).map((i) => i.name);
 
 export type WeaponNameType = (typeof weaponNames)[number];
 export type ArmorNameType = (typeof armorNames)[number];
@@ -40,7 +33,7 @@ export type IngotName = (typeof ingotNames)[number];
 
 export interface ICraftConfig {
   WEAPON: Record<WeaponType, Record<IngotType, CraftItemRequirement<IngotType>>>;
-  ARMOR: Record<ArmorType, Record<LeatherType | IngotType, CraftItemRequirement<LeatherType | IngotType>>>;
+  ARMOR: Record<ArmorCategoryType, Record<LeatherType | IngotType, CraftItemRequirement<LeatherType | IngotType>>>;
   SHIELD: Record<ShieldNameType, Record<IngotType, CraftItemRequirement<IngotType>>>;
   RESOURCES: Record<string, CraftItemRequirement>;
   POTION: Record<string, CraftItemRequirement>;

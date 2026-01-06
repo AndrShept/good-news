@@ -1,10 +1,9 @@
 import { materialModifierConfig } from '@/shared/config/material-modifier-config';
 import type {
   ArmorType,
-  CraftItem,
+
   CraftItemRequiredResources,
-  GameItem,
-  GameItemType,
+
   IngotType,
   LeatherType,
   ResourceType,
@@ -14,7 +13,6 @@ import { HTTPException } from 'hono/http-exception';
 
 import { type ShieldNameType, craftConfig } from '../../shared/config/craft-config';
 import type { TDataBase, TTransaction } from '../db/db';
-import { containerSlotTable, craftItemTable, resourceTable } from '../db/schema';
 import { itemContainerService } from './item-container-service';
 
 export const craftItemService = (db: TTransaction | TDataBase) => ({

@@ -1,12 +1,12 @@
 import { calculate } from '@/shared/calculate';
 import { type BuffCreateJob, jobName } from '@/shared/job-types';
-import type { ContainerSlot, Hero, IPosition, Modifier, OmitModifier } from '@/shared/types';
+import type { Hero, IPosition, Modifier, OmitModifier } from '@/shared/types';
 import { and, eq, sql } from 'drizzle-orm';
 import type {} from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction } from '../db/db';
-import { buffTable, equipmentTable, heroTable, locationTable, modifierTable } from '../db/schema';
+import { buffTable, heroTable, locationTable, modifierTable } from '../db/schema';
 import { serverState } from '../game/state/hero-state';
 import { newCombineModifier } from '../lib/utils';
 import { actionQueue } from '../queue/actionQueue';

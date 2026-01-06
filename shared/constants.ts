@@ -1,4 +1,6 @@
-export const BASE_STATS = {
+import type { IHeroStat } from './types';
+
+export const BASE_STATS: IHeroStat = {
   strength: 10,
   dexterity: 10,
   intelligence: 10,
@@ -15,6 +17,10 @@ export const BASE_WALK_TIME = 10000;
 export const HP_MULTIPLIER_COST = 10;
 export const MANA_MULTIPLIER_INT = 15;
 
-export const DEFAULT_ITEM_STACK = 20;
+export const DEFAULT_ITEM_STACK = {
+  RESOURCE: 20,
+  POTION: 10,
+  GOLD: 1000,
+} as const;
 
 export const BANK_CONTAINER_COST = 100;

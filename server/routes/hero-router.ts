@@ -12,14 +12,10 @@ import type {
   WalkMapStartData,
 } from '@/shared/socket-data-types';
 import {
-  type Buff,
-  type ContainerSlot,
-  type Equipment,
   type EquipmentSlotType,
   type ErrorResponse,
-  type GameItem,
-  type GameItemType,
   type Hero,
+  type ItemInstance,
   type PathNode,
   type QueueCraftItem,
   type Skill,
@@ -39,27 +35,22 @@ import { z } from 'zod';
 import { io } from '..';
 import { socketEvents } from '../../shared/socket-events';
 import type { Context } from '../context';
+import { mapTemplate } from '../data/map-template';
 import { db } from '../db/db';
 import {
-  buildingTypeEnum,
-  containerSlotTable,
   coreMaterialTypeEnum,
-  gameItemTable,
   heroTable,
   itemContainerTable,
+  itemInstanceTable,
   locationTable,
   modifierTable,
-  resourceTable,
   resourceTypeEnum,
   skillTable,
   skillsTypeEnum,
   slotEnum,
   stateTypeEnum,
 } from '../db/schema';
-import { buffTable } from '../db/schema/buff-schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
-import { mapEntities } from '../entities/map';
-import { placeEntities } from '../entities/places';
 import { serverState } from '../game/state/hero-state';
 import { heroOnline } from '../lib/heroOnline';
 import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
@@ -81,40 +72,33 @@ export const heroRouter = new Hono<Context>()
 
     async (c) => {
       const userId = c.get('user')?.id as string;
-
-      const hero = await db.query.heroTable.findFirst({
-        where: eq(heroTable.userId, userId),
-        with: {
-          modifier: true,
-          group: true,
-          location: true,
-          equipments: {
-            with: {
-              gameItem: {
-                with: {
-                  accessory: true,
-                  armor: true,
-                  weapon: true,
-                  shield: true,
-                },
-              },
-            },
+      const stateHeroId = serverState.user.get(userId);
+      let hero: Hero | null = null;
+      if (!stateHeroId) {
+        hero = (await db.query.heroTable.findFirst({
+          where: eq(heroTable.userId, userId),
+          with: {
+            modifier: true,
+            group: true,
+            location: true,
+            buffs: true,
+            queueCraftItems: true,
+            itemContainers: { columns: { id: true, type: true, name: true }, where: eq(itemContainerTable.type, 'BACKPACK') },
           },
-          queueCraftItems: true,
-          itemContainers: { columns: { id: true, type: true, name: true }, where: eq(itemContainerTable.type, 'BACKPACK') },
-        },
-      });
+        })) as Hero;
 
-      if (!hero) {
-        throw new HTTPException(404, {
-          message: 'hero not found',
+        if (!hero) {
+          throw new HTTPException(404, {
+            message: 'hero not found',
+          });
+        }
+
+        serverState.user.set(userId, hero.id);
+        const equipments = await db.query.itemInstanceTable.findMany({
+          where: and(eq(itemInstanceTable.ownerHeroId, hero.id), eq(itemInstanceTable.location, 'EQUIPMENT')),
+          with: { itemTemplate: true },
         });
-      }
-      verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
-      const stateHero = serverState.hero.get(hero.id);
-
-      if (!stateHero) {
         serverState.hero.set(hero.id, {
           id: hero.id,
           name: hero.name,
@@ -133,6 +117,8 @@ export const heroRouter = new Hono<Context>()
           goldCoins: hero.goldCoins,
           maxQueueCraftCount: hero.maxQueueCraftCount,
           premiumCoins: hero.premiumCoins,
+          buffs: hero.buffs ?? [],
+          equipments,
           location: {
             x: hero.location?.x!,
             y: hero.location?.y!,
@@ -142,36 +128,20 @@ export const heroRouter = new Hono<Context>()
             placeId: hero.location?.placeId ?? null,
           },
         });
+        await heroOnline(hero.id);
       }
-      if (stateHero) {
-        stateHero.offlineTimer = undefined;
-        stateHero.isOnline = true;
-      }
-      await heroOnline(hero.id);
-      const returnHeroData = {
-        ...hero,
 
-        currentHealth: stateHero?.currentHealth ?? hero.currentHealth,
-        currentMana: stateHero?.currentMana ?? hero.currentMana,
-        maxHealth: stateHero?.maxHealth ?? hero.maxHealth,
-        maxMana: stateHero?.maxMana ?? hero.maxMana,
-        state: stateHero?.state ?? hero.state,
-        isOnline: stateHero?.isOnline ?? hero.isOnline,
-        modifier: stateHero?.modifier ?? hero.modifier,
-        stat: stateHero?.stat ?? hero.stat,
-        location: {
-          ...hero.location,
-          x: stateHero?.location.x ?? hero.location!.x,
-          y: stateHero?.location.y ?? hero.location!.y,
-          targetX: stateHero?.location.targetX ?? hero.location!.targetX,
-          targetY: stateHero?.location.targetY ?? hero.location!.targetY,
-        },
-      };
+      const heroId = stateHeroId ?? hero?.id!;
+      const stateHero = serverState.getHeroState(heroId);
+
+      verifyHeroOwnership({ heroUserId: hero?.userId ?? stateHero.userId, userId });
+      stateHero.offlineTimer = undefined;
+      stateHero.isOnline = true;
 
       return c.json<SuccessResponse<Hero>>({
         success: true,
         message: 'hero fetched',
-        data: returnHeroData as Hero,
+        data: stateHero as Hero,
       });
     },
   )
@@ -705,7 +675,7 @@ export const heroRouter = new Hono<Context>()
       verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
 
       const heroPos = { x: heroState.location.x, y: heroState.location.y };
-      const map = mapEntities.find((m) => m.id === heroState.location.mapId);
+      const map = mapTemplate.find((m) => m.id === heroState.location.mapId);
       if (!map) throw new HTTPException(404, { message: 'map not found' });
 
       const MAP_WIDTH = map.width;

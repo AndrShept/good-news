@@ -1,4 +1,4 @@
-import type { Hero, IHeroStat, OmitModifier, PathNode } from '@/shared/types';
+import type { BuffInstance, Hero, IHeroStat, ItemInstance, OmitModifier, PathNode } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 type IHeroServerState = Pick<
@@ -29,6 +29,8 @@ type IHeroServerState = Pick<
   };
   stat: IHeroStat;
   modifier: OmitModifier;
+  equipments: ItemInstance[];
+  buffs: BuffInstance[];
   paths?: PathNode[];
   offlineTimer?: number;
 };
@@ -36,6 +38,7 @@ type IHeroServerState = Pick<
 export const serverState = {
   hero: new Map<string, IHeroServerState>(),
   pathPersistQueue: new Map<string, { x: number; y: number }>(),
+  user: new Map<string, string>(),
 
   getHeroState(heroId: string) {
     const hero = this.hero.get(heroId);

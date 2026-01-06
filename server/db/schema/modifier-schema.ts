@@ -2,7 +2,6 @@ import { relations } from 'drizzle-orm';
 import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { heroTable } from './hero-schema';
-import { resourceTable } from './resource-schema';
 
 export const modifierTable = pgTable('modifier', {
   id: uuid().primaryKey().defaultRandom().notNull(),
@@ -39,9 +38,7 @@ export const modifierTable = pgTable('modifier', {
   heroId: uuid().references(() => heroTable.id, {
     onDelete: 'cascade',
   }),
-  // resourceId: uuid().references(() => resourceTable.id, {
-  //   onDelete: 'cascade',
-  // }),
+
 
   createdAt: timestamp('created_at', {
     withTimezone: true,
@@ -56,8 +53,5 @@ export const modifierRelations = relations(modifierTable, ({ one }) => ({
     fields: [modifierTable.heroId],
     references: [heroTable.id],
   }),
-  // resource: one(resourceTable, {
-  //   fields: [modifierTable.resourceId],
-  //   references: [resourceTable.id],
-  // }),
+
 }));

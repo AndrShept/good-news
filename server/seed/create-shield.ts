@@ -1,19 +1,18 @@
 import { eq } from 'drizzle-orm';
 
 import { db } from '../db/db';
-import { armorTable, gameItemTable, shieldTable } from '../db/schema';
-import { shieldEntities } from '../entities/shield';
+import { shieldTemplate } from '../data/shield-template';
+import { itemTemplateTable } from '../db/schema';
+
 
 export const createShield = async () => {
-  for (const shield of shieldEntities) {
-    const findShield = await db.query.gameItemTable.findFirst({ where: eq(gameItemTable.id, shield.id) });
-    if (findShield) continue;
-    await db.insert(gameItemTable).values(shield);
-    await db.insert(shieldTable).values({
-      ...shield.shield,
-      gameItemId: shield.id,
-    });
-  }
+   for (const shield of shieldTemplate) {
+     const findOne = await db.query.itemTemplateTable.findFirst({ where: eq(itemTemplateTable.id, shield.id) });
+     if (findOne) continue;
+     await db.insert(itemTemplateTable).values({
+       ...shield,
+     });
+   }
   console.log('✔ shields create');
   return;
 };

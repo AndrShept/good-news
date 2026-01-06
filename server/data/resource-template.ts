@@ -1,101 +1,92 @@
 import { imageConfig } from '@/shared/config/image-config';
-import type { gameItemTable, potionTable } from '../db/schema';
-import type { resourceTable } from '../db/schema/resource-schema';
+import { DEFAULT_ITEM_STACK } from '@/shared/constants';
 
-export const resourceEntities = [
+import type { itemTemplateTable } from '../db/schema';
+
+export const resourceTemplate = [
   {
     id: '0199df54-be65-7db2-af0a-1002d323d64d',
     name: 'iron ore',
     image: imageConfig.icon.RESOURCES['IRON-ORE'],
     type: 'RESOURCES',
-    resource: {
-      gameItemId: '',
-      type: 'IRON-ORE',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+    resourceInfo: {
       category: 'ORE',
-      rarity: 'COMMON',
+      type: 'IRON-ORE',
     },
-    craftInfo: null
+
   },
   {
     id: '0199df74-c722-7695-96d9-59a701689d03',
     name: 'copper ore',
     image: imageConfig.icon.RESOURCES['COPPER-ORE'],
     type: 'RESOURCES',
-    resource: {
-      gameItemId: '',
-      type: 'COPPER-ORE',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+    resourceInfo: {
       category: 'ORE',
-      rarity: 'COMMON',
+      type: 'COPPER-ORE',
     },
-    craftInfo: null
   },
   {
     id: '019ac735-a9c0-7e79-98cb-e392af762b03',
     name: 'silver ore',
     image: imageConfig.icon.RESOURCES['SILVER-ORE'],
     type: 'RESOURCES',
-    resource: {
-      gameItemId: '',
-      type: 'SILVER-ORE',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+    resourceInfo: {
       category: 'ORE',
-      rarity: 'COMMON',
+      type: 'SILVER-ORE',
     },
-    craftInfo: null
   },
   {
     id: '019ac738-6ec9-7763-b633-d5ed4046b6f0',
     name: 'gold ore',
     image: imageConfig.icon.RESOURCES['GOLD-ORE'],
     type: 'RESOURCES',
-    resource: {
-      gameItemId: '',
-      type: 'GOLD-ORE',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+    resourceInfo: {
       category: 'ORE',
-      rarity: 'COMMON',
+      type: 'GOLD-ORE',
     },
-    craftInfo: null
   },
   {
     id: '019ac738-e2f2-79a0-9f96-968231e0853e',
     name: 'mithril ore',
     image: imageConfig.icon.RESOURCES['MITHRIL-ORE'],
     type: 'RESOURCES',
-    resource: {
-      gameItemId: '',
-      type: 'MITHRIL-ORE',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+    resourceInfo: {
       category: 'ORE',
-      rarity: 'RARE',
+      type: 'MITHRIL-ORE',
     },
-    craftInfo: null
   },
   {
     id: '019ac739-be74-7813-9a75-8e8b0710a51e',
     name: 'adamantine ore',
     image: imageConfig.icon.RESOURCES['ADAMANTINE-ORE'],
     type: 'RESOURCES',
-    resource: {
-      gameItemId: '',
-      type: 'ADAMANTINE-ORE',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+    resourceInfo: {
       category: 'ORE',
-      rarity: 'EPIC',
+      type: 'ADAMANTINE-ORE',
     },
-    craftInfo: null
   },
   {
     id: '019ac73a-d3f4-7c91-90b5-e0756f68d876',
     name: 'iron ingot',
     image: imageConfig.icon.RESOURCES['IRON-INGOT'],
     type: 'RESOURCES',
-    resource: {
-      gameItemId: '',
-      type: 'IRON-INGOT',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+    resourceInfo: {
       category: 'INGOT',
-      rarity: 'COMMON',
-    },
-    craftInfo: {
-      
-      baseResourceCategory: 'ORE',
-      requiredBuildingType: 'FORGE',
+      type: 'IRON-INGOT',
     },
   },
   {
@@ -103,15 +94,11 @@ export const resourceEntities = [
     name: 'copper ingot',
     image: imageConfig.icon.RESOURCES['COPPER-INGOT'],
     type: 'RESOURCES',
-    resource: {
-      gameItemId: '',
-      type: 'COPPER-INGOT',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+    resourceInfo: {
       category: 'INGOT',
-      rarity: 'COMMON',
-    },
-    craftInfo: {
-      baseResourceCategory: 'ORE',
-      requiredBuildingType: 'FORGE',
+      type: 'COPPER-INGOT',
     },
   },
   {
@@ -119,15 +106,11 @@ export const resourceEntities = [
     name: 'silver ingot',
     image: imageConfig.icon.RESOURCES['SILVER-INGOT'],
     type: 'RESOURCES',
-    resource: {
-      gameItemId: '',
-      type: 'SILVER-INGOT',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+    resourceInfo: {
       category: 'INGOT',
-      rarity: 'COMMON',
-    },
-    craftInfo: {
-      baseResourceCategory: 'ORE',
-      requiredBuildingType: 'FORGE',
+      type: 'SILVER-INGOT',
     },
   },
   {
@@ -135,15 +118,11 @@ export const resourceEntities = [
     name: 'gold ingot',
     image: imageConfig.icon.RESOURCES['GOLD-INGOT'],
     type: 'RESOURCES',
-    resource: {
-      gameItemId: '',
-      type: 'GOLD-INGOT',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+    resourceInfo: {
       category: 'INGOT',
-      rarity: 'COMMON',
-    },
-    craftInfo: {
-      baseResourceCategory: 'ORE',
-      requiredBuildingType: 'FORGE',
+      type: 'GOLD-INGOT',
     },
   },
   {
@@ -151,15 +130,11 @@ export const resourceEntities = [
     name: 'mithril ingot',
     image: imageConfig.icon.RESOURCES['MITHRIL-INGOT'],
     type: 'RESOURCES',
-    resource: {
-      gameItemId: '',
-      type: 'MITHRIL-INGOT',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+    resourceInfo: {
       category: 'INGOT',
-      rarity: 'COMMON',
-    },
-    craftInfo: {
-      baseResourceCategory: 'ORE',
-      requiredBuildingType: 'FORGE',
+      type: 'MITHRIL-INGOT',
     },
   },
   {
@@ -167,15 +142,11 @@ export const resourceEntities = [
     name: 'adamantine ingot',
     image: imageConfig.icon.RESOURCES['ADAMANTINE-INGOT'],
     type: 'RESOURCES',
-    resource: {
-      gameItemId: '',
-      type: 'ADAMANTINE-INGOT',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+    resourceInfo: {
       category: 'INGOT',
-      rarity: 'COMMON',
-    },
-    craftInfo: {
-      baseResourceCategory: 'ORE',
-      requiredBuildingType: 'FORGE',
+      type: 'ADAMANTINE-INGOT',
     },
   },
   {
@@ -183,12 +154,11 @@ export const resourceEntities = [
     name: 'regular leather',
     image: imageConfig.icon.RESOURCES['REGULAR-LEATHER'],
     type: 'RESOURCES',
-    resource: {
-      gameItemId: '',
-      type: 'REGULAR-LEATHER',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+    resourceInfo: {
       category: 'LEATHER',
-      rarity: 'COMMON',
+      type: 'REGULAR-LEATHER',
     },
-    craftInfo: null
   },
-] as const satisfies Array<typeof gameItemTable.$inferInsert & { resource: typeof resourceTable.$inferInsert }>;
+] as const satisfies (typeof itemTemplateTable.$inferInsert)[];

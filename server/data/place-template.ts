@@ -1,9 +1,9 @@
 import { imageConfig } from '@/shared/config/image-config';
-import type { Building, TPlace } from '@/shared/types';
+import type {  TPlace } from '@/shared/types';
+import { buildingTemplate } from './building-template';
 
-import { buildingEntities } from './buildings';
 
-export const placeEntities: TPlace[] = [
+export const placeTemplate: TPlace[] = [
   {
     id: '0198c15a-149a-7cb5-bbf2-bf8ddd2c9f98',
     name: 'Solmer Town',
@@ -11,13 +11,7 @@ export const placeEntities: TPlace[] = [
     image: imageConfig.icon.place.solmer,
     x: 7,
     y: 7,
-    buildings: [
-      buildingEntities['MAGIC-SHOP'],
-      buildingEntities.TEMPLE,
-      buildingEntities.BLACKSMITH,
-      buildingEntities.FORGE,
-      buildingEntities.BANK,
-    ],
+    buildings: [buildingTemplate['MAGIC-SHOP'], buildingTemplate.TEMPLE, buildingTemplate.BLACKSMITH, buildingTemplate.FORGE, buildingTemplate.BANK],
     mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
   },
   {
@@ -28,6 +22,6 @@ export const placeEntities: TPlace[] = [
     x: 10,
     y: 10,
     mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
-    buildings: [buildingEntities.FORGE],
+    buildings: [buildingTemplate.FORGE],
   },
 ];

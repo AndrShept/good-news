@@ -5,48 +5,37 @@ import { z } from 'zod';
 
 import type { client } from '../frontend/src/lib/utils';
 import {
-  armorTable,
-  buildingTypeEnum,
-  containerSlotTable,
-  craftItemTable,
+  buffInstanceTable,
   groupTable,
   heroTable,
   itemContainerTable,
   itemContainerTypeEnum,
   modifierTable,
-  potionTable,
   skillTable,
   skillsTypeEnum,
   stateTypeEnum,
-  weaponTable,
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
-import { buffTable } from '../server/db/schema/buff-schema';
+import type { buffTemplateTable } from '../server/db/schema/buff-template-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
-import { equipmentTable, slotEnum } from '../server/db/schema/equipment-schema';
-import {
-  accessoryTable,
-  armorSlotEnum,
+import type { itemInstanceTable, rarityEnum, slotEnum } from '../server/db/schema/item-instance-schema';
+import type {
+  armorCategoryEnum,
   armorTypeEnum,
-  gameItemEnum,
-  gameItemTable,
-  shieldTable,
+  coreMaterialTypeEnum,
+  ingotTypeEnum,
+  itemTemplateEnum,
+  itemTemplateTable,
+  leatherTypeEnum,
+  oreTypeEnum,
+  resourceCategoryEnum,
+  resourceTypeEnum,
   weaponHandEnum,
   weaponTypeEnum,
-} from '../server/db/schema/game-item-schema';
+} from '../server/db/schema/item-template-schema';
 import type { locationTable } from '../server/db/schema/location-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { queueCraftItemTable, queueCraftStatusEnum } from '../server/db/schema/queue-craft-item-schema';
-import type {
-  coreMaterialTypeEnum,
-  ingotTypeEnum,
-  leatherTypeEnum,
-  oreTypeEnum,
-  rarityEnum,
-  resourceCategoryEnum,
-  resourceTable,
-  resourceTypeEnum,
-} from '../server/db/schema/resource-schema';
 import type { Layer } from './json-types';
 
 export interface SuccessResponse<T = undefined> {
@@ -164,9 +153,9 @@ export type PathNode = { x: number; y: number; mapId: string; completedAt: numbe
 export type GetPostsData = InferResponseType<typeof client.post.$get>;
 
 export type EquipmentSlotType = (typeof slotEnum.enumValues)[number];
-export type GameItemType = (typeof gameItemEnum.enumValues)[number];
-export type ArmorSlotType = (typeof armorSlotEnum.enumValues)[number];
+export type ItemTemplateType = (typeof itemTemplateEnum.enumValues)[number];
 export type ArmorType = (typeof armorTypeEnum.enumValues)[number];
+export type ArmorCategoryType = (typeof armorCategoryEnum.enumValues)[number];
 export type RarityType = (typeof rarityEnum.enumValues)[number];
 export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
@@ -185,7 +174,7 @@ export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
 export type TLocation = typeof locationTable.$inferSelect;
 export type QueueCraftItem = typeof queueCraftItemTable.$inferSelect & {
-  craftItem?: CraftItem | null;
+  craftItem?: ItemTemplate | null;
 };
 
 export const placeValues = ['TOWN', 'DUNGEON', 'MINE'] as const;
@@ -202,9 +191,9 @@ export type TPlace = {
   buildings: Building[];
 };
 
-// export const buildingValues = ['MAGIC-SHOP', 'TEMPLE', 'BLACKSMITH', 'FORGE', 'BANK'] as const;
+export const buildingValues = ['MAGIC-SHOP', 'TEMPLE', 'BLACKSMITH', 'FORGE', 'BANK'] as const;
 export const tileTypeValues = ['OBJECT', 'WATER', 'GROUND'] as const;
-export type BuildingType = (typeof buildingTypeEnum.enumValues)[number];
+export type BuildingType = (typeof buildingValues)[number];
 
 export type Building = {
   id: string;
@@ -228,30 +217,26 @@ export type TMap = {
   layers: Layer[];
 };
 
+export type TEquipInfo = {
+  weaponType?: WeaponType;
+  weaponHand?: WeaponHandType;
+  armorType?: ArmorType;
+  armorCategory?: ArmorCategoryType;
+};
+export type TResourceInfo = {
+  category: ResourceCategoryType;
+  type: ResourceType;
+};
+export type TPotionInfo = {
+  type: 'BUFF' | 'RESTORE';
+  restore?: { health?: number; mana?: number };
+  buffTemplateId?: string;
+};
+
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'heroId' | 'resourceId'>;
 
-export type Equipment = typeof equipmentTable.$inferSelect & {
-  gameItem?: GameItem;
-};
 export type TItemContainer = typeof itemContainerTable.$inferSelect & {
-  containerSlots?: ContainerSlot[] | null;
-};
-export type ContainerSlot = typeof containerSlotTable.$inferSelect & {
-  gameItem?: GameItem | null;
-};
-
-export type Weapon = typeof weaponTable.$inferSelect;
-export type Armor = typeof armorTable.$inferSelect;
-export type Shield = typeof shieldTable.$inferSelect;
-export type Potion = typeof potionTable.$inferSelect;
-export type Accessory = typeof accessoryTable.$inferSelect;
-export type Resource = typeof resourceTable.$inferSelect & {
-  gameItem?: GameItem | null;
-  modifier?: Modifier | null;
-};
-
-export type CraftItem = typeof craftItemTable.$inferSelect & {
-  gameItem?: GameItem | null;
+  itemsInstance: ItemInstance[] | null;
 };
 
 export type CraftInfo = { baseResourceCategory: ResourceCategoryType; requiredBuildingType: BuildingType };
@@ -264,23 +249,22 @@ export type CraftItemRequirement<T extends IngotType | LeatherType | OreType = R
   craftTime: number;
 };
 
-export type GroupCraftItem = { itemType: GameItemType; subgroups: { subtype: WeaponType; items: CraftItem[] }[] };
+export type ItemTemplate = typeof itemTemplateTable.$inferSelect;
+export type ItemInstance = typeof itemInstanceTable.$inferSelect & {
+  itemTemplate?: ItemTemplate | null;
+};
 
-export type GameItem = InferSelectModel<typeof gameItemTable> & {
-  craftInfo?: CraftInfo | null;
-  weapon?: Weapon | null;
-  armor?: Armor | null;
-  shield?: Shield | null;
-  potion?: Potion | null;
-  accessory?: Accessory | null;
-  resource?: Resource | null;
+export type BuffTemplate = typeof buffTemplateTable.$inferSelect;
+export type BuffInstance = typeof buffInstanceTable.$inferSelect & {
+  buffTemplate?: BuffTemplate  | null;
 };
 
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier?: Modifier;
   location?: TLocation;
   group?: Group;
-  equipments?: Equipment[];
+  buffs?: BuffInstance[];
+  equipments?: ItemInstance[];
   queueCraftItems?: QueueCraftItem[];
   itemContainers?: { id: string; type: ItemContainerType; name: string }[];
 };
@@ -297,7 +281,6 @@ export type MapHero = HeroSidebarItem & {
   x: number;
   y: number;
 };
-export type Buff = typeof buffTable.$inferSelect;
 
 export type Skill = typeof skillTable.$inferSelect & {
   hero?: Hero | null;

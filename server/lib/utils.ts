@@ -7,9 +7,9 @@ import { sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import nodemailer from 'nodemailer';
 import z from 'zod';
+import { mapTemplate } from '../data/map-template';
 
-import { mapEntities } from '../entities/map';
-import solmerValley from '../json/solmer-valley.json';
+
 
 const schema = z.object({
   DATABASE_URL: z.string(),
@@ -89,7 +89,7 @@ export const rand = (num: number) => {
 };
 
 export const getTileExists = (mapId: string, index: number, tileType: TileType) => {
-  const map = mapEntities.find((m) => m.id === mapId);
+  const map = mapTemplate.find((m) => m.id === mapId);
   const tiles = map?.layers.find((l) => l.name === tileType);
   return tiles?.data[index];
 };

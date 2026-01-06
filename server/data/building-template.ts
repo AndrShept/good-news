@@ -1,7 +1,7 @@
 import { imageConfig } from '@/shared/config/image-config';
 import type { Building, BuildingType } from '@/shared/types';
 
-export const buildingEntities = {
+export const buildingTemplate = {
   'MAGIC-SHOP': {
     id: '0198c15a-149a-7cb5-bbf2-bf8ddd2c9f98',
     name: 'Magic Shop',

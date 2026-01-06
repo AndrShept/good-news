@@ -1,20 +1,18 @@
 import { eq } from 'drizzle-orm';
 
+import { armorTemplate } from '../data/armor-template';
 import { db } from '../db/db';
-import { armorTable, gameItemTable } from '../db/schema';
-import { armorEntities } from '../entities/armor';
+import { itemTemplateTable } from '../db/schema';
 
-export const createArmors = async () => {
-  for (const armor of armorEntities) {
-    const findArmor = await db.query.gameItemTable.findFirst({ where: eq(gameItemTable.id, armor.id) });
-    if (findArmor) continue;
-    await db.insert(gameItemTable).values(armor);
-    await db.insert(armorTable).values({
-      ...armor.armor,
-      gameItemId: armor.id,
+export const createArmor = async () => {
+  for (const armor of armorTemplate) {
+    const findOne = await db.query.itemTemplateTable.findFirst({ where: eq(itemTemplateTable.id, armor.id) });
+    if (findOne) continue;
+    await db.insert(itemTemplateTable).values({
+      ...armor,
     });
   }
   console.log('✔ armors create');
   return;
 };
-createArmors();
+createArmor();

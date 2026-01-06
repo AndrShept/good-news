@@ -8,8 +8,8 @@ import { z } from 'zod';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { heroTable, locationTable } from '../db/schema';
-import { placeEntities } from '../entities/places';
 import { loggedIn } from '../middleware/loggedIn';
+import { placeData } from '../data/place-template';
 
 export const placeRouter = new Hono<Context>()
   .get(
@@ -24,7 +24,7 @@ export const placeRouter = new Hono<Context>()
 
     async (c) => {
       const { id } = c.req.valid('param');
-      const place = placeEntities.find((p) => p.id === id);
+      const place = placeData.find((p) => p.id === id);
       if (!place) {
         throw new HTTPException(404, {
           message: 'place not found',
@@ -49,7 +49,7 @@ export const placeRouter = new Hono<Context>()
     ),
     async (c) => {
       const { id } = c.req.valid('param');
-      const place = placeEntities.find((p) => p.id === id);
+      const place = placeData.find((p) => p.id === id);
       if (!place) {
         throw new HTTPException(404, {
           message: 'place not found',
