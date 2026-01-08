@@ -1,9 +1,10 @@
-import type { Equipment, EquipmentSlotType, GameItem } from '@/shared/types';
+import type { EquipmentSlotType, ItemInstance } from '@/shared/types';
 import { and, eq } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction, db } from '../db/db';
-import { containerSlotTable, equipmentTable, heroTable } from '../db/schema';
+import { heroTable } from '../db/schema';
+import { serverState } from '../game/state/hero-state';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 
@@ -17,7 +18,7 @@ interface IEquipItem {
 
 interface IUnEquipItem {
   equipmentItemId: string;
-  gameItemId: string;
+  itemInstance: string;
   itemContainerId: string;
   heroId: string;
   usedSlots: number;
@@ -25,7 +26,7 @@ interface IUnEquipItem {
 }
 
 interface IGetEquip {
-  item: GameItem;
+  itemInstance: ItemInstance;
   itemContainerId: string;
   heroId: string;
   usedSlots: number;
@@ -33,79 +34,73 @@ interface IGetEquip {
 }
 
 export const equipmentService = (db: TTransaction | TDataBase) => ({
-  async getEquipItem(id: string, options?: Parameters<typeof db.query.equipmentTable.findFirst>[0]): Promise<Equipment> {
-    const equipItem = await db.query.equipmentTable.findFirst({ where: eq(equipmentTable.id, id), ...options });
 
-    if (!equipItem) throw new HTTPException(404, { message: 'equipItem not found' });
-
-    return equipItem;
-  },
 
   async equipItem({ gameItemId, inventoryItemId, heroId, slot, itemContainerId }: IEquipItem) {
-    await db.insert(equipmentTable).values({
-      heroId,
-      gameItemId,
-      slot,
-    });
-    await db.delete(containerSlotTable).where(eq(containerSlotTable.id, inventoryItemId));
-    await itemContainerService(db).setUsedSlots(itemContainerId);
-    await heroService(db).updateModifier(heroId);
+    // await db.insert(equipmentTable).values({
+    //   heroId,
+    //   gameItemId,
+    //   slot,
+    // });
+    // await db.delete(containerSlotTable).where(eq(containerSlotTable.id, inventoryItemId));
+    // await itemContainerService(db).setUsedSlots(itemContainerId);
+    // await heroService(db).updateModifier(heroId);
   },
 
-  async unEquipItem({ equipmentItemId, gameItemId, heroId, itemContainerId, maxSlots, usedSlots }: IUnEquipItem) {
-    const isInventoryFull = usedSlots >= maxSlots;
+  async unEquipItem({ equipmentItemId, itemInstance, heroId, itemContainerId, maxSlots, usedSlots }: IUnEquipItem) {
+    // const isInventoryFull = usedSlots >= maxSlots;
 
-    if (isInventoryFull) {
-      throw new HTTPException(409, { message: 'Inventory is full', cause: { canShow: true } });
-    }
+    // if (isInventoryFull) {
+    //   throw new HTTPException(409, { message: 'Inventory is full', cause: { canShow: true } });
+    // }
 
-    await db.delete(equipmentTable).where(eq(equipmentTable.id, equipmentItemId));
-    const [newInventoryItem] = await db.insert(containerSlotTable).values({ gameItemId, itemContainerId }).returning();
-    await itemContainerService(db).setUsedSlots(itemContainerId);
-    await heroService(db).updateModifier(heroId);
+    // await db.delete(equipmentTable).where(eq(equipmentTable.id, equipmentItemId));
+    // const [newInventoryItem] = await db.insert(containerSlotTable).values({ gameItemId, itemContainerId }).returning();
+    // await itemContainerService(db).setUsedSlots(itemContainerId);
+    // await heroService(db).updateModifier(heroId);
 
-    return {
-      success: true,
-      data: newInventoryItem,
-    };
+    // return {
+    //   success: true,
+    //   data: newInventoryItem,
+    // };
   },
 
-  async findEquipItem(slot: EquipmentSlotType, heroId: string) {
-    const equipItem = await db.query.equipmentTable.findFirst({
-      where: and(eq(equipmentTable.heroId, heroId), eq(equipmentTable.slot, slot)),
-    });
+  findEquipItem(slot: EquipmentSlotType, heroId: string) {
+    const heroState = serverState.getHeroState(heroId);
+    const equipItem = heroState.equipments.find((e) => e.slot === slot);
+
     if (!equipItem) return;
 
     return equipItem;
   },
 
-  async getEquipSlot({ usedSlots, maxSlots, itemContainerId, heroId, item }: IGetEquip): Promise<EquipmentSlotType | undefined> {
-    if (item.type === 'ARMOR') {
-      return item.armor?.slot === 'SHIELD' ? 'LEFT_HAND' : item.armor?.slot;
-    }
-    if (item.type === 'SHIELD') {
-      return 'LEFT_HAND';
-    }
-    if (item.type === 'WEAPON') {
-      const isTwoHanded = item.weapon?.weaponHand === 'TWO_HANDED';
-      const isOneHanded = item.weapon?.weaponHand === 'ONE_HANDED';
-      const existLeftSlot = await this.findEquipItem('LEFT_HAND', heroId);
-      if (isTwoHanded && existLeftSlot) {
-        await this.unEquipItem({
-          equipmentItemId: existLeftSlot.id,
-          gameItemId: existLeftSlot.gameItemId,
-          heroId,
-          itemContainerId,
-          maxSlots,
-          usedSlots,
-        });
+  async getEquipSlot({ usedSlots, maxSlots, itemContainerId, heroId, itemInstance }: IGetEquip): Promise<EquipmentSlotType | undefined> {
+    // if (itemInstance.itemTemplate?.type === 'ARMOR') {
+    //   return itemInstance.itemTemplate.equipInfo?.armorType === 'SHIELD' ? 'LEFT_HAND' : itemInstance.itemTemplate.equipInfo?.armorType;
+    // }
+    // if (itemInstance.itemTemplate?.type === 'SHIELD') {
+    //   return 'LEFT_HAND';
+    // }
+    // if (itemInstance.itemTemplate?.type === 'WEAPON') {
+    //   const isTwoHanded = itemInstance.itemTemplate?.equipInfo?.weaponHand === 'TWO_HANDED';
+    //   const isOneHanded = itemInstance.itemTemplate?.equipInfo?.weaponHand === 'ONE_HANDED';
+    //   const existLeftSlot = this.findEquipItem('LEFT_HAND', heroId);
+    //   if (isTwoHanded && existLeftSlot) {
+    //     await this.unEquipItem({
+    //       equipmentItemId: existLeftSlot.id,
+    //       gameItemId: existLeftSlot.gameItemId,
+    //       heroId,
+    //       itemContainerId,
+    //       maxSlots,
+    //       usedSlots,
+    //     });
 
-        return 'RIGHT_HAND';
-      }
-      if (isOneHanded && !existLeftSlot) {
-        return 'LEFT_HAND';
-      }
-      return 'RIGHT_HAND';
-    }
+    //     return 'RIGHT_HAND';
+    //   }
+    //   if (isOneHanded && !existLeftSlot) {
+    //     return 'LEFT_HAND';
+    //   }
+    //   return 'RIGHT_HAND';
+    // }
   },
 });

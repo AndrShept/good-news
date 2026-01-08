@@ -1,4 +1,4 @@
-import type { ArmorSlotType, ResourceType, SkillType, StateType, WeaponType } from '../types';
+import type { ArmorType, ResourceType, SkillType, StateType, WeaponType } from '../types';
 
 export const imageConfig = {
   icon: {
@@ -67,7 +67,7 @@ export const imageConfig = {
       GLOVES: '/sprites/icons/armor/gloves.png',
       HELMET: '/sprites/icons/armor/helmet.png',
       SHIELD: '/sprites/icons/armor/shield.png',
-    } as Record<ArmorSlotType, string>,
+    } as Record<ArmorType, string>,
     ACCESSORY: {
       AMULET: '/sprites/icons/accessory/amulet.png',
       RING: '/sprites/icons/accessory/ring.png',
@@ -83,7 +83,7 @@ export const imageConfig = {
       buff: {
         strength: '/sprites/icons/potions/str.png',
         constitution: '/sprites/icons/potions/const.png',
-        intelligence: '/sprites/icons/potions/ing.png',
+        intelligence: '/sprites/icons/potions/int.png',
         dexterity: '/sprites/icons/potions/dex.png',
         luck: '/sprites/icons/potions/luck.png',
       },

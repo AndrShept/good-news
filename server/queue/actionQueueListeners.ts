@@ -13,7 +13,7 @@ import { and, eq, ne } from 'drizzle-orm';
 import { io } from '..';
 import type { GameMessageType } from '../../frontend/src/store/useGameMessages';
 import { db } from '../db/db';
-import { buffTable, gameItemTable, heroTable, modifierTable, queueCraftItemTable } from '../db/schema';
+import {  heroTable, modifierTable, queueCraftItemTable } from '../db/schema';
 import { heroService } from '../services/hero-service';
 import { queueCraftItemService } from '../services/queue-craft-item-service';
 import { actionQueue, queueEvents } from './actionQueue';

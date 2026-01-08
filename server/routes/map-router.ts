@@ -10,7 +10,7 @@ import { db } from '../db/db';
 import { heroTable, locationTable } from '../db/schema';
 import { serverState } from '../game/state/hero-state';
 import { loggedIn } from '../middleware/loggedIn';
-import { mapData } from '../data/map-template';
+import { mapTemplate } from '../data/map-template';
 
 export const mapRouter = new Hono<Context>()
   .get(
@@ -26,7 +26,7 @@ export const mapRouter = new Hono<Context>()
     async (c) => {
       const { id } = c.req.valid('param');
 
-      const map = mapData.find((m) => m.id === id);
+      const map = mapTemplate.find((m) => m.id === id);
       if (!map) {
         throw new HTTPException(404, {
           message: 'map not found',
@@ -52,7 +52,7 @@ export const mapRouter = new Hono<Context>()
     ),
     async (c) => {
       const { id } = c.req.valid('param');
-      const map = mapData.find((m) => m.id === id);
+      const map = mapTemplate.find((m) => m.id === id);
       if (!map) {
         throw new HTTPException(404, {
           message: 'map not found',

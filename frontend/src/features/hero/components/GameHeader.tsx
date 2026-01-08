@@ -6,6 +6,7 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { BackpackButton } from '@/features/item-container/components/BackpackButton';
 import { ContainerUsedSlots } from '@/features/item-container/components/ContainerUsedSlots';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
+import { ShopItemCardButton } from '@/features/shop/components/ShopItemCardButton';
 import { SkillsPopover } from '@/features/skill/components/SkillsPopover';
 import { imageConfig } from '@/shared/config/image-config';
 import { useBackpack } from '@/store/useBackpack';
@@ -33,6 +34,7 @@ export const GameHeader = memo(() => {
         <BackpackButton />
         <SkillsPopover />
         <GroupMenuButton />
+        <ShopItemCardButton />
       </section>
       <section className="flex items-center gap-1 text-[15px]">
         <LogOutButton />

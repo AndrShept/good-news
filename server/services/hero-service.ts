@@ -6,11 +6,10 @@ import type {} from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction } from '../db/db';
-import { buffTable, heroTable, locationTable, modifierTable } from '../db/schema';
+import { buffInstanceTable, heroTable, locationTable, modifierTable } from '../db/schema';
 import { serverState } from '../game/state/hero-state';
 import { newCombineModifier } from '../lib/utils';
 import { actionQueue } from '../queue/actionQueue';
-import { craftItemService } from './craft-item-service';
 
 interface IDrinkPotion {
   isBuffPotion: boolean;
@@ -59,8 +58,8 @@ export const heroService = (db: TTransaction | TDataBase) => ({
   async updateHeroMaxValues(data: IUpdateHeroMaxValues) {
     const { constitution, heroId, intelligence, bonusMaxHealth, bonusMaxMana } = data;
     const { maxHealth, maxMana } = calculate.maxValues({ constitution, intelligence, bonusMaxHealth, bonusMaxMana });
-
-    await db
+    const heroState = serverState.getHeroState(heroId);
+    const [returnValue] = await db
       .update(heroTable)
       .set({
         maxHealth,
@@ -68,34 +67,32 @@ export const heroService = (db: TTransaction | TDataBase) => ({
         currentHealth: sql`LEAST(${heroTable.currentHealth}, ${maxHealth})`,
         currentMana: sql`LEAST(${heroTable.currentMana}, ${maxMana})`,
       })
-      .where(eq(heroTable.id, heroId));
+      .where(eq(heroTable.id, heroId))
+      .returning({
+        maxHealth: heroTable.maxHealth,
+        maxMana: heroTable.maxMana,
+        currentHealth: heroTable.currentHealth,
+        currentMana: heroTable.currentMana,
+      });
+    heroState.currentHealth = returnValue.currentHealth;
+    heroState.maxHealth = returnValue.maxHealth;
+    heroState.currentMana = returnValue.currentMana;
+    heroState.maxMana = returnValue.maxMana;
   },
-  async getHeroStatsWithModifiers(heroId: string) {
-    const [buffs, equipments, hero] = await Promise.all([
-      db.query.buffTable.findMany({ where: eq(buffTable.heroId, heroId), columns: { modifier: true } }),
-      db.query.equipmentTable.findMany({
-        where: eq(equipmentTable.heroId, heroId),
-        with: {
-          gameItem: { with: { accessory: true, armor: true, weapon: true, shield: true } },
-        },
-      }),
-      db.query.heroTable.findFirst({
-        where: eq(heroTable.id, heroId),
-        columns: { currentMana: true, currentHealth: true, stat: true },
-      }),
-    ]);
+  getHeroStatsWithModifiers(heroId: string) {
+    const { buffs, equipments } = serverState.getHeroState(heroId);
     const coreMaterialModifiers: Partial<OmitModifier>[] = [];
-
-    for (const item of equipments) {
-      const coreMaterialModifier = craftItemService(db).getMaterialModifier(item.gameItem, item.gameItem.coreMaterial);
-      if (coreMaterialModifier) {
-        coreMaterialModifiers.push(coreMaterialModifier);
-      }
-    }
+    const hero = serverState.getHeroState(heroId);
+    // for (const item of equipments) {
+    //   const coreMaterialModifier = craftItemService(db).getMaterialModifier(item.gameItem, item.gameItem.coreMaterial);
+    //   if (coreMaterialModifier) {
+    //     coreMaterialModifiers.push(coreMaterialModifier);
+    //   }
+    // }
 
     const modifiers = [
-      ...buffs.map((b) => b.modifier),
-      ...equipments.map((e) => e.gameItem.armor ?? e.gameItem.accessory ?? e.gameItem.weapon ?? e.gameItem.shield),
+      ...buffs.map((b) => b.buffTemplate?.modifier),
+      ...equipments.map((e) => e.itemTemplate?.coreModifier),
       ...coreMaterialModifiers,
     ];
 
@@ -109,7 +106,8 @@ export const heroService = (db: TTransaction | TDataBase) => ({
   },
 
   async updateModifier(heroId: string) {
-    const { newModifier, sumStatAndModifier } = await this.getHeroStatsWithModifiers(heroId);
+    const { newModifier, sumStatAndModifier } = this.getHeroStatsWithModifiers(heroId);
+    const hero = serverState.getHeroState(heroId);
     await this.updateHeroMaxValues({
       bonusMaxHealth: sumStatAndModifier.maxHealth,
       bonusMaxMana: sumStatAndModifier.maxMana,
@@ -117,7 +115,8 @@ export const heroService = (db: TTransaction | TDataBase) => ({
       intelligence: sumStatAndModifier.intelligence,
       heroId,
     });
-    await db.update(modifierTable).set(newModifier).where(eq(modifierTable.heroId, heroId));
+    const [returningModifier] = await db.update(modifierTable).set(newModifier).where(eq(modifierTable.heroId, heroId)).returning();
+    hero.modifier = returningModifier;
   },
   async spendGold(heroId: string, amount: number, heroCurrentGold: number) {
     if (heroCurrentGold < amount) throw new HTTPException(422, { message: 'You don’t have enough gold', cause: { canShow: true } });
@@ -143,65 +142,61 @@ export const heroService = (db: TTransaction | TDataBase) => ({
   },
 
   async drinkPotion({ currentHealth, currentMana, heroId, inventoryItemPotion, isBuffPotion, maxHealth, maxMana }: IDrinkPotion) {
-    if (isBuffPotion) {
-      const gameItemId = inventoryItemPotion?.gameItem?.potion?.buffInfo?.gameItemId ?? '';
-      const delay = inventoryItemPotion?.gameItem?.potion?.buffInfo?.duration ?? 0;
-      const modifier = inventoryItemPotion?.gameItem?.potion?.buffInfo?.modifier ?? {};
-      const name = inventoryItemPotion?.gameItem?.potion?.buffInfo?.name ?? '';
-      const image = inventoryItemPotion?.gameItem?.potion?.buffInfo?.image ?? '';
-      const completedAt = new Date(Date.now() + delay).toISOString();
-      const jobId = `buffId-${gameItemId}-heroId-${heroId}`;
-      const jobData: BuffCreateJob = {
-        jobName: 'BUFF_CREATE',
-        payload: { heroId, gameItemId },
-      };
-
-      const findExistBuff = await db.query.buffTable.findFirst({
-        where: and(eq(buffTable.heroId, heroId), eq(buffTable.gameItemId, gameItemId)),
-      });
-      if (findExistBuff) {
-        await db
-          .update(buffTable)
-          .set({ completedAt: new Date(Date.now() + delay).toISOString() })
-          .where(and(eq(buffTable.heroId, heroId), eq(buffTable.gameItemId, gameItemId)));
-
-        await actionQueue.remove(jobId);
-        await actionQueue.add(jobName['buff-create'], jobData, {
-          delay,
-          jobId,
-          removeOnComplete: true,
-        });
-        return;
-      }
-
-      await db.insert(buffTable).values({
-        type: 'POSITIVE',
-        modifier,
-        name,
-        image,
-        duration: delay,
-        completedAt,
-        heroId,
-        gameItemId,
-      });
-      await this.updateModifier(heroId);
-
-      await actionQueue.add(jobName['buff-create'], jobData, {
-        delay,
-        jobId,
-        removeOnComplete: true,
-      });
-    } else {
-      const restoredHealth = Math.min(maxHealth, currentHealth + (inventoryItemPotion?.gameItem?.potion?.restore?.health ?? 0));
-      const restoredMana = Math.min(maxMana, currentMana + (inventoryItemPotion?.gameItem?.potion?.restore?.mana ?? 0));
-      await db
-        .update(heroTable)
-        .set({
-          currentHealth: restoredHealth,
-          currentMana: restoredMana,
-        })
-        .where(eq(heroTable.id, heroId));
-    }
+    // if (isBuffPotion) {
+    //   const gameItemId = inventoryItemPotion?.gameItem?.potion?.buffInfo?.gameItemId ?? '';
+    //   const delay = inventoryItemPotion?.gameItem?.potion?.buffInfo?.duration ?? 0;
+    //   const modifier = inventoryItemPotion?.gameItem?.potion?.buffInfo?.modifier ?? {};
+    //   const name = inventoryItemPotion?.gameItem?.potion?.buffInfo?.name ?? '';
+    //   const image = inventoryItemPotion?.gameItem?.potion?.buffInfo?.image ?? '';
+    //   const completedAt = new Date(Date.now() + delay).toISOString();
+    //   const jobId = `buffId-${gameItemId}-heroId-${heroId}`;
+    //   const jobData: BuffCreateJob = {
+    //     jobName: 'BUFF_CREATE',
+    //     payload: { heroId, gameItemId },
+    //   };
+    //   const findExistBuff = await db.query.buffInstanceTable.findFirst({
+    //     where: and(eq(buffInstanceTable.ownerHeroId, heroId), eq(buffInstanceTable.gameItemId, gameItemId)),
+    //   });
+    //   if (findExistBuff) {
+    //     await db
+    //       .update(buffInstanceTable)
+    //       .set({ expiresAt: new Date(Date.now() + delay).toISOString() })
+    //       .where(and(eq(buffInstanceTable.ownerHeroId, heroId), eq(buffInstanceTable.buffTemplateId, gameItemId)));
+    //     await actionQueue.remove(jobId);
+    //     await actionQueue.add(jobName['buff-create'], jobData, {
+    //       delay,
+    //       jobId,
+    //       removeOnComplete: true,
+    //     });
+    //     return;
+    //   }
+    //   await db.insert(buffInstanceTable).values({
+    //     type: 'POSITIVE',
+    //     modifier,
+    //     name,
+    //     image,
+    //     duration: delay,
+    //     completedAt,
+    //     heroId,
+    //     gameItemId,
+    //   });
+    //   await this.updateModifier(heroId);
+    //   await actionQueue.add(jobName['buff-create'], jobData, {
+    //     delay,
+    //     jobId,
+    //     removeOnComplete: true,
+    //   });
+    // } else {
+    //   const restoredHealth = Math.min(maxHealth, currentHealth + (inventoryItemPotion?.gameItem?.potion?.restore?.health ?? 0));
+    //   const restoredMana = Math.min(maxMana, currentMana + (inventoryItemPotion?.gameItem?.potion?.restore?.mana ?? 0));
+    //   await db
+    //     .update(heroTable)
+    //     .set({
+    //       currentHealth: restoredHealth,
+    //       currentMana: restoredMana,
+    //     })
+    //     .where(eq(heroTable.id, heroId));
+    // }
   },
 
   async walkMapCOmplete(heroId: string, pos: IPosition) {

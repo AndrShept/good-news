@@ -22,7 +22,7 @@ function RouteComponent() {
     state: data?.state,
   }));
   const isCharacter = state === 'CHARACTER';
-  const isPlace = !!placeId && !isCharacter 
+  const isPlace = !!placeId && !isCharacter;
   const isMap = !isCharacter && !!mapId;
 
   return (
@@ -31,6 +31,7 @@ function RouteComponent() {
       {isPlace && <Place />}
       {isMap && <GameMapLayout />}
       <ModalProvider />
+      {/* <SheetProvider /> */}
     </>
   );
 }

@@ -236,7 +236,7 @@ export type TPotionInfo = {
 export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'heroId' | 'resourceId'>;
 
 export type TItemContainer = typeof itemContainerTable.$inferSelect & {
-  itemsInstance: ItemInstance[] | null;
+  itemsInstance?: ItemInstance[] | null;
 };
 
 export type CraftInfo = { baseResourceCategory: ResourceCategoryType; requiredBuildingType: BuildingType };
@@ -256,7 +256,7 @@ export type ItemInstance = typeof itemInstanceTable.$inferSelect & {
 
 export type BuffTemplate = typeof buffTemplateTable.$inferSelect;
 export type BuffInstance = typeof buffInstanceTable.$inferSelect & {
-  buffTemplate?: BuffTemplate  | null;
+  buffTemplate?: BuffTemplate | null;
 };
 
 export type Hero = InferSelectModel<typeof heroTable> & {
@@ -298,7 +298,8 @@ export type ApiGetMapHeroes = InferResponseType<(typeof client.map)[':id']['hero
 export type ApiGetPlaceHeroes = InferResponseType<(typeof client.place)[':id']['heroes']['$get']>['data'];
 export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
 
-export type ApiGetCraftItemResponse = InferResponseType<(typeof client)['craft']['items'][':buildingType']['$get']>['data'];
+// export type ApiGetCraftItemResponse = InferResponseType<(typeof client)['craft']['items'][':buildingType']['$get']>['data'];
+export type ApiGetShopItemTemplateResponse = InferResponseType<(typeof client)['shop'][':buildingType']['$get']>['data'];
 
 export type IHeroStat = {
   strength: number;

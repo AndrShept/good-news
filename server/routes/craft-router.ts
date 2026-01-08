@@ -1,4 +1,4 @@
-import { type CraftItem, type Resource, type SuccessResponse } from '@/shared/types';
+import { buildingValues, type SuccessResponse } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -9,7 +9,6 @@ import { type ICraftConfig, craftConfig } from '../../shared/config/craft-config
 import { type IMaterialModifierConfig, materialModifierConfig } from '../../shared/config/material-modifier-config';
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { buildingTypeEnum, craftItemTable } from '../db/schema';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const craftRouter = new Hono<Context>()
@@ -18,7 +17,7 @@ export const craftRouter = new Hono<Context>()
     zValidator(
       'param',
       z.object({
-        buildingType: z.enum(buildingTypeEnum.enumValues),
+        buildingType: z.enum(buildingValues),
       }),
     ),
     loggedIn,
@@ -26,28 +25,28 @@ export const craftRouter = new Hono<Context>()
     async (c) => {
       const { buildingType } = c.req.valid('param');
 
-      let craftItems: CraftItem[] = [];
+      // let craftItems: CraftItem[] = [];
 
-      if (buildingType === 'FORGE') {
-        craftItems = await db.query.craftItemTable.findMany({
-          where: eq(craftItemTable.requiredBuildingType, 'FORGE'),
-          with: { gameItem: { with: { resource: true } } },
-        });
-      }
-      if (buildingType === 'BLACKSMITH') {
-        craftItems = await db.query.craftItemTable.findMany({
-          where: eq(craftItemTable.requiredBuildingType, 'BLACKSMITH'),
-          with: {
-            gameItem: { with: { armor: true, weapon: true, shield: true } },
-          },
-        });
-      }
+      // if (buildingType === 'FORGE') {
+      //   craftItems = await db.query.craftItemTable.findMany({
+      //     where: eq(craftItemTable.requiredBuildingType, 'FORGE'),
+      //     with: { gameItem: { with: { resource: true } } },
+      //   });
+      // }
+      // if (buildingType === 'BLACKSMITH') {
+      //   craftItems = await db.query.craftItemTable.findMany({
+      //     where: eq(craftItemTable.requiredBuildingType, 'BLACKSMITH'),
+      //     with: {
+      //       gameItem: { with: { armor: true, weapon: true, shield: true } },
+      //     },
+      //   });
+      // }
 
-      return c.json<SuccessResponse<CraftItem[]>>({
-        message: 'craft item fetched!',
-        success: true,
-        data: craftItems,
-      });
+      // return c.json<SuccessResponse<CraftItem[]>>({
+      //   message: 'craft item fetched!',
+      //   success: true,
+      //   data: craftItems,
+      // });
     },
   )
   .get(
@@ -56,18 +55,18 @@ export const craftRouter = new Hono<Context>()
     loggedIn,
 
     async (c) => {
-      const resources = await db.query.resourceTable.findMany({
-        with: {
-          gameItem: true,
-        },
-      });
+      // const resources = await db.query.resourceTable.findMany({
+      //   with: {
+      //     gameItem: true,
+      //   },
+      // });
 
-      return c.json<SuccessResponse<{ resources: Resource[]; craftConfig: ICraftConfig; materialModifierConfig: IMaterialModifierConfig }>>(
-        {
-          message: 'craft item fetched!',
-          success: true,
-          data: { resources, craftConfig, materialModifierConfig },
-        },
-      );
+      // return c.json<SuccessResponse<{ resources: Resource[]; craftConfig: ICraftConfig; materialModifierConfig: IMaterialModifierConfig }>>(
+      //   {
+      //     message: 'craft item fetched!',
+      //     success: true,
+      //     data: { resources, craftConfig, materialModifierConfig },
+      //   },
+      // );
     },
   );

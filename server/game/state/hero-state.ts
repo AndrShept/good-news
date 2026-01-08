@@ -1,24 +1,16 @@
-import type { BuffInstance, Hero, IHeroStat, ItemInstance, OmitModifier, PathNode } from '@/shared/types';
+import type {
+  BuffInstance,
+  Hero,
+  IHeroStat,
+  ItemContainerType,
+  ItemInstance,
+  OmitModifier,
+  PathNode,
+  TItemContainer,
+} from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
-type IHeroServerState = Pick<
-  Hero,
-  | 'currentHealth'
-  | 'currentMana'
-  | 'maxHealth'
-  | 'maxMana'
-  | 'state'
-  | 'isOnline'
-  | 'userId'
-  | 'avatarImage'
-  | 'characterImage'
-  | 'id'
-  | 'name'
-  | 'level'
-  | 'maxQueueCraftCount'
-  | 'goldCoins'
-  | 'premiumCoins'
-> & {
+type IHeroServerState = Omit<Hero, 'createdAt' | 'location'> & {
   location: {
     x: number;
     y: number;
@@ -31,6 +23,7 @@ type IHeroServerState = Pick<
   modifier: OmitModifier;
   equipments: ItemInstance[];
   buffs: BuffInstance[];
+  itemContainers: { id: string; type: ItemContainerType; name: string }[];
   paths?: PathNode[];
   offlineTimer?: number;
 };
@@ -39,6 +32,7 @@ export const serverState = {
   hero: new Map<string, IHeroServerState>(),
   pathPersistQueue: new Map<string, { x: number; y: number }>(),
   user: new Map<string, string>(),
+  container: new Map<string, TItemContainer>(),
 
   getHeroState(heroId: string) {
     const hero = this.hero.get(heroId);
@@ -47,4 +41,11 @@ export const serverState = {
     }
     return hero;
   },
+  getContainerState(containerId: string) {
+    const container = this.container.get(containerId);
+
+    return container;
+  },
 };
+console.log('SERVER STATE INIT', Date.now());
+console.log(serverState.user);

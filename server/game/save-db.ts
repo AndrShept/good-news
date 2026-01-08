@@ -21,7 +21,7 @@ export const saveDb = {
       }
       console.timeEnd('DB PATH SAVE ✔');
 
-      await delay(30000);
+      await delay(300000);
     }
   },
 };

@@ -12,6 +12,7 @@ import type {
   WalkMapStartData,
 } from '@/shared/socket-data-types';
 import {
+  type BuffInstance,
   type EquipmentSlotType,
   type ErrorResponse,
   type Hero,
@@ -22,6 +23,7 @@ import {
   type SuccessResponse,
   type TItemContainer,
   type WeaponHandType,
+  buildingValues,
   createHeroSchema,
   statsSchema,
 } from '@/shared/types';
@@ -36,8 +38,10 @@ import { io } from '..';
 import { socketEvents } from '../../shared/socket-events';
 import type { Context } from '../context';
 import { mapTemplate } from '../data/map-template';
+import { placeTemplate } from '../data/place-template';
 import { db } from '../db/db';
 import {
+  buffInstanceTable,
   coreMaterialTypeEnum,
   heroTable,
   itemContainerTable,
@@ -57,8 +61,6 @@ import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
-import { containerSlotItemService } from '../services/container-slot-item-service';
-import { craftItemService } from '../services/craft-item-service';
 import { equipmentService } from '../services/equipment-service';
 import { heroService } from '../services/hero-service';
 import { itemContainerService } from '../services/item-container-service';
@@ -81,51 +83,37 @@ export const heroRouter = new Hono<Context>()
             modifier: true,
             group: true,
             location: true,
-            buffs: true,
+            buffs: { with: { buffTemplate: true } },
             queueCraftItems: true,
             itemContainers: { columns: { id: true, type: true, name: true }, where: eq(itemContainerTable.type, 'BACKPACK') },
           },
         })) as Hero;
-
         if (!hero) {
           throw new HTTPException(404, {
             message: 'hero not found',
           });
         }
 
-        serverState.user.set(userId, hero.id);
+        console.log('FETCH HERO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         const equipments = await db.query.itemInstanceTable.findMany({
           where: and(eq(itemInstanceTable.ownerHeroId, hero.id), eq(itemInstanceTable.location, 'EQUIPMENT')),
           with: { itemTemplate: true },
         });
-
+        const { createdAt, location, ...heroState } = hero;
+        serverState.user.set(userId, hero.id);
         serverState.hero.set(hero.id, {
-          id: hero.id,
-          name: hero.name,
-          level: hero.level,
-          avatarImage: hero.avatarImage,
-          characterImage: hero.characterImage,
-          currentHealth: hero.currentHealth,
-          currentMana: hero.currentMana,
-          maxHealth: hero.maxHealth,
-          maxMana: hero.maxMana,
-          state: hero.state,
-          isOnline: hero.isOnline,
-          userId: hero.userId,
-          modifier: hero.modifier!,
-          stat: hero.stat,
-          goldCoins: hero.goldCoins,
-          maxQueueCraftCount: hero.maxQueueCraftCount,
-          premiumCoins: hero.premiumCoins,
-          buffs: hero.buffs ?? [],
+          ...heroState,
           equipments,
+          modifier: hero.modifier!,
+          buffs: hero.buffs ?? [],
+          itemContainers: hero.itemContainers ?? [],
           location: {
-            x: hero.location?.x!,
-            y: hero.location?.y!,
-            targetX: hero.location?.targetX ?? null,
-            targetY: hero.location?.targetY ?? null,
-            mapId: hero.location?.mapId ?? null,
-            placeId: hero.location?.placeId ?? null,
+            x: location!.x,
+            y: location!.y,
+            mapId: location?.mapId ?? null,
+            placeId: location?.placeId ?? null,
+            targetX: location?.targetX ?? null,
+            targetY: location?.y ?? null,
           },
         });
         await heroOnline(hero.id);
@@ -170,7 +158,7 @@ export const heroRouter = new Hono<Context>()
     const heroExist = await db.query.heroTable.findFirst({
       where: eq(heroTable.userId, userId),
     });
-    const place = placeEntities.find((p) => p.name === 'Solmer Town');
+    const place = placeTemplate.find((p) => p.name === 'Solmer Town');
     if (!place) {
       throw new HTTPException(404, {
         message: 'place not found',
@@ -240,7 +228,7 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const { id } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-      const hero = await heroService(db).getHeroByColum(id, { userId: true, id: true, goldCoins: true, level: true });
+      const hero = serverState.getHeroState(id);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
@@ -254,14 +242,18 @@ export const heroRouter = new Hono<Context>()
         );
       }
       await db.transaction(async (tx) => {
-        await tx
+        const [{ freeStatPoints, goldCoins, stat }] = await tx
           .update(heroTable)
           .set({
             freeStatPoints: hero.level * 10,
             goldCoins: hero.goldCoins - RESET_STATS_COST,
             stat: BASE_STATS,
           })
-          .where(eq(heroTable.id, id));
+          .where(eq(heroTable.id, id))
+          .returning({ freeStatPoints: heroTable.freeStatPoints, goldCoins: heroTable.goldCoins, stat: heroTable.stat });
+        hero.freeStatPoints = freeStatPoints;
+        hero.goldCoins = goldCoins;
+        hero.stat = stat;
         await heroService(tx).updateModifier(hero.id);
       });
 
@@ -290,7 +282,7 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const { freeStatPoints, ...stat } = c.req.valid('json');
 
-      const hero = await heroService(db).getHero(id);
+      const hero = serverState.getHeroState(id);
 
       validateHeroStats({ freeStatPoints, stat, level: hero.level });
 
@@ -303,6 +295,8 @@ export const heroRouter = new Hono<Context>()
             stat,
           })
           .where(eq(heroTable.id, id));
+        hero.freeStatPoints = freeStatPoints;
+        hero.stat = stat;
         await heroService(tx).updateModifier(hero.id);
       });
 
@@ -322,73 +316,21 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const userId = c.get('user')?.id as string;
       const { id, itemContainerId } = c.req.valid('param');
-      const [hero, itemContainer] = await Promise.all([
-        heroService(db).getHero(id),
-        itemContainerService(db).getItemContainerById(itemContainerId, {
-          with: {
-            containerSlots: {
-              orderBy: asc(containerSlotTable.createdAt),
-              with: {
-                gameItem: { with: { weapon: true, armor: true, accessory: true, shield: true, potion: true, resource: true } },
-              },
-            },
-          },
-        }),
-      ]);
+      const heroState = serverState.getHeroState(id);
+      let containerState = serverState.getContainerState(itemContainerId);
+      if (!containerState) {
+        console.log('FETCH CONTAINER !!!!!!!!!!!!!! CONTAINER');
+        const itemContainer = await itemContainerService(db).getItemContainerById(itemContainerId);
+        containerState = itemContainer;
+        serverState.container.set(itemContainer.id, itemContainer);
+      }
 
-      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
+      verifyHeroOwnership({ heroUserId: heroState.userId, userId, containerHeroId: containerState.heroId, heroId: heroState.id });
       return c.json<SuccessResponse<TItemContainer>>({
         message: `container fetched !!!`,
         success: true,
-        data: itemContainer,
+        data: containerState,
       });
-    },
-  )
-  .post(
-    '/:id/shop/items/:gameItemId/buy',
-    loggedIn,
-    zValidator(
-      'param',
-      z.object({
-        id: z.string(),
-        gameItemId: z.string(),
-      }),
-    ),
-    async (c) => {
-      const { id, gameItemId } = c.req.valid('param');
-      const userId = c.get('user')?.id as string;
-
-      const gameItem = await db.query.gameItemTable.findFirst({
-        where: eq(gameItemTable.id, gameItemId),
-      });
-      if (!gameItem) throw new HTTPException(404, { message: 'Game item not found' });
-
-      const quantity = 6;
-      const result = await db.transaction(async (tx) => {
-        const hero = await heroService(tx).getHero(id);
-        const itemContainer = await itemContainerService(tx).getHeroBackpack(id);
-        verifyHeroOwnership({ heroUserId: hero.userId, userId, heroId: hero.id, containerHeroId: itemContainer.heroId });
-        const itemPrice = quantity * gameItem.price;
-        const { data } = await containerSlotItemService(tx).obtainInventoryItem({
-          currentInventorySlots: itemContainer.usedSlots,
-          maxInventorySlots: itemContainer.maxSlots,
-          gameItemId: gameItem.id,
-          gameItemType: gameItem.type,
-          itemContainerId: itemContainer.id,
-          quantity,
-        });
-        await heroService(tx).spendGold(hero.id, itemPrice, hero.goldCoins);
-        return data;
-      });
-
-      return c.json<SuccessResponse<ContainerSlot>>(
-        {
-          success: true,
-          message: `You successfully obtain the`,
-          data: { ...result, gameItem: gameItem as GameItem, quantity },
-        },
-        201,
-      );
     },
   )
 
@@ -407,76 +349,75 @@ export const heroRouter = new Hono<Context>()
       const { id, inventoryItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
 
-      const [inventoryItem, hero, itemContainer] = await Promise.all([
-        containerSlotItemService(db).getContainerSlotItem(inventoryItemId, {
-          with: {
-            gameItem: { with: { weapon: true, armor: true } },
-          },
-        }),
-        heroService(db).getHeroByColum(id, { id: true, userId: true }),
-        itemContainerService(db).getHeroBackpack(id),
-      ]);
-      const isEquipment =
-        inventoryItem?.gameItem?.type === 'ARMOR' ||
-        inventoryItem?.gameItem?.type === 'WEAPON' ||
-        inventoryItem?.gameItem?.type === 'SHIELD';
+      // const [inventoryItem, hero, itemContainer] = await Promise.all([
+      //   containerSlotItemService(db).getContainerSlotItem(inventoryItemId, {
+      //     with: {
+      //       gameItem: { with: { weapon: true, armor: true } },
+      //     },
+      //   }),
+      //   heroService(db).getHeroByColum(id, { id: true, userId: true }),
+      //   itemContainerService(db).getHeroBackpack(id),
+      // ]);
+      // const isEquipment =
+      //   inventoryItem?.gameItem?.type === 'ARMOR' ||
+      //   inventoryItem?.gameItem?.type === 'WEAPON' ||
+      //   inventoryItem?.gameItem?.type === 'SHIELD';
 
-      if (!isEquipment) {
-        throw new HTTPException(403, {
-          message: 'You cannot equip this item.',
-        });
-      }
-      if (!inventoryItem.gameItem) {
-        throw new HTTPException(403, {
-          message: 'inventoryItem gameItem not found',
-        });
-      }
+      // if (!isEquipment) {
+      //   throw new HTTPException(403, {
+      //     message: 'You cannot equip this item.',
+      //   });
+      // }
+      // if (!inventoryItem.gameItem) {
+      //   throw new HTTPException(403, {
+      //     message: 'inventoryItem gameItem not found',
+      //   });
+      // }
 
-      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
-      const slot = await equipmentService(db).getEquipSlot({
-        itemContainerId: itemContainer.id,
-        item: inventoryItem.gameItem,
-        usedSlots: itemContainer.usedSlots,
-        maxSlots: itemContainer.maxSlots,
-        heroId: hero.id,
-      });
+      // verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
+      // const slot = await equipmentService(db).getEquipSlot({
+      //   itemContainerId: itemContainer.id,
+      //   item: inventoryItem.gameItem,
+      //   usedSlots: itemContainer.usedSlots,
+      //   maxSlots: itemContainer.maxSlots,
+      //   heroId: hero.id,
+      // });
 
-      if (!slot) {
-        throw new HTTPException(404, {
-          message: 'slot not found',
-        });
-      }
-      const existingEquipItem = await equipmentService(db).findEquipItem(slot, hero.id);
+      // if (!slot) {
+      //   throw new HTTPException(404, {
+      //     message: 'slot not found',
+      //   });
+      // }
+      // const existingEquipItem = await equipmentService(db).findEquipItem(slot, hero.id);
 
-      await db.transaction(async (tx) => {
-        if (existingEquipItem) {
-          await equipmentService(tx).unEquipItem({
-            equipmentItemId: existingEquipItem.id,
-            gameItemId: existingEquipItem.gameItemId,
-            itemContainerId: itemContainer.id,
-            usedSlots: itemContainer.usedSlots,
-            maxSlots: itemContainer.maxSlots,
-            heroId: hero.id,
-          });
-        }
+      // await db.transaction(async (tx) => {
+      //   if (existingEquipItem) {
+      //     await equipmentService(tx).unEquipItem({
+      //       equipmentItemId: existingEquipItem.id,
+      //       gameItemId: existingEquipItem.gameItemId,
+      //       itemContainerId: itemContainer.id,
+      //       usedSlots: itemContainer.usedSlots,
+      //       maxSlots: itemContainer.maxSlots,
+      //       heroId: hero.id,
+      //     });
+      //   }
 
-        await equipmentService(tx).equipItem({
-          gameItemId: inventoryItem.gameItemId,
-          heroId: hero.id,
-          slot,
-          inventoryItemId: inventoryItem.id,
-          itemContainerId: itemContainer.id,
-        });
-      });
+      //   await equipmentService(tx).equipItem({
+      //     gameItemId: inventoryItem.gameItemId,
+      //     heroId: hero.id,
+      //     slot,
+      //     inventoryItemId: inventoryItem.id,
+      //     itemContainerId: itemContainer.id,
+      //   });
+      // });
 
-      return c.json<SuccessResponse<GameItem>>(
-        {
-          success: true,
-          message: 'success equipped item',
-          data: inventoryItem.gameItem,
-        },
-        201,
-      );
+      // return c.json<SuccessResponse>(
+      //   {
+      //     success: true,
+      //     message: 'success equipped item',
+      //   },
+      //   201,
+      // );
     },
   )
   .post(
@@ -493,29 +434,26 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const { id, equipmentItemId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-      const [hero, equipmentItem] = await Promise.all([
-        heroService(db).getHeroByColum(id, { id: true, userId: true }),
-        equipmentService(db).getEquipItem(equipmentItemId, { with: { gameItem: true } }),
-      ]);
-      const heroBackpack = await itemContainerService(db).getHeroBackpack(hero.id);
+      const heroState = serverState.getHeroState(id);
+      const heroBackpack = await itemContainerService(db).getHeroBackpack(heroState.id);
 
-      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: heroBackpack.heroId, heroId: hero.id });
-      await db.transaction(async (tx) => {
-        await equipmentService(tx).unEquipItem({
-          equipmentItemId: equipmentItem.id,
-          gameItemId: equipmentItem.gameItemId,
-          heroId: hero.id,
-          maxSlots: heroBackpack.maxSlots,
-          usedSlots: heroBackpack.usedSlots,
-          itemContainerId: heroBackpack.id,
-        });
-      });
+      verifyHeroOwnership({ heroUserId: heroState.userId, userId, containerHeroId: heroBackpack.heroId, heroId: heroState.id });
 
-      return c.json<SuccessResponse<Equipment>>(
+      // await db.transaction(async (tx) => {
+      //   await equipmentService(tx).unEquipItem({
+      //     equipmentItemId: equipmentItem.id,
+      //     gameItemId: equipmentItem.gameItemId,
+      //     heroId: hero.id,
+      //     maxSlots: heroBackpack.maxSlots,
+      //     usedSlots: heroBackpack.usedSlots,
+      //     itemContainerId: heroBackpack.id,
+      //   });
+      // });
+
+      return c.json<SuccessResponse>(
         {
           success: true,
           message: `success unequipped item `,
-          data: equipmentItem,
         },
         201,
       );
@@ -544,16 +482,16 @@ export const heroRouter = new Hono<Context>()
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
 
-      await db.transaction(async (tx) => {
-        await tx.delete(containerSlotTable).where(eq(containerSlotTable.id, containerSlotItem.id));
-        await itemContainerService(tx).setUsedSlots(itemContainer.id);
-      });
+      // await db.transaction(async (tx) => {
+      //   await tx.delete(containerSlotTable).where(eq(containerSlotTable.id, containerSlotItem.id));
+      //   await itemContainerService(tx).setUsedSlots(itemContainer.id);
+      // });
 
-      return c.json<SuccessResponse<ContainerSlot>>(
+      return c.json<SuccessResponse>(
         {
           success: true,
           message: `Success deleted item`,
-          data: containerSlotItem,
+          // data: containerSlotItem,
         },
         201,
       );
@@ -645,10 +583,10 @@ export const heroRouter = new Hono<Context>()
 
     verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
-    const buffs = await db.query.buffTable.findMany({
-      where: eq(buffTable.heroId, hero.id),
+    const buffs = await db.query.buffInstanceTable.findMany({
+      where: eq(buffInstanceTable.ownerHeroId, hero.id),
     });
-    return c.json<SuccessResponse<Buff[]>>({
+    return c.json<SuccessResponse<BuffInstance[]>>({
       message: 'buffs fetched!',
       success: true,
       data: buffs,
@@ -777,7 +715,7 @@ export const heroRouter = new Hono<Context>()
       }
       const heroPosX = heroState.location.x;
       const heroPosY = heroState.location.y;
-      const place = placeEntities.find((p) => p.x === heroPosX && p.y === heroPosY);
+      const place = placeTemplate.find((p) => p.x === heroPosX && p.y === heroPosY);
       if (!place) {
         throw new HTTPException(404, {
           message: 'place not found',
@@ -845,7 +783,7 @@ export const heroRouter = new Hono<Context>()
       }
       verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
 
-      const place = placeEntities.find((p) => p.id === heroState.location.placeId);
+      const place = placeTemplate.find((p) => p.id === heroState.location.placeId);
       if (!place) {
         throw new HTTPException(404, {
           message: 'place not found',
@@ -908,48 +846,48 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const hero = await heroService(db).getHero(id);
+      // const hero = await heroService(db).getHero(id);
 
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      // verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      const isFullHealth = hero.currentHealth >= hero.maxHealth;
+      // const isFullHealth = hero.currentHealth >= hero.maxHealth;
 
-      if (hero.state === 'BATTLE') {
-        throw new HTTPException(403, {
-          message: 'hero is a battle',
-        });
-      }
-      if (isFullHealth) {
-        throw new HTTPException(403, {
-          message: 'hero full HP',
-        });
-      }
+      // if (hero.state === 'BATTLE') {
+      //   throw new HTTPException(403, {
+      //     message: 'hero is a battle',
+      //   });
+      // }
+      // if (isFullHealth) {
+      //   throw new HTTPException(403, {
+      //     message: 'hero full HP',
+      //   });
+      // }
 
-      const jobId = `hero-${hero.id}-regen-health`;
-      const { sumStatAndModifier } = await heroService(db).getHeroStatsWithModifiers(hero.id);
-      const every = calculate.manaRegenTime(sumStatAndModifier.constitution);
-      console.log('healthTime', every);
-      const jobData: RegenHealthJob = {
-        jobName: 'REGEN_HEALTH',
-        payload: {
-          heroId: hero.id,
-          currentHealth: hero.currentHealth,
-        },
-      };
-      const messageData: SelfMessageData = {
-        message: 'Start health regen',
-        type: 'INFO',
-      };
-      await actionQueue.upsertJobScheduler(
-        jobId,
-        { every, startDate: new Date(Date.now() + every) },
-        { data: jobData, name: jobName['regen-health'], opts: { removeOnComplete: true } },
-      );
-      io.to(hero.id).emit(socketEvents.selfMessage(), messageData);
-      return c.json<SuccessResponse>({
-        message: 'start regen health ',
-        success: true,
-      });
+      // const jobId = `hero-${hero.id}-regen-health`;
+      // const { sumStatAndModifier } = await heroService(db).getHeroStatsWithModifiers(hero.id);
+      // const every = calculate.manaRegenTime(sumStatAndModifier.constitution);
+      // console.log('healthTime', every);
+      // const jobData: RegenHealthJob = {
+      //   jobName: 'REGEN_HEALTH',
+      //   payload: {
+      //     heroId: hero.id,
+      //     currentHealth: hero.currentHealth,
+      //   },
+      // };
+      // const messageData: SelfMessageData = {
+      //   message: 'Start health regen',
+      //   type: 'INFO',
+      // };
+      // await actionQueue.upsertJobScheduler(
+      //   jobId,
+      //   { every, startDate: new Date(Date.now() + every) },
+      //   { data: jobData, name: jobName['regen-health'], opts: { removeOnComplete: true } },
+      // );
+      // io.to(hero.id).emit(socketEvents.selfMessage(), messageData);
+      // return c.json<SuccessResponse>({
+      //   message: 'start regen health ',
+      //   success: true,
+      // });
     },
   )
   .post(
@@ -961,48 +899,48 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
 
-      const hero = await heroService(db).getHero(id);
+      // const hero = await heroService(db).getHero(id);
 
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      // verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      const isFullMana = hero.currentMana >= hero.maxMana;
+      // const isFullMana = hero.currentMana >= hero.maxMana;
 
-      if (hero.state === 'BATTLE') {
-        throw new HTTPException(403, {
-          message: 'hero is a battle',
-        });
-      }
-      if (isFullMana) {
-        throw new HTTPException(403, {
-          message: 'hero full MANA',
-        });
-      }
+      // if (hero.state === 'BATTLE') {
+      //   throw new HTTPException(403, {
+      //     message: 'hero is a battle',
+      //   });
+      // }
+      // if (isFullMana) {
+      //   throw new HTTPException(403, {
+      //     message: 'hero full MANA',
+      //   });
+      // }
 
-      const jobId = `hero-${hero.id}-regen-mana`;
-      const { sumStatAndModifier } = await heroService(db).getHeroStatsWithModifiers(hero.id);
-      const every = calculate.manaRegenTime(sumStatAndModifier.intelligence);
-      console.log('manaTime', every);
-      const jobData: RegenManaJob = {
-        jobName: 'REGEN_MANA',
-        payload: {
-          heroId: hero.id,
-          currentMana: hero.currentMana,
-        },
-      };
-      const messageData: SelfMessageData = {
-        message: 'Start mana regen',
-        type: 'INFO',
-      };
-      await actionQueue.upsertJobScheduler(
-        jobId,
-        { every, startDate: new Date(Date.now() + every) },
-        { data: jobData, name: jobName['regen-mana'], opts: { removeOnComplete: true } },
-      );
-      io.to(hero.id).emit(socketEvents.selfMessage(), messageData);
-      return c.json<SuccessResponse>({
-        message: 'start regen mana ',
-        success: true,
-      });
+      // const jobId = `hero-${hero.id}-regen-mana`;
+      // const { sumStatAndModifier } = await heroService(db).getHeroStatsWithModifiers(hero.id);
+      // const every = calculate.manaRegenTime(sumStatAndModifier.intelligence);
+      // console.log('manaTime', every);
+      // const jobData: RegenManaJob = {
+      //   jobName: 'REGEN_MANA',
+      //   payload: {
+      //     heroId: hero.id,
+      //     currentMana: hero.currentMana,
+      //   },
+      // };
+      // const messageData: SelfMessageData = {
+      //   message: 'Start mana regen',
+      //   type: 'INFO',
+      // };
+      // await actionQueue.upsertJobScheduler(
+      //   jobId,
+      //   { every, startDate: new Date(Date.now() + every) },
+      //   { data: jobData, name: jobName['regen-mana'], opts: { removeOnComplete: true } },
+      // );
+      // io.to(hero.id).emit(socketEvents.selfMessage(), messageData);
+      // return c.json<SuccessResponse>({
+      //   message: 'start regen mana ',
+      //   success: true,
+      // });
     },
   )
   .put(
@@ -1040,7 +978,7 @@ export const heroRouter = new Hono<Context>()
       'param',
       z.object({
         id: z.string(),
-        buildingType: z.enum(buildingTypeEnum.enumValues),
+        buildingType: z.enum(buildingValues),
       }),
     ),
     async (c) => {
@@ -1069,7 +1007,7 @@ export const heroRouter = new Hono<Context>()
       'json',
       z.object({
         coreMaterialType: z.optional(z.enum(coreMaterialTypeEnum.enumValues)),
-        buildingType: z.enum(buildingTypeEnum.enumValues),
+        buildingType: z.enum(buildingValues),
         craftItemId: z.string(),
       }),
     ),
@@ -1077,108 +1015,107 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const { craftItemId, coreMaterialType, buildingType } = c.req.valid('json');
-      const hero = serverState.getHeroState(id);
-      const [craftItem, coreMaterial, backpack] = await Promise.all([
-        craftItemService(db).getCraftItem(craftItemId, { with: { gameItem: { with: { weapon: true, armor: true, shield: true } } } }),
-        coreMaterialType && db.query.resourceTable.findFirst({ where: eq(resourceTable.type, coreMaterialType) }),
-        itemContainerService(db).getHeroBackpack(id),
-      ]);
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-      const place = placeEntities.find((p) => p.id === hero.location.placeId);
-      const isNotInsideRequiredBuilding = place?.buildings?.every((b) => b.type !== craftItem.requiredBuildingType);
-      if (isNotInsideRequiredBuilding) {
-        throw new HTTPException(400, {
-          message: 'You are not inside the required place building.',
-          cause: { canShow: true },
-        });
-      }
-      if (backpack.usedSlots >= backpack.maxSlots) {
-        throw new HTTPException(400, {
-          message: 'Inventory is full',
-          cause: { canShow: true },
-        });
-      }
+      // const { craftItemId, coreMaterialType, buildingType } = c.req.valid('json');
+      // const hero = serverState.getHeroState(id);
+      // const [craftItem, coreMaterial, backpack] = await Promise.all([
 
-      if (coreMaterial && coreMaterial?.category !== craftItem.requiredCraftResourceCategory) {
-        throw new HTTPException(400, {
-          message: 'Invalid base resource for this craft item.',
-          cause: { canShow: true },
-        });
-      }
+      //   itemContainerService(db).getHeroBackpack(id),
+      // ]);
+      // verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      // const place = placeTemplate.find((p) => p.id === hero.location.placeId);
+      // const isNotInsideRequiredBuilding = place?.buildings?.every((b) => b.type !== craftItem.requiredBuildingType);
+      // if (isNotInsideRequiredBuilding) {
+      //   throw new HTTPException(400, {
+      //     message: 'You are not inside the required place building.',
+      //     cause: { canShow: true },
+      //   });
+      // }
+      // if (backpack.usedSlots >= backpack.maxSlots) {
+      //   throw new HTTPException(400, {
+      //     message: 'Inventory is full',
+      //     cause: { canShow: true },
+      //   });
+      // }
 
-      const requirement = craftItemService(db).getCraftItemRequirement(craftItem.gameItem!, coreMaterialType);
-      await itemContainerService(db).checkCraftResources(backpack.id, requirement?.resources);
-      await skillService(db).checkSkillRequirement(hero.id, requirement?.skills);
-      const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
-        where: and(eq(queueCraftItemTable.heroId, hero.id), ne(queueCraftItemTable.status, 'FAILED')),
-      });
-      if (heroQueueCraftItems.length >= hero.maxQueueCraftCount) {
-        throw new HTTPException(400, {
-          message: 'Craft queue limit has been reached.',
-          cause: { canShow: true },
-        });
-      }
+      // if (coreMaterial && coreMaterial?.category !== craftItem.requiredCraftResourceCategory) {
+      //   throw new HTTPException(400, {
+      //     message: 'Invalid base resource for this craft item.',
+      //     cause: { canShow: true },
+      //   });
+      // }
 
-      const lastItem = heroQueueCraftItems.at(-1);
+      // const requirement = craftItemService(db).getCraftItemRequirement(craftItem.gameItem!, coreMaterialType);
+      // await itemContainerService(db).checkCraftResources(backpack.id, requirement?.resources);
+      // await skillService(db).checkSkillRequirement(hero.id, requirement?.skills);
+      // const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
+      //   where: and(eq(queueCraftItemTable.heroId, hero.id), ne(queueCraftItemTable.status, 'FAILED')),
+      // });
+      // if (heroQueueCraftItems.length >= hero.maxQueueCraftCount) {
+      //   throw new HTTPException(400, {
+      //     message: 'Craft queue limit has been reached.',
+      //     cause: { canShow: true },
+      //   });
+      // }
 
-      if (lastItem && lastItem?.buildingType !== craftItem.requiredBuildingType) {
-        throw new HTTPException(400, {
-          message: 'You can only queue items from the same building type.',
-          cause: { canShow: true },
-        });
-      }
-      if (!requirement?.craftTime) {
-        throw new HTTPException(404, {
-          message: 'craft time not found',
-        });
-      }
-      let delay = requirement.craftTime;
+      // const lastItem = heroQueueCraftItems.at(-1);
 
-      if (lastItem) {
-        const now = Date.now();
-        const completedAt = new Date(lastItem.completedAt).getTime();
+      // if (lastItem && lastItem?.buildingType !== craftItem.requiredBuildingType) {
+      //   throw new HTTPException(400, {
+      //     message: 'You can only queue items from the same building type.',
+      //     cause: { canShow: true },
+      //   });
+      // }
+      // if (!requirement?.craftTime) {
+      //   throw new HTTPException(404, {
+      //     message: 'craft time not found',
+      //   });
+      // }
+      // let delay = requirement.craftTime;
 
-        const remainingTime = Math.max(0, completedAt - now);
+      // if (lastItem) {
+      //   const now = Date.now();
+      //   const completedAt = new Date(lastItem.completedAt).getTime();
 
-        delay = remainingTime + requirement.craftTime;
-      }
+      //   const remainingTime = Math.max(0, completedAt - now);
 
-      const completedAt = new Date(Date.now() + delay).toISOString();
-      const randomUuid = generateRandomUuid();
-      const jobId = `hero-${hero.id}_queue-craft-${randomUuid}`;
-      const [newQueueCraftItem] = await db
-        .insert(queueCraftItemTable)
-        .values({
-          heroId: hero.id,
-          buildingType: craftItem.requiredBuildingType,
-          jobId,
-          coreMaterialType,
-          status: !lastItem ? 'PROGRESS' : 'PENDING',
-          craftItemId: craftItem.id,
-          completedAt,
-        })
-        .returning();
-      const jobData: QueueCraftItemJob = {
-        jobName: 'QUEUE_CRAFT_ITEM',
-        payload: {
-          heroId: hero.id,
-          queueCraftItemId: newQueueCraftItem.id,
-          coreMaterialType,
-          buildingType: craftItem.requiredBuildingType,
-        },
-      };
-      console.log('@@@@@@@', delay);
-      await actionQueue.add(jobName['queue-craft-item'], jobData, {
-        delay,
-        jobId,
-        removeOnComplete: true,
-      });
+      //   delay = remainingTime + requirement.craftTime;
+      // }
+
+      // const completedAt = new Date(Date.now() + delay).toISOString();
+      // const randomUuid = generateRandomUuid();
+      // const jobId = `hero-${hero.id}_queue-craft-${randomUuid}`;
+      // const [newQueueCraftItem] = await db
+      //   .insert(queueCraftItemTable)
+      //   .values({
+      //     heroId: hero.id,
+      //     buildingType: craftItem.requiredBuildingType,
+      //     jobId,
+      //     coreMaterialType,
+      //     status: !lastItem ? 'PROGRESS' : 'PENDING',
+      //     craftItemId: craftItem.id,
+      //     completedAt,
+      //   })
+      //   .returning();
+      // const jobData: QueueCraftItemJob = {
+      //   jobName: 'QUEUE_CRAFT_ITEM',
+      //   payload: {
+      //     heroId: hero.id,
+      //     queueCraftItemId: newQueueCraftItem.id,
+      //     coreMaterialType,
+      //     buildingType: craftItem.requiredBuildingType,
+      //   },
+      // };
+      // console.log('@@@@@@@', delay);
+      // await actionQueue.add(jobName['queue-craft-item'], jobData, {
+      //   delay,
+      //   jobId,
+      //   removeOnComplete: true,
+      // });
 
       return c.json<SuccessResponse<QueueCraftItem>>({
         message: 'craft item add to queue',
         success: true,
-        data: newQueueCraftItem,
+        // data: newQueueCraftItem,
       });
     },
   )
@@ -1191,75 +1128,75 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id, queueCraftItemId } = c.req.valid('param');
 
-      const [hero, queueItems] = await Promise.all([
-        heroService(db).getHeroByColum(id, { id: true, userId: true, state: true }),
-        db.query.queueCraftItemTable.findMany({
-          where: eq(queueCraftItemTable.heroId, id),
-          with: { craftItem: { with: { gameItem: true } } },
-        }),
-      ]);
+      // const [hero, queueItems] = await Promise.all([
+      //   heroService(db).getHeroByColum(id, { id: true, userId: true, state: true }),
+      //   db.query.queueCraftItemTable.findMany({
+      //     where: eq(queueCraftItemTable.heroId, id),
+      //     with: { craftItem: { with: { gameItem: true } } },
+      //   }),
+      // ]);
 
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      // verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      if (hero.state === 'BATTLE') {
-        throw new HTTPException(409, { message: 'Action not allowed: hero now is battle' });
-      }
+      // if (hero.state === 'BATTLE') {
+      //   throw new HTTPException(409, { message: 'Action not allowed: hero now is battle' });
+      // }
 
-      const deletedItem = queueItems.find((i) => i.id === queueCraftItemId);
-      if (!deletedItem) {
-        throw new HTTPException(404, { message: 'queue craft item not found' });
-      }
+      // const deletedItem = queueItems.find((i) => i.id === queueCraftItemId);
+      // if (!deletedItem) {
+      //   throw new HTTPException(404, { message: 'queue craft item not found' });
+      // }
 
-      await db.delete(queueCraftItemTable).where(eq(queueCraftItemTable.id, queueCraftItemId));
+      // await db.delete(queueCraftItemTable).where(eq(queueCraftItemTable.id, queueCraftItemId));
 
-      await actionQueue.remove(deletedItem.jobId);
+      // await actionQueue.remove(deletedItem.jobId);
 
-      const remaining = queueItems.filter((i) => i.id !== queueCraftItemId);
+      // const remaining = queueItems.filter((i) => i.id !== queueCraftItemId);
 
-      const progressJob = remaining.find((i) => i.status === 'PROGRESS');
-      const pendingJobs = remaining.filter((i) => i.status === 'PENDING');
+      // const progressJob = remaining.find((i) => i.status === 'PROGRESS');
+      // const pendingJobs = remaining.filter((i) => i.status === 'PENDING');
 
-      if (!progressJob && pendingJobs.length > 0) {
-        const next = await queueCraftItemService(db).setNextQueueCraftItem(hero.id);
-        if (next) {
-          const updateData: QueueCraftItemSocketData = {
-            type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
-            payload: {
-              queueItemCraftId: next.id,
-              status: 'PROGRESS',
-              completedAt: next.completedAt,
-              buildingType: deletedItem.buildingType,
-            },
-          };
-          io.to(hero.id).emit(socketEvents.queueCraft(), updateData);
-        }
-      }
+      // if (!progressJob && pendingJobs.length > 0) {
+      //   const next = await queueCraftItemService(db).setNextQueueCraftItem(hero.id);
+      //   if (next) {
+      //     const updateData: QueueCraftItemSocketData = {
+      //       type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
+      //       payload: {
+      //         queueItemCraftId: next.id,
+      //         status: 'PROGRESS',
+      //         completedAt: next.completedAt,
+      //         buildingType: deletedItem.buildingType,
+      //       },
+      //     };
+      //     io.to(hero.id).emit(socketEvents.queueCraft(), updateData);
+      //   }
+      // }
 
-      let delayAccumulator = 0;
+      // let delayAccumulator = 0;
 
-      if (progressJob) {
-        const remainingMs = Math.max(new Date(progressJob.completedAt).getTime() - Date.now(), 0);
-        delayAccumulator = remainingMs;
-      }
+      // if (progressJob) {
+      //   const remainingMs = Math.max(new Date(progressJob.completedAt).getTime() - Date.now(), 0);
+      //   delayAccumulator = remainingMs;
+      // }
 
-      for (const item of pendingJobs) {
-        const requirement = craftItemService(db).getCraftItemRequirement(item.craftItem.gameItem, item.coreMaterialType);
-        if (!requirement?.craftTime) {
-          console.error('FOR CRAFT ITEM NOT FOUND');
-          continue;
-        }
-        delayAccumulator += requirement.craftTime;
+      // for (const item of pendingJobs) {
+      //   const requirement = craftItemService(db).getCraftItemRequirement(item.craftItem.gameItem, item.coreMaterialType);
+      //   if (!requirement?.craftTime) {
+      //     console.error('FOR CRAFT ITEM NOT FOUND');
+      //     continue;
+      //   }
+      //   delayAccumulator += requirement.craftTime;
 
-        const job = await actionQueue.getJob(item.jobId);
-        if (job) {
-          await job.changeDelay(delayAccumulator);
-        }
-      }
+      //   const job = await actionQueue.getJob(item.jobId);
+      //   if (job) {
+      //     await job.changeDelay(delayAccumulator);
+      //   }
+      // }
 
-      return c.json<SuccessResponse>({
-        message: 'queue craft item deleted',
-        success: true,
-      });
+      // return c.json<SuccessResponse>({
+      //   message: 'queue craft item deleted',
+      //   success: true,
+      // });
     },
   )
   .get('/:id/skills', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
