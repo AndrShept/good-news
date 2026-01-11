@@ -1,9 +1,10 @@
-import { Equipment } from '@/shared/types';
+
 import { memo } from 'react';
 
 import { CharacterStatusBar } from './CharacterStatusBar';
 import { Equipments } from './Equipment';
 import { FillBar } from './FillBar';
+import { ItemInstance } from '@/shared/types';
 
 interface Props {
   avatarImage: string;
@@ -15,7 +16,7 @@ interface Props {
   name: string;
   level: number;
   id: string;
-  equipments: Equipment[];
+  equipments: ItemInstance[];
 }
 
 export const Paperdoll = memo(

@@ -24,6 +24,7 @@ import {
   type TItemContainer,
   type WeaponHandType,
   buildingValues,
+  buyItemsSchema,
   createHeroSchema,
   statsSchema,
 } from '@/shared/types';
@@ -55,17 +56,14 @@ import {
   stateTypeEnum,
 } from '../db/schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
-import { serverState } from '../game/state/hero-state';
+import { type IHeroServerState, serverState } from '../game/state/server-state';
 import { heroOnline } from '../lib/heroOnline';
 import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
-import { equipmentService } from '../services/equipment-service';
 import { heroService } from '../services/hero-service';
 import { itemContainerService } from '../services/item-container-service';
-import { queueCraftItemService } from '../services/queue-craft-item-service';
-import { skillService } from '../services/skill-service';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -74,62 +72,51 @@ export const heroRouter = new Hono<Context>()
 
     async (c) => {
       const userId = c.get('user')?.id as string;
-      const stateHeroId = serverState.user.get(userId);
-      let hero: Hero | null = null;
+      let stateHeroId = serverState.user.get(userId);
+      let heroId: undefined | string = stateHeroId;
+
       if (!stateHeroId) {
-        hero = (await db.query.heroTable.findFirst({
+        const hero = await db.query.heroTable.findFirst({
           where: eq(heroTable.userId, userId),
           with: {
             modifier: true,
             group: true,
             location: true,
+
             buffs: { with: { buffTemplate: true } },
             queueCraftItems: true,
             itemContainers: { columns: { id: true, type: true, name: true }, where: eq(itemContainerTable.type, 'BACKPACK') },
           },
-        })) as Hero;
+        });
         if (!hero) {
           throw new HTTPException(404, {
             message: 'hero not found',
           });
         }
-
+        heroId = hero.id;
+        stateHeroId = hero.id;
         console.log('FETCH HERO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         const equipments = await db.query.itemInstanceTable.findMany({
           where: and(eq(itemInstanceTable.ownerHeroId, hero.id), eq(itemInstanceTable.location, 'EQUIPMENT')),
           with: { itemTemplate: true },
         });
-        const { createdAt, location, ...heroState } = hero;
         serverState.user.set(userId, hero.id);
-        serverState.hero.set(hero.id, {
-          ...heroState,
-          equipments,
-          modifier: hero.modifier!,
-          buffs: hero.buffs ?? [],
-          itemContainers: hero.itemContainers ?? [],
-          location: {
-            x: location!.x,
-            y: location!.y,
-            mapId: location?.mapId ?? null,
-            placeId: location?.placeId ?? null,
-            targetX: location?.targetX ?? null,
-            targetY: location?.y ?? null,
-          },
-        });
+        const setData = { ...hero, equipments };
+        serverState.hero.set(hero.id, setData as Hero);
+
         await heroOnline(hero.id);
       }
 
-      const heroId = stateHeroId ?? hero?.id!;
-      const stateHero = serverState.getHeroState(heroId);
-
-      verifyHeroOwnership({ heroUserId: hero?.userId ?? stateHero.userId, userId });
+      const stateHero = heroService.getHero(heroId ?? stateHeroId);
+      verifyHeroOwnership({ heroUserId: stateHero?.userId, userId });
       stateHero.offlineTimer = undefined;
       stateHero.isOnline = true;
+      const { paths, offlineTimer, ...returnData } = stateHero;
 
-      return c.json<SuccessResponse<Hero>>({
+      return c.json<SuccessResponse<typeof returnData>>({
         success: true,
         message: 'hero fetched',
-        data: stateHero as Hero,
+        data: returnData,
       });
     },
   )
@@ -228,7 +215,7 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const { id } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-      const hero = serverState.getHeroState(id);
+      const hero = heroService.getHero(id);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
@@ -241,21 +228,10 @@ export const heroRouter = new Hono<Context>()
           422,
         );
       }
-      await db.transaction(async (tx) => {
-        const [{ freeStatPoints, goldCoins, stat }] = await tx
-          .update(heroTable)
-          .set({
-            freeStatPoints: hero.level * 10,
-            goldCoins: hero.goldCoins - RESET_STATS_COST,
-            stat: BASE_STATS,
-          })
-          .where(eq(heroTable.id, id))
-          .returning({ freeStatPoints: heroTable.freeStatPoints, goldCoins: heroTable.goldCoins, stat: heroTable.stat });
-        hero.freeStatPoints = freeStatPoints;
-        hero.goldCoins = goldCoins;
-        hero.stat = stat;
-        await heroService(tx).updateModifier(hero.id);
-      });
+      hero.freeStatPoints = hero.level * 10;
+      hero.goldCoins = hero.goldCoins - RESET_STATS_COST;
+      hero.stat = BASE_STATS;
+      heroService.updateModifier(hero.id);
 
       return c.json<SuccessResponse>({ message: 'Hero stats have been reset successfully.', success: true });
     },
@@ -282,23 +258,14 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const { freeStatPoints, ...stat } = c.req.valid('json');
 
-      const hero = serverState.getHeroState(id);
+      const hero = heroService.getHero(id);
 
       validateHeroStats({ freeStatPoints, stat, level: hero.level });
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
-      await db.transaction(async (tx) => {
-        await db
-          .update(heroTable)
-          .set({
-            freeStatPoints,
-            stat,
-          })
-          .where(eq(heroTable.id, id));
-        hero.freeStatPoints = freeStatPoints;
-        hero.stat = stat;
-        await heroService(tx).updateModifier(hero.id);
-      });
+      hero.stat = stat;
+      hero.freeStatPoints = freeStatPoints;
+      heroService.updateModifier(hero.id);
 
       return c.json<SuccessResponse>({ success: true, message: 'Stats have been successfully updated.' }, 200);
     },
@@ -316,13 +283,20 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const userId = c.get('user')?.id as string;
       const { id, itemContainerId } = c.req.valid('param');
-      const heroState = serverState.getHeroState(id);
-      let containerState = serverState.getContainerState(itemContainerId);
+      const heroState = heroService.getHero(id);
+      let containerState = serverState.container.get(itemContainerId);
       if (!containerState) {
         console.log('FETCH CONTAINER !!!!!!!!!!!!!! CONTAINER');
-        const itemContainer = await itemContainerService(db).getItemContainerById(itemContainerId);
-        containerState = itemContainer;
-        serverState.container.set(itemContainer.id, itemContainer);
+
+        const itemContainer = await db.query.itemContainerTable.findFirst({
+          where: eq(itemContainerTable.id, itemContainerId),
+          with: { itemsInstance: { with: { itemTemplate: true } } },
+        });
+        if (!itemContainer) {
+          throw new HTTPException(404, { message: 'itemContainer not found' });
+        }
+        containerState = itemContainer as TItemContainer;
+        serverState.container.set(itemContainer.id, itemContainer as TItemContainer);
       }
 
       verifyHeroOwnership({ heroUserId: heroState.userId, userId, containerHeroId: containerState.heroId, heroId: heroState.id });
@@ -330,6 +304,32 @@ export const heroRouter = new Hono<Context>()
         message: `container fetched !!!`,
         success: true,
         data: containerState,
+      });
+    },
+  )
+  .post(
+    '/:id/shop/buy',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string(),
+      }),
+    ),
+    zValidator('json', buyItemsSchema),
+    async (c) => {
+      const userId = c.get('user')?.id as string;
+      const { id } = c.req.valid('param');
+      const { items } = c.req.valid('json');
+      const hero = heroService.getHero(id);
+
+      const backpack = itemContainerService.getBackpack(hero.id);
+
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.heroId, heroId: hero.id });
+
+      return c.json<SuccessResponse>({
+        message: `success buy items`,
+        success: true,
       });
     },
   )
@@ -460,38 +460,36 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .delete(
-    '/:id/item-container/slot-item/:containerSlotId',
+    '/:id/item-container/:itemContainerId/item/:itemInstanceId',
     loggedIn,
     zValidator(
       'param',
       z.object({
-        id: z.string(),
-        containerSlotId: z.string(),
+        id: z.string().uuid(),
+        itemContainerId: z.string().uuid(),
+        itemInstanceId: z.string().uuid(),
       }),
     ),
 
     async (c) => {
-      const { id, containerSlotId } = c.req.valid('param');
+      const { id, itemContainerId, itemInstanceId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-      const [hero, containerSlotItem] = await Promise.all([
-        heroService(db).getHeroByColum(id, { id: true, userId: true }),
-        containerSlotItemService(db).getContainerSlotItem(containerSlotId, { with: { gameItem: true } }),
-      ]);
+      const hero = heroService.getHero(id);
+      const container = itemContainerService.getContainer(itemContainerId);
 
-      const itemContainer = await itemContainerService(db).getItemContainerById(containerSlotItem.itemContainerId);
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: container.heroId, heroId: hero.id });
 
-      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
+      const findIndex = container.itemsInstance.findIndex((i) => i.id === itemInstanceId);
+      if (findIndex === -1) {
+        throw new HTTPException(404, { message: 'item instance not found' });
+      }
+      const [deletedItem] = container.itemsInstance.splice(findIndex, 1)
 
-      // await db.transaction(async (tx) => {
-      //   await tx.delete(containerSlotTable).where(eq(containerSlotTable.id, containerSlotItem.id));
-      //   await itemContainerService(tx).setUsedSlots(itemContainer.id);
-      // });
-
-      return c.json<SuccessResponse>(
+      return c.json<SuccessResponse<ItemInstance>>(
         {
           success: true,
           message: `Success deleted item`,
-          // data: containerSlotItem,
+          data: deletedItem,
         },
         201,
       );
@@ -579,12 +577,13 @@ export const heroRouter = new Hono<Context>()
   .get('/:id/buffs', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
     const userId = c.get('user')?.id;
     const { id } = c.req.valid('param');
-    const hero = await heroService(db).getHero(id);
+    const hero = heroService.getHero(id);
 
     verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
     const buffs = await db.query.buffInstanceTable.findMany({
       where: eq(buffInstanceTable.ownerHeroId, hero.id),
+      with: { buffTemplate: true },
     });
     return c.json<SuccessResponse<BuffInstance[]>>({
       message: 'buffs fetched!',
@@ -608,7 +607,7 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
       const targetPos = c.req.valid('json');
-      const heroState = serverState.getHeroState(id);
+      const heroState = heroService.getHero(id);
 
       verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
 
@@ -633,7 +632,7 @@ export const heroRouter = new Hono<Context>()
       const walkPathWithTime: PathNode[] = paths.map((path, idx) => ({
         ...path,
         completedAt: now + walkTime * (idx + 1),
-        mapId: heroState.location.mapId ?? '',
+        mapId: heroState.location.mapId!,
       }));
 
       const savePosQueue = serverState.pathPersistQueue.get(id);
@@ -669,11 +668,7 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const heroState = serverState.hero.get(id);
-
-      if (!heroState) {
-        throw new HTTPException(404, { message: 'hero nof found' });
-      }
+      const heroState = heroService.getHero(id);
       verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
 
       serverState.pathPersistQueue.set(id, { x: heroState.location.x, y: heroState.location.y });
@@ -705,7 +700,7 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
 
-      const heroState = serverState.getHeroState(id);
+      const heroState = heroService.getHero(id);
       verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
 
       if (heroState.state !== 'IDLE') {
@@ -838,111 +833,7 @@ export const heroRouter = new Hono<Context>()
       });
     },
   )
-  .post(
-    '/:id/regeneration/health',
-    loggedIn,
-    zValidator('param', z.object({ id: z.string() })),
 
-    async (c) => {
-      const user = c.get('user');
-      const { id } = c.req.valid('param');
-      // const hero = await heroService(db).getHero(id);
-
-      // verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      // const isFullHealth = hero.currentHealth >= hero.maxHealth;
-
-      // if (hero.state === 'BATTLE') {
-      //   throw new HTTPException(403, {
-      //     message: 'hero is a battle',
-      //   });
-      // }
-      // if (isFullHealth) {
-      //   throw new HTTPException(403, {
-      //     message: 'hero full HP',
-      //   });
-      // }
-
-      // const jobId = `hero-${hero.id}-regen-health`;
-      // const { sumStatAndModifier } = await heroService(db).getHeroStatsWithModifiers(hero.id);
-      // const every = calculate.manaRegenTime(sumStatAndModifier.constitution);
-      // console.log('healthTime', every);
-      // const jobData: RegenHealthJob = {
-      //   jobName: 'REGEN_HEALTH',
-      //   payload: {
-      //     heroId: hero.id,
-      //     currentHealth: hero.currentHealth,
-      //   },
-      // };
-      // const messageData: SelfMessageData = {
-      //   message: 'Start health regen',
-      //   type: 'INFO',
-      // };
-      // await actionQueue.upsertJobScheduler(
-      //   jobId,
-      //   { every, startDate: new Date(Date.now() + every) },
-      //   { data: jobData, name: jobName['regen-health'], opts: { removeOnComplete: true } },
-      // );
-      // io.to(hero.id).emit(socketEvents.selfMessage(), messageData);
-      // return c.json<SuccessResponse>({
-      //   message: 'start regen health ',
-      //   success: true,
-      // });
-    },
-  )
-  .post(
-    '/:id/regeneration/mana',
-    loggedIn,
-    zValidator('param', z.object({ id: z.string() })),
-
-    async (c) => {
-      const user = c.get('user');
-      const { id } = c.req.valid('param');
-
-      // const hero = await heroService(db).getHero(id);
-
-      // verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      // const isFullMana = hero.currentMana >= hero.maxMana;
-
-      // if (hero.state === 'BATTLE') {
-      //   throw new HTTPException(403, {
-      //     message: 'hero is a battle',
-      //   });
-      // }
-      // if (isFullMana) {
-      //   throw new HTTPException(403, {
-      //     message: 'hero full MANA',
-      //   });
-      // }
-
-      // const jobId = `hero-${hero.id}-regen-mana`;
-      // const { sumStatAndModifier } = await heroService(db).getHeroStatsWithModifiers(hero.id);
-      // const every = calculate.manaRegenTime(sumStatAndModifier.intelligence);
-      // console.log('manaTime', every);
-      // const jobData: RegenManaJob = {
-      //   jobName: 'REGEN_MANA',
-      //   payload: {
-      //     heroId: hero.id,
-      //     currentMana: hero.currentMana,
-      //   },
-      // };
-      // const messageData: SelfMessageData = {
-      //   message: 'Start mana regen',
-      //   type: 'INFO',
-      // };
-      // await actionQueue.upsertJobScheduler(
-      //   jobId,
-      //   { every, startDate: new Date(Date.now() + every) },
-      //   { data: jobData, name: jobName['regen-mana'], opts: { removeOnComplete: true } },
-      // );
-      // io.to(hero.id).emit(socketEvents.selfMessage(), messageData);
-      // return c.json<SuccessResponse>({
-      //   message: 'start regen mana ',
-      //   success: true,
-      // });
-    },
-  )
   .put(
     '/:id/state',
     loggedIn,
@@ -954,16 +845,11 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const { type } = c.req.valid('json');
 
-      const hero = await heroService(db).getHeroByColum(id, { id: true, userId: true });
+      const hero = heroService.getHero(id);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      await db
-        .update(heroTable)
-        .set({
-          state: type,
-        })
-        .where(eq(heroTable.id, hero.id));
+      hero.state = type;
 
       return c.json<SuccessResponse>({
         message: 'state changed',
@@ -984,18 +870,14 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id, buildingType } = c.req.valid('param');
-      const hero = await heroService(db).getHero(id);
+      const hero = heroService.getHero(id);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-      const queueCraftItems = await db.query.queueCraftItemTable.findMany({
-        where: and(eq(queueCraftItemTable.heroId, hero.id), eq(queueCraftItemTable.buildingType, buildingType)),
-        orderBy: asc(queueCraftItemTable.createdAt),
-      });
 
       return c.json<SuccessResponse<QueueCraftItem[]>>({
         message: 'craft item add to queue',
         success: true,
-        data: queueCraftItems,
+        // data: queueCraftItems,
       });
     },
   )
@@ -1203,10 +1085,7 @@ export const heroRouter = new Hono<Context>()
     const user = c.get('user');
     const { id } = c.req.valid('param');
 
-    const hero = await heroService(db).getHeroByColum(id, {
-      id: true,
-      userId: true,
-    });
+    const hero = heroService.getHero(id);
     const skills = await db.query.skillTable.findMany({
       where: eq(skillTable.heroId, hero.id),
     });
@@ -1222,24 +1101,17 @@ export const heroRouter = new Hono<Context>()
   .get('/:id/item-container', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
     const user = c.get('user');
     const { id } = c.req.valid('param');
-    const hero = await heroService(db).getHero(id, {
-      with: {
-        location: { columns: { placeId: true } },
-      },
-      columns: {
-        id: true,
-        userId: true,
-      },
-    });
+    const hero = heroService.getHero(id);
 
     const itemContainers = await db.query.itemContainerTable.findMany({
       where: and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.placeId, hero.location?.placeId!)),
+
       orderBy: asc(itemContainerTable.createdAt),
     });
 
     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-    return c.json<SuccessResponse<TItemContainer[]>>({
+    return c.json<SuccessResponse<typeof itemContainers>>({
       message: 'bank containers fetched',
       success: true,
       data: itemContainers,
@@ -1249,11 +1121,8 @@ export const heroRouter = new Hono<Context>()
     const user = c.get('user');
     const { id } = c.req.valid('param');
 
-    const hero = await heroService(db).getHero(id, {
-      with: {
-        location: { columns: { placeId: true } },
-      },
-    });
+    const hero = heroService.getHero(id);
+
     const count = await db.$count(itemContainerTable, and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.type, 'BANK')));
     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
@@ -1264,7 +1133,16 @@ export const heroRouter = new Hono<Context>()
         type: 'BANK',
         name: `${count + 1}`,
       });
-      const premiumCoins = await heroService(tx).spendPremCoin(hero.id, BANK_CONTAINER_COST, hero.premiumCoins);
+      const [{ premiumCoins }] = await db
+        .update(heroTable)
+        .set({
+          premiumCoins: hero.premiumCoins - BANK_CONTAINER_COST,
+        })
+        .where(eq(heroTable.id, hero.id))
+        .returning({ premiumCoins: heroTable.premiumCoins });
+
+      heroService.spendPremCoin(hero.id, BANK_CONTAINER_COST);
+
       return premiumCoins;
     });
 
@@ -1283,12 +1161,8 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id, itemContainerId } = c.req.valid('param');
       const data = c.req.valid('json');
-      const [hero, itemContainer] = await Promise.all([
-        heroService(db).getHero(id, {
-          columns: { id: true, userId: true },
-        }),
-        itemContainerService(db).getItemContainerById(itemContainerId),
-      ]);
+      const hero = heroService.getHero(id);
+      const itemContainer = itemContainerService.getContainer(itemContainerId);
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id, heroId: hero.id, containerHeroId: itemContainer.heroId });
 
       await db

@@ -3,7 +3,7 @@ import { socketEvents } from '@/shared/socket-events';
 import type { PathNode } from '@/shared/types';
 
 import { io } from '..';
-import { serverState } from './state/hero-state';
+import { serverState } from './state/server-state';
 import { heroOffline } from '../lib/heroOffline';
 
 export const moveTick = () => {

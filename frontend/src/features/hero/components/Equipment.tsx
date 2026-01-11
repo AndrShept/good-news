@@ -2,26 +2,27 @@ import { GameItemCard } from '@/components/GameItemCard';
 import { GameItemImg } from '@/components/GameItemImg';
 import { BASE_EQUIPMENTS_IMAGE } from '@/lib/config';
 import { cn } from '@/lib/utils';
-import { Equipment, EquipmentSlotType } from '@/shared/types';
+import { EquipmentSlotType, ItemInstance } from '@/shared/types';
 import { memo } from 'react';
 
 import { CharacterSprite } from './CharacterSprite';
 
 interface Props {
-  equipments: Equipment[];
+  equipments: ItemInstance[];
   characterImage: string;
 }
 
 export const Equipments = memo(({ equipments, characterImage }: Props) => {
   const equipmentBySlot = equipments.reduce(
     (acc, equip) => {
+      if (!equip.slot) return acc;
       acc[equip.slot] = equip;
       return acc;
     },
-    {} as Record<EquipmentSlotType, Equipment>,
+    {} as Record<EquipmentSlotType, ItemInstance>,
   );
   return (
-    <div className="mx-auto flex ">
+    <div className="mx-auto flex">
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(0, 5).map((equipment) => (
           <li className="flex size-12 items-center justify-center border" key={equipment.id}>

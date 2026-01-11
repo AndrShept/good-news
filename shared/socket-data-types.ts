@@ -1,6 +1,6 @@
 import type { GameMessageType } from '../frontend/src/store/useGameMessages';
 import type { BuffCreateJob, QueueCraftItemJob, RegenHealthJob, RegenManaJob } from './job-types';
-import type { BuildingType, GameItem, HeroSidebarItem,  MapHero, QueueCraftStatusType, StateType } from './types';
+import type { BuildingType, HeroSidebarItem,  MapHero, QueueCraftStatusType, StateType } from './types';
 
 export type SocketGroupResponse = {
   message: string;

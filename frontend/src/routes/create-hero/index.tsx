@@ -60,6 +60,7 @@ function RouteComponent() {
           dexterity: stats.dexterity,
           intelligence: stats.intelligence,
           luck: stats.luck,
+          wisdom: stats.wisdom,
           strength: stats.strength,
         },
       },
@@ -80,7 +81,7 @@ function RouteComponent() {
   return (
     <Background imageUrl="/sprites/shrine6.png">
       <div className="m-auto flex max-w-5xl flex-col gap-4 rounded-lg border bg-black/70 p-4 text-[15px] backdrop-blur-md md:flex-row md:p-10">
-          <HeroAvatarList avatar={avatarImage} setAvatar={setAvatarImage} />
+        <HeroAvatarList avatar={avatarImage} setAvatar={setAvatarImage} />
 
         <div className="mx-auto flex max-w-[220px] flex-col gap-4">
           <Form {...form}>

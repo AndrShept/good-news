@@ -4,7 +4,7 @@ import { HTTPException } from 'hono/http-exception';
 
 import type { TDataBase, TTransaction, db } from '../db/db';
 import { heroTable } from '../db/schema';
-import { serverState } from '../game/state/hero-state';
+import { serverState } from '../game/state/server-state';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 

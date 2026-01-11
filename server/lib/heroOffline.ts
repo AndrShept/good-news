@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 
 import { io } from '..';
 
-import { serverState } from '../game/state/hero-state';
+import { serverState } from '../game/state/server-state';
 import { actionQueue } from '../queue/actionQueue';
 import { jobQueueId } from './utils';
 

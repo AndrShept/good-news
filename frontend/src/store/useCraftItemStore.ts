@@ -1,10 +1,10 @@
-import { CoreMaterialType, CraftItem, ResourceType } from '@/shared/types';
+import { CoreMaterialType, ItemTemplate } from '@/shared/types';
 import { create } from 'zustand';
 
 interface IUseCraftItemStore {
   coreMaterialType: CoreMaterialType | null;
   setCoreMaterial: (type: CoreMaterialType | null) => void;
-  craftItem: CraftItem | null | undefined;
+  craftItem: ItemTemplate | null | undefined;
   setCraftItem: (craftItem: CraftItem | null | undefined) => void;
 }
 

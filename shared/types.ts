@@ -233,10 +233,10 @@ export type TPotionInfo = {
   buffTemplateId?: string;
 };
 
-export type OmitModifier = Omit<Modifier, 'id' | 'createdAt' | 'updatedAt' | 'heroId' | 'resourceId'>;
+export type OmitModifier = Omit<Modifier, 'id' | 'heroId'>;
 
 export type TItemContainer = typeof itemContainerTable.$inferSelect & {
-  itemsInstance?: ItemInstance[] | null;
+  itemsInstance: ItemInstance[] 
 };
 
 export type CraftInfo = { baseResourceCategory: ResourceCategoryType; requiredBuildingType: BuildingType };
@@ -251,22 +251,22 @@ export type CraftItemRequirement<T extends IngotType | LeatherType | OreType = R
 
 export type ItemTemplate = typeof itemTemplateTable.$inferSelect;
 export type ItemInstance = typeof itemInstanceTable.$inferSelect & {
-  itemTemplate?: ItemTemplate | null;
+  itemTemplate: ItemTemplate 
 };
 
 export type BuffTemplate = typeof buffTemplateTable.$inferSelect;
 export type BuffInstance = typeof buffInstanceTable.$inferSelect & {
-  buffTemplate?: BuffTemplate | null;
+  buffTemplate: BuffTemplate
 };
 
 export type Hero = InferSelectModel<typeof heroTable> & {
-  modifier?: Modifier;
-  location?: TLocation;
-  group?: Group;
-  buffs?: BuffInstance[];
-  equipments?: ItemInstance[];
-  queueCraftItems?: QueueCraftItem[];
-  itemContainers?: { id: string; type: ItemContainerType; name: string }[];
+  modifier: Modifier;
+  location: TLocation;
+  group: Group;
+  buffs: BuffInstance[];
+  equipments: ItemInstance[];
+  // queueCraftItems?: QueueCraftItem[];
+  itemContainers: { id: string; type: ItemContainerType; name: string }[];
 };
 
 export type HeroSidebarItem = {
@@ -292,7 +292,7 @@ export type IPosition = {
 };
 
 //API RESPONSE
-
+export type ApiGetHeroResponse = InferResponseType<(typeof client.hero)['$get']>['data'];
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];
 export type ApiGetMapHeroes = InferResponseType<(typeof client.map)[':id']['heroes']['$get']>['data'];
 export type ApiGetPlaceHeroes = InferResponseType<(typeof client.place)[':id']['heroes']['$get']>['data'];
@@ -303,9 +303,10 @@ export type ApiGetShopItemTemplateResponse = InferResponseType<(typeof client)['
 
 export type IHeroStat = {
   strength: number;
-  constitution: number;
-  intelligence: number;
   dexterity: number;
+  intelligence: number;
+  wisdom: number;
+  constitution: number;
   luck: number;
 };
 export type IHeroStatEnum = keyof IHeroStat;
@@ -316,9 +317,11 @@ export const statsSchema = createSelectSchema(modifierTable, {
   intelligence: z.number(),
   dexterity: z.number(),
   luck: z.number(),
+  wisdom: z.number(),
 }).pick({
   constitution: true,
   dexterity: true,
+  wisdom: true,
   luck: true,
   intelligence: true,
   strength: true,
@@ -343,6 +346,7 @@ export const createHeroSchema = createInsertSchema(heroTable, {
     stat: z.object({
       constitution: z.number(),
       dexterity: z.number(),
+      wisdom: z.number(),
       luck: z.number(),
       intelligence: z.number(),
       strength: z.number(),
@@ -350,4 +354,15 @@ export const createHeroSchema = createInsertSchema(heroTable, {
   });
 export const changeStatSchema = statsSchema.extend({
   freeStatPoints: z.number(),
+});
+
+export const buyItemsSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        id: z.string().uuid(),
+        quantity: z.number().int().positive(),
+      }),
+    )
+    .refine((items) => new Set(items.map((i) => i.id)).size === items.length, { message: 'Duplicate item id' }),
 });

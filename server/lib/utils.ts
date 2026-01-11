@@ -7,9 +7,8 @@ import { sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import nodemailer from 'nodemailer';
 import z from 'zod';
+
 import { mapTemplate } from '../data/map-template';
-
-
 
 const schema = z.object({
   DATABASE_URL: z.string(),
@@ -98,7 +97,7 @@ export const jobQueueId = {
   offline: (heroId: string) => `offline-${heroId}`,
 };
 
-export const newCombineModifier = <T extends Partial<Modifier> | null | undefined>(...args: T[]) => {
+export const sumAllModifier = <T extends Partial<Modifier> | null | undefined>(...args: T[]) => {
   const result: OmitModifier = {
     constitution: 0,
     defense: 0,
@@ -106,6 +105,7 @@ export const newCombineModifier = <T extends Partial<Modifier> | null | undefine
     evasion: 0,
     healthRegen: 0,
     intelligence: 0,
+    wisdom: 0,
     luck: 0,
     magicResistance: 0,
     manaRegen: 0,

@@ -12,6 +12,7 @@ export const modifierTable = pgTable('modifier', {
   strength: integer().default(0).notNull(),
   dexterity: integer().default(0).notNull(),
   intelligence: integer().default(0).notNull(),
+  wisdom: integer().default(0).notNull(),
   constitution: integer().default(0).notNull(),
   luck: integer().default(0).notNull(),
 
@@ -39,13 +40,6 @@ export const modifierTable = pgTable('modifier', {
     onDelete: 'cascade',
   }),
 
-
-  createdAt: timestamp('created_at', {
-    withTimezone: true,
-    mode: 'string',
-  })
-    .notNull()
-    .defaultNow(),
 });
 
 export const modifierRelations = relations(modifierTable, ({ one }) => ({

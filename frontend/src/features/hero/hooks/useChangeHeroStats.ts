@@ -4,9 +4,10 @@ import { IntelligenceIcon } from '@/components/game-icons/IntelligenceIcon';
 import { LuckIcon } from '@/components/game-icons/LuckIcon';
 import { StrengthIcon } from '@/components/game-icons/StrengthIcon';
 import { IHeroStat, Modifier } from '@/shared/types';
-import { ComponentProps, ComponentType, Dispatch, FC, SetStateAction, useCallback } from 'react';
+import { ComponentProps, ComponentType, Dispatch,  SetStateAction, useCallback } from 'react';
 
 import { Stat } from '../components/Stats';
+import { WisdomIcon } from '@/components/game-icons/WisdomIcon';
 
 interface Props {
   setCurrentStats: Dispatch<SetStateAction<IHeroStat>>;
@@ -23,6 +24,7 @@ export const statIcon: Record<keyof IHeroStat, ComponentType<ComponentProps<'div
   dexterity: DexterityIcon,
   intelligence: IntelligenceIcon,
   luck: LuckIcon,
+  wisdom: WisdomIcon
 };
 export const useChangeHeroStats = ({ currentStats, setCurrentStats, setFreePoints, baseStats, freePoints, modifier }: Props) => {
   const getStatPriority = (stat: keyof IHeroStat) => {
@@ -30,8 +32,9 @@ export const useChangeHeroStats = ({ currentStats, setCurrentStats, setFreePoint
       strength: 1,
       dexterity: 2,
       intelligence: 3,
-      constitution: 4,
-      luck: 5,
+      wisdom: 4,
+      constitution: 5,
+      luck: 6,
     };
     return priority[stat];
   };

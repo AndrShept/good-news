@@ -13,11 +13,12 @@ interface Props {
 export const CharacterStat = memo(({ freeStatPoints, modifier, heroStat }: Props) => {
   if (!modifier) throw new Error('modifier not found');
   if (!heroStat) throw new Error('stat not found');
-  const initialHeroStats = {
+  const initialHeroStats: IHeroStat = {
     strength: 0,
     constitution: 0,
     dexterity: 0,
     intelligence: 0,
+    wisdom: 0,
     luck: 0,
   };
   const [stats, setStats] = useState<IHeroStat>(initialHeroStats);
@@ -30,7 +31,16 @@ export const CharacterStat = memo(({ freeStatPoints, modifier, heroStat }: Props
     baseStats.current = heroStat;
     setFreePoints(freeStatPoints);
     baseFreePoints.current = freeStatPoints;
-  }, [freeStatPoints, heroStat, modifier.constitution, modifier.dexterity, modifier.intelligence, modifier.luck, modifier.strength]);
+  }, [
+    freeStatPoints,
+    heroStat,
+    modifier.constitution,
+    modifier.dexterity,
+    modifier.intelligence,
+    modifier.luck,
+    modifier.strength,
+    modifier.wisdom,
+  ]);
   return (
     <>
       <Stats

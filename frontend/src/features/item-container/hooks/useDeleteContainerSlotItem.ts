@@ -2,7 +2,7 @@ import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { deleteContainerSlotItem } from '../api/delete-container-slot-item';
+import { deleteContainerSlotItem } from '../api/delete-container-instance-item';
 import { useItemContainerUpdate } from './useItemContainerUpdate';
 
 interface IDeleteContainerSlotItem {

@@ -1,12 +1,10 @@
 import { client } from '@/lib/utils';
 import { ErrorResponse } from '@/shared/types';
 
-export const shopBuyItems = async ({ id, gameItemId }: { id: string; gameItemId: string }) => {
-  const res = await client.hero[':id'].shop.items[':gameItemId'].buy.$post({
-    param: {
-      id,
-      gameItemId,
-    },
+export const shopBuyItems = async ({ id, items }: { id: string; items: { id: string; quantity: number }[] }) => {
+  const res = await client.hero[':id'].shop.buy.$post({
+    param: { id },
+    json: { items },
   });
 
   if (!res.ok) {

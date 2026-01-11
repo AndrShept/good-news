@@ -6,7 +6,7 @@ import { HTTPException } from 'hono/http-exception';
 import { io } from '..';
 import { db } from '../db/db';
 import { heroTable, locationTable } from '../db/schema';
-import { serverState } from '../game/state/hero-state';
+import { serverState } from '../game/state/server-state';
 import { actionQueue } from '../queue/actionQueue';
 import { jobQueueId } from './utils';
 

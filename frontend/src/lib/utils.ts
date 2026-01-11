@@ -7,10 +7,10 @@ import { format, intervalToDuration } from 'date-fns';
 import { hc } from 'hono/client';
 import { RefObject } from 'react';
 import toast from 'react-hot-toast';
+import type { Socket } from 'socket.io-client';
 import { twMerge } from 'tailwind-merge';
 
 import type { ApiRoutes } from '../../../server';
-import type{ Socket } from 'socket.io-client';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -121,6 +121,7 @@ export const modifierChangeName = (modifier: keyof OmitModifier) => {
     intelligence: 'intelligence',
     constitution: 'constitution',
     luck: 'luck',
+    wisdom: 'wisdom',
     defense: 'defense',
     evasion: 'evasion',
     magicResistance: 'magic resistance',
@@ -151,6 +152,7 @@ export const getModifiers = (...args: Partial<OmitModifier>[]) => {
     physCritChance: 0,
     physHitChance: 0,
     strength: 0,
+    wisdom: 0,
     dexterity: 0,
     intelligence: 0,
     constitution: 0,
@@ -177,4 +179,3 @@ export function capitalize(text: string | undefined) {
   if (!text) return '';
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 }
-

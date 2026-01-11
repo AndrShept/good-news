@@ -34,6 +34,7 @@ export const Stats = memo(({ reset, setCurrentStats, currentStats, freePoints, s
   });
 
   const { mutate, isPending } = useConfirmStats({ ...currentStats, freeStatPoints: freePoints });
+  console.log(baseStats);
   const onConfirm = async () => {
     mutate();
   };

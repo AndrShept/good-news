@@ -1,7 +1,7 @@
 import { db } from '../db/db';
 import { delay } from '../lib/utils';
 import { heroService } from '../services/hero-service';
-import { serverState } from './state/hero-state';
+import { serverState } from './state/server-state';
 
 export const saveDb = {
   async walkMapComplete() {
@@ -21,7 +21,7 @@ export const saveDb = {
       }
       console.timeEnd('DB PATH SAVE ✔');
 
-      await delay(300000);
+      await delay(600000);
     }
   },
 };

@@ -15,7 +15,7 @@ import { db } from './db/db';
 import { heroTable } from './db/schema';
 import { gameLoop } from './game/gameLoop';
 import { saveDb } from './game/save-db';
-import { serverState } from './game/state/hero-state';
+import { serverState } from './game/state/server-state';
 import { heroOffline } from './lib/heroOffline';
 import { inviteGroup } from './lib/inviteGroup';
 import { joinRoom } from './lib/joinRoom';
@@ -93,7 +93,7 @@ const httpServer = serve({
   hostname: '0.0.0.0',
 });
 
-actionQueueListeners();
+// actionQueueListeners();
 
 export const io = new Server(httpServer, {
   cors: {

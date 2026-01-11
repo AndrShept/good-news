@@ -1,8 +1,8 @@
 import { getHeroOptions } from '@/features/hero/api/get-hero';
-import { Hero } from '@/shared/types';
+import { ApiGetHeroResponse, Hero } from '@/shared/types';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 
-export const useHero = <T = Hero>(select: (data: Hero | undefined) => T): T => {
+export const useHero = <T = Hero>(select: (data: ApiGetHeroResponse | undefined) => T): T => {
   const { data } = useSuspenseQuery({
     ...getHeroOptions(),
     select,

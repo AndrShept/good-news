@@ -12,6 +12,7 @@ interface UseShopItemStore {
   items: ShopItemCard[];
   isOpen: boolean;
   getTotalPrice: () => number;
+  getTotalQuantity: () => number;
   toggleIsOpen: () => void;
   onClose: () => void;
   clearAllItems: () => void;
@@ -25,6 +26,7 @@ export const useShopItemStore = create<UseShopItemStore>((set, get) => ({
   items: [],
   isOpen: false,
   totalPrice: 0,
+  totalQuantity: 0,
   onClose: () => set({ isOpen: false }),
   toggleIsOpen: () => set((state) => ({ isOpen: !state.isOpen })),
   clearAllItems: () => set(() => ({ items: [] })),
@@ -38,6 +40,9 @@ export const useShopItemStore = create<UseShopItemStore>((set, get) => ({
     }),
   removeShopItem: (id: string) => set((state) => ({ items: state.items.filter((i) => i.id === id) })),
   increment: (id: string) => set((state) => ({ items: state.items.map((i) => (i.id === id ? { ...i, quantity: i.quantity + 1 } : i)) })),
-  decrement: (id: string) => set((state) => ({ items: state.items.map((i) => (i.id === id ? { ...i, quantity: i.quantity - 1 } : i)) })),
+  decrement: (id: string) =>
+    set((state) => ({ items: state.items.map((i) => (i.id === id ? { ...i, quantity: i.quantity - 1 } : i)).filter((i) => !!i.quantity) })),
   getTotalPrice: () => get().items.reduce((acc, i) => acc + i.quantity * i.price, 0),
+  getTotalQuantity: () => get().items.reduce((acc, i) => acc + i.quantity, 0),
+
 }));

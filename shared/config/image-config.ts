@@ -1,4 +1,4 @@
-import type { ArmorType, ResourceType, SkillType, StateType, WeaponType } from '../types';
+import type { ArmorType, IHeroStat, ResourceType, SkillType, StateType, WeaponType } from '../types';
 
 export const imageConfig = {
   icon: {
@@ -29,7 +29,20 @@ export const imageConfig = {
       refresh: '/sprites/icons/ui/refresh.png',
       settings: '/sprites/icons/ui/settings.png',
       skill: '/sprites/icons/ui/skill.png',
+      gold2: '/sprites/icons/ui/gold2.png',
+      'gold-bag': '/sprites/icons/ui/gold-bag.png',
+      bag2: '/sprites/icons/ui/bag2.png',
+      bag3: '/sprites/icons/ui/bag3.png',
+      'shop-cart': '/sprites/icons/ui/shop-cart.png',
     },
+    stat: {
+      strength: '/sprites/icons/stats/strength.png',
+      dexterity: '/sprites/icons/stats/dexterity.png',
+      intelligence: '/sprites/icons/stats/intelligence.png',
+      wisdom: '/sprites/icons/stats/wisdom.png',
+      constitution: '/sprites/icons/stats/constitution.png',
+      luck: '/sprites/icons/stats/luck.png',
+    } as Record<keyof IHeroStat, string>,
     state: {
       IDLE: '/sprites/icons/state/idle.png',
       BATTLE: '/sprites/icons/state/battle.png',
@@ -72,13 +85,7 @@ export const imageConfig = {
       AMULET: '/sprites/icons/accessory/amulet.png',
       RING: '/sprites/icons/accessory/ring.png',
     },
-    stat: {
-      strength: '/sprites/icons/stats/strength.png',
-      constitution: '/sprites/icons/stats/constitution.png',
-      intelligence: '/sprites/icons/stats/intelligence.png',
-      dexterity: '/sprites/icons/stats/dexterity.png',
-      luck: '/sprites/icons/stats/luck.png',
-    },
+
     POTION: {
       buff: {
         strength: '/sprites/icons/potions/str.png',

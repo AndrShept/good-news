@@ -8,7 +8,7 @@ import { z } from 'zod';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { heroTable, locationTable } from '../db/schema';
-import { serverState } from '../game/state/hero-state';
+import { serverState } from '../game/state/server-state';
 import { loggedIn } from '../middleware/loggedIn';
 import { mapTemplate } from '../data/map-template';
 

@@ -1,6 +1,6 @@
 import type { SocketGroupResponse } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import type { GameItem, Hero, PaginatedResponse, SuccessResponse, User } from '@/shared/types';
+import type {  Hero, PaginatedResponse, SuccessResponse, User } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq, ilike, isNull, ne } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -43,7 +43,7 @@ export const groupRouter = new Hono<Context>()
         where,
       });
       const totalPages = Math.ceil(heroes.length / limit);
-      return c.json<PaginatedResponse<Hero[]>>({
+      return c.json<PaginatedResponse<typeof heroes>>({
         message: 'available heroes fetched!',
         success: true,
         data: heroes,
@@ -76,7 +76,7 @@ export const groupRouter = new Hono<Context>()
         where: eq(heroTable.groupId, id),
       });
 
-      return c.json<SuccessResponse<Hero[]>>(
+      return c.json<SuccessResponse<typeof heroes>>(
         {
           message: 'group members  fetched!',
           success: true,
