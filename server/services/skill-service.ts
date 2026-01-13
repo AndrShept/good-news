@@ -1,4 +1,4 @@
-import { calculate } from '@/shared/calculate';
+import { calculate } from '../lib/calculate';
 import type { CraftItemRequiredSkills, RarityType, ResourceType, Skill, SkillType } from '@/shared/types';
 import { and, eq, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';

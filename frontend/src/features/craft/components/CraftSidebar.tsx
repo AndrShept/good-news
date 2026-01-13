@@ -29,7 +29,7 @@ export const CraftSidebar = memo(({ craftItems, onSelect, selectedItemId }: Prop
               })}
               onClick={() => onSelect(craftItem)}
             >
-              {craftItem.gameItem?.name}
+              {craftItem.name}
             </li>
           ))}
         </ul>

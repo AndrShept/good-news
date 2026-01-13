@@ -9,13 +9,13 @@ import type {
   TItemContainer,
 } from '@/shared/types';
 
-export type IHeroServerState = Hero & {
+export type HeroRuntime = Hero & {
   paths?: PathNode[];
   offlineTimer?: number;
 };
 
 export const serverState = {
-  hero: new Map<string, IHeroServerState>(),
+  hero: new Map<string, HeroRuntime>(),
   container: new Map<string, TItemContainer>(),
   user: new Map<string, string>(),
   pathPersistQueue: new Map<string, { x: number; y: number }>(),

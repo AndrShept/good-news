@@ -21,7 +21,6 @@ import { inviteGroup } from './lib/inviteGroup';
 import { joinRoom } from './lib/joinRoom';
 import { leaveRoom } from './lib/leaveRoom';
 import { sessionHandler } from './middleware/sessionHandler';
-import { actionQueueListeners } from './queue/actionQueueListeners';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
 import { craftRouter } from './routes/craft-router';

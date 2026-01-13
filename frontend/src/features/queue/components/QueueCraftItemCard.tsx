@@ -39,11 +39,9 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
         'opacity-80 saturate-50': isPending,
       })}
     >
-      <GameItemImg className="size-10" image={props.craftItemMap[props.craftItemId]?.gameItem?.image} />
-      <p className="line-clamp-1 text-sm">{props.craftItemMap[props.craftItemId]?.gameItem?.name}</p>
-      {props.coreMaterialType && (
-        <p className={(cn(''), materialConfig[props.coreMaterialType]?.color)}>{props.coreMaterialType.toLowerCase()}</p>
-      )}
+      {/* <GameItemImg className="size-10" image={props.craftItemMap[props.craftItemId]?.gameItem?.image} />
+      <p className="line-clamp-1 text-sm">{props.craftItemMap[props.craftItemId]?.gameItem?.name}</p> */}
+  
       <p
         className={cn('text-sm', {
           'text-muted': props.status === 'PENDING',
@@ -60,13 +58,13 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
       >
         {Math.max(0, Math.ceil(timer / 1000))} сек
       </p>
-      <button
+      {/* <button
         disabled={isPending}
         onClick={() => mutate({ queueCraftItemId: props.id, buildingType: props.buildingType })}
         className={cn('absolute inset-0 hidden items-center justify-center bg-black/90 group-hover:flex')}
       >
         <X size={30} className="text-red-500" />
-      </button>
+      </button> */}
     </li>
   );
 });

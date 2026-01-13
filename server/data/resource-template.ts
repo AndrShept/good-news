@@ -15,7 +15,7 @@ export const resourceTemplate = [
       category: 'ORE',
       type: 'IRON-ORE',
     },
-
+    craftInfo: null,
   },
   {
     id: '0199df74-c722-7695-96d9-59a701689d03',
@@ -28,6 +28,7 @@ export const resourceTemplate = [
       category: 'ORE',
       type: 'COPPER-ORE',
     },
+    craftInfo: null,
   },
   {
     id: '019ac735-a9c0-7e79-98cb-e392af762b03',
@@ -40,6 +41,7 @@ export const resourceTemplate = [
       category: 'ORE',
       type: 'SILVER-ORE',
     },
+    craftInfo: null,
   },
   {
     id: '019ac738-6ec9-7763-b633-d5ed4046b6f0',
@@ -52,6 +54,7 @@ export const resourceTemplate = [
       category: 'ORE',
       type: 'GOLD-ORE',
     },
+    craftInfo: null,
   },
   {
     id: '019ac738-e2f2-79a0-9f96-968231e0853e',
@@ -64,6 +67,7 @@ export const resourceTemplate = [
       category: 'ORE',
       type: 'MITHRIL-ORE',
     },
+    craftInfo: null,
   },
   {
     id: '019ac739-be74-7813-9a75-8e8b0710a51e',
@@ -76,6 +80,7 @@ export const resourceTemplate = [
       category: 'ORE',
       type: 'ADAMANTINE-ORE',
     },
+    craftInfo: null,
   },
   {
     id: '019ac73a-d3f4-7c91-90b5-e0756f68d876',
@@ -87,6 +92,10 @@ export const resourceTemplate = [
     resourceInfo: {
       category: 'INGOT',
       type: 'IRON-INGOT',
+    },
+    craftInfo: {
+      baseResourceCategory: 'ORE',
+      requiredBuildingType: 'FORGE',
     },
   },
   {
@@ -100,6 +109,10 @@ export const resourceTemplate = [
       category: 'INGOT',
       type: 'COPPER-INGOT',
     },
+    craftInfo: {
+      baseResourceCategory: 'ORE',
+      requiredBuildingType: 'FORGE',
+    },
   },
   {
     id: '019ac73d-d28e-7d2f-87ed-3de08098de4f',
@@ -111,6 +124,10 @@ export const resourceTemplate = [
     resourceInfo: {
       category: 'INGOT',
       type: 'SILVER-INGOT',
+    },
+    craftInfo: {
+      baseResourceCategory: 'ORE',
+      requiredBuildingType: 'FORGE',
     },
   },
   {
@@ -124,6 +141,10 @@ export const resourceTemplate = [
       category: 'INGOT',
       type: 'GOLD-INGOT',
     },
+    craftInfo: {
+      baseResourceCategory: 'ORE',
+      requiredBuildingType: 'FORGE',
+    },
   },
   {
     id: '019ac73e-bd49-739f-a996-78e034cdb769',
@@ -135,6 +156,10 @@ export const resourceTemplate = [
     resourceInfo: {
       category: 'INGOT',
       type: 'MITHRIL-INGOT',
+    },
+    craftInfo: {
+      baseResourceCategory: 'ORE',
+      requiredBuildingType: 'FORGE',
     },
   },
   {
@@ -148,6 +173,10 @@ export const resourceTemplate = [
       category: 'INGOT',
       type: 'ADAMANTINE-INGOT',
     },
+    craftInfo: {
+      baseResourceCategory: 'ORE',
+      requiredBuildingType: 'FORGE',
+    },
   },
   {
     id: '019abb58-1d6a-7b1f-b277-409189ddfc64',
@@ -160,5 +189,6 @@ export const resourceTemplate = [
       category: 'LEATHER',
       type: 'REGULAR-LEATHER',
     },
+    craftInfo: null,
   },
 ] as const satisfies (typeof itemTemplateTable.$inferInsert)[];

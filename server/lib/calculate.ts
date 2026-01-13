@@ -1,6 +1,6 @@
 import { rarityXpRewards, skillExpConfig } from './config/skill-exp-config';
-import { BASE_HEALTH_REGEN_TIME, BASE_MANA_REGEN_TIME, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from './constants';
-import type { RarityType, SkillType } from './types';
+import { BASE_HEALTH_REGEN_TIME, BASE_MANA_REGEN_TIME, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../../shared/constants';
+import type { RarityType, SkillType } from '../../shared/types';
 
 export const calculate = {
   walkTime(dexterity: number) {

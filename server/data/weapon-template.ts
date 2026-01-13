@@ -11,6 +11,10 @@ export const weaponTemplate = [
       weaponHand: 'ONE_HANDED',
       weaponType: 'SWORD',
     },
+    craftInfo: {
+      baseResourceCategory: 'INGOT',
+      requiredBuildingType: 'BLACKSMITH',
+    },
     coreModifier: {
       minDamage: 10,
       maxDamage: 17,

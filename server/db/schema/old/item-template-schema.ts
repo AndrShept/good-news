@@ -1,4 +1,4 @@
-import type { OmitModifier,  TEquipInfo, TPotionInfo, TResourceInfo } from '@/shared/types';
+import type { CraftInfo, OmitModifier,  TEquipInfo, TPotionInfo, TResourceInfo } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { boolean, integer, jsonb, pgEnum, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
@@ -36,6 +36,7 @@ export const itemTemplateTable = pgTable('item_template', {
   resourceInfo: jsonb('resourceInfo').$type<TResourceInfo>(),
   potionInfo: jsonb('potionInfo').$type<TPotionInfo>(),
   coreModifier: jsonb('coreModifier').$type<Partial<OmitModifier>>(),
+  craftInfo: jsonb('craftInfo').$type<CraftInfo>(),
 });
 
 export const itemTemplateRelations = relations(itemTemplateTable, ({}) => ({}));

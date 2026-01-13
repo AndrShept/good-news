@@ -31,9 +31,9 @@ export const CraftBuilding = () => {
     <section className="flex w-full">
       <CraftSidebar craftItems={craftItems} onSelect={setCraftItem} selectedItemId={craftItem?.id} />
       <div className="flex flex-1 flex-col p-1">
-        <div className="min-h-0 flex-1">{craftItem && craftItem.gameItem && <CraftItemCard {...craftItem} />}</div>
+        <div className="min-h-0 flex-1">{craftItem  && <CraftItemCard {...craftItem} />}</div>
 
-        <QueueCraftItemsList />
+        {/* <QueueCraftItemsList /> */}
 
         <div className="mx-auto w-[200px] p-3">
           <CraftButton craftItem={craftItem} buildingType={selectBuilding?.type} />

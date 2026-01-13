@@ -7,11 +7,10 @@ import type { Socket } from 'socket.io';
 import { io } from '..';
 import { db } from '../db/db';
 import { groupTable, heroTable } from '../db/schema';
-import { generateRandomUuid } from './utils';
 
 interface IValidateGroupMembers {
-  fromHero: Hero;
-  invitedHero: Hero;
+  fromHero: typeof heroTable.$inferSelect & { group: typeof groupTable.$inferSelect | null | undefined };
+  invitedHero: typeof heroTable.$inferSelect ;
 }
 
 const validateGroupMembers = async ({ fromHero, invitedHero }: IValidateGroupMembers) => {

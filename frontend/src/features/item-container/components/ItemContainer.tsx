@@ -1,11 +1,12 @@
-import { GameItemCard } from '@/components/GameItemCard';
-import { GameItemSlot } from '@/components/GameItemSlot';
+
+import { GameItemSlot } from '@/features/item-instance/components/GameItemSlot';
 import { TItemContainer } from '@/shared/types';
 import { memo } from 'react';
 
 import { useCreateContainerItems } from '../hooks/useCreateContainerItems';
 import { ContainerCapacityInfo } from './ContainerCapacityInfo';
 import { ItemContainerSkeleton } from './ItemContainerSkeleton';
+import { ItemInstanceCard } from '@/features/item-instance/components/ItemInstanceCard';
 
 interface Props extends TItemContainer {
   isLoading: boolean;
@@ -22,21 +23,12 @@ export const ItemContainer = memo(({ capacity, itemsInstance, isLoading }: Props
       )}
       <ul className="flex w-full flex-wrap gap-1">
         {!isLoading ? (
-          items?.map((containerSlot) => {
-            if (!containerSlot) {
+          items?.map((ItemInstance) => {
+            if (!ItemInstance) {
               const id = crypto.randomUUID();
               return <GameItemSlot key={id} />;
             }
-            return (
-              <GameItemCard
-                key={containerSlot.id}
-                id={containerSlot.id}
-                gameItem={containerSlot.gameItem}
-                quantity={containerSlot.quantity}
-                itemContainerId={containerSlot.itemContainerId}
-                type="BACKPACK"
-              />
-            );
+            return <ItemInstanceCard {...ItemInstance} />;
           })
         ) : (
           <ItemContainerSkeleton />

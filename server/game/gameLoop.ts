@@ -4,5 +4,5 @@ import { saveDb } from './save-db';
 
 export const gameLoop =  () => {
   moveTick();
-  saveDb.walkMapComplete();
+  // saveDb.walkMapComplete();
 };

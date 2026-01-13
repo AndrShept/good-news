@@ -16,7 +16,7 @@ import {
   stateTypeEnum,
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
-import type { buffTemplateTable } from '../server/db/schema/buff-template-schema';
+import type { buffTemplateTable } from '../server/db/schema/old/buff-template-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import type { itemInstanceTable, rarityEnum, slotEnum } from '../server/db/schema/item-instance-schema';
 import type {
@@ -32,7 +32,7 @@ import type {
   resourceTypeEnum,
   weaponHandEnum,
   weaponTypeEnum,
-} from '../server/db/schema/item-template-schema';
+} from '../server/db/schema/old/item-template-schema';
 import type { locationTable } from '../server/db/schema/location-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { queueCraftItemTable, queueCraftStatusEnum } from '../server/db/schema/queue-craft-item-schema';
@@ -236,8 +236,10 @@ export type TPotionInfo = {
 export type OmitModifier = Omit<Modifier, 'id' | 'heroId'>;
 
 export type TItemContainer = typeof itemContainerTable.$inferSelect & {
-  itemsInstance: ItemInstance[] 
+  itemsInstance: ItemInstance[];
 };
+
+export type CraftItem = ItemTemplateInsert;
 
 export type CraftInfo = { baseResourceCategory: ResourceCategoryType; requiredBuildingType: BuildingType };
 export type CraftItemRequiredResources<T = ResourceType> = { type: T; quantity: number };
@@ -251,18 +253,19 @@ export type CraftItemRequirement<T extends IngotType | LeatherType | OreType = R
 
 export type ItemTemplate = typeof itemTemplateTable.$inferSelect;
 export type ItemInstance = typeof itemInstanceTable.$inferSelect & {
-  itemTemplate: ItemTemplate 
+  itemTemplate: ItemTemplate;
 };
+export type ItemTemplateInsert = typeof itemTemplateTable.$inferInsert;
 
 export type BuffTemplate = typeof buffTemplateTable.$inferSelect;
 export type BuffInstance = typeof buffInstanceTable.$inferSelect & {
-  buffTemplate: BuffTemplate
+  buffTemplate: BuffTemplate;
 };
 
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier: Modifier;
   location: TLocation;
-  group: Group;
+  group?: Group;
   buffs: BuffInstance[];
   equipments: ItemInstance[];
   // queueCraftItems?: QueueCraftItem[];
@@ -297,6 +300,7 @@ export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get'
 export type ApiGetMapHeroes = InferResponseType<(typeof client.map)[':id']['heroes']['$get']>['data'];
 export type ApiGetPlaceHeroes = InferResponseType<(typeof client.place)[':id']['heroes']['$get']>['data'];
 export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
+export type ApiGetCraftItemsResponse = InferResponseType<(typeof client.craft.items)[':buildingType']['$get']>['data'];
 
 // export type ApiGetCraftItemResponse = InferResponseType<(typeof client)['craft']['items'][':buildingType']['$get']>['data'];
 export type ApiGetShopItemTemplateResponse = InferResponseType<(typeof client)['shop'][':buildingType']['$get']>['data'];

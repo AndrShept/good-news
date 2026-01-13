@@ -15,17 +15,18 @@ export const useHeroBackpack = () => {
   const resourceCountInBackpack = useMemo(() => {
     const result: Partial<Record<ResourceType, number>> = {};
 
-    // if (!backpack?.containerSlots?.length) return;
+    if (!backpack) return;
     if (!allResourcesByType?.length) return;
     for (const resource of allResourcesByType) {
+      if(!resource) continue
       for (const backpackItem of backpack.itemsInstance) {
-        if (backpackItem?.gameItem?.resource?.type === resource) {
+        if (backpackItem.itemTemplate.resourceInfo?.type === resource) {
           result[resource] = (result[resource] ?? 0) + backpackItem.quantity;
         }
       }
     }
     return result;
-  }, [allResourcesByType, backpack?.containerSlots]);
+  }, [allResourcesByType, backpack]);
   return {
     resourceCountInBackpack,
     backpack,

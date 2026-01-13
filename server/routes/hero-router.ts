@@ -1,4 +1,4 @@
-import { calculate } from '@/shared/calculate';
+import { calculate } from '../lib/calculate';
 import { BANK_CONTAINER_COST, BASE_STATS, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
 import { type QueueCraftItemJob, type RegenHealthJob, type RegenManaJob, jobName } from '@/shared/job-types';
 import type {
@@ -56,7 +56,7 @@ import {
   stateTypeEnum,
 } from '../db/schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
-import { type IHeroServerState, serverState } from '../game/state/server-state';
+import { serverState } from '../game/state/server-state';
 import { heroOnline } from '../lib/heroOnline';
 import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
@@ -334,131 +334,6 @@ export const heroRouter = new Hono<Context>()
     },
   )
 
-  .post(
-    '/:id/inventory/:inventoryItemId/equip',
-    loggedIn,
-    zValidator(
-      'param',
-      z.object({
-        id: z.string(),
-        inventoryItemId: z.string(),
-      }),
-    ),
-
-    async (c) => {
-      const { id, inventoryItemId } = c.req.valid('param');
-      const userId = c.get('user')?.id as string;
-
-      // const [inventoryItem, hero, itemContainer] = await Promise.all([
-      //   containerSlotItemService(db).getContainerSlotItem(inventoryItemId, {
-      //     with: {
-      //       gameItem: { with: { weapon: true, armor: true } },
-      //     },
-      //   }),
-      //   heroService(db).getHeroByColum(id, { id: true, userId: true }),
-      //   itemContainerService(db).getHeroBackpack(id),
-      // ]);
-      // const isEquipment =
-      //   inventoryItem?.gameItem?.type === 'ARMOR' ||
-      //   inventoryItem?.gameItem?.type === 'WEAPON' ||
-      //   inventoryItem?.gameItem?.type === 'SHIELD';
-
-      // if (!isEquipment) {
-      //   throw new HTTPException(403, {
-      //     message: 'You cannot equip this item.',
-      //   });
-      // }
-      // if (!inventoryItem.gameItem) {
-      //   throw new HTTPException(403, {
-      //     message: 'inventoryItem gameItem not found',
-      //   });
-      // }
-
-      // verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.heroId, heroId: hero.id });
-      // const slot = await equipmentService(db).getEquipSlot({
-      //   itemContainerId: itemContainer.id,
-      //   item: inventoryItem.gameItem,
-      //   usedSlots: itemContainer.usedSlots,
-      //   maxSlots: itemContainer.maxSlots,
-      //   heroId: hero.id,
-      // });
-
-      // if (!slot) {
-      //   throw new HTTPException(404, {
-      //     message: 'slot not found',
-      //   });
-      // }
-      // const existingEquipItem = await equipmentService(db).findEquipItem(slot, hero.id);
-
-      // await db.transaction(async (tx) => {
-      //   if (existingEquipItem) {
-      //     await equipmentService(tx).unEquipItem({
-      //       equipmentItemId: existingEquipItem.id,
-      //       gameItemId: existingEquipItem.gameItemId,
-      //       itemContainerId: itemContainer.id,
-      //       usedSlots: itemContainer.usedSlots,
-      //       maxSlots: itemContainer.maxSlots,
-      //       heroId: hero.id,
-      //     });
-      //   }
-
-      //   await equipmentService(tx).equipItem({
-      //     gameItemId: inventoryItem.gameItemId,
-      //     heroId: hero.id,
-      //     slot,
-      //     inventoryItemId: inventoryItem.id,
-      //     itemContainerId: itemContainer.id,
-      //   });
-      // });
-
-      // return c.json<SuccessResponse>(
-      //   {
-      //     success: true,
-      //     message: 'success equipped item',
-      //   },
-      //   201,
-      // );
-    },
-  )
-  .post(
-    '/:id/equipment/:equipmentItemId/unequip',
-    loggedIn,
-    zValidator(
-      'param',
-      z.object({
-        id: z.string(),
-        equipmentItemId: z.string(),
-      }),
-    ),
-
-    async (c) => {
-      const { id, equipmentItemId } = c.req.valid('param');
-      const userId = c.get('user')?.id as string;
-      const heroState = serverState.getHeroState(id);
-      const heroBackpack = await itemContainerService(db).getHeroBackpack(heroState.id);
-
-      verifyHeroOwnership({ heroUserId: heroState.userId, userId, containerHeroId: heroBackpack.heroId, heroId: heroState.id });
-
-      // await db.transaction(async (tx) => {
-      //   await equipmentService(tx).unEquipItem({
-      //     equipmentItemId: equipmentItem.id,
-      //     gameItemId: equipmentItem.gameItemId,
-      //     heroId: hero.id,
-      //     maxSlots: heroBackpack.maxSlots,
-      //     usedSlots: heroBackpack.usedSlots,
-      //     itemContainerId: heroBackpack.id,
-      //   });
-      // });
-
-      return c.json<SuccessResponse>(
-        {
-          success: true,
-          message: `success unequipped item `,
-        },
-        201,
-      );
-    },
-  )
   .delete(
     '/:id/item-container/:itemContainerId/item/:itemInstanceId',
     loggedIn,
@@ -483,94 +358,69 @@ export const heroRouter = new Hono<Context>()
       if (findIndex === -1) {
         throw new HTTPException(404, { message: 'item instance not found' });
       }
-      const [deletedItem] = container.itemsInstance.splice(findIndex, 1)
+      const [deletedItem] = container.itemsInstance.splice(findIndex, 1);
 
-      return c.json<SuccessResponse<ItemInstance>>(
+      return c.json<SuccessResponse<{ name: string; quantity: number }>>(
         {
           success: true,
           message: `Success deleted item`,
-          data: deletedItem,
+          data: { name: deletedItem.itemTemplate.name, quantity: deletedItem.quantity },
         },
         201,
       );
     },
   )
   .post(
-    '/:id/inventory/:inventoryItemId/drink',
+    '/:id/item/:itemInstanceId/use',
     loggedIn,
     zValidator(
       'param',
       z.object({
-        id: z.string(),
-        inventoryItemId: z.string(),
+        id: z.string().uuid(),
+        itemInstanceId: z.string().uuid(),
       }),
     ),
     async (c) => {
-      const { id, inventoryItemId } = c.req.valid('param');
+      const { id, itemInstanceId } = c.req.valid('param');
       const userId = c.get('user')?.id as string;
-      const [inventoryItemPotion, hero] = await Promise.all([
-        containerSlotItemService(db).getContainerSlotItem(inventoryItemId, {
-          with: {
-            gameItem: {
-              with: {
-                potion: true,
-              },
-            },
-          },
-        }),
-        heroService(db).getHero(id),
-      ]);
-
-      if (inventoryItemPotion.gameItem?.type !== 'POTION') {
-        throw new HTTPException(403, {
-          message: 'This item not a potion',
-        });
+      const hero = heroService.getHero(id);
+      const backpack = itemContainerService.getBackpack(hero.id);
+      const findItem = backpack.itemsInstance.find((i) => i.id === itemInstanceId);
+      if (!findItem) {
+        throw new HTTPException(404, { message: 'find item not found' });
       }
-
-      const isBuffPotion = inventoryItemPotion?.gameItem?.potion?.type === 'BUFF';
-      const isHealthPotion = !!(inventoryItemPotion?.gameItem?.potion?.restore?.health ?? 0 > 0);
-      const isManaPotion = !!(inventoryItemPotion?.gameItem?.potion?.restore?.mana ?? 0 > 0);
-      const isRestorePotion = isHealthPotion && isManaPotion;
-
-      const isFullHealth = hero.currentHealth >= hero.maxHealth;
-      const isFullMana = hero.currentMana >= hero.maxMana;
-
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
       if (hero.state === 'BATTLE') {
         throw new HTTPException(403, { message: 'You cannot use potions during battle.', cause: { canShow: true } });
       }
-      if (isFullHealth && isHealthPotion && !isBuffPotion && !isRestorePotion) {
-        throw new HTTPException(400, { message: 'You are already at full health', cause: { canShow: true } });
-      }
-      if (isFullHealth && isFullMana && !isBuffPotion && isRestorePotion) {
-        throw new HTTPException(400, { message: 'You are already at full health and mana', cause: { canShow: true } });
-      }
-      if (isFullMana && isManaPotion && !isBuffPotion && !isRestorePotion) {
-        throw new HTTPException(400, { message: 'You are already at full mana', cause: { canShow: true } });
+      switch (findItem.itemTemplate.type) {
+        case 'POTION': {
+          const isBuffPotion = findItem.itemTemplate.potionInfo?.type === 'BUFF';
+          const isHealthPotion = !!(findItem.itemTemplate.potionInfo?.restore?.health ?? 0 > 0);
+          const isManaPotion = !!(findItem.itemTemplate.potionInfo?.restore?.mana ?? 0 > 0);
+          const isRestorePotion = isHealthPotion && isManaPotion;
+
+          const isFullHealth = hero.currentHealth >= hero.maxHealth;
+          const isFullMana = hero.currentMana >= hero.maxMana;
+          if (isFullHealth && isHealthPotion && !isBuffPotion && !isRestorePotion) {
+            throw new HTTPException(400, { message: 'You are already at full health', cause: { canShow: true } });
+          }
+          if (isFullHealth && isFullMana && !isBuffPotion && isRestorePotion) {
+            throw new HTTPException(400, { message: 'You are already at full health and mana', cause: { canShow: true } });
+          }
+          if (isFullMana && isManaPotion && !isBuffPotion && !isRestorePotion) {
+            throw new HTTPException(400, { message: 'You are already at full mana', cause: { canShow: true } });
+          }
+
+          break;
+        }
       }
 
-      await db.transaction(async (tx) => {
-        await heroService(tx).drinkPotion({
-          inventoryItemPotion,
-          isBuffPotion,
-          heroId: hero.id,
-          currentHealth: hero.currentHealth,
-          currentMana: hero.currentMana,
-          maxHealth: hero.maxHealth,
-          maxMana: hero.maxMana,
-        });
-        await containerSlotItemService(tx).decrementContainerSlotItemQuantity(
-          inventoryItemPotion.id,
-          hero.id,
-          inventoryItemPotion.quantity,
-        );
-      });
-
-      return c.json<SuccessResponse<ContainerSlot>>({
+      return c.json<SuccessResponse<{ name: string }>>({
         success: true,
         message: `You drink `,
-        data: inventoryItemPotion,
+        data: { name: 'POTION NAME' },
       });
     },
   )
@@ -764,10 +614,7 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
 
-      const heroState = serverState.hero.get(id);
-      if (!heroState) {
-        throw new HTTPException(404, { message: 'heroState not found' });
-      }
+      const heroState = heroService.getHero(id);
       if (!heroState.location.placeId) {
         throw new HTTPException(404, { message: 'heroState.location.placeId not found' });
       }
@@ -899,10 +746,7 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       // const { craftItemId, coreMaterialType, buildingType } = c.req.valid('json');
       // const hero = serverState.getHeroState(id);
-      // const [craftItem, coreMaterial, backpack] = await Promise.all([
-
-      //   itemContainerService(db).getHeroBackpack(id),
-      // ]);
+      // const [craftItem, coreMaterial, backpack] = await Promise.all([itemContainerService(db).getHeroBackpack(id)]);
       // verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
       // const place = placeTemplate.find((p) => p.id === hero.location.placeId);
       // const isNotInsideRequiredBuilding = place?.buildings?.every((b) => b.type !== craftItem.requiredBuildingType);
@@ -994,11 +838,11 @@ export const heroRouter = new Hono<Context>()
       //   removeOnComplete: true,
       // });
 
-      return c.json<SuccessResponse<QueueCraftItem>>({
-        message: 'craft item add to queue',
-        success: true,
-        // data: newQueueCraftItem,
-      });
+      // return c.json<SuccessResponse<QueueCraftItem>>({
+      //   message: 'craft item add to queue',
+      //   success: true,
+      //   data: newQueueCraftItem,
+      // });
     },
   )
   .delete(

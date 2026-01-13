@@ -2,7 +2,7 @@ import type { OmitModifier } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
-import { heroTable } from './hero-schema';
+import { heroTable } from '../hero-schema';
 
 export const buffTypeEnum = pgEnum('buff_type_enum', ['POSITIVE', 'NEGATIVE']);
 

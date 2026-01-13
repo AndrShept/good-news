@@ -1,4 +1,4 @@
-import { calculate } from '@/shared/calculate';
+import { calculate } from '../../lib/calculate';
 import { type BuffCreateJob, jobName } from '@/shared/job-types';
 import type { Hero, IPosition, Modifier, OmitModifier } from '@/shared/types';
 import { and, eq, sql } from 'drizzle-orm';

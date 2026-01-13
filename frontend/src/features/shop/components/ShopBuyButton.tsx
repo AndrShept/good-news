@@ -29,7 +29,7 @@ export const ShopBuyButton = ({ items }: Props) => {
       setGameMessage({
         text: data.message,
         type: 'SUCCESS',
-        // data: { gameItemName: data.data?.gameItem?.name ?? '', quantity: data.data?.quantity },
+    
       });
     },
   });

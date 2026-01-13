@@ -1,5 +1,5 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { calculate } from '@/shared/calculate';
+import { calculate } from '../../../../../server/lib/calculate';
 import { Skill, SkillType } from '@/shared/types';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';

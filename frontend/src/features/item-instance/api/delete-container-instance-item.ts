@@ -14,7 +14,8 @@ export const deleteContainerInstanceItem = async ({
     param: { id, itemContainerId, itemInstanceId },
   });
   if (!res.ok) {
-    return (await res.json()) as unknown as ErrorResponse;
+    const err = (await res.json()) as unknown as ErrorResponse;
+    throw new Error(err.message);
   }
 
   return await res.json();

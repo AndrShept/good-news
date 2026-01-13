@@ -1,11 +1,11 @@
 import { client } from '@/lib/utils';
 import { ErrorResponse } from '@/shared/types';
 
-export const drinkPotion = async ({ id, inventoryItemId }: { id: string; inventoryItemId: string }) => {
-  const res = await client.hero[':id'].inventory[':inventoryItemId'].drink.$post({
+export const itemUse = async ({ heroId, itemInstanceId }: { heroId: string; itemInstanceId: string; }) => {
+  const res = await client.hero[':id'].item[':itemInstanceId'].use.$post({
     param: {
-      id,
-      inventoryItemId,
+      id: heroId,
+      itemInstanceId,
     },
   });
   if (!res.ok) {
@@ -13,5 +13,5 @@ export const drinkPotion = async ({ id, inventoryItemId }: { id: string; invento
     throw new Error(err.message, { cause: { canShow: err.canShow } });
   }
 
-  return res.json();
+  return await res.json();
 };

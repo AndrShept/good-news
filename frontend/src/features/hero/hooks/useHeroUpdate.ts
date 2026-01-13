@@ -24,7 +24,7 @@ export const useHeroUpdate = () => {
           ...oldData.location,
           ...data.location,
         },
-        group: { ...oldData.group, ...data.group },
+        group: { ...oldData.group , ...data.group },
       } 
     });
   }, []);

@@ -34,10 +34,10 @@ export const useCreateQueueCraftItemMutation = () => {
       }
       return await res.json();
     },
-    onSuccess: ({ data }) => {
-      if (data) {
-        addQueueCraftItems(data.buildingType, data);
-      }
-    },
+    // onSuccess: ({ data }) => {
+    //   if (data) {
+    //     addQueueCraftItems(data.buildingType, data);
+    //   }
+    // },
   });
 };

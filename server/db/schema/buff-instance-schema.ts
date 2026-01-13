@@ -2,7 +2,7 @@ import type { OmitModifier } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
-import { buffTemplateTable } from './buff-template-schema';
+import { buffTemplateTable } from './old/buff-template-schema';
 import { heroTable } from './hero-schema';
 
 export const buffInstanceTable = pgTable('buff_instance', {

@@ -3,7 +3,32 @@ import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-
 
 import { heroTable } from './hero-schema';
 import { itemContainerTable } from './item-container-schema';
-import { itemTemplateTable } from './item-template-schema';
+import { itemTemplateTable } from './old/item-template-schema';
+import type { OmitModifier } from '@/shared/types';
+
+
+export const itemTemplateEnum = pgEnum('item_template_enum', ['WEAPON', 'ARMOR', 'SHIELD', 'POTION', 'RESOURCES', 'MISC', 'ACCESSORY']);
+
+export const armorCategoryEnum = pgEnum('armor_category_enum', ['PLATE', 'MAIL', 'LEATHER', 'CLOTH']);
+export const armorTypeEnum = pgEnum('armor_type_enum', ['HELMET', 'CHEST', 'LEGS', 'BELT', 'BOOTS', 'GLOVES', 'SHIELD']);
+
+export const weaponTypeEnum = pgEnum('weapon_type_enum', ['DAGGER', 'SWORD', 'AXE', 'STAFF']);
+
+export const weaponHandEnum = pgEnum('weapon_hand_enum', ['ONE_HANDED', 'TWO_HANDED']);
+
+const oreValues = ['IRON-ORE', 'COPPER-ORE', 'SILVER-ORE', 'GOLD-ORE', 'MITHRIL-ORE', 'ADAMANTINE-ORE'] as const;
+const leatherValues = ['REGULAR-LEATHER'] as const;
+const ingotValues = ['IRON-INGOT', 'COPPER-INGOT', 'SILVER-INGOT', 'GOLD-INGOT', 'MITHRIL-INGOT', 'ADAMANTINE-INGOT'] as const;
+
+export const ingotTypeEnum = pgEnum('ingot_type_enum', [...ingotValues]);
+export const oreTypeEnum = pgEnum('ore_type_enum', [...oreValues]);
+export const leatherTypeEnum = pgEnum('leather_type_enum', [...leatherValues]);
+
+export const resourceTypeEnum = pgEnum('resource_type_enum', [...oreValues, ...leatherValues, ...ingotValues]);
+export const coreMaterialTypeEnum = pgEnum('core_material_enum', [...leatherValues, ...ingotValues]);
+export const resourceCategoryEnum = pgEnum('resource_category_enum', ['ORE', 'WOOD', 'HERB', 'LEATHER', 'INGOT']);
+
+//////////////
 
 export const itemLocationEnum = pgEnum('item_location_enum', ['BANK', 'BACKPACK', 'EQUIPMENT', 'LOOT', 'MARKET']);
 export const rarityEnum = pgEnum('rarity_enum', ['COMMON', 'MAGIC', 'EPIC', 'RARE', 'LEGENDARY']);
@@ -26,6 +51,8 @@ export const itemInstanceTable = pgTable('item_instance', {
   itemContainerId: uuid().references(() => itemContainerTable.id, { onDelete: 'cascade' }),
   itemTemplateId: uuid().references(() => itemTemplateTable.id, { onDelete: 'cascade' }),
   location: itemLocationEnum().notNull(),
+  coreMaterial: coreMaterialTypeEnum(),
+  materialModifier: jsonb('materialModifier').$type<Partial<OmitModifier>>(),
   slot: slotEnum(),
   marketPrice: integer(),
   durability: integer(),
