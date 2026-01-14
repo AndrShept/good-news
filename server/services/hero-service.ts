@@ -1,8 +1,8 @@
 import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
+import { buffTemplateMapIds } from '@/shared/templates/buff-template';
 import type { Hero, OmitModifier } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
-import { buffTemplateMap, buffTemplateMapIds } from '../data/buff-template';
 import { serverState } from '../game/state/server-state';
 import { sumAllModifier } from '../lib/utils';
 import { ItemTemplateService } from './item-template-service';
@@ -25,7 +25,7 @@ export const heroService = {
     // }
     const itemsMapIds = ItemTemplateService.getAllItemsTemplateMapIds();
     const modifiers = [
-      ...hero.buffs.map((b) => buffTemplateMapIds[b.buffTemplateId].modifier),
+      ...(hero.buffs ?? []).map((b) => buffTemplateMapIds[b.buffTemplateId].modifier),
       ...(hero.equipments ?? []).map((e) => itemsMapIds[e.itemTemplateId].coreModifier),
       ...coreMaterialModifiers,
     ];

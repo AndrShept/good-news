@@ -1,4 +1,5 @@
-import type { RarityType, SkillType } from '@/shared/types';
+import type { SkillKey } from '@/shared/templates/skill-template';
+import type { RarityType } from '@/shared/types';
 
 export const skillExpConfig = {
   BLACKSMITHING: {
@@ -22,7 +23,7 @@ export const skillExpConfig = {
   REGENERATION: {
     difficultyMultiplier: 2.6,
   },
-} as const satisfies Record<SkillType, { difficultyMultiplier: number }>;
+} as const satisfies Record<SkillKey, { difficultyMultiplier: number }>;
 
 export const rarityXpRewards: Record<RarityType, number> = {
   COMMON: 10,

@@ -1,3 +1,4 @@
+import { placeTemplate } from '@/shared/templates/place-template';
 import type { HeroSidebarItem, SuccessResponse, TPlace } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq } from 'drizzle-orm';
@@ -9,7 +10,6 @@ import type { Context } from '../context';
 import { db } from '../db/db';
 import { heroTable, locationTable } from '../db/schema';
 import { loggedIn } from '../middleware/loggedIn';
-import { placeTemplate } from '../data/place-template';
 
 export const placeRouter = new Hono<Context>()
   .get(

@@ -1,3 +1,4 @@
+import { mapTemplate } from '@/shared/templates/map-template';
 import type { MapHero, SuccessResponse, TMap } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq } from 'drizzle-orm';
@@ -10,7 +11,6 @@ import { db } from '../db/db';
 import { heroTable, locationTable } from '../db/schema';
 import { serverState } from '../game/state/server-state';
 import { loggedIn } from '../middleware/loggedIn';
-import { mapTemplate } from '../data/map-template';
 
 export const mapRouter = new Hono<Context>()
   .get(
@@ -32,7 +32,6 @@ export const mapRouter = new Hono<Context>()
           message: 'map not found',
         });
       }
-
 
       return c.json<SuccessResponse<TMap>>({
         message: 'map fetched!',

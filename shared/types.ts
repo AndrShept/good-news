@@ -17,7 +17,6 @@ import {
 import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import type { itemInstanceTable, rarityEnum, slotEnum } from '../server/db/schema/item-instance-schema';
-import type { locationTable } from '../server/db/schema/location-schema';
 import type {
   armorCategoryEnum,
   armorTypeEnum,
@@ -31,10 +30,12 @@ import type {
   weaponHandEnum,
   weaponTypeEnum,
 } from '../server/db/schema/item-instance-schema';
+import type { locationTable } from '../server/db/schema/location-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { queueCraftItemTable, queueCraftStatusEnum } from '../server/db/schema/queue-craft-item-schema';
 import type { skillInstanceTable } from '../server/db/schema/skill-instance-schema';
 import type { Layer } from './json-types';
+import type { SkillKey } from './templates/skill-template';
 
 export interface SuccessResponse<T = undefined> {
   success: true;
@@ -225,13 +226,12 @@ export type RecipeTemplate = {
 
   itemTemplateId: string;
 
-  building: BuildingType;
-  category: ResourceCategoryType;
-
   timeMs: number;
   requirement: {
     resources: { templateId: string; amount: number }[];
     skills: { skillId: string; level: number }[];
+    building: BuildingType;
+    category: ResourceCategoryType;
   };
 
   defaultUnlocked: boolean;
@@ -269,6 +269,7 @@ export type ItemTemplate = {
   type: string;
   name: string;
   image: string;
+  key: string;
   stackable: boolean;
   maxStack?: number;
   buyPrice?: number;
@@ -318,6 +319,7 @@ export type SkillTemplate = {
   id: string;
   name: string;
   image: string;
+  key: SkillKey;
 };
 
 export type IPosition = {

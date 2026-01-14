@@ -1,7 +1,7 @@
 import { imageConfig } from '@/shared/config/image-config';
 import type { TMap } from '@/shared/types';
 
-import solverValley from './json/solmer-valley.json';
+import solverValley from '../../server/data/json/solmer-valley.json';
 import { placeTemplate } from './place-template';
 
 export const mapTemplate: TMap[] = [

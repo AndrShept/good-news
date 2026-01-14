@@ -1,31 +1,26 @@
 import { GameItemImg } from '@/components/GameItemImg';
-import { ModifierInfoCard } from '@/features/item-instance/components/ModifierInfoCard';
-import { WeaponInfo } from '@/features/item-instance/components/WeaponInfo';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
+import { ModifierInfoCard } from '@/features/item-instance/components/ModifierInfoCard';
+import { WeaponInfo } from '@/features/item-instance/components/WeaponInfo';
 import { useSkill } from '@/features/skill/hooks/useSkill';
 import { capitalize, cn, formatDurationFromSeconds } from '@/lib/utils';
 import { CraftItem, ItemTemplate } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 
-import { useCraftItem } from '../hooks/useCraftItem';
-
-type Props = CraftItem
+type Props = CraftItem;
 
 export const CraftItemCard = (props: Props) => {
-  const { resourceMap } = useCraftItem();
   const coreMaterialType = useCraftItemStore((state) => state.coreMaterialType);
-  const { resourceCountInBackpack } = useHeroBackpack();
-  // const requirement = getCraftItemRequirement(props.gameItem, coreMaterialType);
   const { skillMap } = useSkill();
   return (
     <ScrollArea className="h-full">
       <div className="flex flex-1 flex-col items-center text-center">
         <div className="mb-2 space-x-1 text-lg font-semibold capitalize md:text-xl">
-          <span>{props.name}</span>
+          <span>{props.itemTemplateId}</span>
         </div>
-        <GameItemImg className="md:size-15 size-10" image={props.image} />
-        <p className="text-muted-foreground/30 ">{capitalize(props.type)}</p>
+        {/*<GameItemImg className="md:size-15 size-10" image={props.image} />
+        <p className="text-muted-foreground/30 ">{capitalize(props.type)}</p>*/}
 
         <h2 className="my-1.5 text-xl text-yellow-300">Craft Info:</h2>
         <div>

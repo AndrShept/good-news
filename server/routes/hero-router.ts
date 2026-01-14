@@ -10,6 +10,10 @@ import type {
   WalkMapCompleteData,
   WalkMapStartData,
 } from '@/shared/socket-data-types';
+import { mapTemplate } from '@/shared/templates/map-template';
+import { placeTemplate } from '@/shared/templates/place-template';
+import { recipeTemplate } from '@/shared/templates/recipe-template';
+import { skillsTemplate } from '@/shared/templates/skill-template';
 import {
   type BuffInstance,
   type EquipmentSlotType,
@@ -36,10 +40,6 @@ import { z } from 'zod';
 import { io } from '..';
 import { socketEvents } from '../../shared/socket-events';
 import type { Context } from '../context';
-import { mapTemplate } from '../data/map-template';
-import { placeTemplate } from '../data/place-template';
-import { recipeTemplate } from '../data/recipe-template';
-import { skillsTemplate } from '../data/skill-template';
 import { db } from '../db/db';
 import {
   buffInstanceTable,
@@ -426,10 +426,9 @@ export const heroRouter = new Hono<Context>()
       if (hero.state !== 'IDLE') {
         throw new HTTPException(403, { message: 'You cannot use item during some action.', cause: { canShow: true } });
       }
-      switch (findItem.itemTemplate.type) {
+      const template = ItemTemplateService.getAllItemsTemplateMapIds();
+      switch (template[findItem.itemTemplateId].type) {
         case 'POTION': {
-          
-
           break;
         }
       }
@@ -999,6 +998,8 @@ export const heroRouter = new Hono<Context>()
     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
     const newPremiumCoinsValue = await db.transaction(async (tx) => {
+      heroService.spendPremCoin(hero.id, BANK_CONTAINER_COST);
+
       await tx.insert(itemContainerTable).values({
         heroId: hero.id,
         placeId: hero.location?.placeId,
@@ -1012,8 +1013,6 @@ export const heroRouter = new Hono<Context>()
         })
         .where(eq(heroTable.id, hero.id))
         .returning({ premiumCoins: heroTable.premiumCoins });
-
-      heroService.spendPremCoin(hero.id, BANK_CONTAINER_COST);
 
       return premiumCoins;
     });

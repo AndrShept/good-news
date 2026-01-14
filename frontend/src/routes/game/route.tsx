@@ -2,7 +2,7 @@ import { Game } from '@/components/Game';
 import { SocketProvider } from '@/components/providers/SocketProvider';
 import { getUserQueryOptions } from '@/features/auth/api/get-user';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { getCraftDataOptions } from '@/features/craft/api/get-craft-data';
+import { getGameDataOptions } from '@/features/hero/api/get-game-data';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
@@ -15,7 +15,7 @@ export const Route = createFileRoute('/game')({
     const [auth, hero] = await Promise.all([
       context.queryClient.ensureQueryData(getUserQueryOptions()),
       context.queryClient.ensureQueryData(getHeroOptions()),
-      // context.queryClient.ensureQueryData(getCraftDataOptions()),
+      context.queryClient.ensureQueryData(getGameDataOptions()),
     ]);
     if (!auth) {
       throw redirect({ to: '/auth/sign-in' });

@@ -1,11 +1,9 @@
+import { armorTemplate } from '@/shared/templates/armor-template';
+import { potionTemplate } from '@/shared/templates/potion-template';
+import { resourceTemplate } from '@/shared/templates/resource-template';
+import { shieldTemplate } from '@/shared/templates/shield-template';
+import { weaponTemplate } from '@/shared/templates/weapon-template';
 import type { ItemTemplate } from '@/shared/types';
-
-import { armorTemplate } from '../data/armor-template';
-import { potionTemplate } from '../data/potion-template';
-import { resourceTemplate } from '../data/resource-template';
-import { shieldTemplate } from '../data/shield-template';
-import { weaponTemplate } from '../data/weapon-template';
-import { buffTemplate } from '../data/buff-template';
 
 export const ItemTemplateService = {
   getAllItemsTemplate() {

@@ -1,5 +1,6 @@
 import { BASE_HEALTH_REGEN_TIME, BASE_MANA_REGEN_TIME, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
 import type { IMapJson } from '@/shared/json-types';
+import { mapTemplate } from '@/shared/templates/map-template';
 import type { Modifier, OmitModifier, TileType } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
@@ -7,8 +8,6 @@ import { sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import nodemailer from 'nodemailer';
 import z from 'zod';
-
-import { mapTemplate } from '../data/map-template';
 
 const schema = z.object({
   DATABASE_URL: z.string(),

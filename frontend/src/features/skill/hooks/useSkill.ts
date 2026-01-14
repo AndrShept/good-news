@@ -1,9 +1,10 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { calculate } from '../../../../../server/lib/calculate';
-import { Skill, SkillType } from '@/shared/types';
+import { SkillKey, skillTemplateById } from '@/shared/templates/skill-template';
+import { SkillInstance } from '@/shared/types';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
+import { calculate } from '../../../../../server/lib/calculate';
 import { getSkillsOptions } from '../api/get-skills';
 
 export const useSkill = () => {
@@ -13,10 +14,11 @@ export const useSkill = () => {
     () =>
       skills?.reduce(
         (acc, skill) => {
-          acc[skill.type] = calculate.getExpSkillToNextLevel(skill.type, skill.level);
+          const template = skillTemplateById[skill.skillTemplateId];
+          acc[template.key] = calculate.getExpSkillToNextLevel(template.key, skill.level);
           return acc;
         },
-        {} as Record<SkillType, number>,
+        {} as Record<SkillKey, number>,
       ),
     [skills],
   );
@@ -24,10 +26,11 @@ export const useSkill = () => {
     () =>
       skills?.reduce(
         (acc, skill) => {
-          acc[skill.type] = skill;
+          const template = skillTemplateById[skill.skillTemplateId];
+          acc[template.key] = skill;
           return acc;
         },
-        {} as Record<SkillType, Skill>,
+        {} as Record<SkillKey, SkillInstance>,
       ),
     [skills],
   );
