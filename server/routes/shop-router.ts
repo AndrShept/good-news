@@ -6,9 +6,8 @@ import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
 import type { Context } from '../context';
-import { db } from '../db/db';
-import { itemTemplateTable } from '../db/schema';
 import { loggedIn } from '../middleware/loggedIn';
+import { ItemTemplateService } from '../services/item-template-service';
 
 export const shopRouter = new Hono<Context>().get(
   '/:buildingType',
@@ -21,20 +20,8 @@ export const shopRouter = new Hono<Context>().get(
   ),
   async (c) => {
     const { buildingType } = c.req.valid('param');
-    // let shopItems: ItemTemplate[] = [];
-    // if (buildingType === 'MAGIC-SHOP') {
-    //   shopItems = await db.query.itemTemplateTable.findMany({
-    //     where: eq(itemTemplateTable.type, 'POTION'),
-    //     orderBy: asc(itemTemplateTable.type),
-    //   });
-    // } else {
-    //   shopItems = await db.query.itemTemplateTable.findMany({
-    //     orderBy: asc(itemTemplateTable.type),
-    //   });
-    // }
-    const shopItems = await db.query.itemTemplateTable.findMany({
-      orderBy: asc(itemTemplateTable.type),
-    });
+
+    const shopItems = ItemTemplateService.getAllItemsTemplate();
 
     return c.json<SuccessResponse<ItemTemplate[]>>({
       message: 'items fetched!',

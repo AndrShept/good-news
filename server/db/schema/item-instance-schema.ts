@@ -1,11 +1,9 @@
+import type { OmitModifier } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { heroTable } from './hero-schema';
 import { itemContainerTable } from './item-container-schema';
-import { itemTemplateTable } from './old/item-template-schema';
-import type { OmitModifier } from '@/shared/types';
-
 
 export const itemTemplateEnum = pgEnum('item_template_enum', ['WEAPON', 'ARMOR', 'SHIELD', 'POTION', 'RESOURCES', 'MISC', 'ACCESSORY']);
 
@@ -49,7 +47,7 @@ export const itemInstanceTable = pgTable('item_instance', {
   id: uuid().primaryKey().defaultRandom().notNull(),
   ownerHeroId: uuid().references(() => heroTable.id, { onDelete: 'cascade' }),
   itemContainerId: uuid().references(() => itemContainerTable.id, { onDelete: 'cascade' }),
-  itemTemplateId: uuid().references(() => itemTemplateTable.id, { onDelete: 'cascade' }),
+  itemTemplateId: uuid().notNull(),
   location: itemLocationEnum().notNull(),
   coreMaterial: coreMaterialTypeEnum(),
   materialModifier: jsonb('materialModifier').$type<Partial<OmitModifier>>(),
@@ -68,9 +66,5 @@ export const itemInstanceRelations = relations(itemInstanceTable, ({ one }) => (
   itemContainer: one(itemContainerTable, {
     fields: [itemInstanceTable.itemContainerId],
     references: [itemContainerTable.id],
-  }),
-  itemTemplate: one(itemTemplateTable, {
-    fields: [itemInstanceTable.itemTemplateId],
-    references: [itemTemplateTable.id],
   }),
 }));

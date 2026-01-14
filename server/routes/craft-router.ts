@@ -1,4 +1,4 @@
-import { type CraftItem, type ItemTemplate, type ItemTemplateInsert, type SuccessResponse, buildingValues } from '@/shared/types';
+import { type CraftItem, type ItemTemplate, type SuccessResponse, buildingValues } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -10,7 +10,6 @@ import { type IMaterialModifierConfig, materialModifierConfig } from '../lib/con
 import type { Context } from '../context';
 import { resourceTemplate } from '../data/resource-template';
 import { db } from '../db/db';
-import { itemTemplateTable } from '../db/schema';
 import { loggedIn } from '../middleware/loggedIn';
 import { ItemTemplateService } from '../services/item-template-service';
 
@@ -30,12 +29,12 @@ export const craftRouter = new Hono<Context>()
 
       let craftItems: CraftItem[] = [];
 
-      if (buildingType === 'FORGE') {
-        craftItems = resourceTemplate.filter((r) => r.craftInfo?.requiredBuildingType === 'FORGE');
-      }
-      if (buildingType === 'BLACKSMITH') {
-        craftItems = ItemTemplateService.getAllItemsTemplate().filter((t) => t.craftInfo?.requiredBuildingType === 'BLACKSMITH');
-      }
+      // if (buildingType === 'FORGE') {
+      //   craftItems = resourceTemplate.filter((r) => r.craftInfo?.requiredBuildingType === 'FORGE');
+      // }
+      // if (buildingType === 'BLACKSMITH') {
+      //   craftItems = ItemTemplateService.getAllItemsTemplate().filter((t) => t.craftInfo?.requiredBuildingType === 'BLACKSMITH');
+      // }
 
       return c.json<SuccessResponse<CraftItem[]>>({
         message: 'craft item fetched!',

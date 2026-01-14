@@ -1,4 +1,4 @@
-import type { itemTemplateTable } from '../db/schema';
+import type { ItemTemplate } from '@/shared/types';
 
 export const shieldTemplate = [
   {
@@ -10,13 +10,10 @@ export const shieldTemplate = [
     equipInfo: {
       armorType: 'SHIELD',
     },
-    craftInfo: {
-      baseResourceCategory: 'INGOT',
-      requiredBuildingType: 'BLACKSMITH',
-    },
+
     coreModifier: {
       defense: 20,
       evasion: -10,
     },
   },
-] as const satisfies (typeof itemTemplateTable.$inferInsert)[];
+] as const satisfies ItemTemplate[];

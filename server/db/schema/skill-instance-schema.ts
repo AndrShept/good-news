@@ -3,25 +3,14 @@ import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-
 
 import { heroTable } from './hero-schema';
 
-export const skillsTypeEnum = pgEnum('skill_type_enum', [
-  'BLACKSMITHING',
-  'MINING',
-  'SMELTING',
-  'ALCHEMY',
-  'TAILORING',
-  'REGENERATION',
-  'MEDITATION',
-]);
-
-export const skillTable = pgTable('skill', {
+export const skillInstanceTable = pgTable('skill_instance', {
   id: uuid().primaryKey().defaultRandom().notNull(),
-  name: text().notNull(),
-  type: skillsTypeEnum().notNull(),
   level: integer().notNull().default(1),
   currentExperience: integer().notNull().default(0),
   heroId: uuid()
     .references(() => heroTable.id, { onDelete: 'cascade' })
     .notNull(),
+  skillTemplateId: uuid().notNull(),
   createdAt: timestamp('created_at', {
     mode: 'string',
     withTimezone: true,
@@ -30,9 +19,9 @@ export const skillTable = pgTable('skill', {
     .notNull(),
 });
 
-export const skillTableRelations = relations(skillTable, ({ one }) => ({
+export const skillTableRelations = relations(skillInstanceTable, ({ one }) => ({
   hero: one(heroTable, {
-    fields: [skillTable.heroId],
+    fields: [skillInstanceTable.heroId],
     references: [heroTable.id],
   }),
 }));

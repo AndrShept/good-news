@@ -1,7 +1,8 @@
 import { imageConfig } from '@/shared/config/image-config';
 import { DEFAULT_ITEM_STACK } from '@/shared/constants';
+import type { ItemTemplate } from '@/shared/types';
 
-import type { itemTemplateTable } from '../db/schema';
+import { buffTemplateMap } from './buff-template';
 
 export const potionTemplate = [
   {
@@ -14,9 +15,8 @@ export const potionTemplate = [
     buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
-      buffTemplateId: '019b946f-742c-7627-9de6-73af060a03e4',
+      buffTemplateId: buffTemplateMap['Effect of Might'].id,
     },
-    craftInfo: null,
   },
   {
     id: '019b94bf-87a4-7d81-809a-891133ed1264',
@@ -28,9 +28,8 @@ export const potionTemplate = [
     buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
-      buffTemplateId: '019b9470-df1c-7946-a8cf-1c4083a34253',
+      buffTemplateId: buffTemplateMap['Effect of Vitality'].id,
     },
-    craftInfo: null,
   },
   {
     id: '019b94c0-8d44-781a-8e28-4f21c2312f19',
@@ -42,9 +41,21 @@ export const potionTemplate = [
     buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
-      buffTemplateId: '019b94b9-0900-7d19-8f06-43a153ae7c94',
+      buffTemplateId: buffTemplateMap['Effect of Arcane'].id,
     },
-    craftInfo: null,
+  },
+  {
+    id: '019b94c0-8d44-781a-8e28-4f21c2312f19',
+    image: imageConfig.icon.POTION.buff.intelligence,
+    name: 'wisdom potion',
+    type: 'POTION',
+    stackable: true,
+    maxStack: DEFAULT_ITEM_STACK.POTION,
+    buyPrice: 100,
+    potionInfo: {
+      type: 'BUFF',
+      buffTemplateId: buffTemplateMap['Effect of Clarity'].id,
+    },
   },
   {
     id: '019b94c1-48b3-7466-873f-9e98bbabe3ca',
@@ -56,9 +67,8 @@ export const potionTemplate = [
     buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
-      buffTemplateId: '019b94b9-c90d-7961-a800-9213835a04ab',
+      buffTemplateId: buffTemplateMap['Effect of Agility'].id,
     },
-    craftInfo: null,
   },
   {
     id: '019b94c2-032c-7199-aafc-adac4156454b',
@@ -70,9 +80,8 @@ export const potionTemplate = [
     buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
-      buffTemplateId: '019b94ba-985f-71b2-b657-549b6c411139',
+      buffTemplateId: buffTemplateMap['Effect of Fortune'].id,
     },
-    craftInfo: null,
   },
   {
     id: '019b94c3-26c8-7f32-8aff-6c3c619be13f',
@@ -86,7 +95,6 @@ export const potionTemplate = [
       type: 'RESTORE',
       restore: { health: 50 },
     },
-    craftInfo: null,
   },
   {
     id: '019b94c5-e0c8-7b6a-871e-344b3a6825be',
@@ -100,7 +108,6 @@ export const potionTemplate = [
       type: 'RESTORE',
       restore: { mana: 70 },
     },
-    craftInfo: null,
   },
   {
     id: '019b94dc-f13a-7065-bc19-54812d686d0d',
@@ -114,7 +121,6 @@ export const potionTemplate = [
       type: 'RESTORE',
       restore: { health: 35, mana: 40 },
     },
-    craftInfo: null,
   },
   {
     id: '019b94de-40d3-7325-bc62-b3de30b46b25',
@@ -128,7 +134,6 @@ export const potionTemplate = [
       type: 'RESTORE',
       restore: { health: 100 },
     },
-    craftInfo: null,
   },
   {
     id: '019b94de-ef34-72dd-9952-763d5d16cfc9',
@@ -142,7 +147,6 @@ export const potionTemplate = [
       type: 'RESTORE',
       restore: { mana: 150 },
     },
-    craftInfo: null,
   },
   {
     id: '019b94df-aa16-7cff-9152-f86be3a7df11',
@@ -156,6 +160,5 @@ export const potionTemplate = [
       type: 'RESTORE',
       restore: { health: 70, mana: 90 },
     },
-    craftInfo: null,
   },
-] as const satisfies (typeof itemTemplateTable.$inferInsert)[];
+] as const satisfies ItemTemplate[];

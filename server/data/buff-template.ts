@@ -1,6 +1,5 @@
 import { imageConfig } from '@/shared/config/image-config';
-
-import type { buffTemplateTable } from '../db/schema';
+import type { BuffTemplate } from '@/shared/types';
 
 export const buffTemplate = [
   {
@@ -21,7 +20,15 @@ export const buffTemplate = [
   },
   {
     id: '019b94b9-0900-7d19-8f06-43a153ae7c94',
-    name: 'Effect of Wisdom',
+    name: 'Effect of Clarity',
+    image: imageConfig.icon.POTION.buff.intelligence,
+    type: 'POSITIVE',
+    duration: 60 * 60 * 1000,
+    modifier: { wisdom: 8 },
+  },
+  {
+    id: '019bb762-7011-7230-b9eb-1a9ece3a7700',
+    name: 'Effect of Arcane',
     image: imageConfig.icon.POTION.buff.intelligence,
     type: 'POSITIVE',
     duration: 60 * 60 * 1000,
@@ -43,4 +50,22 @@ export const buffTemplate = [
     duration: 60 * 60 * 1000,
     modifier: { luck: 8 },
   },
-] as const satisfies (typeof buffTemplateTable.$inferInsert)[];
+] as const satisfies BuffTemplate[];
+
+const names = buffTemplate.map((i) => i.name);
+type BuffTemplateName = (typeof names)[number];
+
+export const buffTemplateMap = buffTemplate.reduce(
+  (acc, template) => {
+    acc[template.name] = template;
+    return acc;
+  },
+  {} as Record<BuffTemplateName, BuffTemplate>,
+);
+export const buffTemplateMapIds = buffTemplate.reduce(
+  (acc, template) => {
+    acc[template.id] = template;
+    return acc;
+  },
+  {} as Record<string, BuffTemplate>,
+);

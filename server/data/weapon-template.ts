@@ -1,4 +1,6 @@
-import type { itemTemplateTable } from '../db/schema';
+import type { ItemTemplate } from '@/shared/types';
+
+
 
 export const weaponTemplate = [
   {
@@ -11,13 +13,10 @@ export const weaponTemplate = [
       weaponHand: 'ONE_HANDED',
       weaponType: 'SWORD',
     },
-    craftInfo: {
-      baseResourceCategory: 'INGOT',
-      requiredBuildingType: 'BLACKSMITH',
-    },
+
     coreModifier: {
       minDamage: 10,
       maxDamage: 17,
     },
   },
-] as const satisfies (typeof itemTemplateTable.$inferInsert)[];
+] as const satisfies ItemTemplate[];

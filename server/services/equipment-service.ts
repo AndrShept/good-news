@@ -4,10 +4,6 @@ import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 
 export const equipmentService = {
-  async equipItem() {},
-
-  async unEquipItem() {},
-
   findEquipItem(slot: EquipmentSlotType, heroId: string) {
     const hero = heroService.getHero(heroId);
     const equipItem = hero.equipments.find((e) => e.slot === slot);
@@ -44,4 +40,7 @@ export const equipmentService = {
       return 'RIGHT_HAND';
     }
   },
+  equipItem() {},
+
+  unEquipItem() {},
 };

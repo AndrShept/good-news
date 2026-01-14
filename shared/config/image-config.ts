@@ -1,4 +1,4 @@
-import type { ArmorType, IHeroStat, ResourceType, SkillType, StateType, WeaponType } from '../types';
+import type { ArmorType, IHeroStat, ResourceType, StateType, WeaponType } from '../types';
 
 export const imageConfig = {
   icon: {
@@ -56,7 +56,7 @@ export const imageConfig = {
       TAILORING: '/sprites/icons/skills/tailoring.png',
       REGENERATION: '/sprites/icons/skills/regeneration.png',
       MEDITATION: '/sprites/icons/skills/meditation.png',
-    } as Record<SkillType, string>,
+    } ,
     place: {
       mine: '/sprites/icons/places/mine.png',
       solmer: '/sprites/icons/places/solmer.webp',

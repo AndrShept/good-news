@@ -8,8 +8,6 @@ import { groupTable } from './group-schema';
 import { itemContainerTable } from './item-container-schema';
 import { locationTable } from './location-schema';
 import { modifierTable } from './modifier-schema';
-import { queueCraftItemTable } from './queue-craft-item-schema';
-import { skillTable } from './skill-schema';
 
 export const stateTypeEnum = pgEnum('state_type_enum', ['CHARACTER', 'IDLE', 'BATTLE', 'CRAFT', 'WALK']);
 
@@ -61,8 +59,6 @@ export const heroRelations = relations(heroTable, ({ one, many }) => ({
     references: [userTable.id],
   }),
 
-  queueCraftItems: many(queueCraftItemTable),
   buffs: many(buffInstanceTable),
-  skills: many(skillTable),
   itemContainers: many(itemContainerTable),
 }));

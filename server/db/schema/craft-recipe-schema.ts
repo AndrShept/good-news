@@ -6,8 +6,8 @@ export const craftRecipeTable = pgTable('craft_recipe', {
   id: uuid().primaryKey().defaultRandom().notNull(),
   heroId: uuid().references(() => heroTable.id, {
     onDelete: 'set null',
-  }),
-  itemTemplateId: uuid(),
+  }).notNull(),
+  recipeId: uuid().notNull(),
   createdAt: timestamp('created_at', {
     withTimezone: true,
     mode: 'string',

@@ -1,4 +1,3 @@
-import { calculate } from '../lib/calculate';
 import { BANK_CONTAINER_COST, BASE_STATS, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
 import { type QueueCraftItemJob, type RegenHealthJob, type RegenManaJob, jobName } from '@/shared/job-types';
 import type {
@@ -19,7 +18,6 @@ import {
   type ItemInstance,
   type PathNode,
   type QueueCraftItem,
-  type Skill,
   type SuccessResponse,
   type TItemContainer,
   type WeaponHandType,
@@ -40,23 +38,26 @@ import { socketEvents } from '../../shared/socket-events';
 import type { Context } from '../context';
 import { mapTemplate } from '../data/map-template';
 import { placeTemplate } from '../data/place-template';
+import { recipeTemplate } from '../data/recipe-template';
+import { skillsTemplate } from '../data/skill-template';
 import { db } from '../db/db';
 import {
   buffInstanceTable,
   coreMaterialTypeEnum,
+  craftRecipeTable,
   heroTable,
   itemContainerTable,
   itemInstanceTable,
   locationTable,
   modifierTable,
   resourceTypeEnum,
-  skillTable,
-  skillsTypeEnum,
+  skillInstanceTable,
   slotEnum,
   stateTypeEnum,
 } from '../db/schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
 import { serverState } from '../game/state/server-state';
+import { calculate } from '../lib/calculate';
 import { heroOnline } from '../lib/heroOnline';
 import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
@@ -64,6 +65,7 @@ import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
 import { heroService } from '../services/hero-service';
 import { itemContainerService } from '../services/item-container-service';
+import { ItemTemplateService } from '../services/item-template-service';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -83,8 +85,6 @@ export const heroRouter = new Hono<Context>()
             group: true,
             location: true,
 
-            buffs: { with: { buffTemplate: true } },
-            queueCraftItems: true,
             itemContainers: { columns: { id: true, type: true, name: true }, where: eq(itemContainerTable.type, 'BACKPACK') },
           },
         });
@@ -95,10 +95,9 @@ export const heroRouter = new Hono<Context>()
         }
         heroId = hero.id;
         stateHeroId = hero.id;
-        console.log('FETCH HERO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        console.log('FETCH HERO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         const equipments = await db.query.itemInstanceTable.findMany({
           where: and(eq(itemInstanceTable.ownerHeroId, hero.id), eq(itemInstanceTable.location, 'EQUIPMENT')),
-          with: { itemTemplate: true },
         });
         serverState.user.set(userId, hero.id);
         const setData = { ...hero, equipments };
@@ -117,6 +116,37 @@ export const heroRouter = new Hono<Context>()
         success: true,
         message: 'hero fetched',
         data: returnData,
+      });
+    },
+  )
+  .get(
+    '/:id/craft-recipe',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string().uuid(),
+      }),
+    ),
+
+    async (c) => {
+      const userId = c.get('user')?.id as string;
+      const { id } = c.req.valid('param');
+      const hero = heroService.getHero(id);
+      verifyHeroOwnership({ heroUserId: hero.userId, userId });
+
+      const learnedItems = await db.query.craftRecipeTable.findMany({
+        where: eq(craftRecipeTable.heroId, hero.id),
+        columns: { recipeId: true },
+      });
+      const defaultRecipe = recipeTemplate.filter((r) => r.defaultUnlocked === true).map((i) => ({ recipeId: i.id }));
+
+      const mergedRecipe = [...learnedItems, ...defaultRecipe];
+
+      return c.json<SuccessResponse<typeof mergedRecipe>>({
+        success: true,
+        message: 'craft items fetched',
+        data: mergedRecipe,
       });
     },
   )
@@ -190,11 +220,10 @@ export const heroRouter = new Hono<Context>()
         heroId: newHero.id,
         placeId: place.id,
       });
-      for (const skill of skillsTypeEnum.enumValues) {
-        await tx.insert(skillTable).values({
+      for (const skill of skillsTemplate) {
+        await tx.insert(skillInstanceTable).values({
           heroId: newHero.id,
-          name: skill.toLowerCase(),
-          type: skill,
+          skillTemplateId: skill.id,
         });
       }
 
@@ -286,20 +315,23 @@ export const heroRouter = new Hono<Context>()
       const heroState = heroService.getHero(id);
       let containerState = serverState.container.get(itemContainerId);
       if (!containerState) {
-        console.log('FETCH CONTAINER !!!!!!!!!!!!!! CONTAINER');
+        console.log('FETCH CONTAINER !!!!!!!!!!!');
 
         const itemContainer = await db.query.itemContainerTable.findFirst({
           where: eq(itemContainerTable.id, itemContainerId),
-          with: { itemsInstance: { with: { itemTemplate: true } } },
+          with: { itemsInstance: true },
         });
         if (!itemContainer) {
           throw new HTTPException(404, { message: 'itemContainer not found' });
         }
-        containerState = itemContainer as TItemContainer;
-        serverState.container.set(itemContainer.id, itemContainer as TItemContainer);
+
+        containerState = itemContainer;
+
+        verifyHeroOwnership({ heroUserId: heroState.userId, userId, containerHeroId: containerState.heroId, heroId: heroState.id });
+
+        serverState.container.set(itemContainer.id, itemContainer);
       }
 
-      verifyHeroOwnership({ heroUserId: heroState.userId, userId, containerHeroId: containerState.heroId, heroId: heroState.id });
       return c.json<SuccessResponse<TItemContainer>>({
         message: `container fetched !!!`,
         success: true,
@@ -359,12 +391,12 @@ export const heroRouter = new Hono<Context>()
         throw new HTTPException(404, { message: 'item instance not found' });
       }
       const [deletedItem] = container.itemsInstance.splice(findIndex, 1);
-
+      const mapIds = ItemTemplateService.getAllItemsTemplateMapIds();
       return c.json<SuccessResponse<{ name: string; quantity: number }>>(
         {
           success: true,
           message: `Success deleted item`,
-          data: { name: deletedItem.itemTemplate.name, quantity: deletedItem.quantity },
+          data: { name: mapIds[deletedItem.itemTemplateId].name, quantity: deletedItem.quantity },
         },
         201,
       );
@@ -387,31 +419,16 @@ export const heroRouter = new Hono<Context>()
       const backpack = itemContainerService.getBackpack(hero.id);
       const findItem = backpack.itemsInstance.find((i) => i.id === itemInstanceId);
       if (!findItem) {
-        throw new HTTPException(404, { message: 'find item not found' });
+        throw new HTTPException(404, { message: 'backpack find item not found' });
       }
-      verifyHeroOwnership({ heroUserId: hero.userId, userId });
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.heroId, heroId: hero.id });
 
-      if (hero.state === 'BATTLE') {
-        throw new HTTPException(403, { message: 'You cannot use potions during battle.', cause: { canShow: true } });
+      if (hero.state !== 'IDLE') {
+        throw new HTTPException(403, { message: 'You cannot use item during some action.', cause: { canShow: true } });
       }
       switch (findItem.itemTemplate.type) {
         case 'POTION': {
-          const isBuffPotion = findItem.itemTemplate.potionInfo?.type === 'BUFF';
-          const isHealthPotion = !!(findItem.itemTemplate.potionInfo?.restore?.health ?? 0 > 0);
-          const isManaPotion = !!(findItem.itemTemplate.potionInfo?.restore?.mana ?? 0 > 0);
-          const isRestorePotion = isHealthPotion && isManaPotion;
-
-          const isFullHealth = hero.currentHealth >= hero.maxHealth;
-          const isFullMana = hero.currentMana >= hero.maxMana;
-          if (isFullHealth && isHealthPotion && !isBuffPotion && !isRestorePotion) {
-            throw new HTTPException(400, { message: 'You are already at full health', cause: { canShow: true } });
-          }
-          if (isFullHealth && isFullMana && !isBuffPotion && isRestorePotion) {
-            throw new HTTPException(400, { message: 'You are already at full health and mana', cause: { canShow: true } });
-          }
-          if (isFullMana && isManaPotion && !isBuffPotion && !isRestorePotion) {
-            throw new HTTPException(400, { message: 'You are already at full mana', cause: { canShow: true } });
-          }
+          
 
           break;
         }
@@ -428,14 +445,19 @@ export const heroRouter = new Hono<Context>()
     const userId = c.get('user')?.id;
     const { id } = c.req.valid('param');
     const hero = heroService.getHero(id);
-
     verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
-    const buffs = await db.query.buffInstanceTable.findMany({
-      where: eq(buffInstanceTable.ownerHeroId, hero.id),
-      with: { buffTemplate: true },
-    });
-    return c.json<SuccessResponse<BuffInstance[]>>({
+    let buffs = serverState.buff.get(hero.id);
+    if (!buffs) {
+      console.log('FETCH BUFFS!!!!!');
+      const buffsDb = await db.query.buffInstanceTable.findMany({
+        where: eq(buffInstanceTable.ownerHeroId, hero.id),
+      });
+      buffs = buffsDb;
+      serverState.buff.set(hero.id, buffsDb);
+    }
+
+    return c.json<SuccessResponse<typeof buffs>>({
       message: 'buffs fetched!',
       success: true,
       data: buffs,
@@ -930,13 +952,19 @@ export const heroRouter = new Hono<Context>()
     const { id } = c.req.valid('param');
 
     const hero = heroService.getHero(id);
-    const skills = await db.query.skillTable.findMany({
-      where: eq(skillTable.heroId, hero.id),
-    });
+    let skills = serverState.skill.get(hero.id);
+    if (!skills) {
+      console.log('FETCH SKILLS!!!!!');
+      const skillsDb = await db.query.skillInstanceTable.findMany({
+        where: eq(skillInstanceTable.heroId, hero.id),
+      });
+      skills = skillsDb;
+      serverState.skill.set(hero.id, skillsDb);
+    }
 
     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-    return c.json<SuccessResponse<Skill[]>>({
+    return c.json<SuccessResponse<typeof skills>>({
       message: 'skills fetched',
       success: true,
       data: skills,

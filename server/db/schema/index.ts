@@ -11,5 +11,5 @@ export * from './buff-instance-schema';
 export * from './group-schema';
 export * from './location-schema';
 export * from './queue-craft-item-schema';
-export * from './skill-schema';
+export * from './skill-instance-schema';
 export * from './craft-recipe-schema';

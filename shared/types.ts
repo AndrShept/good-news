@@ -6,36 +6,34 @@ import { z } from 'zod';
 import type { client } from '../frontend/src/lib/utils';
 import {
   buffInstanceTable,
+  craftRecipeTable,
   groupTable,
   heroTable,
   itemContainerTable,
   itemContainerTypeEnum,
   modifierTable,
-  skillTable,
-  skillsTypeEnum,
   stateTypeEnum,
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
-import type { buffTemplateTable } from '../server/db/schema/old/buff-template-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import type { itemInstanceTable, rarityEnum, slotEnum } from '../server/db/schema/item-instance-schema';
+import type { locationTable } from '../server/db/schema/location-schema';
 import type {
   armorCategoryEnum,
   armorTypeEnum,
   coreMaterialTypeEnum,
   ingotTypeEnum,
   itemTemplateEnum,
-  itemTemplateTable,
   leatherTypeEnum,
   oreTypeEnum,
   resourceCategoryEnum,
   resourceTypeEnum,
   weaponHandEnum,
   weaponTypeEnum,
-} from '../server/db/schema/old/item-template-schema';
-import type { locationTable } from '../server/db/schema/location-schema';
+} from '../server/db/schema/item-instance-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { queueCraftItemTable, queueCraftStatusEnum } from '../server/db/schema/queue-craft-item-schema';
+import type { skillInstanceTable } from '../server/db/schema/skill-instance-schema';
 import type { Layer } from './json-types';
 
 export interface SuccessResponse<T = undefined> {
@@ -168,7 +166,6 @@ export type CoreMaterialType = (typeof coreMaterialTypeEnum.enumValues)[number];
 export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[number];
 export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
 export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number];
-export type SkillType = (typeof skillsTypeEnum.enumValues)[number];
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
@@ -217,6 +214,39 @@ export type TMap = {
   layers: Layer[];
 };
 
+export type OmitModifier = Omit<Modifier, 'id' | 'heroId'>;
+
+export type TItemContainer = typeof itemContainerTable.$inferSelect & {
+  itemsInstance: ItemInstance[];
+};
+
+export type RecipeTemplate = {
+  id: string;
+
+  itemTemplateId: string;
+
+  building: BuildingType;
+  category: ResourceCategoryType;
+
+  timeMs: number;
+  requirement: {
+    resources: { templateId: string; amount: number }[];
+    skills: { skillId: string; level: number }[];
+  };
+
+  defaultUnlocked: boolean;
+};
+
+export type CraftItem = RecipeTemplate;
+
+// export type CraftInfo = { baseResourceCategory: ResourceCategoryType; requiredBuildingType: BuildingType, requirement: CraftItemRequirement };
+
+// export type CraftItemRequirement = {
+//   resources: { id: string; amount: number }[];
+//   skills: { id: string; level: number }[];
+//   timeMs: number;
+// };
+
 export type TEquipInfo = {
   weaponType?: WeaponType;
   weaponHand?: WeaponHandType;
@@ -233,39 +263,36 @@ export type TPotionInfo = {
   buffTemplateId?: string;
 };
 
-export type OmitModifier = Omit<Modifier, 'id' | 'heroId'>;
+export type ItemInstance = typeof itemInstanceTable.$inferSelect;
+export type ItemTemplate = {
+  id: string;
+  type: string;
+  name: string;
+  image: string;
+  stackable: boolean;
+  maxStack?: number;
+  buyPrice?: number;
 
-export type TItemContainer = typeof itemContainerTable.$inferSelect & {
-  itemsInstance: ItemInstance[];
+  equipInfo?: TEquipInfo;
+  // resourceInfo?: TResourceInfo;
+  potionInfo?: TPotionInfo;
+  coreModifier?: Partial<OmitModifier>;
 };
 
-export type CraftItem = ItemTemplateInsert;
-
-export type CraftInfo = { baseResourceCategory: ResourceCategoryType; requiredBuildingType: BuildingType };
-export type CraftItemRequiredResources<T = ResourceType> = { type: T; quantity: number };
-export type CraftItemRequiredSkills = { type: SkillType; level: number };
-
-export type CraftItemRequirement<T extends IngotType | LeatherType | OreType = ResourceType> = {
-  resources: CraftItemRequiredResources<T>[];
-  skills: CraftItemRequiredSkills[];
-  craftTime: number;
-};
-
-export type ItemTemplate = typeof itemTemplateTable.$inferSelect;
-export type ItemInstance = typeof itemInstanceTable.$inferSelect & {
-  itemTemplate: ItemTemplate;
-};
-export type ItemTemplateInsert = typeof itemTemplateTable.$inferInsert;
-
-export type BuffTemplate = typeof buffTemplateTable.$inferSelect;
-export type BuffInstance = typeof buffInstanceTable.$inferSelect & {
-  buffTemplate: BuffTemplate;
+export type BuffInstance = typeof buffInstanceTable.$inferSelect;
+export type BuffTemplate = {
+  id: string;
+  name: string;
+  image: string;
+  type: 'POSITIVE' | 'NEGATIVE';
+  duration: number;
+  modifier: Partial<OmitModifier>;
 };
 
 export type Hero = InferSelectModel<typeof heroTable> & {
   modifier: Modifier;
   location: TLocation;
-  group?: Group;
+  group: Group;
   buffs: BuffInstance[];
   equipments: ItemInstance[];
   // queueCraftItems?: QueueCraftItem[];
@@ -285,8 +312,12 @@ export type MapHero = HeroSidebarItem & {
   y: number;
 };
 
-export type Skill = typeof skillTable.$inferSelect & {
-  hero?: Hero | null;
+export type SkillInstance = typeof skillInstanceTable.$inferSelect;
+
+export type SkillTemplate = {
+  id: string;
+  name: string;
+  image: string;
 };
 
 export type IPosition = {
