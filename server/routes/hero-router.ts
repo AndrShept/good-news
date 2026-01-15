@@ -63,9 +63,12 @@ import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
+import { equipmentService } from '../services/equipment-service';
 import { heroService } from '../services/hero-service';
 import { itemContainerService } from '../services/item-container-service';
-import { ItemTemplateService } from '../services/item-template-service';
+import { itemInstanceService } from '../services/item-instance-service';
+import { itemTemplateService } from '../services/item-template-service';
+import { itemUseService } from '../services/item-use-service';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -100,7 +103,7 @@ export const heroRouter = new Hono<Context>()
           where: and(eq(itemInstanceTable.ownerHeroId, hero.id), eq(itemInstanceTable.location, 'EQUIPMENT')),
         });
         serverState.user.set(userId, hero.id);
-        const setData = { ...hero, equipments };
+        const setData = { ...hero, equipments: equipments ?? [], buffs: [] };
         serverState.hero.set(hero.id, setData as Hero);
 
         await heroOnline(hero.id);
@@ -359,14 +362,50 @@ export const heroRouter = new Hono<Context>()
       const { id } = c.req.valid('param');
       const { items } = c.req.valid('json');
       const hero = heroService.getHero(id);
-
       const backpack = itemContainerService.getBackpack(hero.id);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.heroId, heroId: hero.id });
+      const place = placeTemplate.find((p) => p.id === hero.location.placeId);
+      if (!place) throw new HTTPException(409, { message: 'Hero not a place' });
+      if (!place.buildings.some((b) => b.type === 'MAGIC-SHOP')) {
+        throw new HTTPException(409, { message: 'this a not a shop' });
+      }
 
-      return c.json<SuccessResponse>({
+      const itemTemlateById = itemTemplateService.getAllItemsTemplateMapIds();
+      const { needCapacity, sumPriceGold } = items.reduce(
+        (acc, item) => {
+          const tempalte = itemTemlateById[item.id];
+          const buyPrice = tempalte.buyPrice ?? 0;
+          acc.sumPriceGold += item.quantity * buyPrice;
+          if (!tempalte.stackable) {
+            acc.needCapacity += item.quantity;
+          } else {
+            acc.needCapacity += Math.ceil(item.quantity / (tempalte.maxStack ?? 1));
+          }
+          return acc;
+        },
+        { sumPriceGold: 0, needCapacity: 0 },
+      );
+      heroService.checkFreeBackpackCapacity(hero.id, needCapacity);
+
+      heroService.assertHasEnoughGold(hero.id, sumPriceGold);
+      const returnData = [];
+      for (const item of items) {
+        const template = itemTemlateById[item.id];
+        returnData.push({ name: template.name, quantity: item.quantity });
+        itemContainerService.obtainItem({
+          heroId: hero.id,
+          itemContainerId: backpack.id,
+          itemTemplateId: template.id,
+          quantity: item.quantity,
+        });
+      }
+      heroService.spendGold(hero.id, sumPriceGold);
+
+      return c.json<SuccessResponse<typeof returnData>>({
         message: `success buy items`,
         success: true,
+        data: returnData,
       });
     },
   )
@@ -396,7 +435,7 @@ export const heroRouter = new Hono<Context>()
         throw new HTTPException(404, { message: 'item instance not found' });
       }
       const [deletedItem] = container.itemsInstance.splice(findIndex, 1);
-      const mapIds = ItemTemplateService.getAllItemsTemplateMapIds();
+      const mapIds = itemTemplateService.getAllItemsTemplateMapIds();
       return c.json<SuccessResponse<{ name: string; quantity: number }>>(
         {
           success: true,
@@ -422,26 +461,46 @@ export const heroRouter = new Hono<Context>()
       const userId = c.get('user')?.id as string;
       const hero = heroService.getHero(id);
       const backpack = itemContainerService.getBackpack(hero.id);
-      const findItem = backpack.itemsInstance.find((i) => i.id === itemInstanceId);
-      if (!findItem) {
-        throw new HTTPException(404, { message: 'backpack find item not found' });
-      }
       verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.heroId, heroId: hero.id });
 
-      if (hero.state !== 'IDLE') {
+      if (hero.state === 'BATTLE') {
         throw new HTTPException(403, { message: 'You cannot use item during some action.', cause: { canShow: true } });
       }
-      const template = ItemTemplateService.getAllItemsTemplateMapIds();
-      switch (template[findItem.itemTemplateId].type) {
-        case 'POTION': {
-          break;
+      const template = itemTemplateService.getAllItemsTemplateMapIds();
+      const result = {
+        name: '',
+        message: '',
+      };
+      const equipItem = hero.equipments.find((e) => e.id === itemInstanceId);
+      if (equipItem) {
+        equipmentService.unEquipItem(hero.id, itemInstanceId);
+        result.message = 'You have unequipped the item';
+        result.name = template[equipItem.itemTemplateId].name;
+      } else {
+        const itemInstance = itemInstanceService.getItemInstance(backpack.id, itemInstanceId);
+        switch (template[itemInstance.itemTemplateId].type) {
+          case 'POTION': {
+            const useResult = itemUseService.drink(hero.id, itemInstanceId);
+            result.message = useResult.message;
+            result.name = useResult.name;
+            break;
+          }
+          case 'ACCESSORY':
+          case 'ARMOR':
+          case 'WEAPON':
+          case 'SHIELD': {
+            equipmentService.equipItem(hero.id, itemInstanceId);
+            result.message = 'You have equipped the item';
+            result.name = template[itemInstance.itemTemplateId].name;
+            break;
+          }
         }
       }
 
       return c.json<SuccessResponse<{ name: string }>>({
         success: true,
-        message: `You drink `,
-        data: { name: 'POTION NAME' },
+        message: result.message,
+        data: { name: result.name },
       });
     },
   )

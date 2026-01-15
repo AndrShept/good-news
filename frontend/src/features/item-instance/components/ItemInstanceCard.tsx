@@ -1,25 +1,23 @@
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CustomTooltip } from '@/components/CustomTooltip';
+import { GameItemImg } from '@/components/GameItemImg';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ItemInstance, ItemTemplate } from '@/shared/types';
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 
 import { GameItemSlot } from './GameItemSlot';
 import { ItemInstanceCardDropdownMenu } from './ItemInstanceCardDropdownMenu';
 import { ItemInstanceCardHoverTooltip } from './ItemInstanceCardHoverTooltip';
-import { CustomTooltip } from '@/components/CustomTooltip';
-import { GameItemImg } from '@/components/GameItemImg';
-
-
 
 type Props = ItemInstance & {
-  itemTemplate: ItemTemplate
-}
+  itemTemplate: ItemTemplate;
+};
 export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <GameItemSlot>
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger className="size-full">
+      <DropdownMenu modal={false} open={isOpen} onOpenChange={setIsOpen}>
+        <DropdownMenuTrigger className="size-full">
           <CustomTooltip>
             <CustomTooltip.Trigger>
               <GameItemImg image={props.itemTemplate.image} />
@@ -31,11 +29,12 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
             </CustomTooltip.Trigger>
             <CustomTooltip.Content>{!isOpen && <ItemInstanceCardHoverTooltip {...props} />}</CustomTooltip.Content>
           </CustomTooltip>
-        </PopoverTrigger>
-        <PopoverContent className="w-fit p-0">
-          <ItemInstanceCardDropdownMenu {...props} onClose={() => setIsOpen(false)} />
-        </PopoverContent>
-      </Popover>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent>
+          <ItemInstanceCardDropdownMenu {...props} />
+        </DropdownMenuContent>
+      </DropdownMenu>
     </GameItemSlot>
   );
 });

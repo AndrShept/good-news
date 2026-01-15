@@ -8,8 +8,9 @@ type Props = ComponentProps<'button'>;
 
 export const CancelButton = ({ className, ...props }: Props) => {
   return (
-    <Button {...props} size={'icon'} variant={'outline'} className={cn('size-10 hover:text-red-500', className)}>
+    <Button {...props} variant={'outline'} className={cn('hover:text-red-500', className)}>
       <X className="size-5" />
+      No
     </Button>
   );
 };

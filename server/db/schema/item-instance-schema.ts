@@ -42,6 +42,7 @@ export const slotEnum = pgEnum('equipment_slot_enum', [
   'RING_LEFT',
   'RING_RIGHT',
   'BELT',
+  'SHIELD',
 ]);
 export const itemInstanceTable = pgTable('item_instance', {
   id: uuid().primaryKey().defaultRandom().notNull(),

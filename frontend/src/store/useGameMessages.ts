@@ -14,7 +14,7 @@ export const gameMessageValues = Object.values(gameMessageObj);
 export type GameMessageType = (typeof gameMessageValues)[number];
 export interface IGameMessage {
   text: string;
-  data?: { gameItemName: string; quantity?: number };
+  data?: { name: string; quantity?: number }[];
   success?: boolean;
   type: GameMessageType;
   createdAt?: number;

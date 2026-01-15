@@ -9,7 +9,6 @@ import type { Context } from '../context';
 import { db } from '../db/db';
 import { type IMaterialModifierConfig, materialModifierConfig } from '../lib/config/material-modifier-config';
 import { loggedIn } from '../middleware/loggedIn';
-import { ItemTemplateService } from '../services/item-template-service';
 
 export const craftRouter = new Hono<Context>().get(
   '/items/:buildingType',

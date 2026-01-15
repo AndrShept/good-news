@@ -3,7 +3,7 @@ import { ItemInstanceCard } from '@/features/item-instance/components/ItemInstan
 import { BASE_EQUIPMENTS_IMAGE } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { EquipmentSlotType, ItemInstance } from '@/shared/types';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 
 import { useGameData } from '../hooks/useGameData';
 import { CharacterSprite } from './CharacterSprite';
@@ -13,14 +13,18 @@ interface Props {
   characterImage: string;
 }
 
-export const Equipments = memo(({ equipments, characterImage }: Props) => {
-  const equipmentBySlot = equipments.reduce(
-    (acc, equip) => {
-      if (!equip.slot) return acc;
-      acc[equip.slot] = equip;
-      return acc;
-    },
-    {} as Record<EquipmentSlotType, ItemInstance>,
+export const Equipments = memo(function Equipments({ equipments, characterImage }: Props) {
+  const equipmentBySlot = useMemo(
+    () =>
+      equipments.reduce(
+        (acc, equip) => {
+          if (!equip.slot) return acc;
+          acc[equip.slot] = equip;
+          return acc;
+        },
+        {} as Record<EquipmentSlotType, ItemInstance>,
+      ),
+    [equipments],
   );
   const { itemsTemplateById } = useGameData();
 

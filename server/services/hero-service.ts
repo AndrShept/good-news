@@ -5,7 +5,8 @@ import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
 import { sumAllModifier } from '../lib/utils';
-import { ItemTemplateService } from './item-template-service';
+import { itemContainerService } from './item-container-service';
+import { itemTemplateService } from './item-template-service';
 
 export const heroService = {
   getHero(heroId: string) {
@@ -14,8 +15,28 @@ export const heroService = {
     return hero;
   },
 
+  checkFreeBackpackCapacity(heroId: string, value?: number) {
+    const backpack = itemContainerService.getBackpack(heroId);
+
+    if (backpack.capacity < backpack.itemsInstance.length + (value ?? 0)) {
+      throw new HTTPException(409, { message: 'Backpack is full!', cause: { canShow: true } });
+    }
+  },
+
+  assertHasEnoughGold(heroId: string, amount: number) {
+    const hero = this.getHero(heroId);
+
+    if (hero.goldCoins < amount) {
+      throw new HTTPException(409, {
+        message: 'Not enough gold',
+        cause: { canShow: true },
+      });
+    }
+  },
+
   getHeroStatsWithModifiers(heroId: string) {
     const hero = this.getHero(heroId);
+    const buffs = serverState.buff.get(heroId) ?? [];
     const coreMaterialModifiers: Partial<OmitModifier>[] = [];
     // for (const item of equipments) {
     //   const coreMaterialModifier = craftItemService(db).getMaterialModifier(item.gameItem, item.gameItem.coreMaterial);
@@ -23,9 +44,10 @@ export const heroService = {
     //     coreMaterialModifiers.push(coreMaterialModifier);
     //   }
     // }
-    const itemsMapIds = ItemTemplateService.getAllItemsTemplateMapIds();
+    const itemsMapIds = itemTemplateService.getAllItemsTemplateMapIds();
     const modifiers = [
-      ...(hero.buffs ?? []).map((b) => buffTemplateMapIds[b.buffTemplateId].modifier),
+      // ...(hero.buffs ?? []).map((b) => buffTemplateMapIds[b.buffTemplateId].modifier),
+      ...buffs.map((b) => buffTemplateMapIds[b.buffTemplateId].modifier),
       ...(hero.equipments ?? []).map((e) => itemsMapIds[e.itemTemplateId].coreModifier),
       ...coreMaterialModifiers,
     ];
@@ -46,7 +68,7 @@ export const heroService = {
     return { maxHealth, maxMana };
   },
 
-  async updateModifier(heroId: string) {
+  updateModifier(heroId: string) {
     const hero = this.getHero(heroId);
     const { sumModifier, sumStatAndModifier } = this.getHeroStatsWithModifiers(heroId);
     const { maxHealth, maxMana } = this.calculateMaxValues({

@@ -4,7 +4,16 @@ import { useModalStore } from '@/store/useModalStore';
 
 import { AcceptButton } from '../AcceptButton';
 import { CancelButton } from '../CancelButton';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+} from '../ui/dialog';
 
 export const ChangeNameBankTabModal = () => {
   const { modalData, setModalData } = useModalStore();
@@ -16,6 +25,7 @@ export const ChangeNameBankTabModal = () => {
   };
   return (
     <Dialog open={isOpen} onOpenChange={() => setModalData(null)}>
+      <DialogOverlay className="bg-black/30" />
       <DialogContent className="rounded sm:max-w-[400px]">
         <DialogHeader>
           <DialogTitle>Rename Bank Container</DialogTitle>

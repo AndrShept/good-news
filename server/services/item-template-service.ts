@@ -5,7 +5,7 @@ import { shieldTemplate } from '@/shared/templates/shield-template';
 import { weaponTemplate } from '@/shared/templates/weapon-template';
 import type { ItemTemplate } from '@/shared/types';
 
-export const ItemTemplateService = {
+export const itemTemplateService = {
   getAllItemsTemplate() {
     const allItemsTemplate = [...armorTemplate, ...potionTemplate, ...resourceTemplate, ...weaponTemplate, ...shieldTemplate];
     return allItemsTemplate;

@@ -1,72 +1,50 @@
-import { ConfirmPopover } from '@/components/ConfirmPopover';
-import { Button } from '@/components/ui/button';
-import { useHeroId } from '@/features/hero/hooks/useHeroId';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useItemUseMutation } from '@/features/hero/hooks/useItemUseMutation';
-import { useDeleteContainerItem } from '@/features/item-instance/hooks/useDeleteContainerItem';
-import { ItemInstance, ItemTemplate } from '@/shared/types';
+import { ItemInstance, ItemTemplate, ItemTemplateType } from '@/shared/types';
+import { useModalStore } from '@/store/useModalStore';
 
 interface Props extends ItemInstance {
-  onClose: () => void;
   itemTemplate: ItemTemplate;
 }
-export const ItemInstanceCardDropdownMenu = ({ onClose, ...props }: Props) => {
+const buttonNameVariants: Record<ItemTemplateType, string> = {
+  WEAPON: 'Equip',
+  SHIELD: 'Equip',
+  ACCESSORY: 'Equip',
+  ARMOR: 'Equip',
+  POTION: 'Use',
+  MISC: '',
+  RESOURCES: '',
+};
+export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
   const itemUseMutation = useItemUseMutation();
-
-  const deleteInventoryItemMutation = useDeleteContainerItem();
-
+  const { setModalData } = useModalStore();
   const onEquip = () => {
-    itemUseMutation.mutate(
-      {
-        itemInstanceId: props.id,
-      },
-      {
-        onSuccess: () => {
-          onClose();
-        },
-      },
-    );
+    itemUseMutation.mutate({
+      itemInstanceId: props.id,
+    });
   };
-
-  const onDeleteInventoryItem = async () => {
-    await deleteInventoryItemMutation.mutateAsync({ itemContainerId: props.itemContainerId ?? '', itemInstanceId: props.id });
-    // onClose();
+  const buttonName = buttonNameVariants[props.itemTemplate.type];
+  const onDeleteInventoryItem = () => {
+    setModalData({ type: 'DELETE_ITEM_INSTANCE', id: props.id, itemInstance: props });
   };
   return (
-    <section className="space-y-1 p-1">
-      <Button
-        disabled={itemUseMutation.isPending || deleteInventoryItemMutation.isPending}
-        onClick={onEquip}
-        variant={'ghost'}
-        className="flex w-full items-center"
-      >
-        <img className="size-6" src="/sprites/icons/equip.png" />
-        <p className="text-[12px]">Equip</p>
-      </Button>
-
-      {props.location === 'BACKPACK' && (
-        <ConfirmPopover onConfirm={onDeleteInventoryItem} setIsShow={onClose}>
-          <ConfirmPopover.Trigger>
-            <Button
-              disabled={itemUseMutation.isPending || deleteInventoryItemMutation.isPending}
-              variant={'ghost'}
-              className="flex w-full items-center transition hover:text-red-500"
-            >
-              <div>X</div>
-
-              <p className="text-[12px]">Delete</p>
-            </Button>
-          </ConfirmPopover.Trigger>
-          <ConfirmPopover.Content>
-            <ConfirmPopover.Title className="text-red-500">Are you sure you want to delete item?</ConfirmPopover.Title>
-            <ConfirmPopover.Message className="inline-flex">
-              <p className="font-semibold">
-                {props.itemTemplate.name}
-                {props.quantity > 1 && <span className="font-normal text-yellow-300"> x{props.quantity}</span>}
-              </p>
-            </ConfirmPopover.Message>
-          </ConfirmPopover.Content>
-        </ConfirmPopover>
+    <>
+      {props.location === 'BACKPACK' && buttonName && (
+        <DropdownMenuItem disabled={itemUseMutation.isPending} onClick={onEquip}>
+          {buttonName}
+        </DropdownMenuItem>
       )}
-    </section>
+      {props.location === 'EQUIPMENT' && (
+        <DropdownMenuItem disabled={itemUseMutation.isPending} onClick={onEquip}>
+          unEquip
+        </DropdownMenuItem>
+      )}
+
+      {(props.location === 'BACKPACK' || props.location === 'BANK') && (
+        <DropdownMenuItem onClick={onDeleteInventoryItem} disabled={itemUseMutation.isPending}>
+          <p className="text-red-300">Delete</p>
+        </DropdownMenuItem>
+      )}
+    </>
   );
 };

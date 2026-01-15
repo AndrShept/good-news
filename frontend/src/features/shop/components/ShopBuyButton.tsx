@@ -7,6 +7,7 @@ import { getItemContainerOptions } from '@/features/item-container/api/get-item-
 import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
 import { imageConfig } from '@/shared/config/image-config';
 import { useSetGameMessage } from '@/store/useGameMessages';
+import { useShopItemStore } from '@/store/useShopItemStore';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface Props {
@@ -18,18 +19,23 @@ export const ShopBuyButton = ({ items }: Props) => {
   const heroId = useHeroId();
   const backpackId = useGetBackpackId();
   const queryClient = useQueryClient();
+  const { clearAllItems, onClose } = useShopItemStore();
   const { mutate, isPending } = useMutation({
     mutationFn: shopBuyItems,
 
-    async onSuccess(data) {
-   
+    async onSuccess({ message, data }) {
       await queryClient.invalidateQueries({
         queryKey: getItemContainerOptions(heroId, backpackId).queryKey,
       });
+      await queryClient.invalidateQueries({
+        queryKey: getHeroOptions().queryKey,
+      });
+      onClose();
+      clearAllItems();
       setGameMessage({
-        text: data.message,
+        text: message,
         type: 'SUCCESS',
-    
+        data: data,
       });
     },
   });

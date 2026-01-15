@@ -30,7 +30,7 @@ export const useQueueCraftListener = () => {
           await queryClient.invalidateQueries({
             queryKey: getSkillsOptions(heroId).queryKey,
           });
-          setGameMessage({ type: 'SUCCESS', text: 'You create new item', data: { gameItemName: data.payload.gameItemName } });
+          setGameMessage({ type: 'SUCCESS', text: 'You create new item', data: [{ name: data.payload.gameItemName }] });
           if (data.payload.craftExpMessage) {
             setGameMessage({
               type: 'SKILL_EXP',

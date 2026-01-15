@@ -1,5 +1,5 @@
 import { BuffTemplate, ItemTemplate, RecipeTemplate, SkillTemplate } from '@/shared/types';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 import { getGameDataOptions } from '../api/get-game-data';

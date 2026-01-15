@@ -7,7 +7,16 @@ import 'react-color-palette/css';
 
 import { AcceptButton } from '../AcceptButton';
 import { CancelButton } from '../CancelButton';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+} from '../ui/dialog';
 
 export const ChangeColorBankTabModal = () => {
   const { modalData, setModalData } = useModalStore();
@@ -20,11 +29,12 @@ export const ChangeColorBankTabModal = () => {
   };
   return (
     <Dialog open={isOpen} onOpenChange={() => setModalData(null)}>
+      <DialogOverlay className="bg-black/30" />
       <DialogContent className="rounded sm:max-w-[400px]">
         <DialogHeader>
           <DialogTitle>Color Bank Container</DialogTitle>
           <DialogDescription>Change a color for this bank container. You can change the color at any time.</DialogDescription>
-          <ColorPicker hideInput={["rgb", "hsv"]} color={color} onChange={setColor} />
+          <ColorPicker hideInput={['rgb', 'hsv']} color={color} onChange={setColor} />
         </DialogHeader>
 
         <DialogFooter>

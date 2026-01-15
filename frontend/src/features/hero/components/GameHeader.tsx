@@ -14,9 +14,10 @@ import { memo } from 'react';
 import { CharacterPaperdollButton } from './CharacterPaperdollButton';
 
 export const GameHeader = memo(() => {
-  const { goldCoins, premiumCoins } = useHero((data) => ({
+  const { goldCoins, premiumCoins, placeId } = useHero((data) => ({
     goldCoins: data?.goldCoins,
     premiumCoins: data?.premiumCoins,
+    placeId: data?.location.placeId,
   }));
   const { backpack } = useHeroBackpack();
   const { pathname } = useLocation();
@@ -33,7 +34,7 @@ export const GameHeader = memo(() => {
         <BackpackButton />
         <SkillsPopover />
         <GroupMenuButton />
-        <ShopItemCardButton />
+        {placeId && <ShopItemCardButton />}
       </section>
       <section className="flex items-center gap-1 text-[15px]">
         {pathname === '/' && <LogOutButton />}

@@ -44,5 +44,4 @@ export const useShopItemStore = create<UseShopItemStore>((set, get) => ({
     set((state) => ({ items: state.items.map((i) => (i.id === id ? { ...i, quantity: i.quantity - 1 } : i)).filter((i) => !!i.quantity) })),
   getTotalPrice: () => get().items.reduce((acc, i) => acc + i.quantity * i.price, 0),
   getTotalQuantity: () => get().items.reduce((acc, i) => acc + i.quantity, 0),
-
 }));

@@ -36,7 +36,7 @@ export const GameMessage = memo(() => {
           {gameMessages.map((message) => (
             <li
               key={message.createdAt!.toString()}
-              className={cn('space-x-1 text-sm text-green-400', {
+              className={cn('inline-flex flex-wrap gap-1 text-sm text-green-400', {
                 'text-red-400': message.type === 'ERROR',
                 'text-green-400': message.type === 'SUCCESS',
                 'text-muted-foreground': message.type === 'INFO',
@@ -47,8 +47,19 @@ export const GameMessage = memo(() => {
             >
               <time className="text-primary">{getTimeFns(message.createdAt!)}</time>
               <span>{message.text}</span>
-              <span className="text-primary">{message.data?.gameItemName}</span>
-              {!!message.data?.quantity && <span className="text-yellow-300">{`x${message.data?.quantity}`}</span>}
+              {!!message.data?.length && (
+                <ul className="text-primary inline-flex flex-wrap gap-0.5">
+                  [
+                  {message.data.map((m) => (
+                    <li className="">
+                      <span className="">{m.name}</span>
+                      {!!m.quantity && <span className="ml-1 text-yellow-300">{`x${m.quantity}`}</span>}
+                      {!!m.quantity && (message.data?.length ?? 1) > 1 && <span className="mr-0.5">,</span>}
+                    </li>
+                  ))}
+                  ]
+                </ul>
+              )}
             </li>
           ))}
         </ul>

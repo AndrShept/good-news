@@ -1,4 +1,3 @@
-import { CoreMaterialType, CraftItem } from '@/shared/types';
 import { create } from 'zustand';
 
 interface IUseCraftItemStore {

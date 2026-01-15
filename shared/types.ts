@@ -11,6 +11,7 @@ import {
   heroTable,
   itemContainerTable,
   itemContainerTypeEnum,
+  itemLocationEnum,
   modifierTable,
   stateTypeEnum,
 } from '../server/db/schema';
@@ -262,10 +263,12 @@ export type TPotionInfo = {
   buffTemplateId?: string;
 };
 
+export type ItemLocationType = (typeof itemLocationEnum.enumValues)[number];
+
 export type ItemInstance = typeof itemInstanceTable.$inferSelect;
 export type ItemTemplate = {
   id: string;
-  type: string;
+  type: ItemTemplateType;
   name: string;
   image: string;
   key: string;

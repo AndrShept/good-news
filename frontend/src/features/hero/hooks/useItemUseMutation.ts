@@ -26,7 +26,7 @@ export const useItemUseMutation = () => {
         success: true,
         type: 'INFO',
         text: data.message,
-        data: { gameItemName: data.data?.name ?? '' },
+        data: [{ name: data.data?.name ?? '' }],
       });
     },
   });

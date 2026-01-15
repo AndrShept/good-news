@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { loggedIn } from '../middleware/loggedIn';
-import { ItemTemplateService } from '../services/item-template-service';
+import { itemTemplateService } from '../services/item-template-service';
 
 export const shopRouter = new Hono<Context>().get(
   '/:buildingType',
@@ -21,7 +21,7 @@ export const shopRouter = new Hono<Context>().get(
   async (c) => {
     const { buildingType } = c.req.valid('param');
 
-    const shopItems = ItemTemplateService.getAllItemsTemplate();
+    const shopItems = itemTemplateService.getAllItemsTemplate();
 
     return c.json<SuccessResponse<ItemTemplate[]>>({
       message: 'items fetched!',

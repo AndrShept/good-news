@@ -2,9 +2,9 @@ import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { deleteContainerInstanceItem } from '../api/delete-container-instance-item';
-import { useGetBackpackId } from '../../item-container/hooks/useGetBackpackId';
 import { getItemContainerOptions } from '../../item-container/api/get-item-container';
+import { useGetBackpackId } from '../../item-container/hooks/useGetBackpackId';
+import { deleteContainerInstanceItem } from '../api/delete-container-instance-item';
 
 interface IDeleteContainerSlotItem {
   itemContainerId: string;
@@ -28,7 +28,7 @@ export const useDeleteContainerItem = () => {
         success: true,
         type: 'SUCCESS',
         text: data.message,
-        data: { gameItemName: data.data?.name ?? '', quantity: data.data?.quantity },
+        data: [{ name: data.data?.name ?? '', quantity: data.data?.quantity }],
       });
     },
   });

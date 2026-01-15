@@ -9,6 +9,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogOverlay,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
@@ -32,6 +33,7 @@ export const CreateBankItemContainerModal = ({ placeName }: Props) => {
   };
   return (
     <Dialog open={isShow} onOpenChange={setIsShow}>
+      <DialogOverlay className="bg-black/50" />
       <DialogTrigger asChild>
         <Button variant="outline" size="icon">
           <GameIcon image={imageConfig.icon.ui.prem} />

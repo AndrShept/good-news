@@ -18,5 +18,6 @@ export const getGameDataOptions = () =>
   queryOptions({
     queryKey: ['GAME_DATA'],
     staleTime: Infinity,
+    gcTime: Infinity,
     queryFn: getGameData,
   });
