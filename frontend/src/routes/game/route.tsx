@@ -4,7 +4,6 @@ import { getUserQueryOptions } from '@/features/auth/api/get-user';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { getGameDataOptions } from '@/features/hero/api/get-game-data';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
-import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 

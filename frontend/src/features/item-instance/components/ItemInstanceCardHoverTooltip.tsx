@@ -1,13 +1,14 @@
 import { GameItemImg } from '@/components/GameItemImg';
-import { useCraftItem } from '@/features/craft/hooks/useCraftItem';
 import { materialConfig } from '@/lib/config';
 import { cn, getModifiers } from '@/lib/utils';
-import { ItemInstance } from '@/shared/types';
+import { ItemInstance, ItemTemplate } from '@/shared/types';
 import { memo } from 'react';
 
 import { ModifierInfoCard } from './ModifierInfoCard';
 
-type Props = ItemInstance;
+type Props = ItemInstance & {
+  itemTemplate: ItemTemplate;
+};
 export const ItemInstanceCardHoverTooltip = memo((props: Props) => {
   const modifiers = getModifiers(props.itemTemplate.coreModifier ?? {}, props.materialModifier ?? {});
 

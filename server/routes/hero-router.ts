@@ -12,7 +12,7 @@ import type {
 } from '@/shared/socket-data-types';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
-import { recipeTemplate } from '@/shared/templates/recipe-template';
+import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
 import { skillsTemplate } from '@/shared/templates/skill-template';
 import {
   type BuffInstance,
@@ -120,26 +120,31 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .get(
-    '/:id/craft-recipe',
+    '/:id/craft-recipe/:buildingType',
     loggedIn,
     zValidator(
       'param',
       z.object({
         id: z.string().uuid(),
+        buildingType: z.enum(buildingValues),
       }),
     ),
 
     async (c) => {
       const userId = c.get('user')?.id as string;
-      const { id } = c.req.valid('param');
+      const { id, buildingType } = c.req.valid('param');
       const hero = heroService.getHero(id);
       verifyHeroOwnership({ heroUserId: hero.userId, userId });
 
-      const learnedItems = await db.query.craftRecipeTable.findMany({
+      const learnedItemsDb = await db.query.craftRecipeTable.findMany({
         where: eq(craftRecipeTable.heroId, hero.id),
         columns: { recipeId: true },
       });
-      const defaultRecipe = recipeTemplate.filter((r) => r.defaultUnlocked === true).map((i) => ({ recipeId: i.id }));
+
+      const learnedItems = learnedItemsDb.filter((r) => recipeTemplateById[r.recipeId].requirement.building === buildingType);
+      const defaultRecipe = recipeTemplate
+        .filter((r) => r.defaultUnlocked === true && r.requirement.building === buildingType)
+        .map((i) => ({ recipeId: i.id }));
 
       const mergedRecipe = [...learnedItems, ...defaultRecipe];
 
@@ -756,7 +761,7 @@ export const heroRouter = new Hono<Context>()
     zValidator(
       'json',
       z.object({
-        coreMaterialType: z.optional(z.enum(coreMaterialTypeEnum.enumValues)),
+        coreMaterialType: z.optional(z.string()),
         buildingType: z.enum(buildingValues),
         craftItemId: z.string(),
       }),

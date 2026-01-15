@@ -38,7 +38,6 @@ export const heroService = {
       sumStatAndModifier,
     };
   },
-
   calculateMaxValues(data: { constitution: number; wisdom: number; bonusMaxHealth: number; bonusMaxMana: number }) {
     const { constitution, wisdom, bonusMaxHealth, bonusMaxMana } = data;
     const maxHealth = constitution * HP_MULTIPLIER_COST + bonusMaxHealth;

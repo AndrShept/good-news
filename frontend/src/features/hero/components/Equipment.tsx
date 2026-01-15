@@ -1,11 +1,12 @@
 import { GameItemImg } from '@/components/GameItemImg';
+import { ItemInstanceCard } from '@/features/item-instance/components/ItemInstanceCard';
 import { BASE_EQUIPMENTS_IMAGE } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { EquipmentSlotType, ItemInstance } from '@/shared/types';
 import { memo } from 'react';
 
+import { useGameData } from '../hooks/useGameData';
 import { CharacterSprite } from './CharacterSprite';
-import { ItemInstanceCard } from '@/features/item-instance/components/ItemInstanceCard';
 
 interface Props {
   equipments: ItemInstance[];
@@ -21,13 +22,18 @@ export const Equipments = memo(({ equipments, characterImage }: Props) => {
     },
     {} as Record<EquipmentSlotType, ItemInstance>,
   );
+  const { itemsTemplateById } = useGameData();
+
   return (
     <div className="mx-auto flex">
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(0, 5).map((equipment) => (
           <li className="flex size-12 items-center justify-center border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
-              <ItemInstanceCard  {...equipmentBySlot[equipment.slot]}/>
+              <ItemInstanceCard
+                {...equipmentBySlot[equipment.slot]}
+                itemTemplate={itemsTemplateById[equipmentBySlot[equipment.slot].itemTemplateId]}
+              />
             ) : (
               <GameItemImg className="size-10 opacity-20 grayscale" image={equipment.image} />
             )}
@@ -39,7 +45,10 @@ export const Equipments = memo(({ equipments, characterImage }: Props) => {
         {BASE_EQUIPMENTS_IMAGE.slice(5, 10).map((equipment) => (
           <li className="flex size-12 items-center justify-center border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
-              <ItemInstanceCard  {...equipmentBySlot[equipment.slot]}/>
+              <ItemInstanceCard
+                {...equipmentBySlot[equipment.slot]}
+                itemTemplate={itemsTemplateById[equipmentBySlot[equipment.slot].itemTemplateId]}
+              />
             ) : (
               <GameItemImg
                 className={cn('size-10 opacity-20 grayscale', {

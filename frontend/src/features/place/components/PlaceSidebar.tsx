@@ -20,12 +20,12 @@ export const PlaceSidebar = ({ place }: Props) => {
   const [_, startTransition] = useTransition();
   const { mutate, isPending } = useLeavePlace();
   const setSelectBuilding = useSelectBuildingStore((state) => state.setSelectBuilding);
-  const setCoreMaterial = useCraftItemStore((state) => state.setCoreMaterial);
+  const setCoreMaterialId = useCraftItemStore((state) => state.setCoreMaterialId);
   const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
   useEffect(() => {
     return () => {
       setSelectBuilding(null);
-      setCoreMaterial(null);
+      setCoreMaterialId(undefined);
     };
   }, []);
   return (

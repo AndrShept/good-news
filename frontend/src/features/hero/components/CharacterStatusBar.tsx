@@ -15,21 +15,21 @@ interface Props {
   id: string;
 }
 
-export const CharacterStatusBar = memo(({ avatarImage, currentHealth, currentMana, maxHealth, maxMana, name, level, id }: Props) => {
+export const CharacterStatusBar = memo((props: Props) => {
   return (
     <div className="flex w-full items-center gap-2">
       <div>
-        <HeroAvatar src={avatarImage} />
+        <HeroAvatar src={props.avatarImage} />
       </div>
       <div className="flex w-full flex-col gap-0.5">
         <div>
-          <span className="mr-1">{name}</span>
-          <span className="text-muted-foreground">lvl:{level}</span>
+          <span className="mr-1">{props.name}</span>
+          <span className="text-muted-foreground">lvl:{props.level}</span>
         </div>
 
-        <FillBar value={currentHealth} type="health" maxValue={maxHealth} />
-        <FillBar value={currentMana} type="mana" maxValue={maxMana} />
-        <BuffList id={id} />
+        <FillBar value={props.currentHealth} type="health" maxValue={props.maxHealth} />
+        <FillBar value={props.currentMana} type="mana" maxValue={props.maxMana} />
+        <BuffList id={props.id} />
       </div>
     </div>
   );

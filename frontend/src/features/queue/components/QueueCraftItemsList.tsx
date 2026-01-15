@@ -6,11 +6,9 @@ import { cn } from '@/lib/utils';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQuery } from '@tanstack/react-query';
 
-import { useCraftItem } from '../../craft/hooks/useCraftItem';
 import { QueueCraftItemCard } from './QueueCraftItemCard';
 
 export const QueueCraftItemsList = () => {
-  const { craftItemMap } = useCraftItem();
   const heroId = useHeroId();
   const maxQueueCraftCount = useHero((data) => data?.maxQueueCraftCount ?? 4);
   const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
@@ -29,7 +27,7 @@ export const QueueCraftItemsList = () => {
         /<span>{maxQueueCraftCount}</span>
       </div>
       <ul className="flex flex-wrap gap-2 py-2">
-        {queueCraftItems?.map((queueItem) => <QueueCraftItemCard key={queueItem.id} {...queueItem} craftItemMap={craftItemMap} />)}
+        {queueCraftItems?.map((queueItem) => <QueueCraftItemCard key={queueItem.id} {...queueItem} />)}
       </ul>
     </section>
   );

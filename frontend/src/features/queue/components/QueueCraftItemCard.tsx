@@ -7,9 +7,7 @@ import React, { memo, useEffect, useState } from 'react';
 
 import { useDeleteQueueCraftItemMutation } from '../hooks/useDeleteQueueCraftItemMutation';
 
-interface Props extends QueueCraftItem {
-  craftItemMap: Record<string, CraftItem>;
-}
+type Props = QueueCraftItem;
 
 export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props) {
   const { mutate, isPending } = useDeleteQueueCraftItemMutation();
@@ -41,7 +39,7 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
     >
       {/* <GameItemImg className="size-10" image={props.craftItemMap[props.craftItemId]?.gameItem?.image} />
       <p className="line-clamp-1 text-sm">{props.craftItemMap[props.craftItemId]?.gameItem?.name}</p> */}
-  
+
       <p
         className={cn('text-sm', {
           'text-muted': props.status === 'PENDING',

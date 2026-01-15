@@ -1,3 +1,5 @@
+import { HTTPException } from 'hono/http-exception';
+
 export const itemUseService = {
   drink() {
     const isBuffPotion = findItem.itemTemplate.potionInfo?.type === 'BUFF';

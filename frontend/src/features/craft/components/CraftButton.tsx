@@ -5,22 +5,22 @@ import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { useCreateQueueCraftItemMutation } from '../../queue/hooks/useCreateQueueCraftItemMutation';
 
 interface Props {
-  craftItem: CraftItem | null | undefined;
+  recipeId: string;
   buildingType: BuildingType | undefined;
 }
 
-export const CraftButton = ({ craftItem, buildingType }: Props) => {
-  const coreMaterialType = useCraftItemStore((state) => state.coreMaterialType);
+export const CraftButton = ({ recipeId, buildingType }: Props) => {
+  const coreMaterialId = useCraftItemStore((state) => state.coreMaterialId);
   const { mutate, isPending } = useCreateQueueCraftItemMutation();
   return (
     <>
       <Button
         className="w-full"
-        disabled={isPending || !craftItem || !buildingType}
+        disabled={isPending || !recipeId || !buildingType}
         onClick={() =>
           mutate({
-            craftItemId: craftItem?.id ?? '',
-            coreMaterialType: coreMaterialType ? coreMaterialType : undefined,
+            craftItemId: recipeId ?? '',
+            coreMaterialType: coreMaterialId,
             buildingType: buildingType!,
           })
         }

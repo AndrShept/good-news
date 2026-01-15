@@ -255,7 +255,6 @@ export type TEquipInfo = {
 };
 export type TResourceInfo = {
   category: ResourceCategoryType;
-  type: ResourceType;
 };
 export type TPotionInfo = {
   type: 'BUFF' | 'RESTORE';
@@ -275,7 +274,7 @@ export type ItemTemplate = {
   buyPrice?: number;
 
   equipInfo?: TEquipInfo;
-  // resourceInfo?: TResourceInfo;
+  resourceInfo?: TResourceInfo;
   potionInfo?: TPotionInfo;
   coreModifier?: Partial<OmitModifier>;
 };

@@ -1,12 +1,12 @@
-
+import { useGameData } from '@/features/hero/hooks/useGameData';
 import { GameItemSlot } from '@/features/item-instance/components/GameItemSlot';
+import { ItemInstanceCard } from '@/features/item-instance/components/ItemInstanceCard';
 import { TItemContainer } from '@/shared/types';
 import { memo } from 'react';
 
 import { useCreateContainerItems } from '../hooks/useCreateContainerItems';
 import { ContainerCapacityInfo } from './ContainerCapacityInfo';
 import { ItemContainerSkeleton } from './ItemContainerSkeleton';
-import { ItemInstanceCard } from '@/features/item-instance/components/ItemInstanceCard';
 
 interface Props extends TItemContainer {
   isLoading: boolean;
@@ -14,6 +14,7 @@ interface Props extends TItemContainer {
 
 export const ItemContainer = memo(({ capacity, itemsInstance, isLoading }: Props) => {
   const items = useCreateContainerItems(capacity, itemsInstance);
+  const { itemsTemplateById } = useGameData();
   return (
     <section className="flex w-full flex-col gap-0.5">
       {!isLoading && (
@@ -23,12 +24,13 @@ export const ItemContainer = memo(({ capacity, itemsInstance, isLoading }: Props
       )}
       <ul className="flex w-full flex-wrap gap-1">
         {!isLoading ? (
-          items?.map((ItemInstance) => {
-            if (!ItemInstance) {
+          items?.map((itemInstance) => {
+            if (!itemInstance) {
               const id = crypto.randomUUID();
               return <GameItemSlot key={id} />;
             }
-            return <ItemInstanceCard {...ItemInstance} />;
+            const itemTemplate = itemsTemplateById[itemInstance.itemTemplateId];
+            return <ItemInstanceCard {...itemInstance} itemTemplate={itemTemplate} />;
           })
         ) : (
           <ItemContainerSkeleton />

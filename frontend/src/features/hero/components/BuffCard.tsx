@@ -1,10 +1,12 @@
 import { CustomTooltip } from '@/components/CustomTooltip';
 import { ModifierInfoCard } from '@/features/item-instance/components/ModifierInfoCard';
 import { cn, formatDurationFromSeconds, getModifiers } from '@/lib/utils';
-import { BuffInstance } from '@/shared/types';
+import { BuffInstance, BuffTemplate } from '@/shared/types';
 import { memo, useEffect, useState } from 'react';
 
-type Props = BuffInstance;
+type Props = BuffInstance & {
+  buffTemplate: BuffTemplate;
+};
 
 export const BuffCard = (props: Props) => {
   const [time, setTime] = useState(Date.now());

@@ -1,5 +1,5 @@
 import { client } from '@/lib/utils';
-import { infiniteQueryOptions, keepPreviousData, queryOptions } from '@tanstack/react-query';
+import { infiniteQueryOptions } from '@tanstack/react-query';
 
 export const getGroupAvailableHeroes = async ({ page, searchTerm, selfId }: { page: number; searchTerm: string; selfId: string }) => {
   try {

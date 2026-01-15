@@ -1,17 +1,18 @@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ItemInstance } from '@/shared/types';
+import { ItemInstance, ItemTemplate } from '@/shared/types';
 import React, { memo, useState } from 'react';
 
-import { CustomTooltip } from '../../../components/CustomTooltip';
-
-import { GameItemImg } from '../../../components/GameItemImg';
 import { GameItemSlot } from './GameItemSlot';
 import { ItemInstanceCardDropdownMenu } from './ItemInstanceCardDropdownMenu';
 import { ItemInstanceCardHoverTooltip } from './ItemInstanceCardHoverTooltip';
+import { CustomTooltip } from '@/components/CustomTooltip';
+import { GameItemImg } from '@/components/GameItemImg';
 
 
 
-type Props = ItemInstance 
+type Props = ItemInstance & {
+  itemTemplate: ItemTemplate
+}
 export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
   const [isOpen, setIsOpen] = useState(false);
 

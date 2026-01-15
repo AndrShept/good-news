@@ -7,6 +7,7 @@ import { ItemInstance, ItemTemplate } from '@/shared/types';
 
 interface Props extends ItemInstance {
   onClose: () => void;
+  itemTemplate: ItemTemplate;
 }
 export const ItemInstanceCardDropdownMenu = ({ onClose, ...props }: Props) => {
   const itemUseMutation = useItemUseMutation();

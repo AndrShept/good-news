@@ -1,26 +1,27 @@
 import { GameItemImg } from '@/components/GameItemImg';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
-import { ModifierInfoCard } from '@/features/item-instance/components/ModifierInfoCard';
-import { WeaponInfo } from '@/features/item-instance/components/WeaponInfo';
+import { useGameData } from '@/features/hero/hooks/useGameData';
 import { useSkill } from '@/features/skill/hooks/useSkill';
 import { capitalize, cn, formatDurationFromSeconds } from '@/lib/utils';
-import { CraftItem, ItemTemplate } from '@/shared/types';
+import { recipeTemplateById } from '@/shared/templates/recipe-template';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 
-type Props = CraftItem;
+type Props = { recipeId: string };
 
-export const CraftItemCard = (props: Props) => {
-  const coreMaterialType = useCraftItemStore((state) => state.coreMaterialType);
+export const CraftRecipeItemCard = ({ recipeId }: Props) => {
+  const coreMaterialId = useCraftItemStore((state) => state.coreMaterialId);
   const { skillMap } = useSkill();
+  const { itemsTemplateById } = useGameData();
+  const recipe = recipeTemplateById[recipeId];
+  const itemTemplate = itemsTemplateById[recipe.itemTemplateId];
   return (
     <ScrollArea className="h-full">
       <div className="flex flex-1 flex-col items-center text-center">
         <div className="mb-2 space-x-1 text-lg font-semibold capitalize md:text-xl">
-          <span>{props.itemTemplateId}</span>
+          <span>{itemTemplate.name}</span>
         </div>
-        {/*<GameItemImg className="md:size-15 size-10" image={props.image} />
-        <p className="text-muted-foreground/30 ">{capitalize(props.type)}</p>*/}
+        <GameItemImg className="md:size-15 size-10" image={itemTemplate.image} />
+        <p className="text-muted-foreground/30">{capitalize(itemTemplate.type)}</p>
 
         <h2 className="my-1.5 text-xl text-yellow-300">Craft Info:</h2>
         <div>

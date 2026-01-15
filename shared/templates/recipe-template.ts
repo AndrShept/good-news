@@ -20,7 +20,7 @@ export const recipeTemplate = [
   {
     id: '019bbdf1-505f-7dfc-bf88-bfc3a4847bf0',
 
-    defaultUnlocked: false,
+    defaultUnlocked: true,
     itemTemplateId: resourceTemplateByKey.COPPER_INGOT.id,
     timeMs: 10_000,
     requirement: {
@@ -31,3 +31,11 @@ export const recipeTemplate = [
     },
   },
 ] as const satisfies RecipeTemplate[];
+
+export const recipeTemplateById = recipeTemplate.reduce(
+  (acc, item) => {
+    acc[item.id] = item;
+    return acc;
+  },
+  {} as Record<string, RecipeTemplate>,
+);
