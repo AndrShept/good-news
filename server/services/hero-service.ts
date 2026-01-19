@@ -44,6 +44,7 @@ export const heroService = {
     //     coreMaterialModifiers.push(coreMaterialModifier);
     //   }
     // }
+    // sadsad
     const itemsMapIds = itemTemplateService.getAllItemsTemplateMapIds();
     const modifiers = [
       // ...(hero.buffs ?? []).map((b) => buffTemplateMapIds[b.buffTemplateId].modifier),
