@@ -34,7 +34,7 @@ export const GameMessage = memo(() => {
       <ScrollArea className="h-full p-1">
         <ul ref={ref} className="flex flex-col pl-2 pt-1">
           {gameMessages.map((message) => (
-            <li
+            <div
               key={message.createdAt!.toString()}
               className={cn('inline-flex flex-wrap gap-1 text-sm text-green-400', {
                 'text-red-400': message.type === 'ERROR',
@@ -45,13 +45,17 @@ export const GameMessage = memo(() => {
                 'text-purple-500': message.type === 'LEVEL_EXP',
               })}
             >
-              <time className="text-primary">{getTimeFns(message.createdAt!)}</time>
-              <span>{message.text}</span>
+              <div>
+                <time className="text-primary">{getTimeFns(message.createdAt!)} </time>
+                <span>{message.text}</span>
+              </div>
+
+
               {!!message.data?.length && (
                 <ul className="text-primary inline-flex flex-wrap gap-0.5">
                   [
                   {message.data.map((m) => (
-                    <li className="">
+                    <li key={m.name}>
                       <span className="">{m.name}</span>
                       {!!m.quantity && <span className="ml-1 text-yellow-300">{`x${m.quantity}`}</span>}
                       {!!m.quantity && (message.data?.length ?? 1) > 1 && <span className="mr-0.5">,</span>}
@@ -60,7 +64,7 @@ export const GameMessage = memo(() => {
                   ]
                 </ul>
               )}
-            </li>
+            </div>
           ))}
         </ul>
       </ScrollArea>

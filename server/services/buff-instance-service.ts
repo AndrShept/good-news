@@ -13,7 +13,7 @@ export const buffInstanceService = {
       ownerHeroId: heroId,
       buffTemplateId,
       createdAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + buffTemplate.duration).toISOString(),
+      expiresAt: Date.now() + buffTemplate.duration,
     };
     const buffs = serverState.buff.get(heroId) ?? [];
     if (buffs.some((b) => b.buffTemplateId === buffTemplateId)) {

@@ -30,7 +30,7 @@ export const ItemContainer = memo(({ capacity, itemsInstance, isLoading }: Props
               return <GameItemSlot key={id} />;
             }
             const itemTemplate = itemsTemplateById[itemInstance.itemTemplateId];
-            return <ItemInstanceCard {...itemInstance} itemTemplate={itemTemplate} />;
+            return <ItemInstanceCard key={itemInstance.id} {...itemInstance} itemTemplate={itemTemplate} />;
           })
         ) : (
           <ItemContainerSkeleton />

@@ -1,31 +1,25 @@
 import { useSocket } from '@/components/providers/SocketProvider';
-import { SelfHeroData } from '@/shared/socket-data-types';
+import { RemoveBuffData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import { getHeroOptions } from '../api/get-hero';
 import { useBuff } from './useBuff';
-import { useHeroUpdate } from './useHeroUpdate';
+
 
 export const useHeroListener = () => {
   const { socket } = useSocket();
   const { removeBuff } = useBuff();
-  const { updateHero } = useHeroUpdate();
   const queryClient = useQueryClient();
   useEffect(() => {
-    const listener = async (data: SelfHeroData) => {
-      switch (data.jobName) {
-        case 'BUFF_CREATE':
+    const listener = async (data: RemoveBuffData) => {
+      switch (data.type) {
+        case 'REMOVE_BUFF':
           await queryClient.invalidateQueries({ queryKey: getHeroOptions().queryKey });
-          removeBuff(data.payload.gameItemId);
+          removeBuff(data.payload.buffInstanceId);
           break;
-        case 'REGEN_HEALTH':
-          updateHero({ currentHealth: data.payload.currentHealth });
-          break;
-        case 'REGEN_MANA':
-          updateHero({ currentMana: data.payload.currentMana });
-          break;
+
       }
     };
 
@@ -34,5 +28,5 @@ export const useHeroListener = () => {
     return () => {
       socket.off(socketEvents.selfData(), listener);
     };
-  }, [removeBuff, socket, updateHero]);
+  }, []);
 };

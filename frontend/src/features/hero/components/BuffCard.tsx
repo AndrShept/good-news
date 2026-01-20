@@ -8,16 +8,16 @@ type Props = BuffInstance & {
   buffTemplate: BuffTemplate;
 };
 
-export const BuffCard = (props: Props) => {
+export const BuffCard = memo(function BuffCard(props: Props) {
   const [time, setTime] = useState(Date.now());
   const modifier = getModifiers(props.buffTemplate.modifier);
   useEffect(() => {
-    setTime((new Date(props.expiresAt).getTime() - Date.now()) / 60000);
+    setTime((props.expiresAt - Date.now()) / 60000);
   }, [props.expiresAt]);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTime(Date.now());
+      setTime((props.expiresAt - Date.now()) / 60000);
     }, 60000);
 
     return () => clearInterval(timer);
@@ -52,4 +52,4 @@ export const BuffCard = (props: Props) => {
       </CustomTooltip>
     </article>
   );
-};
+})

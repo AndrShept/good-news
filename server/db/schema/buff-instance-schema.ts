@@ -20,10 +20,7 @@ export const buffInstanceTable = pgTable('buff_instance', {
   })
     .notNull()
     .defaultNow(),
-  expiresAt: timestamp('expires_at', {
-    withTimezone: true,
-    mode: 'string',
-  }).notNull(),
+  expiresAt: integer().notNull(),
 });
 
 export const buffInstanceRelations = relations(buffInstanceTable, ({ one }) => ({

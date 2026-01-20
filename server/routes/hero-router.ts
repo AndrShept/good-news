@@ -77,10 +77,11 @@ export const heroRouter = new Hono<Context>()
 
     async (c) => {
       const userId = c.get('user')?.id as string;
-      let stateHeroId = serverState.user.get(userId);
-      let heroId: undefined | string = stateHeroId;
+      let heroId = serverState.user.get(userId);
 
-      if (!stateHeroId) {
+
+
+      if (!heroId) {
         const hero = await db.query.heroTable.findFirst({
           where: eq(heroTable.userId, userId),
           with: {
@@ -97,7 +98,6 @@ export const heroRouter = new Hono<Context>()
           });
         }
         heroId = hero.id;
-        stateHeroId = hero.id;
         console.log('FETCH HERO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         const equipments = await db.query.itemInstanceTable.findMany({
           where: and(eq(itemInstanceTable.ownerHeroId, hero.id), eq(itemInstanceTable.location, 'EQUIPMENT')),
@@ -106,10 +106,10 @@ export const heroRouter = new Hono<Context>()
         const setData = { ...hero, equipments: equipments ?? [], buffs: [] };
         serverState.hero.set(hero.id, setData as Hero);
 
-        await heroOnline(hero.id);
+        heroOnline(hero.id);
       }
 
-      const stateHero = heroService.getHero(heroId ?? stateHeroId);
+      const stateHero = heroService.getHero(heroId);
       verifyHeroOwnership({ heroUserId: stateHero?.userId, userId });
       stateHero.offlineTimer = undefined;
       stateHero.isOnline = true;

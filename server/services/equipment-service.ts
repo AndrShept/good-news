@@ -71,7 +71,7 @@ export const equipmentService = {
         const isOneHanded = itemTemplate.equipInfo?.weaponHand === 'ONE_HANDED';
         const existLeftSlot = this.findEquipItemBySlot('LEFT_HAND', heroId);
         if (isTwoHanded && existLeftSlot) {
-          this.unEquipItem(hero.id, itemInstanceId);
+          this.unEquipItem(hero.id, existLeftSlot.id);
           return 'RIGHT_HAND';
         }
         if (isOneHanded && !existLeftSlot) {

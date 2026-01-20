@@ -58,30 +58,32 @@ export const mapRouter = new Hono<Context>()
         });
       }
 
-      const mapHeroes = await db
-        .select({
-          id: heroTable.id,
-          name: heroTable.name,
-          state: heroTable.state,
-          level: heroTable.level,
-          avatarImage: heroTable.avatarImage,
-          characterImage: heroTable.characterImage,
-          x: locationTable.x,
-          y: locationTable.y,
-        })
-        .from(heroTable)
-        .innerJoin(locationTable, eq(locationTable.heroId, heroTable.id))
-        .where(and(eq(locationTable.mapId, map.id), eq(heroTable.isOnline, true)));
+      // const mapHeroes = await db
+      //   .select({
+      //     id: heroTable.id,
+      //     name: heroTable.name,
+      //     state: heroTable.state,
+      //     level: heroTable.level,
+      //     avatarImage: heroTable.avatarImage,
+      //     characterImage: heroTable.characterImage,
+      //     x: locationTable.x,
+      //     y: locationTable.y,
+      //   })
+      //   .from(heroTable)
+      //   .innerJoin(locationTable, eq(locationTable.heroId, heroTable.id))
+      //   .where(and(eq(locationTable.mapId, map.id), eq(heroTable.isOnline, true)));
 
-      let newHeroesData: MapHero[] = [];
+      let heroesData: MapHero[] = [];
 
       for (const [heroId, hero] of serverState.hero.entries()) {
-        newHeroesData = mapHeroes.map((h) => (h.id === heroId ? { ...h, x: hero.location.x, y: hero.location.y, state: hero.state } : h));
+        if (hero.location.mapId === id) {
+          heroesData.push({ id: hero.id, avatarImage: hero.avatarImage, characterImage: hero.characterImage, level: hero.level, name: hero.name, state: hero.state, x: hero.location.x, y: hero.location.y })
+        }
       }
       return c.json<SuccessResponse<MapHero[]>>({
         message: 'map  heroes fetched!',
         success: true,
-        data: newHeroesData,
+        data: heroesData,
       });
     },
   );

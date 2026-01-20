@@ -3,7 +3,7 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
 import { joinRoomClient } from '@/lib/utils';
-import { HeroOfflineData, HeroOnlineData, MapUpdateEvent  } from '@/shared/socket-data-types';
+import { HeroOfflineData, HeroOnlineData, MapUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useGameMessages } from '@/store/useGameMessages';
 import { useEffect, useRef } from 'react';
@@ -12,12 +12,12 @@ import { useMapHeroesUpdate } from './useMapHeroesUpdate';
 
 export const useMapListener = () => {
   const setGameMessage = useGameMessages((state) => state.setGameMessage);
-  const { mapId} = useHero((data) => ({
+  const { mapId } = useHero((data) => ({
     mapId: data?.location?.mapId ?? '',
 
   }));
   const { socket } = useSocket();
-  const {  deleteHeroes, addHeroes } = useMapHeroesUpdate(mapId);
+  const { deleteHeroes, addHeroes } = useMapHeroesUpdate(mapId);
   const { updateHero } = useHeroUpdate();
   const id = useHeroId();
   const prevMapIdRef = useRef<string | null>(null);
@@ -60,8 +60,8 @@ export const useMapListener = () => {
 
           break;
         }
-        
-   
+
+
       }
     };
     socket.on(socketEvents.mapUpdate(), listener);

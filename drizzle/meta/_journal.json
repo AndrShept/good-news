@@ -57,6 +57,13 @@
       "when": 1768336722807,
       "tag": "0007_wealthy_shocker",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1768948654572,
+      "tag": "0008_woozy_starbolt",
+      "breakpoints": true
     }
   ]
 }
