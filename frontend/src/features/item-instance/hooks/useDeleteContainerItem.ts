@@ -21,7 +21,7 @@ export const useDeleteContainerItem = () => {
       deleteContainerInstanceItem({ id: heroId, itemContainerId, itemInstanceId }),
 
     async onSuccess(data, variable) {
-      await queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: getItemContainerOptions(heroId, backpackId).queryKey,
       });
       setGameMessage({

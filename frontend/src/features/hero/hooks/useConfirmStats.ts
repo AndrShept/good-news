@@ -22,7 +22,7 @@ export const useConfirmStats = (data: z.infer<typeof changeStatSchema>) => {
         setGameMessage({ type: 'SUCCESS', text: data.message });
       }
 
-      await queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: getHeroOptions().queryKey,
       });
     },

@@ -12,7 +12,7 @@ export const useResetStats = () => {
     mutationFn: resetStats,
     async onSuccess(data, variables, context) {
       if (data.success) {
-        await queryClient.invalidateQueries({
+        queryClient.invalidateQueries({
           queryKey: getHeroOptions().queryKey,
         });
         setGameMessage({

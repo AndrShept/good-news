@@ -18,9 +18,10 @@ const buttonNameVariants: Record<ItemTemplateType, string> = {
 export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
   const itemUseMutation = useItemUseMutation();
   const { setModalData } = useModalStore();
-  const onEquip = () => {
+  const onItemUse = () => {
     itemUseMutation.mutate({
       itemInstanceId: props.id,
+      itemTemplateId: props.itemTemplateId
     });
   };
   const buttonName = buttonNameVariants[props.itemTemplate.type];
@@ -30,12 +31,12 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
   return (
     <>
       {props.location === 'BACKPACK' && buttonName && (
-        <DropdownMenuItem disabled={itemUseMutation.isPending} onClick={onEquip}>
+        <DropdownMenuItem disabled={itemUseMutation.isPending} onClick={onItemUse}>
           {buttonName}
         </DropdownMenuItem>
       )}
       {props.location === 'EQUIPMENT' && (
-        <DropdownMenuItem disabled={itemUseMutation.isPending} onClick={onEquip}>
+        <DropdownMenuItem disabled={itemUseMutation.isPending} onClick={onItemUse}>
           unEquip
         </DropdownMenuItem>
       )}

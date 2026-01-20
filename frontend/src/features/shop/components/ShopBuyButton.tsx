@@ -24,10 +24,10 @@ export const ShopBuyButton = ({ items }: Props) => {
     mutationFn: shopBuyItems,
 
     async onSuccess({ message, data }) {
-      await queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: getItemContainerOptions(heroId, backpackId).queryKey,
       });
-      await queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: getHeroOptions().queryKey,
       });
       onClose();
