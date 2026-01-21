@@ -29,8 +29,8 @@ export const calculate = {
     const time = BASE_HEALTH_REGEN_TIME - constitution * 20;
     return Math.max(1000, time);
   },
-  manaRegenTime(intelligence: number) {
-    const time = BASE_MANA_REGEN_TIME - intelligence * 30;
+  manaRegenTime(wisdom: number) {
+    const time = BASE_MANA_REGEN_TIME - wisdom * 30;
     return Math.max(1000, time);
   },
 

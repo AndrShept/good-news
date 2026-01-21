@@ -7,6 +7,7 @@ import { serverState } from '../game/state/server-state';
 import { sumAllModifier } from '../lib/utils';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
+import { calculate } from '../lib/calculate';
 
 export const heroService = {
   getHero(heroId: string) {
@@ -81,6 +82,21 @@ export const heroService = {
     hero.maxHealth = maxHealth;
     hero.maxMana = maxMana;
     hero.modifier = { ...hero.modifier, ...sumModifier };
+
+    const healthTimeMs = calculate.manaRegenTime(sumStatAndModifier.constitution)
+    const manaTimeMs = calculate.manaRegenTime(sumStatAndModifier.wisdom)
+    hero.regen.manaTimeMs = manaTimeMs
+    hero.regen.healthTimeMs = healthTimeMs
+  },
+  updateRegenTime(heroId: string) {
+    const hero = this.getHero(heroId);
+    const { sumModifier, sumStatAndModifier } = this.getHeroStatsWithModifiers(heroId);
+    const healthTimeMs = calculate.manaRegenTime(sumStatAndModifier.constitution)
+    const manaTimeMs = calculate.manaRegenTime(sumStatAndModifier.wisdom)
+    hero.regen.manaTimeMs = manaTimeMs
+    hero.regen.healthTimeMs = healthTimeMs
+
+
   },
   spendGold(heroId: string, amount: number) {
     const hero = this.getHero(heroId);

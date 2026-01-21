@@ -348,6 +348,13 @@ export type IHeroStat = {
   constitution: number;
   luck: number;
 };
+export type THeroRegen = {
+  healthAcc: number,
+  manaAcc: number,
+  healthTimeMs: number,
+  manaTimeMs: number,
+  lastUpdate: number
+};
 export type IHeroStatEnum = keyof IHeroStat;
 
 export const statsSchema = createSelectSchema(modifierTable, {

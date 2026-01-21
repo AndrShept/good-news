@@ -2,6 +2,7 @@ import { performance } from 'node:perf_hooks'
 
 import { buffTick } from './buff-tick'
 import { moveTick } from './move-tick'
+import { regenTick } from './regen-tick'
 
 
 const TICK_RATE = 200 // ms
@@ -21,6 +22,7 @@ export const gameLoop = () => {
 
     moveTick(lastTick)
     buffTick(lastTick)
+    regenTick(lastTick)
 
     lastTick += TICK_RATE
     ticks++
@@ -32,7 +34,6 @@ export const gameLoop = () => {
   }
 
   const elapsed = performance.now() - start
-
   if (elapsed > 50) {
     console.warn(
       `[TICK SLOW] ${elapsed.toFixed(2)}ms | ticks=${ticks}`

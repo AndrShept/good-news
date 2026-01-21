@@ -23,6 +23,7 @@ import {
   type PathNode,
   type QueueCraftItem,
   type SuccessResponse,
+  type THeroRegen,
   type TItemContainer,
   type WeaponHandType,
   buildingValues,
@@ -103,9 +104,10 @@ export const heroRouter = new Hono<Context>()
           where: and(eq(itemInstanceTable.ownerHeroId, hero.id), eq(itemInstanceTable.location, 'EQUIPMENT')),
         });
         serverState.user.set(userId, hero.id);
+
         const setData = { ...hero, equipments: equipments ?? [], buffs: [] };
         serverState.hero.set(hero.id, setData as Hero);
-
+        heroService.updateRegenTime(hero.id)
         heroOnline(hero.id);
       }
 
@@ -195,6 +197,14 @@ export const heroRouter = new Hono<Context>()
         message: 'Hero already exists for this user.',
       });
     }
+    const regen: THeroRegen = {
+      healthAcc: 0,
+      manaAcc: 0,
+      healthTimeMs: 0,
+      manaTimeMs: 0,
+      lastUpdate: Date.now()
+    }
+
     await db.transaction(async (tx) => {
       const characterImage = '/sprites/new/newb-mage.webp';
       const [newHero] = await tx
@@ -209,6 +219,7 @@ export const heroRouter = new Hono<Context>()
           freeStatPoints,
           maxHealth: stat.constitution * HP_MULTIPLIER_COST,
           maxMana: stat.intelligence * MANA_MULTIPLIER_INT,
+          regen
         })
         .returning();
       await tx.insert(modifierTable).values({

@@ -8,7 +8,7 @@ import { heroService } from "../services/hero-service"
 export const buffTick = (now: number) => {
 
   for (let [heroId, buffs] of serverState.buff.entries()) {
-    for (let i = 0; i < buffs.length; i++) {
+    for (let i = buffs.length - 1; i >= 0; i--) {
       const buff = buffs[i]
       if (buff.expiresAt <= now) {
         const socketData: RemoveBuffData = {
