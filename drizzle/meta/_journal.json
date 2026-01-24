@@ -71,6 +71,20 @@
       "when": 1769028019523,
       "tag": "0009_tearful_misty_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1769094746143,
+      "tag": "0010_bumpy_surge",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1769098041199,
+      "tag": "0011_bitter_cerise",
+      "breakpoints": true
     }
   ]
 }

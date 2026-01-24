@@ -36,8 +36,8 @@ export const ShopItems = ({ buildingType }: Props) => {
           <li
             onClick={() => addShopItem({ id: item.id, name: item.name, image: item.image, quantity: 1, price: item.buyPrice ?? 0 })}
             key={item.id}
-            className={cn("bg-secondary/40 hover:border-border relative flex items-center gap-1 rounded border border-transparent px-3 py-2 shadow-2xl hover:cursor-default", {
-              'bg-orange-300/10' : !!itemsMap[item.id]
+            className={cn("bg-secondary/40 hover:border-border relative flex items-center gap-1 rounded border border-transparent px-3 py-2 shadow-2xl hover:cursor-default select-none", {
+              'bg-orange-300/10': !!itemsMap[item.id]
             })}
           >
             <GameItemImg className="size-10" image={item.image} />

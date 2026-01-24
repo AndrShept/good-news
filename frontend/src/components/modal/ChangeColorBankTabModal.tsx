@@ -38,10 +38,11 @@ export const ChangeColorBankTabModal = () => {
         </DialogHeader>
 
         <DialogFooter>
+
+          <AcceptButton disabled={isPending} onClick={handleSubmit} />
           <DialogClose asChild>
             <CancelButton disabled={isPending} />
           </DialogClose>
-          <AcceptButton disabled={isPending} onClick={handleSubmit} />
         </DialogFooter>
       </DialogContent>
     </Dialog>

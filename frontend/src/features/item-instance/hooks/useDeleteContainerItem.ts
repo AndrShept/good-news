@@ -15,14 +15,13 @@ export const useDeleteContainerItem = () => {
   const setGameMessage = useSetGameMessage();
   const queryClient = useQueryClient();
   const heroId = useHeroId();
-  const backpackId = useGetBackpackId();
   return useMutation({
     mutationFn: ({ itemContainerId, itemInstanceId }: IDeleteContainerSlotItem) =>
       deleteContainerInstanceItem({ id: heroId, itemContainerId, itemInstanceId }),
 
-    async onSuccess(data, variable) {
+    async onSuccess(data, { itemContainerId }) {
       queryClient.invalidateQueries({
-        queryKey: getItemContainerOptions(heroId, backpackId).queryKey,
+        queryKey: getItemContainerOptions(heroId, itemContainerId).queryKey,
       });
       setGameMessage({
         success: true,

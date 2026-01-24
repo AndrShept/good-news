@@ -10,8 +10,9 @@ export const GameItemImg = memo(({ image, isPixelate = true, className, ...props
   return (
     <>
       <img
+        {...props}
         style={{ imageRendering: isPixelate ? 'pixelated' : undefined }}
-        className={cn('size-full object-contain opacity-85 group-hover:opacity-100', className)}
+        className={cn('size-full object-contain opacity-85 select-none group-hover:opacity-100', className)}
         src={image}
         alt={image?.split('/').at(-1)}
       />

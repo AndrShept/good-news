@@ -21,5 +21,9 @@ export const getSkills = async (heroId: string) => {
 export const getSkillsOptions = (heroId: string) =>
   queryOptions({
     queryKey: ['skills', heroId],
+    staleTime: 60 * 1000,
     queryFn: () => getSkills(heroId),
+
+
+
   });

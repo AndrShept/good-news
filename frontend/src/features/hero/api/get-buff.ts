@@ -16,6 +16,7 @@ export const getBuff = async (id: string) => {
 
 export const getBuffOptions = (id: string) =>
   queryOptions({
-    queryKey: ['buff'],
+    queryKey: ['buff', id],
     queryFn: () => getBuff(id),
+
   });

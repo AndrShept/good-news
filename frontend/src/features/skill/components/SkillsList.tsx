@@ -6,7 +6,7 @@ import { useSkill } from '../hooks/useSkill';
 import { SkillSkeleton } from './SkillSkeleton';
 
 export const SkillsList = () => {
-  const { skillNextExpMap, skills, isLoading } = useSkill();
+  const { skills, isLoading } = useSkill();
   const { skillsTemplateById } = useGameData();
 
   return (
@@ -28,11 +28,11 @@ export const SkillsList = () => {
                 <Progress
                   className="bg-background h-3 rounded border"
                   progressClassName="bg-sky-500"
-                  value={(skill.currentExperience / (skillNextExpMap?.[template.key] ?? 0)) * 100}
+                  value={(skill.currentExperience / skill.expToLvl) * 100}
                 />
                 <div className="mx-auto inline-flex gap-1 text-xs">
                   <span className="">{skill.currentExperience}</span>
-                  <span className="text-muted-foreground/30">/{skillNextExpMap?.[template.key]}</span>
+                  <span className="text-muted-foreground/30">/{skill.expToLvl}</span>
                 </div>
               </div>
             </li>

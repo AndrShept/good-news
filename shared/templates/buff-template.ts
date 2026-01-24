@@ -15,7 +15,7 @@ export const buffTemplate = [
     name: 'Effect of Vitality',
     image: imageConfig.icon.POTION.buff.constitution,
     type: 'POSITIVE',
-    duration: 60 * 60 * 1000,
+    duration: 60 * 1000,
     modifier: { constitution: 8 },
   },
   {

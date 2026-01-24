@@ -36,7 +36,7 @@ function GameRouteComponent() {
 
   return (
     <SocketProvider user={user} heroId={heroId}>
-      <Game />
+      <Game  />
     </SocketProvider>
   );
 }

@@ -62,12 +62,19 @@ export type SelfMessageData = { message: string; type: GameMessageType };
 
 
 
-export type SelfHeroData = BuffCreateJob | RegenHealthJob | RegenManaJob | QueueCraftItemJob;
+export type SelfHeroData = RemoveBuffData | SkillUpData
 
 export type RemoveBuffData = {
   type: 'REMOVE_BUFF'
   payload: {
     buffInstanceId: string
+  }
+};
+export type SkillUpData = {
+  type: 'SKILL_UP',
+  payload: {
+    skillInstanceId: string
+    message: string
   }
 }
 

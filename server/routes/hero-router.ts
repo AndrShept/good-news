@@ -70,6 +70,7 @@ import { itemContainerService } from '../services/item-container-service';
 import { itemInstanceService } from '../services/item-instance-service';
 import { itemTemplateService } from '../services/item-template-service';
 import { itemUseService } from '../services/item-use-service';
+import { skillService } from '../services/skill-service';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -79,8 +80,6 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const userId = c.get('user')?.id as string;
       let heroId = serverState.user.get(userId);
-
-
 
       if (!heroId) {
         const hero = await db.query.heroTable.findFirst({
@@ -103,11 +102,18 @@ export const heroRouter = new Hono<Context>()
         const equipments = await db.query.itemInstanceTable.findMany({
           where: and(eq(itemInstanceTable.ownerHeroId, hero.id), eq(itemInstanceTable.location, 'EQUIPMENT')),
         });
+        const skills = await db.query.skillInstanceTable.findMany({
+          where: eq(skillInstanceTable.heroId, hero.id),
+        });
+        const buffs = await db.query.buffInstanceTable.findMany({
+          where: eq(buffInstanceTable.ownerHeroId, hero.id),
+        });
+        serverState.skill.set(hero.id, skills);
+        serverState.buff.set(hero.id, buffs);
         serverState.user.set(userId, hero.id);
 
         const setData = { ...hero, equipments: equipments ?? [], buffs: [] };
         serverState.hero.set(hero.id, setData as Hero);
-        heroService.updateRegenTime(hero.id)
         heroOnline(hero.id);
       }
 
@@ -200,10 +206,9 @@ export const heroRouter = new Hono<Context>()
     const regen: THeroRegen = {
       healthAcc: 0,
       manaAcc: 0,
-      healthTimeMs: 0,
-      manaTimeMs: 0,
-      lastUpdate: Date.now()
-    }
+      healthTimeMs: calculate.healthRegenTime(stat.constitution),
+      manaTimeMs: calculate.manaRegenTime(stat.wisdom),
+    };
 
     await db.transaction(async (tx) => {
       const characterImage = '/sprites/new/newb-mage.webp';
@@ -218,8 +223,8 @@ export const heroRouter = new Hono<Context>()
           userId,
           freeStatPoints,
           maxHealth: stat.constitution * HP_MULTIPLIER_COST,
-          maxMana: stat.intelligence * MANA_MULTIPLIER_INT,
-          regen
+          maxMana: stat.wisdom * MANA_MULTIPLIER_INT,
+          regen,
         })
         .returning();
       await tx.insert(modifierTable).values({
@@ -243,6 +248,7 @@ export const heroRouter = new Hono<Context>()
         await tx.insert(skillInstanceTable).values({
           heroId: newHero.id,
           skillTemplateId: skill.id,
+          expToLvl: skillService.getExpSkillToNextLevel(skill.key, 1),
         });
       }
 
@@ -512,6 +518,57 @@ export const heroRouter = new Hono<Context>()
         success: true,
         message: result.message,
         data: { name: result.name },
+      });
+    },
+  )
+  .post(
+    '/:id/item/:itemInstanceId/move',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string().uuid(),
+        itemInstanceId: z.string().uuid(),
+      }),
+    ),
+    zValidator(
+      'json',
+      z.object({
+        from: z.string().uuid(),
+        to: z.string().uuid(),
+      }),
+    ),
+    async (c) => {
+      const { id, itemInstanceId } = c.req.valid('param');
+      const { from, to } = c.req.valid('json');
+      console.log({
+        itemInstanceId,
+        from,
+        to,
+      });
+      const userId = c.get('user')?.id as string;
+      const hero = heroService.getHero(id);
+      const fromContainer = itemContainerService.getContainer(from);
+      const itemInstance = itemInstanceService.getItemInstance(from, itemInstanceId);
+      const toContainer = itemContainerService.getContainer(to);
+      const iremTemplate = itemTemplateService.getAllItemsTemplateMapIds()[itemInstance.itemTemplateId];
+      for (const container of [fromContainer, toContainer]) {
+        verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: container.heroId, heroId: hero.id });
+      }
+
+      if (hero.state === 'BATTLE') {
+        throw new HTTPException(403, { message: 'You cannot use item during some action.', cause: { canShow: true } });
+      }
+      if (!iremTemplate.stackable) {
+        itemInstance.itemContainerId = to;
+        itemInstance.location = toContainer.type;
+        fromContainer.itemsInstance = fromContainer.itemsInstance.filter((i) => i.id !== itemInstanceId);
+        toContainer.itemsInstance.push(itemInstance);
+      }
+
+      return c.json<SuccessResponse>({
+        success: true,
+        message: 'success move item',
       });
     },
   )

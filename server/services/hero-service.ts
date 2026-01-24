@@ -81,9 +81,11 @@ export const heroService = {
     });
     hero.maxHealth = maxHealth;
     hero.maxMana = maxMana;
+    hero.currentHealth = Math.min(maxHealth, hero.currentHealth)
+    hero.currentMana = Math.min(maxMana, hero.currentMana)
     hero.modifier = { ...hero.modifier, ...sumModifier };
 
-    const healthTimeMs = calculate.manaRegenTime(sumStatAndModifier.constitution)
+    const healthTimeMs = calculate.healthRegenTime(sumStatAndModifier.constitution)
     const manaTimeMs = calculate.manaRegenTime(sumStatAndModifier.wisdom)
     hero.regen.manaTimeMs = manaTimeMs
     hero.regen.healthTimeMs = healthTimeMs

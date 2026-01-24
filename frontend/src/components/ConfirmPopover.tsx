@@ -68,14 +68,6 @@ ConfirmPopover.Content = ({ children, side }) => {
     <PopoverContent side={side} className="flex flex-col gap-4 text-sm">
       {children}
       <section className="ml-auto flex gap-1">
-        <CancelButton
-          disabled={isPending}
-          onClick={() => {
-            setIsOpen(false);
-            setIsShow?.(false);
-          }}
-        />
-
         <AcceptButton
           disabled={isPending}
           onClick={() => {
@@ -86,6 +78,15 @@ ConfirmPopover.Content = ({ children, side }) => {
             });
           }}
         />
+        <CancelButton
+          disabled={isPending}
+          onClick={() => {
+            setIsOpen(false);
+            setIsShow?.(false);
+          }}
+        />
+
+
       </section>
     </PopoverContent>
   );

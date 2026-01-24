@@ -87,7 +87,7 @@ export const Stats = memo(({ reset, setCurrentStats, currentStats, freePoints, s
         </div>
         {!areStatsEqual(baseStats, currentStats) && reset && (
           <Button onClick={onConfirm} disabled={isPending} className="mt-2 w-full" variant={'outline'} size={'icon'}>
-            <p>Confirm</p> <CheckIcon className="size-4 text-green-500" />
+            <p>Aplly</p> <CheckIcon className="size-4 text-green-500" />
           </Button>
         )}
         {reset && <ResetStatsButton />}

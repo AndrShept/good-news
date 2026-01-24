@@ -33,10 +33,11 @@ export const ChangeNameBankTabModal = () => {
         </DialogHeader>
         <InputForm handleSubmit={handleSubmit}>
           <DialogFooter className="mt-2">
+
+            <AcceptButton disabled={isPending} />
             <DialogClose asChild>
               <CancelButton disabled={isPending} />
             </DialogClose>
-            <AcceptButton disabled={isPending} />
           </DialogFooter>
         </InputForm>
       </DialogContent>

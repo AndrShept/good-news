@@ -7,6 +7,8 @@ export const skillInstanceTable = pgTable('skill_instance', {
   id: uuid().primaryKey().defaultRandom().notNull(),
   level: integer().notNull().default(1),
   currentExperience: integer().notNull().default(0),
+  expToLvl: integer().notNull(),
+  expAcc: integer().notNull().default(0),
   heroId: uuid()
     .references(() => heroTable.id, { onDelete: 'cascade' })
     .notNull(),

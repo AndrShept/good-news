@@ -34,9 +34,6 @@ export const calculate = {
     return Math.max(1000, time);
   },
 
-  getExpSkillToNextLevel(skillKey: SkillKey, skillLevel: number) {
-    return Math.floor(100 * Math.pow(skillLevel, skillExpConfig[skillKey].difficultyMultiplier));
-  },
 
   getCraftSkillXp(skillKey: SkillKey, skillLevel: number, coreMaterialRarity: RarityType) {
     // Чим більший skillLevel — тим повільніша прокачка

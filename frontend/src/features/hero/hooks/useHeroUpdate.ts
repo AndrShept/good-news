@@ -4,9 +4,10 @@ import { useCallback } from 'react';
 
 import { getHeroOptions } from '../api/get-hero';
 
-export type OmitDeepHero = Omit<Partial<Hero>, 'location' | 'group'> & {
+export type OmitDeepHero = Omit<Partial<Hero>, 'location' | 'group' | 'regen'> & {
   location?: Partial<Hero['location']>;
   group?: Partial<Hero['group']>;
+  regen?: Partial<Hero['regen']>;
 };
 
 export const useHeroUpdate = () => {
@@ -24,8 +25,9 @@ export const useHeroUpdate = () => {
           ...oldData.location,
           ...data.location,
         },
-        group: { ...oldData.group , ...data.group },
-      } 
+        group: { ...oldData.group, ...data.group },
+        regen: { ...oldData.regen, ...data.regen },
+      }
     });
   }, []);
 

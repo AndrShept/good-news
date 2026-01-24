@@ -15,6 +15,7 @@ export const armorTemplate = [
     coreModifier: {
       defense: 20,
       evasion: -30,
+      constitution: 10
     },
   },
 ] as const satisfies ItemTemplate[];

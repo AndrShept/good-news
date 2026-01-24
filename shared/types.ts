@@ -353,7 +353,6 @@ export type THeroRegen = {
   manaAcc: number,
   healthTimeMs: number,
   manaTimeMs: number,
-  lastUpdate: number
 };
 export type IHeroStatEnum = keyof IHeroStat;
 
