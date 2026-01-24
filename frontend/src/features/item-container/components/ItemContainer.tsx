@@ -24,14 +24,14 @@ export const ItemContainer = memo(({ capacity, id, itemsInstance, isLoading }: P
   const moveItemMutation = useMoveItemInstance();
   return (
     <section
-      onDragEnter={(e) => {
+      onDragEnter={() => {
         if (dragContainerStore.itemInstance?.itemContainerId === id) return;
         if (dragContainerStore.itemInstance?.location === 'EQUIPMENT') return;
         dragCounterRef.current = Math.max(dragCounterRef.current, 2);
 
         setIsDrag(true);
       }}
-      onDragLeave={(e) => {
+      onDragLeave={() => {
         if (dragContainerStore.itemInstance?.itemContainerId === id) return;
         dragCounterRef.current--;
         if (dragCounterRef.current === 0) {
@@ -43,7 +43,7 @@ export const ItemContainer = memo(({ capacity, id, itemsInstance, isLoading }: P
         if (dragContainerStore.itemInstance?.location === 'EQUIPMENT') return;
         e.preventDefault();
       }}
-      onDrop={(e) => {
+      onDrop={() => {
         setIsDrag(false);
         dragCounterRef.current = 0;
         const data = {

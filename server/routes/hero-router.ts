@@ -410,7 +410,7 @@ export const heroRouter = new Hono<Context>()
       for (const item of items) {
         const template = itemTemlateById[item.id];
         returnData.push({ name: template.name, quantity: item.quantity });
-        itemContainerService.obtainItem({
+        itemContainerService.buyItem({
           heroId: hero.id,
           itemContainerId: backpack.id,
           itemTemplateId: template.id,
@@ -541,17 +541,13 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const { id, itemInstanceId } = c.req.valid('param');
       const { from, to } = c.req.valid('json');
-      console.log({
-        itemInstanceId,
-        from,
-        to,
-      });
+
       const userId = c.get('user')?.id as string;
       const hero = heroService.getHero(id);
       const fromContainer = itemContainerService.getContainer(from);
       const itemInstance = itemInstanceService.getItemInstance(from, itemInstanceId);
       const toContainer = itemContainerService.getContainer(to);
-      const iremTemplate = itemTemplateService.getAllItemsTemplateMapIds()[itemInstance.itemTemplateId];
+      const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[itemInstance.itemTemplateId];
       for (const container of [fromContainer, toContainer]) {
         verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: container.heroId, heroId: hero.id });
       }
@@ -559,11 +555,28 @@ export const heroRouter = new Hono<Context>()
       if (hero.state === 'BATTLE') {
         throw new HTTPException(403, { message: 'You cannot use item during some action.', cause: { canShow: true } });
       }
-      if (!iremTemplate.stackable) {
+
+      itemContainerService.checkFreeContainerCapacity(toContainer.id);
+
+      const existContainer = toContainer.itemsInstance.some((i) => i.itemTemplateId === itemTemplate.id);
+
+      if ((!existContainer && itemTemplate.stackable) || !itemTemplate.stackable) {
+        console.log('!!!! UPDATE !!!!');
         itemInstance.itemContainerId = to;
         itemInstance.location = toContainer.type;
-        fromContainer.itemsInstance = fromContainer.itemsInstance.filter((i) => i.id !== itemInstanceId);
+        itemInstance.ownerHeroId = hero.id;
+        itemContainerService.removeItem(from, itemInstanceId);
         toContainer.itemsInstance.push(itemInstance);
+      } else {
+        console.log('!!!! STACK !!!');
+        itemContainerService.removeItem(from, itemInstanceId);
+        itemContainerService.obtainStackableItem({
+          heroId: hero.id,
+          itemContainerId: toContainer.id,
+          itemTemplateId: itemTemplate.id,
+          location: toContainer.type,
+          quantity: itemInstance.quantity,
+        });
       }
 
       return c.json<SuccessResponse>({

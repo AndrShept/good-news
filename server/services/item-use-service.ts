@@ -4,8 +4,8 @@ import { HTTPException } from 'hono/http-exception';
 import { buffInstanceService } from './buff-instance-service';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
-import { itemInstanceService } from './item-instance-service';
 import { itemTemplateService } from './item-template-service';
+import { itemInstanceService } from './item-instance-service';
 
 export const itemUseService = {
   drink(heroId: string, itemInstanceId: string) {

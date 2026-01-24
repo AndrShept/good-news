@@ -13,6 +13,7 @@ import { Server } from 'socket.io';
 import { type Context } from './context';
 import { db } from './db/db';
 import { heroTable } from './db/schema';
+import { locationTable } from './db/schema/location-schema';
 import { gameLoop } from './game/gameLoop';
 import { saveDb } from './game/save-db';
 import { serverState } from './game/state/server-state';
@@ -20,6 +21,7 @@ import { heroOffline } from './lib/heroOffline';
 import { inviteGroup } from './lib/inviteGroup';
 import { joinRoom } from './lib/joinRoom';
 import { leaveRoom } from './lib/leaveRoom';
+import { maintance } from './middleware/maintance';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
 import { commentRouter } from './routes/comment-router';
@@ -30,13 +32,19 @@ import { mapRouter } from './routes/map-router';
 import { placeRouter } from './routes/place-router';
 import { postRouter } from './routes/post-router';
 import { shopRouter } from './routes/shop-router';
-import { locationTable } from './db/schema/location-schema';
 
 const app = new Hono<Context>();
+export let isMaintance = false;
 
 app.use(logger());
 app.use('*', cors(), sessionHandler);
 
+app.use('*', cors(), maintance);
+app.get('/restart', async (c) => {
+  isMaintance = !isMaintance;
+
+  return c.json({ isMaintance: isMaintance }, 200);
+});
 //APP ROUTES
 const routes = app
   .basePath('/api')
@@ -108,7 +116,6 @@ export const io = new Server(httpServer, {
 await db.update(heroTable).set({
   isOnline: false,
   state: 'IDLE',
-
 });
 await db.update(locationTable).set({
   targetX: null,
@@ -133,7 +140,6 @@ io.on('connection', async (socket) => {
     if (heroState) {
       heroState.offlineTimer = Date.now() + 30000;
     }
-   
   });
 });
 

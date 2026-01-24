@@ -5,7 +5,6 @@ export const getHero = async () => {
   try {
     const res = await client.hero.$get();
     const data = await res.json();
-
     if (!res.ok) {
       throw new Error(data.message);
     }

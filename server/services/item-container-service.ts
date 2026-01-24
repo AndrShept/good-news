@@ -1,16 +1,24 @@
-import type { ItemInstance } from '@/shared/types';
+import type { ItemInstance, ItemLocationType } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
 import { heroService } from './hero-service';
-import { itemInstanceService } from './item-instance-service';
 import { itemTemplateService } from './item-template-service';
+import { itemInstanceService } from './item-instance-service';
 
 interface IObtainItem {
   itemContainerId: string;
   itemTemplateId: string;
   quantity: number;
   heroId: string;
+}
+
+interface IObtainStackableItem {
+  quantity: number;
+  itemContainerId: string;
+  itemTemplateId: string;
+  heroId: string;
+  location: ItemLocationType;
 }
 
 export const itemContainerService = {
@@ -49,17 +57,23 @@ export const itemContainerService = {
     }
   },
 
-  obtainItem({ itemContainerId, heroId, itemTemplateId, quantity }: IObtainItem) {
+  buyItem({ itemContainerId, heroId, itemTemplateId, quantity }: IObtainItem) {
     const container = this.getContainer(itemContainerId);
     const templateById = itemTemplateService.getAllItemsTemplateMapIds();
     const template = templateById[itemTemplateId];
-    const location = container.type === 'BACKPACK' ? 'BACKPACK' : 'BANK';
+    const location = 'BACKPACK';
     if (!template.stackable) {
       for (let i = 0; i < quantity; i++) {
         itemInstanceService.createItem({ heroId, itemContainerId, itemTemplateId, quantity: 1, location });
       }
       return;
     }
+    this.obtainStackableItem({ heroId, itemContainerId, itemTemplateId, location, quantity });
+  },
+  obtainStackableItem({ heroId, itemContainerId, itemTemplateId, location, quantity }: IObtainStackableItem) {
+    const container = itemContainerService.getContainer(itemContainerId);
+    const templateById = itemTemplateService.getAllItemsTemplateMapIds();
+    const template = templateById[itemTemplateId];
 
     let remaining = quantity;
 
@@ -84,6 +98,7 @@ export const itemContainerService = {
       remaining -= stackQty;
     }
   },
+
   consumeItem({ itemContainerId, itemInstanceId, quantity }: { itemContainerId: string; itemInstanceId: string; quantity: number }) {
     const container = this.getContainer(itemContainerId);
     const itemInstance = itemInstanceService.getItemInstance(itemContainerId, itemInstanceId);
