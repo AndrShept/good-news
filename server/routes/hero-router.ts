@@ -561,14 +561,12 @@ export const heroRouter = new Hono<Context>()
       const existContainer = toContainer.itemsInstance.some((i) => i.itemTemplateId === itemTemplate.id);
 
       if ((!existContainer && itemTemplate.stackable) || !itemTemplate.stackable) {
-        console.log('!!!! UPDATE !!!!');
         itemInstance.itemContainerId = to;
         itemInstance.location = toContainer.type;
         itemInstance.ownerHeroId = hero.id;
         itemContainerService.removeItem(from, itemInstanceId);
         toContainer.itemsInstance.push(itemInstance);
       } else {
-        console.log('!!!! STACK !!!');
         itemContainerService.removeItem(from, itemInstanceId);
         itemContainerService.obtainStackableItem({
           heroId: hero.id,

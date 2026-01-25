@@ -141,7 +141,7 @@ export const modifierChangeName = (modifier: keyof OmitModifier) => {
   return variants[modifier];
 };
 
-export const getModifiers = (...args: Partial<OmitModifier>[]) => {
+export const getModifiers = (...args: Partial<OmitModifier | undefined>[]) => {
   const baseModifier: Omit<OmitModifier, 'minDamage' | 'maxDamage'> = {
     spellDamage: 0,
     spellCritPower: 0,
@@ -167,6 +167,7 @@ export const getModifiers = (...args: Partial<OmitModifier>[]) => {
   };
   for (const item of args) {
     for (const key in baseModifier) {
+      if (!item) continue;
       const typedKey = key as keyof Omit<OmitModifier, 'minDamage' | 'maxDamage'>;
       baseModifier[typedKey] += item[typedKey] ?? 0;
     }

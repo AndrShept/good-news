@@ -1,6 +1,6 @@
 import { CustomTooltip } from '@/components/CustomTooltip';
 import { ModifierInfoCard } from '@/features/item-instance/components/ModifierInfoCard';
-import { cn, formatDurationFromSeconds, getModifiers } from '@/lib/utils';
+import { cn, formatDurationFromSeconds } from '@/lib/utils';
 import { BuffInstance, BuffTemplate } from '@/shared/types';
 import { memo, useEffect, useState } from 'react';
 
@@ -10,7 +10,6 @@ type Props = BuffInstance & {
 
 export const BuffCard = memo(function BuffCard(props: Props) {
   const [time, setTime] = useState(Date.now());
-  const modifier = getModifiers(props.buffTemplate.modifier);
   useEffect(() => {
     setTime((props.expiresAt - Date.now()) / 60000);
   }, [props.expiresAt]);
@@ -45,11 +44,11 @@ export const BuffCard = memo(function BuffCard(props: Props) {
               </h3>
               <p className="text-muted-foreground/30 text-xs">{props.buffTemplate.type}</p>
             </div>
-            <ModifierInfoCard modifiers={modifier} />
+            <ModifierInfoCard modifiersArgs={[props.buffTemplate.modifier]} />
             <p className="text-muted-foreground/30 text-xs">Expires in: {time.toFixed(0)} minutes</p>
           </div>
         </CustomTooltip.Content>
       </CustomTooltip>
     </article>
   );
-})
+});

@@ -1,31 +1,33 @@
+import { useGameData } from '@/features/hero/hooks/useGameData';
+import { TPotionInfo } from '@/shared/types';
 
+import { ModifierInfoCard } from './ModifierInfoCard';
 
-// import { ModifierInfoCard } from './ModifierInfoCard';
+interface Props {
+  potionInfo: TPotionInfo;
+}
+export const PotionInfo = ({ potionInfo }: Props) => {
+  const { buffTemplateById } = useGameData();
 
-// type Props = Potion;
+  return (
+    <>
+      <div className="mb-1">
+        <span>type: </span>
+        <span>{potionInfo.type.toLowerCase()}</span>
+      </div>
 
-// export const PotionInfo = ({ buffInfo, restore, type }: Props) => {
-//   if (!restore && !buffInfo) return;
-//   return (
-//     <section className="mt-1">
-//       {type === 'RESTORE' && (
-//         <div className="flex flex-col">
-//           {!!restore?.health && (
-//             <div className="flex gap-1">
-//               <span className="text-green-500"> +{restore.health}</span>
-//               <span className="text-muted-foreground">health</span>
-//             </div>
-//           )}
+      {potionInfo.restore?.health && (
+        <div>
+          health: <span className="text-green-500">+{potionInfo.restore?.health}</span>
+        </div>
+      )}
+      {potionInfo.restore?.mana && (
+        <div>
+          mana: <span className="text-green-500">+{potionInfo.restore?.mana}</span>
+        </div>
+      )}
 
-//           {!!restore?.mana && (
-//             <div className="flex gap-1">
-//               <span className="text-green-500"> +{restore?.mana}</span>
-//               <span className="text-muted-foreground">mana</span>
-//             </div>
-//           )}
-//         </div>
-//       )}
-//       {type === 'BUFF' && <ModifierInfoCard modifier={buffInfo?.modifier} />}
-//     </section>
-//   );
-// };
+      {potionInfo.buffTemplateId && <ModifierInfoCard modifiersArgs={[buffTemplateById[potionInfo.buffTemplateId].modifier]} />}
+    </>
+  );
+};
