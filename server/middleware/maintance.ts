@@ -2,6 +2,7 @@ import type { Context, Next } from 'hono';
 import { Style, css } from 'hono/css';
 
 import { isMaintance } from '..';
+import { html } from 'hono/html';
 
 export const maintance = async (c: Context, next: Next) => {
   const containerClass = css`
@@ -67,25 +68,25 @@ export const maintance = async (c: Context, next: Next) => {
   `;
   console.log(c.req.path);
   if (isMaintance && c.req.path !== '/restart') {
-    return c.html(
-      <html lang="en">
-        <head>
-          <meta charset="UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <title>Server Restart in Progress</title>
-          <Style />
-        </head>
-        <body>
-          <div class={containerClass}>
-            <div class={cardClass}>
-              <div class={iconClass}>🔄</div>
-              <h1 class={titleClass}>Server Restart</h1>
-              <p class={messageClass}>The server is currently restarting. We'll be back online shortly.</p>
-              <div class={statusClass}>503 - Service Unavailable</div>
-            </div>
-          </div>
-        </body>
-      </html>,
+    return c.html(html`SERVER MAINTANCE 503`,
+      // <html lang="en">
+      //   <head>
+      //     <meta charset="UTF-8" />
+      //     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      //     <title>Server Restart in Progress</title>
+      //     <Style />
+      //   </head>
+      //   <body>
+      //     <div class={containerClass}>
+      //       <div class={cardClass}>
+      //         <div class={iconClass}>🔄</div>
+      //         <h1 class={titleClass}>Server Restart</h1>
+      //         <p class={messageClass}>The server is currently restarting. We'll be back online shortly.</p>
+      //         <div class={statusClass}>503 - Service Unavailable</div>
+      //       </div>
+      //     </div>
+      //   </body>
+      // </html>,
       503,
     );
   }

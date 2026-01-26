@@ -28,7 +28,7 @@ export const CraftBuilding = () => {
   return (
     <section className="flex w-full">
       <CraftSidebar recipeIds={recipeIds} onSelect={setRecipeId} selectedItemId={recipeId} />
-      <div className="flex flex-1 flex-col p-1">
+      <div className="flex flex-1 flex-col p-1 items-center ">
         <div className="min-h-0 flex-1">{recipeId && <CraftRecipeItemCard recipeId={recipeId} />}</div>
 
         {/* <QueueCraftItemsList /> */}

@@ -6,6 +6,7 @@ import { getBankItemContainersOptions } from '@/features/item-container/api/get-
 import { BankItemContainer } from '@/features/item-container/components/BankItemContainer';
 import { BankItemContainerTabMenu } from '@/features/item-container/components/BankItemContainerTabMenu';
 import { CreateBankItemContainerModal } from '@/features/item-container/components/CreateBankItemContainerModal';
+import { HeroBackpack } from '@/features/item-container/components/HeroBackpack';
 import { capitalize, cn } from '@/lib/utils';
 import { TPlace } from '@/shared/types';
 import { useQuery } from '@tanstack/react-query';
@@ -25,37 +26,42 @@ export const Bank = ({ place }: Props) => {
   }, [itemContainers, select]);
   if (isLoading) return <Spinner size={'sm'} />;
   return (
-    <section className="mx-auto flex w-full max-w-[600px] flex-col">
+    <section className="mx-auto flex w-full  flex-col">
       <h2 className="mb-2 text-center text-xl text-blue-400">{capitalize(place?.name)} bank</h2>
-
-      <Tabs value={select} onValueChange={setSelect} defaultValue={itemContainers?.[0]?.id}>
-        <ScrollArea className="w-full pb-2">
-          <TabsList className="bg-background h-fit gap-0.5">
-            {itemContainers?.map((container) => (
-              <div key={container.id} className="group flex h-9 min-w-14 items-center">
-                <TabsTrigger
-                  className={cn('rounded-none', {
-                    'ring-1': container.id === select,
-                  })}
-                  style={{ backgroundColor: container.color ?? undefined }}
-                  value={container.id}
-                >
-                  {container.name}
-                </TabsTrigger>
+      <div className="flex ">
+        <Tabs className="max-w-1/2" value={select} onValueChange={setSelect} defaultValue={itemContainers?.[0]?.id}>
+          <ScrollArea className="w-full min-w-0 pb-2">
+            <TabsList className="bg-background h-fit min-w-0 flex-1 gap-0.5">
+              {itemContainers?.map((container) => (
+                <div key={container.id} className="group flex h-9 min-w-14 items-center">
+                  <TabsTrigger
+                    className={cn('rounded-none', {
+                      'ring-1': container.id === select,
+                    })}
+                    style={{ backgroundColor: container.color ?? undefined }}
+                    value={container.id}
+                  >
+                    {container.name}
+                  </TabsTrigger>
                   <BankItemContainerTabMenu id={container.id} />
-              </div>
-            ))}
-            <CreateBankItemContainerModal placeName={place?.name ?? ''} />
-          </TabsList>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+                </div>
+              ))}
+              <CreateBankItemContainerModal placeName={place?.name ?? ''} />
+            </TabsList>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
 
-        {itemContainers?.map((container) => (
-          <TabsContent key={container.id} value={container.id}>
-            <BankItemContainer containerId={container.id} />
-          </TabsContent>
-        ))}
-      </Tabs>
+          {itemContainers?.map((container) => (
+            <TabsContent key={container.id} value={container.id}>
+              <BankItemContainer containerId={container.id} />
+            </TabsContent>
+          ))}
+        </Tabs>
+
+        <div className="mt-14.5 ">
+          <HeroBackpack />
+        </div>
+      </div>
     </section>
   );
 };

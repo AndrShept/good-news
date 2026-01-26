@@ -2,13 +2,13 @@ import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { imageConfig } from '@/shared/config/image-config';
-import { useBackpack } from '@/store/useBackpack';
+import { useBackpackStore } from '@/store/useBackpackStore';
 
 import { HeroBackpack } from './HeroBackpack';
 
 export const BackpackButton = () => {
-  const isOpen = useBackpack((state) => state.isOpen);
-  const onOpen = useBackpack((state) => state.onOpen);
+  const isOpen = useBackpackStore((state) => state.isOpen);
+  const onOpen = useBackpackStore((state) => state.onOpen);
   return (
     <>
       <Sheet open={isOpen} onOpenChange={onOpen} modal={false}>

@@ -9,27 +9,16 @@ import { getSkillsOptions } from '../api/get-skills';
 export const useSkill = () => {
   const heroId = useHeroId();
   const { data: skills, isLoading } = useQuery(getSkillsOptions(heroId));
-  // const skillNextExpMap = useMemo(
-  //   () =>
-  //     skills?.reduce(
-  //       (acc, skill) => {
-  //         const template = skillTemplateById[skill.skillTemplateId];
-  //         acc[template.key] = calculate.getExpSkillToNextLevel(template.key, skill.level);
-  //         return acc;
-  //       },
-  //       {} as Record<SkillKey, number>,
-  //     ),
-  //   [skills],
-  // );
+
   const skillMap = useMemo(
     () =>
       skills?.reduce(
         (acc, skill) => {
           const template = skillTemplateById[skill.skillTemplateId];
-          acc[template.key] = skill;
+          acc[skill.skillTemplateId] = skill;
           return acc;
         },
-        {} as Record<SkillKey, SkillInstance>,
+        {} as Record<string, SkillInstance>,
       ),
     [skills],
   );

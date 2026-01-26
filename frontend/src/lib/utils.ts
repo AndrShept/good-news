@@ -45,7 +45,7 @@ export const getTimeFns = (timestamp: number) => {
 };
 
 export const formatDurationFromSeconds = (seconds: number) => {
-  const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
+  const duration = intervalToDuration({ start: 0, end: seconds});
 
   const h = duration.hours ?? 0;
   const m = duration.minutes ?? 0;

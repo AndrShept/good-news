@@ -53,7 +53,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
                 <>
                   <GameItemImg image={props.itemTemplate.image} />
 
-                  {props.quantity > 1 && <div className="absolute bottom-1 right-0 size-3 text-[11px] font-semibold">{props.quantity}</div>}
+                  {props.quantity > 1 && <div className="absolute bottom-0 right-1  text-[12px] font-semibold ">{props.quantity}</div>}
                 </>
               </CustomTooltip.Trigger>
 
