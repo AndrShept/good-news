@@ -4,5 +4,6 @@ import { ItemContainer } from './ItemContainer';
 
 export const HeroBackpack = () => {
   const { backpack, isLoading } = useHeroBackpack();
-  return <ItemContainer  {...backpack!} isLoading={isLoading} />;
+  if(isLoading) return 'dasda'
+  return <ItemContainer  {...backpack!}  />;
 };

@@ -1,7 +1,9 @@
+import { Button } from '@/components/ui/button';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useItemUseMutation } from '@/features/hero/hooks/useItemUseMutation';
 import { ItemInstance, ItemTemplate, ItemTemplateType } from '@/shared/types';
 import { useModalStore } from '@/store/useModalStore';
+import { X } from 'lucide-react';
 
 interface Props extends ItemInstance {
   itemTemplate: ItemTemplate;
@@ -21,7 +23,7 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
   const onItemUse = () => {
     itemUseMutation.mutate({
       itemInstanceId: props.id,
-      itemTemplateId: props.itemTemplateId
+      itemTemplateId: props.itemTemplateId,
     });
   };
   const buttonName = buttonNameVariants[props.itemTemplate.type];
@@ -31,20 +33,20 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
   return (
     <>
       {props.location === 'BACKPACK' && buttonName && (
-        <DropdownMenuItem disabled={itemUseMutation.isPending} onClick={onItemUse}>
+        <Button className='size-3' variant="ghost" size="icon" disabled={itemUseMutation.isPending} onClick={onItemUse}>
           {buttonName}
-        </DropdownMenuItem>
+        </Button>
       )}
       {props.location === 'EQUIPMENT' && (
-        <DropdownMenuItem disabled={itemUseMutation.isPending} onClick={onItemUse}>
+        <Button variant="ghost" size="icon" disabled={itemUseMutation.isPending} onClick={onItemUse}>
           unEquip
-        </DropdownMenuItem>
+        </Button>
       )}
 
       {(props.location === 'BACKPACK' || props.location === 'BANK') && (
-        <DropdownMenuItem onClick={onDeleteInventoryItem} disabled={itemUseMutation.isPending}>
-          <p className="text-red-300">Delete</p>
-        </DropdownMenuItem>
+        <Button className='size-7' variant="ghost" size="icon" onClick={onDeleteInventoryItem} disabled={itemUseMutation.isPending}>
+          <X />
+        </Button>
       )}
     </>
   );

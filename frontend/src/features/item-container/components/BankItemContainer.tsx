@@ -12,5 +12,6 @@ type Props = {
 export const BankItemContainer = memo(({ containerId }: Props) => {
   const heroId = useHeroId();
   const { data, isLoading } = useQuery(getItemContainerOptions(heroId, containerId));
-  return <ItemContainer {...data!} isLoading={isLoading} />;
+  if (isLoading) return 'das';
+  return <ItemContainer {...data!} />;
 });
