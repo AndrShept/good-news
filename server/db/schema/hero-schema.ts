@@ -9,7 +9,18 @@ import { itemContainerTable } from './item-container-schema';
 import { locationTable } from './location-schema';
 import { modifierTable } from './modifier-schema';
 
-export const stateTypeEnum = pgEnum('state_type_enum', ['CHARACTER', 'IDLE', 'BATTLE', 'CRAFT', 'WALK']);
+export const stateTypeEnum = pgEnum('state_type_enum', [
+  'CHARACTER',
+  'IDLE',
+  'BATTLE',
+  'BLACKSMITHING',
+  'FISHING',
+  'LUMBERJACKING',
+  'MINING',
+  'SMELTING',
+  'TAILORING',
+  'WALK',
+]);
 
 export const heroTable = pgTable('hero', {
   id: uuid().primaryKey().notNull(),

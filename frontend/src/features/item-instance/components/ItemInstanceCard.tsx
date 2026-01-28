@@ -28,7 +28,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
     data: props,
     disabled: props.location === 'EQUIPMENT',
   });
-
+  const [isOpen, setIsOpen] = useState(false);
   const style: React.CSSProperties = {
     // transform: CSS.Translate.toString(transform),
     opacity: isDragging || moveItemMutation.isPending ? 0.5 : 1,
@@ -36,23 +36,19 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
   };
   useEffect(() => {
     if (isDragging) {
-      props.setSelectItemOnContainer(null);
+      setIsOpen(false);
     }
   }, [isDragging]);
   return (
     <GameItemSlot className={props.isSelect ? 'rounded ring-1 ring-yellow-200' : undefined}>
-      <div
-        ref={setNodeRef}
-        {...attributes}
-        {...listeners}
-        style={style}
-        className="size-full select-none"
-        onClick={() => {
-          console.log('CLIKCK');
-          props.setSelectItemOnContainer(props.isSelect ? null : props);
-        }}
-      >
-        <Popover>
+      <div ref={setNodeRef} {...attributes} {...listeners} style={style} className="size-full select-none">
+        <Popover
+          open={isOpen}
+          onOpenChange={(open) => {
+            setIsOpen(open);
+            props.setSelectItemOnContainer(open ? props : null);
+          }}
+        >
           <CustomTooltip>
             <PopoverTrigger className="size-full">
               <CustomTooltip.Trigger>
@@ -65,7 +61,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
             <CustomTooltip.Content>
               {!props.isSelect && !isDragging && !over?.id && <ItemInstanceCardHoverTooltip {...props} />}
             </CustomTooltip.Content>
-            <PopoverContent className="flex h-fit w-fit items-center px-2 py-1">
+            <PopoverContent className="bg-secondary flex w-fit h-11 gap-2 select-none items-center  rounded px-2">
               <ItemInstanceCardDropdownMenu {...props} />
             </PopoverContent>
           </CustomTooltip>

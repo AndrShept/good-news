@@ -1,21 +1,22 @@
+import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useItemUseMutation } from '@/features/hero/hooks/useItemUseMutation';
+import { imageConfig } from '@/shared/config/image-config';
 import { ItemInstance, ItemTemplate, ItemTemplateType } from '@/shared/types';
 import { useModalStore } from '@/store/useModalStore';
 import { X } from 'lucide-react';
+import { ReactElement } from 'react';
 
 interface Props extends ItemInstance {
   itemTemplate: ItemTemplate;
 }
-const buttonNameVariants: Record<ItemTemplateType, string> = {
-  WEAPON: 'Equip',
-  SHIELD: 'Equip',
-  ACCESSORY: 'Equip',
-  ARMOR: 'Equip',
-  POTION: 'Use',
-  MISC: '',
-  RESOURCES: '',
+const buttonIconVariants: Record<Exclude<ItemTemplateType, 'MISC' | 'RESOURCES'>, ReactElement> = {
+  WEAPON: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
+  SHIELD: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
+  ACCESSORY: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
+  ARMOR: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
+  POTION: <GameIcon className="size-7 opacity-70 hover:opacity-100" image={imageConfig.icon.action.drink} />,
 };
 export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
   const itemUseMutation = useItemUseMutation();
@@ -26,26 +27,26 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
       itemTemplateId: props.itemTemplateId,
     });
   };
-  const buttonName = buttonNameVariants[props.itemTemplate.type];
+  const icon = buttonIconVariants[props.itemTemplate.type as Exclude<ItemTemplateType, 'MISC' | 'RESOURCES'>];
   const onDeleteInventoryItem = () => {
     setModalData({ type: 'DELETE_ITEM_INSTANCE', id: props.id, itemInstance: props });
   };
   return (
     <>
-      {props.location === 'BACKPACK' && buttonName && (
-        <Button className='size-3' variant="ghost" size="icon" disabled={itemUseMutation.isPending} onClick={onItemUse}>
-          {buttonName}
+      {props.location === 'BACKPACK' && icon && (
+        <Button variant="ghost" className="p-0 hover:bg-transparent" disabled={itemUseMutation.isPending} onClick={onItemUse}>
+          {icon}
         </Button>
       )}
       {props.location === 'EQUIPMENT' && (
-        <Button variant="ghost" size="icon" disabled={itemUseMutation.isPending} onClick={onItemUse}>
-          unEquip
+        <Button className="p-0 hover:bg-transparent" variant="ghost" disabled={itemUseMutation.isPending} onClick={onItemUse}>
+          <GameIcon className="size-5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.unEquip} />
         </Button>
       )}
 
       {(props.location === 'BACKPACK' || props.location === 'BANK') && (
-        <Button className='size-7' variant="ghost" size="icon" onClick={onDeleteInventoryItem} disabled={itemUseMutation.isPending}>
-          <X />
+        <Button className="p-0  hover:bg-transparent" variant="ghost" onClick={onDeleteInventoryItem} disabled={itemUseMutation.isPending}>
+            <GameIcon className="size-6.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.close} />
         </Button>
       )}
     </>

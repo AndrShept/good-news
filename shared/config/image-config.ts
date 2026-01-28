@@ -35,6 +35,12 @@ export const imageConfig = {
       bag3: '/sprites/icons/ui/bag3.png',
       'shop-cart': '/sprites/icons/ui/shop-cart.png',
     },
+    action: {
+      close: '/sprites/icons/action/close.png',
+      equip: '/sprites/icons/action/equip.png',
+      unEquip: '/sprites/icons/action/unEquip.png',
+      drink: '/sprites/icons/action/drink.png',
+    },
     stat: {
       strength: '/sprites/icons/stats/strength.png',
       dexterity: '/sprites/icons/stats/dexterity.png',
@@ -47,6 +53,12 @@ export const imageConfig = {
       IDLE: '/sprites/icons/state/idle.png',
       BATTLE: '/sprites/icons/state/battle.png',
       WALK: '/sprites/icons/state/walk.png',
+      BLACKSMITHING: '/sprites/icons/state/blacksmithing.png',
+      FISHING: '/sprites/icons/state/fishing.png',
+      LUMBERJACKING: '/sprites/icons/state/lumberjacking.png',
+      MINING: '/sprites/icons/state/mining.png',
+      SMELTING: '/sprites/icons/state/smelting.png',
+      TAILORING: '/sprites/icons/state/tailoring.png',
     } as Record<StateType, string>,
     skill: {
       BLACKSMITHING: '/sprites/icons/skills/blacksmithing.png',
@@ -56,7 +68,7 @@ export const imageConfig = {
       TAILORING: '/sprites/icons/skills/tailoring.png',
       REGENERATION: '/sprites/icons/skills/regeneration.png',
       MEDITATION: '/sprites/icons/skills/meditation.png',
-    } ,
+    },
     place: {
       mine: '/sprites/icons/places/mine.png',
       solmer: '/sprites/icons/places/solmer.webp',

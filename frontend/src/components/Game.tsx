@@ -31,6 +31,7 @@ export const Game = () => {
   const mouseSensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 5,
+      
     },
   });
   const sensors = useSensors(mouseSensor);
