@@ -42,10 +42,10 @@ export const BuffCard = memo(function BuffCard(props: Props) {
               <h3 className="line-clamp-2 text-[15px] font-semibold">
                 {props.buffTemplate.name.charAt(0).toUpperCase() + props.buffTemplate.name.slice(1)}
               </h3>
-              <p className="text-muted-foreground/30 text-xs">{props.buffTemplate.type}</p>
+              <p className="text-muted-foreground text-xs">{props.buffTemplate.type}</p>
             </div>
             <ModifierInfoCard modifiersArgs={[props.buffTemplate.modifier]} />
-            <p className="text-muted-foreground/30 text-xs">Expires in: {time.toFixed(0)} minutes</p>
+            <p className="text-muted-foreground text-xs">Expires in: {time.toFixed(0)} minutes</p>
           </div>
         </CustomTooltip.Content>
       </CustomTooltip>

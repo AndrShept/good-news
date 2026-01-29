@@ -10,6 +10,7 @@ import { SkillsPopover } from '@/features/skill/components/SkillsPopover';
 import { imageConfig } from '@/shared/config/image-config';
 import { Link, useLocation } from '@tanstack/react-router';
 import { memo } from 'react';
+import { useMediaQuery } from 'usehooks-ts';
 
 import { CharacterPaperdollButton } from './CharacterPaperdollButton';
 
@@ -21,9 +22,9 @@ export const GameHeader = memo(() => {
   }));
   const { backpack } = useHeroBackpack();
   const { pathname } = useLocation();
-
+  const isMobile = useMediaQuery('(max-width: 640px)');
   return (
-    <header className="bg-background/80 backdrop-blur-xs sticky top-0 z-50 mb-3 flex items-center justify-between border-b px-4 py-2">
+    <header className="bg-background/80 backdrop-blur-xs sticky top-0 z-50 mb-3 flex items-center justify-between border-b px-4  py-2">
       <section>
         <Link to="/">
           <GameIcon image={imageConfig.icon.ui.logo} />
@@ -47,7 +48,7 @@ export const GameHeader = memo(() => {
           <span>{premiumCoins}</span>
         </div>
 
-        <ContainerCapacityInfo usedCapacity={backpack?.itemsInstance.length ?? 0} capacity={backpack?.capacity ?? 0} />
+        {!isMobile && <ContainerCapacityInfo usedCapacity={backpack?.itemsInstance.length ?? 0} capacity={backpack?.capacity ?? 0} />}
       </section>
     </header>
   );

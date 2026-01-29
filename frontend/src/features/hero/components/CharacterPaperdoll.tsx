@@ -1,9 +1,11 @@
+import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
 import { HeroBackpack } from '@/features/item-container/components/HeroBackpack';
-import { LucideStepBack } from 'lucide-react';
+import { imageConfig } from '@/shared/config/image-config';
+import { useHeroUIStore } from '@/store/useHeroUIStore';
+import { useMediaQuery } from 'usehooks-ts';
 
 import { useHero } from '../hooks/useHero';
-import { useHeroStateMutation } from '../hooks/useHeroStateMutation';
 import { CharacterModifier } from './CharacterModifier';
 import { CharacterStat } from './CharacterStat';
 import { Paperdoll } from './Paperdoll';
@@ -23,14 +25,13 @@ export const CharacterPaperdoll = () => {
     level: data?.level ?? 0,
     modifier: data?.modifier,
     equipments: data?.equipments ?? [],
-    
   }));
-  const { mutate, isPending } = useHeroStateMutation();
-
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const { setUiType } = useHeroUIStore();
   return (
-    <section className="flex flex-col gap-1">
-      <Button variant="outline" disabled={isPending} onClick={() => mutate('IDLE')} className="ml-auto w-fit">
-        <LucideStepBack />
+    <section className="mx-auto flex flex-col gap-1">
+      <Button variant="outline" onClick={() => setUiType(null)} className="m-auto w-fit mb-2">
+        <GameIcon className="size-4.5" image={imageConfig.icon.ui.back} />
         Back
       </Button>
       <div className="flex gap-4">
@@ -39,7 +40,7 @@ export const CharacterPaperdoll = () => {
           <CharacterStat freeStatPoints={hero.freeStatPoints} heroStat={hero.stat} modifier={hero.modifier} />
           <CharacterModifier {...hero.modifier!} />
         </div>
-        <HeroBackpack />
+        {!isMobile && <HeroBackpack />}
       </div>
     </section>
   );

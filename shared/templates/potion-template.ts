@@ -49,7 +49,7 @@ export const potionTemplate = [
   },
   {
     id: '019bbea2-77e6-78d0-9f5c-eb6d9947e9e3',
-    image: imageConfig.icon.POTION.buff.intelligence,
+    image: imageConfig.icon.POTION.buff.wisdom,
     name: 'wisdom potion',
     key: 'wisdom_potion',
     type: 'POTION',

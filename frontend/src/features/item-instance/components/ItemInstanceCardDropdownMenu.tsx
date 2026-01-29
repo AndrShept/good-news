@@ -46,7 +46,7 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
 
       {(props.location === 'BACKPACK' || props.location === 'BANK') && (
         <Button className="p-0  hover:bg-transparent" variant="ghost" onClick={onDeleteInventoryItem} disabled={itemUseMutation.isPending}>
-            <GameIcon className="size-6.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.close} />
+            <GameIcon className="size-7.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.close} />
         </Button>
       )}
     </>

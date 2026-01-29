@@ -11,7 +11,7 @@ interface Props {
 export const ErrorLoadingData = ({ reset, error }: Props) => {
   const router = useRouter();
   return (
-    <div className="text-muted-foreground mx-auto flex size-full max-w-[350px] flex-col items-center justify-center text-center">
+    <div className=" mx-auto flex size-full max-w-[350px] flex-col items-center justify-center text-center">
       <h1 className="text-primary mb-3 text-3xl font-semibold">Oops!</h1>
       <p>Sorry, an unexpected error occurred while loading data from the server.</p>
       <p>Data not found!</p>

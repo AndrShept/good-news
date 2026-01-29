@@ -48,7 +48,7 @@ export const GroupAvailableHeroesList = ({ isShow, searchTerm }: Props) => {
               )),
             )}
           </ScrollArea>
-          {!data?.pages[0]?.data.length && !isLoading && <p className="text-muted-foreground/70 m-auto text-sm">not found</p>}
+          {!data?.pages[0]?.data.length && !isLoading && <p className="text-muted-foreground m-auto text-sm">not found</p>}
         </ul>
       ) : (
         <GroupAvailableHeroesListSkeleton />

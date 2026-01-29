@@ -25,13 +25,13 @@ export const UpvoteIcon = ({ isUpvoted, onUpvote, points }: Props) => {
         size={'icon'}
       >
         <HeartIcon
-          className={cn('text-muted-foreground/40 group-hover:text-muted-foreground', {
+          className={cn('text-muted-foreground group-hover:text-muted-foreground', {
             'fill-primary': isUpvoted,
           })}
         />
       </Button>
       <p
-        className={cn('text-muted-foreground/40 text-xs', {
+        className={cn('text-muted-foreground text-xs', {
           'text-primary/70': isUpvoted,
         })}
       >

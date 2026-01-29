@@ -7,6 +7,7 @@ import { getPlaceOptions } from '../api/get-place';
 import { getPlaceHeroesLocationOptions } from '../api/get-place-heroes';
 import { PlaceSidebar } from './PlaceSidebar';
 import { SelectedBuildingPage } from './SelectedBuildingPage';
+import { ModalProvider } from '@/components/providers/ModalProvider';
 
 export const Place = () => {
   const placeId = useHero((data) => data?.location?.placeId ?? '');

@@ -21,7 +21,7 @@ export const ItemInstanceCardHoverTooltip = memo((props: Props) => {
           </div>
         )}*/}
 
-      <p className="text-muted-foreground/40">{props.itemTemplate.type.toLocaleLowerCase()}</p>
+      <p className="text-muted-foreground">{props.itemTemplate.type.toLocaleLowerCase()}</p>
       <EquipInfo
         minDamage={props.itemTemplate.coreModifier?.minDamage}
         maxDamage={props.itemTemplate.coreModifier?.maxDamage}

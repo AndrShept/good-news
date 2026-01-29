@@ -21,7 +21,7 @@ export const CraftSidebar = memo(({ recipeIds, onSelect, selectedItemId }: Props
   return (
     <aside className="sticky top-20 flex h-[calc(100vh-343px)] w-full max-w-[150px] flex-col md:max-w-[200px]">
       <ScrollArea className="h-full">
-        <ul className="text-muted-foreground/60 flex flex-col gap-0.5 hover:cursor-default">
+        <ul className="text-muted-foreground flex flex-col gap-0.5 hover:cursor-default">
           {recipeIds?.map((item) => {
             const recipeTemplate = recipeTemplateById[item.recipeId];
             const itemTemplate = itemsTemplateById[recipeTemplate.itemTemplateId];

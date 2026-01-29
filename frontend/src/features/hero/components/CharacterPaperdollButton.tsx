@@ -1,42 +1,33 @@
 import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
 import { imageConfig } from '@/shared/config/image-config';
-import { StateType } from '@/shared/types';
-import { useTransition } from 'react';
+import { HeroUIType, useHeroUIStore } from '@/store/useHeroUIStore';
 
 import { useHero } from '../hooks/useHero';
-import { useHeroStateMutation } from '../hooks/useHeroStateMutation';
+import { startTransition } from 'react';
 
 type Props = {
-  type: StateType;
+  type: HeroUIType;
 };
 
-export const CharacterPaperdollButton = ({ type }: Props) => {
-  const icon: Record<StateType, string> = {
+export const CharacterPaperdollButton = (props: Props) => {
+  const icon: Record<HeroUIType, string> = {
     CHARACTER: imageConfig.icon.ARMOR.HELMET,
-    IDLE: '',
-    BATTLE: '',
-    CRAFT: '',
-    WALK: '',
   };
-  const { state } = useHero((data) => ({
-    state: data?.state,
-  }));
-  const [isPending, startTransition] = useTransition();
-  const { mutate } = useHeroStateMutation();
-
+  const { setUiType, uiType } = useHeroUIStore();
+  const state = useHero((data) => data?.state);
   return (
     <Button
       onClick={() => {
         startTransition(() => {
-          mutate(type);
+          setUiType(props.type);
         });
       }}
       size="icon"
-      disabled={isPending || (state !== 'IDLE' && state !== 'CHARACTER')}
-      variant={state === type ? 'default' : 'outline'}
+      disabled={state !== 'IDLE'}
+      variant={uiType === props.type ? 'default' : 'outline'}
     >
-      <GameIcon image={icon[type]} />
+      <GameIcon image={icon[props.type]} />
     </Button>
   );
 };

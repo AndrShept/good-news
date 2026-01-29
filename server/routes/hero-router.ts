@@ -934,73 +934,8 @@ export const heroRouter = new Hono<Context>()
       //   });
       // }
 
-      // const requirement = craftItemService(db).getCraftItemRequirement(craftItem.gameItem!, coreMaterialType);
-      // await itemContainerService(db).checkCraftResources(backpack.id, requirement?.resources);
-      // await skillService(db).checkSkillRequirement(hero.id, requirement?.skills);
-      // const heroQueueCraftItems = await db.query.queueCraftItemTable.findMany({
-      //   where: and(eq(queueCraftItemTable.heroId, hero.id), ne(queueCraftItemTable.status, 'FAILED')),
-      // });
-      // if (heroQueueCraftItems.length >= hero.maxQueueCraftCount) {
-      //   throw new HTTPException(400, {
-      //     message: 'Craft queue limit has been reached.',
-      //     cause: { canShow: true },
-      //   });
-      // }
-
-      // const lastItem = heroQueueCraftItems.at(-1);
-
-      // if (lastItem && lastItem?.buildingType !== craftItem.requiredBuildingType) {
-      //   throw new HTTPException(400, {
-      //     message: 'You can only queue items from the same building type.',
-      //     cause: { canShow: true },
-      //   });
-      // }
-      // if (!requirement?.craftTime) {
-      //   throw new HTTPException(404, {
-      //     message: 'craft time not found',
-      //   });
-      // }
-      // let delay = requirement.craftTime;
-
-      // if (lastItem) {
-      //   const now = Date.now();
-      //   const completedAt = new Date(lastItem.completedAt).getTime();
-
-      //   const remainingTime = Math.max(0, completedAt - now);
-
-      //   delay = remainingTime + requirement.craftTime;
-      // }
-
-      // const completedAt = new Date(Date.now() + delay).toISOString();
-      // const randomUuid = generateRandomUuid();
-      // const jobId = `hero-${hero.id}_queue-craft-${randomUuid}`;
-      // const [newQueueCraftItem] = await db
-      //   .insert(queueCraftItemTable)
-      //   .values({
-      //     heroId: hero.id,
-      //     buildingType: craftItem.requiredBuildingType,
-      //     jobId,
-      //     coreMaterialType,
-      //     status: !lastItem ? 'PROGRESS' : 'PENDING',
-      //     craftItemId: craftItem.id,
-      //     completedAt,
-      //   })
-      //   .returning();
-      // const jobData: QueueCraftItemJob = {
-      //   jobName: 'QUEUE_CRAFT_ITEM',
-      //   payload: {
-      //     heroId: hero.id,
-      //     queueCraftItemId: newQueueCraftItem.id,
-      //     coreMaterialType,
-      //     buildingType: craftItem.requiredBuildingType,
-      //   },
-      // };
-      // console.log('@@@@@@@', delay);
-      // await actionQueue.add(jobName['queue-craft-item'], jobData, {
-      //   delay,
-      //   jobId,
-      //   removeOnComplete: true,
-      // });
+    
+      
 
       // return c.json<SuccessResponse<QueueCraftItem>>({
       //   message: 'craft item add to queue',
@@ -1018,75 +953,12 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id, queueCraftItemId } = c.req.valid('param');
 
-      // const [hero, queueItems] = await Promise.all([
-      //   heroService(db).getHeroByColum(id, { id: true, userId: true, state: true }),
-      //   db.query.queueCraftItemTable.findMany({
-      //     where: eq(queueCraftItemTable.heroId, id),
-      //     with: { craftItem: { with: { gameItem: true } } },
-      //   }),
-      // ]);
+      
 
-      // verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-      // if (hero.state === 'BATTLE') {
-      //   throw new HTTPException(409, { message: 'Action not allowed: hero now is battle' });
-      // }
-
-      // const deletedItem = queueItems.find((i) => i.id === queueCraftItemId);
-      // if (!deletedItem) {
-      //   throw new HTTPException(404, { message: 'queue craft item not found' });
-      // }
-
-      // await db.delete(queueCraftItemTable).where(eq(queueCraftItemTable.id, queueCraftItemId));
-
-      // await actionQueue.remove(deletedItem.jobId);
-
-      // const remaining = queueItems.filter((i) => i.id !== queueCraftItemId);
-
-      // const progressJob = remaining.find((i) => i.status === 'PROGRESS');
-      // const pendingJobs = remaining.filter((i) => i.status === 'PENDING');
-
-      // if (!progressJob && pendingJobs.length > 0) {
-      //   const next = await queueCraftItemService(db).setNextQueueCraftItem(hero.id);
-      //   if (next) {
-      //     const updateData: QueueCraftItemSocketData = {
-      //       type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE',
-      //       payload: {
-      //         queueItemCraftId: next.id,
-      //         status: 'PROGRESS',
-      //         completedAt: next.completedAt,
-      //         buildingType: deletedItem.buildingType,
-      //       },
-      //     };
-      //     io.to(hero.id).emit(socketEvents.queueCraft(), updateData);
-      //   }
-      // }
-
-      // let delayAccumulator = 0;
-
-      // if (progressJob) {
-      //   const remainingMs = Math.max(new Date(progressJob.completedAt).getTime() - Date.now(), 0);
-      //   delayAccumulator = remainingMs;
-      // }
-
-      // for (const item of pendingJobs) {
-      //   const requirement = craftItemService(db).getCraftItemRequirement(item.craftItem.gameItem, item.coreMaterialType);
-      //   if (!requirement?.craftTime) {
-      //     console.error('FOR CRAFT ITEM NOT FOUND');
-      //     continue;
-      //   }
-      //   delayAccumulator += requirement.craftTime;
-
-      //   const job = await actionQueue.getJob(item.jobId);
-      //   if (job) {
-      //     await job.changeDelay(delayAccumulator);
-      //   }
-      // }
-
-      // return c.json<SuccessResponse>({
-      //   message: 'queue craft item deleted',
-      //   success: true,
-      // });
+      return c.json<SuccessResponse>({
+        message: 'queue craft item deleted',
+        success: true,
+      });
     },
   )
   .get('/:id/skills', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {

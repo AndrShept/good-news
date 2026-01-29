@@ -26,10 +26,10 @@ export const MovingPathInfo = memo(function MovingPathInfo({ heroState }: Props)
   return (
     <section className="bg-secondary absolute left-1/2 z-50 flex h-fit w-fit -translate-x-1/2 flex-col items-center gap-2 rounded-b px-4 py-3 text-sm">
       <div className="flex gap-1">
-        <span className="text-muted-foreground/50">
+        <span className="text-muted-foreground">
           tile: <span className="text-primary">{movementPathTiles.length}</span>
         </span>
-        <span className="text-muted-foreground/50">
+        <span className="text-muted-foreground">
           time: <span className="text-primary">{'40sec'}</span>
         </span>
       </div>

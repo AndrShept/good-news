@@ -21,7 +21,7 @@ export const buffTemplate = [
   {
     id: '019b94b9-0900-7d19-8f06-43a153ae7c94',
     name: 'Effect of Clarity',
-    image: imageConfig.icon.POTION.buff.intelligence,
+    image: imageConfig.icon.POTION.buff.wisdom,
     type: 'POSITIVE',
     duration: 60 * 60 * 1000,
     modifier: { wisdom: 8 },

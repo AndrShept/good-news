@@ -1,13 +1,11 @@
 import { CustomTooltip } from '@/components/CustomTooltip';
 import { GameItemImg } from '@/components/GameItemImg';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ItemInstance, ItemTemplate } from '@/shared/types';
-import { useBackpackStore } from '@/store/useBackpackStore';
-import { useDragContainerStore } from '@/store/useDragContainerStore';
 import { useDraggable } from '@dnd-kit/core';
-import { CSS } from '@dnd-kit/utilities';
-import { Dispatch, SetStateAction, memo, useEffect, useRef, useState } from 'react';
+
+import {memo, useEffect, useState } from 'react';
 
 import { useMoveItemInstance } from '../hooks/useMoveItemInstance';
 import { GameItemSlot } from './GameItemSlot';
@@ -17,7 +15,6 @@ import { ItemInstanceCardHoverTooltip } from './ItemInstanceCardHoverTooltip';
 type Props = ItemInstance & {
   itemTemplate: ItemTemplate;
   setSelectItemOnContainer: (data: ItemInstance | null) => void;
-  // selectItemInContainer: ItemInstance | null;
   isSelect: boolean;
 };
 

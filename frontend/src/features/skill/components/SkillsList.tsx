@@ -19,7 +19,7 @@ export const SkillsList = () => {
               <div className="inline-flex items-center justify-between gap-1 text-[15px]">
                 <div className="flex w-full max-w-[115x] items-center gap-1">
                   <GameIcon className="size-6" image={template.image} />
-                  <span className="text-muted-foreground/50 truncate">{template.name} </span>
+                  <span className="text-muted-foreground truncate">{template.name} </span>
                 </div>
 
                 <div className="text-base font-semibold">{skill.level}</div>
@@ -32,7 +32,7 @@ export const SkillsList = () => {
                 />
                 <div className="mx-auto inline-flex gap-1 text-xs">
                   <span className="">{skill.currentExperience}</span>
-                  <span className="text-muted-foreground/30">/{skill.expToLvl}</span>
+                  <span className="text-muted-foreground">/{skill.expToLvl}</span>
                 </div>
               </div>
             </li>

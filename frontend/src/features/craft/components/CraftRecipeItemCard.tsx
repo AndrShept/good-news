@@ -22,15 +22,15 @@ export const CraftRecipeItemCard = ({ recipeId }: Props) => {
         <GameItemImg className="md:size-15 size-11.5" image={itemTemplate.image} />
         <span className="mb-2 capitalize">{itemTemplate.name}</span>
         <div>
-          <span className="text-muted-foreground/50">type: </span>
+          <span className="text-muted-foreground">type: </span>
           <span>{itemTemplate.type.toLowerCase()}</span>
         </div>
 
         <div>
-          <span className="text-muted-foreground/50">craft time:</span> <span>{formatDurationFromSeconds(recipe.timeMs)}</span>
+          <span className="text-muted-foreground">craft time:</span> <span>{formatDurationFromSeconds(recipe.timeMs)}</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-muted-foreground/50">resorces:</span>
+          <span className="text-muted-foreground">resorces:</span>
           <ul className="flex gap-1">
             {recipe.requirement.resources.map((resoure) => (
               <li className="flex items-center">
@@ -47,7 +47,7 @@ export const CraftRecipeItemCard = ({ recipeId }: Props) => {
           </ul>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-muted-foreground/50">skill:</span>
+          <span className="text-muted-foreground">skill:</span>
           <ul className="flex gap-1">
             {recipe.requirement.skills.map((skill) => (
               <li

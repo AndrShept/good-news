@@ -4,6 +4,7 @@ export const imageConfig = {
   icon: {
     ui: {
       fish: '/sprites/icons/ui/fish.png',
+      back: '/sprites/icons/ui/back.png',
       gold: '/sprites/icons/ui/gold.png',
       prem: '/sprites/icons/ui/prem.png',
       group: '/sprites/icons/ui/group.png',
@@ -103,6 +104,7 @@ export const imageConfig = {
         strength: '/sprites/icons/potions/str.png',
         constitution: '/sprites/icons/potions/const.png',
         intelligence: '/sprites/icons/potions/int.png',
+        wisdom: '/sprites/icons/potions/wis.png',
         dexterity: '/sprites/icons/potions/dex.png',
         luck: '/sprites/icons/potions/luck.png',
       },

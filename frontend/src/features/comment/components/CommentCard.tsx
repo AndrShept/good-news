@@ -58,7 +58,7 @@ export const CommentCard = memo(function CommentCard({ comment }: Props) {
         <div className="flex w-full flex-col gap-1">
           <div className="flex items-center gap-1">
             <p>{comment.author?.username}</p>
-            <p className="text-muted-foreground/40 text-xs">{getFormatDateTime(comment?.createdAt)}</p>
+            <p className="text-muted-foreground text-xs">{getFormatDateTime(comment?.createdAt)}</p>
           </div>
           <p className="text-muted-foreground text-sm">{comment.content}</p>
           <div className="flex items-center gap-1">

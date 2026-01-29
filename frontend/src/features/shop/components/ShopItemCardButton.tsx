@@ -41,7 +41,7 @@ export const ShopItemCardButton = () => {
                     <span className="truncate">{item.name}</span>
                   </div>
 
-                  <span className="text-muted-foreground/30 md:ml-auto">{item.quantity * item.price}</span>
+                  <span className="text-muted-foreground md:ml-auto">{item.quantity * item.price}</span>
                 </div>
                 <div className="flex gap-0.5">
                   <Button onClick={() => decrement(item.id)} className="size-6" variant={'ghost'} size={'icon'}>

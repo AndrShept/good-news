@@ -3,6 +3,7 @@ import { ItemInstanceCard } from '@/features/item-instance/components/ItemInstan
 import { BASE_EQUIPMENTS_IMAGE } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { EquipmentSlotType, ItemInstance } from '@/shared/types';
+import { useSelectItemInstanceStore } from '@/store/useSelectItemInstanceStore';
 import { memo, useMemo } from 'react';
 
 import { useGameData } from '../hooks/useGameData';
@@ -27,7 +28,7 @@ export const Equipments = memo(function Equipments({ equipments, characterImage 
     [equipments],
   );
   const { itemsTemplateById } = useGameData();
-
+  const { itemInstance, setItemInstance } = useSelectItemInstanceStore();
   return (
     <div className="mx-auto flex">
       <ul className="flex flex-col gap-0.5">
@@ -35,6 +36,8 @@ export const Equipments = memo(function Equipments({ equipments, characterImage 
           <li className="flex size-12 items-center justify-center border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
               <ItemInstanceCard
+                setSelectItemOnContainer={setItemInstance}
+                isSelect={itemInstance?.id === equipmentBySlot?.[equipment.slot].id}
                 {...equipmentBySlot[equipment.slot]}
                 itemTemplate={itemsTemplateById[equipmentBySlot[equipment.slot].itemTemplateId]}
               />
@@ -50,6 +53,8 @@ export const Equipments = memo(function Equipments({ equipments, characterImage 
           <li className="flex size-12 items-center justify-center border" key={equipment.id}>
             {equipmentBySlot?.[equipment.slot] ? (
               <ItemInstanceCard
+                setSelectItemOnContainer={setItemInstance}
+                isSelect={itemInstance?.id === equipmentBySlot?.[equipment.slot].id}
                 {...equipmentBySlot[equipment.slot]}
                 itemTemplate={itemsTemplateById[equipmentBySlot[equipment.slot].itemTemplateId]}
               />
