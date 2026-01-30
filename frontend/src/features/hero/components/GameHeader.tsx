@@ -48,7 +48,7 @@ export const GameHeader = memo(() => {
           <span>{premiumCoins}</span>
         </div>
 
-        {!isMobile && <ContainerCapacityInfo usedCapacity={backpack?.itemsInstance.length ?? 0} capacity={backpack?.capacity ?? 0} />}
+        {!isMobile && <ContainerCapacityInfo iconSize='size-6' usedCapacity={backpack?.itemsInstance.length ?? 0} capacity={backpack?.capacity ?? 0} />}
       </section>
     </header>
   );

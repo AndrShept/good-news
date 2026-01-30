@@ -4,6 +4,7 @@ import { memo } from 'react';
 
 import { getItemContainerOptions } from '../api/get-item-container';
 import { ItemContainer } from './ItemContainer';
+import { ItemContainerSkeleton } from './ItemContainerSkeleton';
 
 type Props = {
   containerId: string;
@@ -12,6 +13,6 @@ type Props = {
 export const BankItemContainer = memo(({ containerId }: Props) => {
   const heroId = useHeroId();
   const { data, isLoading } = useQuery(getItemContainerOptions(heroId, containerId));
-  if (isLoading) return 'das';
+  if (isLoading) return <ItemContainerSkeleton />;
   return <ItemContainer {...data!} />;
 });

@@ -32,6 +32,7 @@ export const buildingTemplate = {
     id: '019b3361-12c8-7a81-b6e4-731ffb190e16',
     name: 'Bank',
     type: 'BANK',
-    image: imageConfig.icon.ui.chest,
+    image: imageConfig.icon.ui.chest3,
   },
+  
 } as const satisfies Record<BuildingType, Building>;

@@ -2,8 +2,23 @@ import type { RecipeTemplate } from '@/shared/types';
 
 import { resourceTemplateByKey } from './resource-template';
 import { skillTemplateByKey } from './skill-template';
+import { weaponTemplateByKey } from './weapon-template';
 
 export const recipeTemplate = [
+  {
+    id: '019c0f1d-7fae-7157-ab50-ccb50d7a1fa8',
+
+    defaultUnlocked: true,
+    itemTemplateId: weaponTemplateByKey.broadsword.id,
+    timeMs: 10_000,
+    requirement: {
+      resources: [{ templateId: resourceTemplateByKey.IRON_ORE.id, amount: 3 }],
+      skills: [{ skillId: skillTemplateByKey.SMELTING.id, level: 1 }],
+      building: 'BLACKSMITH',
+      category: 'ORE',
+      coreResource: true
+    },
+  },
   {
     id: '019bbdf1-110a-780b-95fe-cedb029252a3',
 

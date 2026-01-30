@@ -2,23 +2,6 @@ import { imageConfig } from '@/shared/config/image-config';
 import { DEFAULT_ITEM_STACK } from '@/shared/constants';
 import type { ItemTemplate } from '@/shared/types';
 
-export const resourceKeyValues = [
-  'IRON_ORE',
-  'COPPER_ORE',
-  'SILVER_ORE',
-  'GOLD_ORE',
-  'MITHRIL_ORE',
-  'ADAMANTINE_ORE',
-  'IRON_INGOT',
-  'COPPER_INGOT',
-  'SILVER_INGOT',
-  'GOLD_INGOT',
-  'MITHRIL_INGOT',
-  'ADAMANTINE_INGOT',
-  'REGULAR_LEATHER',
-] as const;
-export type ItemTemplateKey = (typeof resourceKeyValues)[number];
-
 export const resourceTemplate = [
   {
     id: '0199df54-be65-7db2-af0a-1002d323d64d',
@@ -185,6 +168,10 @@ export const resourceTemplateById = resourceTemplate.reduce(
   },
   {} as Record<string, ItemTemplate>,
 );
+
+const resourceKeys = resourceTemplate.map((r) => r.key);
+export type ItemTemplateKey = (typeof resourceKeys)[number];
+
 export const resourceTemplateByKey = resourceTemplate.reduce(
   (acc, template) => {
     acc[template.key] = template;

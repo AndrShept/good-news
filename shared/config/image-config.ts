@@ -17,6 +17,8 @@ export const imageConfig = {
       backpack: '/sprites/icons/ui/backpack.png',
       bag: '/sprites/icons/ui/bag.png',
       chest: '/sprites/icons/ui/chest.png',
+      chest2: '/sprites/icons/ui/chest2.png',
+      chest3: '/sprites/icons/ui/chest3.png',
       battle: '/sprites/icons/ui/battle.png',
       book: '/sprites/icons/ui/book.png',
       defense: '/sprites/icons/ui/defense.png',
@@ -35,6 +37,9 @@ export const imageConfig = {
       bag2: '/sprites/icons/ui/bag2.png',
       bag3: '/sprites/icons/ui/bag3.png',
       'shop-cart': '/sprites/icons/ui/shop-cart.png',
+      buy: '/sprites/icons/ui/buy.png',
+      sell: '/sprites/icons/ui/sell.png',
+      character: '/sprites/icons/ui/character.png',
     },
     action: {
       close: '/sprites/icons/action/close.png',
@@ -77,6 +82,8 @@ export const imageConfig = {
     building: {
       blacksmith: '/sprites/icons/buildings/blacksmith.png',
       forge: '/sprites/icons/buildings/forge.png',
+      alchemy: '/sprites/icons/buildings/alchemy.png',
+      tailor: '/sprites/icons/buildings/tailor.png',
       'magic-shop': '/sprites/icons/buildings/magic-shop.png',
       temple: '/sprites/icons/buildings/temple.png',
     },

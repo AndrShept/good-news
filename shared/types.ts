@@ -190,9 +190,11 @@ export type TPlace = {
   buildings: Building[];
 };
 
-export const buildingValues = ['MAGIC-SHOP', 'TEMPLE', 'BLACKSMITH', 'FORGE', 'BANK'] as const;
+export const buildingValues = ['MAGIC-SHOP', 'TEMPLE', 'BANK', 'BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY'] as const;
+export const craftBuildingValues = ['BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY'] as const;
 export const tileTypeValues = ['OBJECT', 'WATER', 'GROUND'] as const;
 export type BuildingType = (typeof buildingValues)[number];
+export type CraftBuildingType = (typeof craftBuildingValues)[number];
 
 export type Building = {
   id: string;
@@ -233,20 +235,13 @@ export type RecipeTemplate = {
     skills: { skillId: string; level: number }[];
     building: BuildingType;
     category: ResourceCategoryType;
+    coreResource?: boolean;
   };
 
   defaultUnlocked: boolean;
 };
 
 export type CraftItem = RecipeTemplate;
-
-// export type CraftInfo = { baseResourceCategory: ResourceCategoryType; requiredBuildingType: BuildingType, requirement: CraftItemRequirement };
-
-// export type CraftItemRequirement = {
-//   resources: { id: string; amount: number }[];
-//   skills: { id: string; level: number }[];
-//   timeMs: number;
-// };
 
 export type TEquipInfo = {
   weaponType?: WeaponType;
@@ -349,10 +344,10 @@ export type IHeroStat = {
   luck: number;
 };
 export type THeroRegen = {
-  healthAcc: number,
-  manaAcc: number,
-  healthTimeMs: number,
-  manaTimeMs: number,
+  healthAcc: number;
+  manaAcc: number;
+  healthTimeMs: number;
+  manaTimeMs: number;
 };
 export type IHeroStatEnum = keyof IHeroStat;
 
