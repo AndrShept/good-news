@@ -1,6 +1,10 @@
+import { getHeroOptions } from '@/features/hero/api/get-hero';
+import { useHero } from '@/features/hero/hooks/useHero';
+import { getMapHeroesLocation } from '@/features/map/api/get-map-heroes';
+import { useQuery } from '@tanstack/react-query';
 import { PropsWithChildren, createContext, useContext, useEffect, useMemo, useState } from 'react';
-import {  io } from 'socket.io-client';
-import type{ Socket} from 'socket.io-client';
+import { io } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 
 interface ISocketContext {
   socket: Socket;
@@ -34,6 +38,7 @@ export const SocketProvider = ({
     [heroId, user],
   );
   const [isConnected, setIsConnected] = useState(socket.connected);
+  const { refetch } = useQuery(getHeroOptions());
 
   useEffect(() => {
     if (user) {
@@ -41,6 +46,7 @@ export const SocketProvider = ({
     }
     function onConnect() {
       setIsConnected(true);
+      refetch();
     }
 
     async function onDisconnect() {
@@ -48,12 +54,11 @@ export const SocketProvider = ({
     }
 
     socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
     return () => {
-      socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
+      socket.disconnect();
     };
-  }, [heroId, socket, user]);
+  }, [heroId, refetch, socket, user]);
 
   return <SocketContext.Provider value={{ socket, isConnected }}>{children}</SocketContext.Provider>;
 };

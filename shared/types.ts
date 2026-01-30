@@ -194,7 +194,8 @@ export const buildingValues = ['MAGIC-SHOP', 'TEMPLE', 'BANK', 'BLACKSMITH', 'FO
 export const craftBuildingValues = ['BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY'] as const;
 export const tileTypeValues = ['OBJECT', 'WATER', 'GROUND'] as const;
 export type BuildingType = (typeof buildingValues)[number];
-export type CraftBuildingType = (typeof craftBuildingValues)[number];
+export type CraftBuildingType = Extract<BuildingType, 'BLACKSMITH' | 'FORGE' | 'TAILOR' | 'ALCHEMY'>;
+export type SelectCoreResourceBuildingType = Extract<CraftBuildingType, 'TAILOR' | 'BLACKSMITH'>;
 
 export type Building = {
   id: string;

@@ -138,7 +138,7 @@ io.on('connection', async (socket) => {
     console.info('disconnect ' + username);
     const heroState = serverState.hero.get(heroId);
     if (heroState) {
-      heroState.offlineTimer = Date.now() + 30000;
+      heroState.offlineTimer = Date.now() + 10000;
     }
   });
 });

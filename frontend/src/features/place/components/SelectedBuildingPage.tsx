@@ -15,7 +15,11 @@ export const SelectedBuildingPage = ({ place }: Props) => {
   const isMagicShop = selectBuilding?.type === 'MAGIC-SHOP';
   const isTemple = selectBuilding?.type === 'TEMPLE';
   const isBank = selectBuilding?.type === 'BANK';
-  const isCraftBuilding = selectBuilding?.type === 'BLACKSMITH' || selectBuilding?.type === 'FORGE';
+  const isCraftBuilding =
+    selectBuilding?.type === 'BLACKSMITH' ||
+    selectBuilding?.type === 'FORGE' ||
+    selectBuilding?.type === 'ALCHEMY' ||
+    selectBuilding?.type === 'TAILOR';
   return (
     <section className="flex min-w-0 flex-1 p-1.5">
       {!selectBuilding && <p>{place?.name}</p>}

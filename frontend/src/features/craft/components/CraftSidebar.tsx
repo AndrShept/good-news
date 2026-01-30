@@ -1,11 +1,7 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { cn } from '@/lib/utils';
-import { CraftItem } from '@/shared/types';
-import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { memo } from 'react';
-
-import { SelectBaseResource } from './CraftSelectResource';
 
 interface Props {
   recipeIds: { recipeId: string }[] | undefined;
@@ -14,9 +10,8 @@ interface Props {
 }
 
 export const CraftSidebar = memo(({ recipeIds, onSelect, selectedItemId }: Props) => {
-  const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
   const { recipeTemplateById, itemsTemplateById } = useGameData();
-  const canShowSelectResource = selectBuilding?.type === 'BLACKSMITH';
+
 
   return (
     <aside className="sticky top-20 flex h-[calc(100vh-343px)] w-full max-w-[150px] flex-col md:max-w-[200px]">
@@ -39,7 +34,6 @@ export const CraftSidebar = memo(({ recipeIds, onSelect, selectedItemId }: Props
           })}
         </ul>
       </ScrollArea>
-      <div className="mt-auto">{canShowSelectResource && <SelectBaseResource />}</div>
     </aside>
   );
 });

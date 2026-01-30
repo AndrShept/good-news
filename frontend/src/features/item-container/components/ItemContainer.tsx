@@ -1,11 +1,9 @@
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { GameItemSlot } from '@/features/item-instance/components/GameItemSlot';
 import { ItemInstanceCard } from '@/features/item-instance/components/ItemInstanceCard';
-
 import { cn } from '@/lib/utils';
 import { TItemContainer } from '@/shared/types';
-
-import {  useSelectedItemId, useSetSelectedItem } from '@/store/useSelectItemInstanceStore';
+import { useSelectedItemId, useSetSelectedItem } from '@/store/useSelectItemInstanceStore';
 import { useDroppable } from '@dnd-kit/core';
 import { memo } from 'react';
 
@@ -20,9 +18,9 @@ export const ItemContainer = memo(({ capacity, id, itemsInstance }: Props) => {
     data: { to: id },
   });
 
-  const setSelectedItemInstance = useSetSelectedItem(); 
+  const setSelectedItemInstance = useSetSelectedItem();
   const selectedItemId = useSelectedItemId();
-  
+
   const items = useCreateContainerItems(capacity, itemsInstance);
   const { itemsTemplateById } = useGameData();
 
@@ -34,7 +32,7 @@ export const ItemContainer = memo(({ capacity, id, itemsInstance }: Props) => {
       })}
     >
       <div className="flex items-center gap-2">
-        <ContainerCapacityInfo usedCapacity={itemsInstance.length} capacity={capacity} iconSize="size-6" />
+        <ContainerCapacityInfo usedCapacity={itemsInstance.length } capacity={capacity} iconSize="size-6" />
       </div>
 
       <ul className="flex w-full flex-wrap gap-1">
@@ -55,7 +53,6 @@ export const ItemContainer = memo(({ capacity, id, itemsInstance }: Props) => {
           );
         })}
       </ul>
-   
     </section>
   );
 });

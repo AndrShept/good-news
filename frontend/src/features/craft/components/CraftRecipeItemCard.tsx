@@ -5,12 +5,10 @@ import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack
 import { useSkill } from '@/features/skill/hooks/useSkill';
 import { cn, formatDurationFromSeconds } from '@/lib/utils';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
-import { useCraftItemStore } from '@/store/useCraftItemStore';
 
 type Props = { recipeId: string };
 
 export const CraftRecipeItemCard = ({ recipeId }: Props) => {
-  const coreMaterialId = useCraftItemStore((state) => state.coreMaterialId);
   const { skillMap } = useSkill();
   const { stackedItems } = useHeroBackpack();
   const { itemsTemplateById, skillsTemplateById } = useGameData();
@@ -30,17 +28,17 @@ export const CraftRecipeItemCard = ({ recipeId }: Props) => {
           <span className="text-muted-foreground">craft time:</span> <span>{formatDurationFromSeconds(recipe.timeMs)}</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-muted-foreground">resorces:</span>
+          <span className="text-muted-foreground">resources:</span>
           <ul className="flex gap-1">
-            {recipe.requirement.resources.map((resoure) => (
-              <li className="flex items-center">
-                <GameItemImg className="size-7.5" image={itemsTemplateById[resoure.templateId].image} />
+            {recipe.requirement.resources.map((resource) => (
+              <li key={resource.templateId} className="flex items-center">
+                <GameItemImg className="size-7.5" image={itemsTemplateById[resource.templateId].image} />
                 <p
                   className={cn({
-                    'text-red-600': (stackedItems?.[resoure.templateId] ?? 0) < resoure.amount,
+                    'text-red-600': (stackedItems?.[resource.templateId] ?? 0) < resource.amount,
                   })}
                 >
-                  x{resoure.amount}
+                  x{resource.amount}
                 </p>
               </li>
             ))}
@@ -51,6 +49,7 @@ export const CraftRecipeItemCard = ({ recipeId }: Props) => {
           <ul className="flex gap-1">
             {recipe.requirement.skills.map((skill) => (
               <li
+                key={skill.skillId}
                 className={cn('flex items-center gap-1', {
                   'text-red-600': (skillMap?.[skill.skillId].level ?? 0) < skill.level,
                 })}

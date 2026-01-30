@@ -34,5 +34,16 @@ export const buildingTemplate = {
     type: 'BANK',
     image: imageConfig.icon.ui.chest3,
   },
-  
+  ALCHEMY: {
+    id: '019c0fb8-4bde-7911-8092-75bc5710aa71',
+    name: 'Alchemy',
+    type: 'ALCHEMY',
+    image: imageConfig.icon.building.alchemy,
+  },
+  TAILOR: {
+    id: '019c0fb8-b7c4-7598-a3b5-17aed6846eba',
+    name: 'Tailor',
+    type: 'TAILOR',
+    image: imageConfig.icon.building.tailor,
+  },
 } as const satisfies Record<BuildingType, Building>;

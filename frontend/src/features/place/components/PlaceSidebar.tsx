@@ -5,7 +5,7 @@ import { imageConfig } from '@/shared/config/image-config';
 import { TPlace } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
-import React, { useEffect, useTransition } from 'react';
+import React, { startTransition, useEffect } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 
 import { useLeavePlace } from '../hooks/useLeavePlace';
@@ -17,17 +17,16 @@ interface Props {
 
 export const PlaceSidebar = ({ place }: Props) => {
   const matches = useMediaQuery('(min-width: 768px)');
-  const [_, startTransition] = useTransition();
   const { mutate, isPending } = useLeavePlace();
   const setSelectBuilding = useSelectBuildingStore((state) => state.setSelectBuilding);
-  const setCoreMaterialId = useCraftItemStore((state) => state.setCoreMaterialId);
+  const setCoreResourceId = useCraftItemStore((state) => state.setCoreResourceId);
   const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
-  useEffect(() => {
-    return () => {
-      setSelectBuilding(null);
-      setCoreMaterialId(undefined);
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     setSelectBuilding(null);
+  //     setCoreResourceId(undefined);
+  //   };
+  // }, []);
   return (
     <aside className="top-18 sticky h-[calc(100vh-330px)] max-w-[200px] rounded p-1.5">
       <ScrollArea className="h-full">

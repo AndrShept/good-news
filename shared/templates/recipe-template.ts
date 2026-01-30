@@ -12,10 +12,10 @@ export const recipeTemplate = [
     itemTemplateId: weaponTemplateByKey.broadsword.id,
     timeMs: 10_000,
     requirement: {
-      resources: [{ templateId: resourceTemplateByKey.IRON_ORE.id, amount: 3 }],
-      skills: [{ skillId: skillTemplateByKey.SMELTING.id, level: 1 }],
+      resources: [{ templateId: resourceTemplateByKey.IRON_INGOT.id, amount: 3 }],
+      skills: [{ skillId: skillTemplateByKey.BLACKSMITHING.id, level: 1 }],
       building: 'BLACKSMITH',
-      category: 'ORE',
+      category: 'INGOT',
       coreResource: true
     },
   },

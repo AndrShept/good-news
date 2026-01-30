@@ -1,32 +1,33 @@
+import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
-import { BuildingType, CraftItem } from '@/shared/types';
+import { imageConfig } from '@/shared/config/image-config';
+import { BuildingType, CraftBuildingType } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 
 import { useCreateQueueCraftItemMutation } from '../../queue/hooks/useCreateQueueCraftItemMutation';
 
 interface Props {
   recipeId: string;
-  buildingType: BuildingType | undefined;
+  buildingType: CraftBuildingType;
 }
 
 export const CraftButton = ({ recipeId, buildingType }: Props) => {
-  const coreMaterialId = useCraftItemStore((state) => state.coreMaterialId);
+  const coreResourceId = useCraftItemStore((state) => state.coreResourceId);
   const { mutate, isPending } = useCreateQueueCraftItemMutation();
   return (
-    <>
-      <Button
-        className="w-full"
-        disabled={isPending || !recipeId || !buildingType}
-        onClick={() =>
-          mutate({
-            craftItemId: recipeId ?? '',
-            coreMaterialType: coreMaterialId,
-            buildingType: buildingType!,
-          })
-        }
-      >
-        Craft
-      </Button>
-    </>
+    <Button
+      className="w-full"
+      disabled={isPending || !recipeId || !buildingType}
+      onClick={() =>
+        mutate({
+          craftItemId: recipeId ?? '',
+          coreMaterialType: coreResourceId,
+          buildingType: buildingType,
+        })
+      }
+    >
+      <GameIcon image={imageConfig.icon.state.BLACKSMITHING} />
+      Craft
+    </Button>
   );
 };
