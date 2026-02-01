@@ -11,11 +11,11 @@ import { QueueCraftItemCard } from './QueueCraftItemCard';
 export const QueueCraftItemsList = () => {
   const heroId = useHeroId();
   const maxQueueCraftCount = useHero((data) => data?.maxQueueCraftCount ?? 4);
-  const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
-  const { data: queueCraftItems } = useQuery(getQueueCraftItemOptions(heroId, selectBuilding?.type));
+  // const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
+  const { data: queueCraftItems } = useQuery(getQueueCraftItemOptions(heroId));
   if (!queueCraftItems?.length) return;
   return (
-    <section className="mt-2 flex flex-col">
+    <section className="mt-2 flex flex-col min-w-0 max-w-[400px] w-full ">
       <div className="text-muted mx-auto flex">
         <span
           className={cn('', {
@@ -26,9 +26,12 @@ export const QueueCraftItemsList = () => {
         </span>
         /<span>{maxQueueCraftCount}</span>
       </div>
-      <ul className="flex flex-wrap gap-2 py-2">
+      <ScrollArea className='w-full '>
+      <ul className="flex  gap-2 py-2  ">
         {queueCraftItems?.map((queueItem) => <QueueCraftItemCard key={queueItem.id} {...queueItem} />)}
       </ul>
+    <ScrollBar orientation="horizontal"/>
+      </ScrollArea>
     </section>
   );
 };

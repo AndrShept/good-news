@@ -40,7 +40,7 @@ export const recipeTemplate = [
     timeMs: 10_000,
     requirement: {
       resources: [{ templateId: resourceTemplateByKey.COPPER_ORE.id, amount: 3 }],
-      skills: [{ skillId: skillTemplateByKey.SMELTING.id, level: 1 }],
+      skills: [{ skillId: skillTemplateByKey.SMELTING.id, level: 2 }],
       building: 'FORGE',
       category: 'ORE',
     },

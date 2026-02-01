@@ -1,31 +1,24 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { client } from '@/lib/utils';
-import { BuildingType, CraftBuildingType, ErrorResponse } from '@/shared/types';
-import { useMutation } from '@tanstack/react-query';
+import { ErrorResponse } from '@/shared/types';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { getQueueCraftItemOptions } from '../api/getQueueCraftItems';
 import { useQueueCraftItem } from './useQueueCraftItem';
 
 export const useCreateQueueCraftItemMutation = () => {
   const id = useHeroId();
+  const queryClient = useQueryClient();
   const { addQueueCraftItems } = useQueueCraftItem();
   return useMutation({
-    mutationFn: async ({
-      craftItemId,
-      coreMaterialType,
-      buildingType,
-    }: {
-      craftItemId: string;
-      coreMaterialType: string | undefined;
-      buildingType: CraftBuildingType
-    }) => {
-      const res = await client.hero[':id'].action['queue-craft'].$post({
+    mutationFn: async ({ recipeId, coreResourceId }: { recipeId: string; coreResourceId: string | undefined }) => {
+      const res = await client.hero[':id']['queue-craft']['add'].$post({
         param: {
           id,
         },
         json: {
-          craftItemId,
-          coreMaterialType,
-          buildingType,
+          recipeId,
+          coreResourceId,
         },
       });
       if (!res.ok) {
@@ -34,10 +27,11 @@ export const useCreateQueueCraftItemMutation = () => {
       }
       return await res.json();
     },
-    // onSuccess: ({ data }) => {
-    //   if (data) {
-    //     addQueueCraftItems(data.buildingType, data);
-    //   }
-    // },
+    onSuccess: ({ data }) => {
+      queryClient.invalidateQueries({ queryKey: getQueueCraftItemOptions(id).queryKey });
+      // if (data) {
+      //   addQueueCraftItems(data.buildingType, data);
+      // }
+    },
   });
 };

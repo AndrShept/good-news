@@ -21,13 +21,14 @@ import {
   type Hero,
   type ItemInstance,
   type PathNode,
-  type QueueCraftItem,
+  type QueueCraft,
   type SuccessResponse,
   type THeroRegen,
   type TItemContainer,
   type WeaponHandType,
   buildingValues,
   buyItemsSchema,
+  craftBuildingValues,
   createHeroSchema,
   statsSchema,
 } from '@/shared/types';
@@ -869,91 +870,129 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .get(
-    '/:id/queue/craft-item/:buildingType',
+    '/:id/queue-craft',
     loggedIn,
     zValidator(
       'param',
       z.object({
         id: z.string(),
-        buildingType: z.enum(buildingValues),
       }),
     ),
     async (c) => {
       const user = c.get('user');
-      const { id, buildingType } = c.req.valid('param');
+      const { id } = c.req.valid('param');
       const hero = heroService.getHero(id);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      return c.json<SuccessResponse<QueueCraftItem[]>>({
+      const queueCraftItems = serverState.queueCraft.get(hero.id);
+
+      return c.json<SuccessResponse<QueueCraft[]>>({
         message: 'craft item add to queue',
         success: true,
-        // data: queueCraftItems,
+        data: queueCraftItems ?? [],
       });
     },
   )
   .post(
-    '/:id/action/queue-craft',
+    '/:id/queue-craft/add',
     loggedIn,
     zValidator('param', z.object({ id: z.string() })),
     zValidator(
       'json',
       z.object({
-        coreMaterialType: z.optional(z.string()),
-        buildingType: z.enum(buildingValues),
-        craftItemId: z.string(),
+        coreResourceId: z.optional(z.string().uuid()),
+        recipeId: z.string().uuid(),
       }),
     ),
 
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      // const { craftItemId, coreMaterialType, buildingType } = c.req.valid('json');
-      // const hero = serverState.getHeroState(id);
-      // const [craftItem, coreMaterial, backpack] = await Promise.all([itemContainerService(db).getHeroBackpack(id)]);
-      // verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-      // const place = placeTemplate.find((p) => p.id === hero.location.placeId);
-      // const isNotInsideRequiredBuilding = place?.buildings?.every((b) => b.type !== craftItem.requiredBuildingType);
-      // if (isNotInsideRequiredBuilding) {
-      //   throw new HTTPException(400, {
-      //     message: 'You are not inside the required place building.',
-      //     cause: { canShow: true },
-      //   });
-      // }
-      // if (backpack.usedSlots >= backpack.maxSlots) {
-      //   throw new HTTPException(400, {
-      //     message: 'Inventory is full',
-      //     cause: { canShow: true },
-      //   });
-      // }
+      const { recipeId, coreResourceId } = c.req.valid('json');
+      const hero = heroService.getHero(id);
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      const queueCraft = serverState.queueCraft.get(hero.id);
 
-      // if (coreMaterial && coreMaterial?.category !== craftItem.requiredCraftResourceCategory) {
-      //   throw new HTTPException(400, {
-      //     message: 'Invalid base resource for this craft item.',
-      //     cause: { canShow: true },
-      //   });
-      // }
+      const recipe = recipeTemplateById[recipeId];
+      const recipeTemplate = itemTemplateService.getAllItemsTemplateMapIds()[recipe.itemTemplateId];
 
-    
-      
+      const place = placeTemplate.find((p) => p.id === hero.location.placeId);
 
-      // return c.json<SuccessResponse<QueueCraftItem>>({
-      //   message: 'craft item add to queue',
-      //   success: true,
-      //   data: newQueueCraftItem,
-      // });
+      heroService.checkFreeBackpackCapacity(hero.id);
+
+      const validateRequiredBuilding = place?.buildings?.some((b) => b.type === recipe.requirement.building);
+
+      for (const reqSkill of recipe.requirement.skills) {
+        skillService.checkSkillRequirement(hero.id, reqSkill.skillId, reqSkill.level);
+      }
+      for (const reqResource of recipe.requirement.resources) {
+        itemContainerService.checkRequirementsItems(hero.id, reqResource.templateId, reqResource.amount);
+      }
+
+      if (!validateRequiredBuilding) {
+        throw new HTTPException(400, {
+          message: 'You are not inside the required place building.',
+          cause: { canShow: true },
+        });
+      }
+
+      if (recipe.requirement.coreResource && !coreResourceId) {
+        throw new HTTPException(400, {
+          message: 'You need select core resource for this craft item.',
+          cause: { canShow: true },
+        });
+      }
+
+      if (coreResourceId && recipe.requirement.coreResource) {
+        const coreResourceTemplate = itemTemplateService.getAllItemsTemplateMapIds()[coreResourceId];
+
+        if (recipe.requirement.category !== coreResourceTemplate.resourceInfo?.category) {
+          throw new HTTPException(400, {
+            message: 'Invalid base resource for this craft item.',
+            cause: { canShow: true },
+          });
+        }
+      }
+      const now = Date.now();
+      if (!queueCraft?.length) {
+        serverState.queueCraft.set(hero.id, [
+          {
+            id: generateRandomUuid(),
+            recipeId,
+            coreResourceId,
+            expiresAt: now + recipe.timeMs,
+            craftBuildingType: recipe.requirement.building,
+            status: 'PROGRESS',
+          },
+        ]);
+      } else {
+        const last = queueCraft.at(-1)?.expiresAt;
+        queueCraft.push({
+          id: generateRandomUuid(),
+          recipeId,
+          coreResourceId,
+          expiresAt: now + Math.max((last ?? 0) - now, 0),
+          craftBuildingType: recipe.requirement.building,
+          status: 'PENDING',
+        });
+      }
+
+      return c.json<SuccessResponse<QueueCraft[]>>({
+        message: 'craft item add to queue',
+        success: true,
+        data: queueCraft,
+      });
     },
   )
   .delete(
-    '/:id/action/queue-craft/:queueCraftItemId',
+    '/:id/queue-craft/:queueCraftItemId',
     loggedIn,
     zValidator('param', z.object({ id: z.string(), queueCraftItemId: z.string() })),
 
     async (c) => {
       const user = c.get('user');
       const { id, queueCraftItemId } = c.req.valid('param');
-
-      
 
       return c.json<SuccessResponse>({
         message: 'queue craft item deleted',

@@ -172,9 +172,6 @@ export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
 export type TLocation = typeof locationTable.$inferSelect;
-export type QueueCraftItem = typeof queueCraftItemTable.$inferSelect & {
-  craftItem?: ItemTemplate | null;
-};
 
 export const placeValues = ['TOWN', 'DUNGEON', 'MINE'] as const;
 export type PlaceType = (typeof placeValues)[number];
@@ -189,6 +186,15 @@ export type TPlace = {
   mapId: string;
   buildings: Building[];
 };
+
+export interface QueueCraft {
+  id: string
+  recipeId: string;
+  expiresAt: number;
+  coreResourceId?: string;
+  craftBuildingType: CraftBuildingType;
+  status: typeof queueCraftStatusEnum.enumValues[number];
+}
 
 export const buildingValues = ['MAGIC-SHOP', 'TEMPLE', 'BANK', 'BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY'] as const;
 export const craftBuildingValues = ['BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY'] as const;
@@ -234,7 +240,7 @@ export type RecipeTemplate = {
   requirement: {
     resources: { templateId: string; amount: number }[];
     skills: { skillId: string; level: number }[];
-    building: BuildingType;
+    building: CraftBuildingType;
     category: ResourceCategoryType;
     coreResource?: boolean;
   };

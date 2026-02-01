@@ -14,7 +14,7 @@ export const CraftSidebar = memo(({ recipeIds, onSelect, selectedItemId }: Props
 
 
   return (
-    <aside className="sticky top-20 flex h-[calc(100vh-343px)] w-full max-w-[150px] flex-col md:max-w-[200px]">
+    <aside className="sticky top-20 flex h-[calc(100vh-343px)] w-full max-w-[150px] flex-col md:max-w-[170px]">
       <ScrollArea className="h-full">
         <ul className="text-muted-foreground flex flex-col gap-0.5 hover:cursor-default">
           {recipeIds?.map((item) => {
@@ -23,7 +23,7 @@ export const CraftSidebar = memo(({ recipeIds, onSelect, selectedItemId }: Props
             return (
               <li
                 key={recipeTemplate.id}
-                className={cn('px-1.5 py-0.5', {
+                className={cn('px-1.5 py-0.5 truncate', {
                   'bg-secondary/50 text-primary': selectedItemId === item.recipeId,
                 })}
                 onClick={() => onSelect(item.recipeId)}

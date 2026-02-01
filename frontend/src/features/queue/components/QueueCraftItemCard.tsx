@@ -1,27 +1,29 @@
 import { GameItemImg } from '@/components/GameItemImg';
-import { materialConfig } from '@/lib/config';
+import { useGameData } from '@/features/hero/hooks/useGameData';
 import { cn } from '@/lib/utils';
-import { CraftItem, QueueCraftItem } from '@/shared/types';
+import { QueueCraft } from '@/shared/types';
 import { X } from 'lucide-react';
 import React, { memo, useEffect, useState } from 'react';
 
 import { useDeleteQueueCraftItemMutation } from '../hooks/useDeleteQueueCraftItemMutation';
 
-type Props = QueueCraftItem;
+type Props = QueueCraft;
 
 export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props) {
   const { mutate, isPending } = useDeleteQueueCraftItemMutation();
-
-  const [timer, setTimer] = useState(new Date(props.completedAt).getTime() - Date.now());
+  const { itemsTemplateById, recipeTemplateById } = useGameData();
+  const recipe = recipeTemplateById[props.recipeId];
+  const template = itemsTemplateById[recipe.itemTemplateId];
+  const [timer, setTimer] = useState(props.expiresAt - Date.now());
 
   useEffect(() => {
-    setTimer(new Date(props.completedAt).getTime() - Date.now());
-  }, [props.completedAt]);
+    setTimer(props.expiresAt - Date.now());
+  }, [props.expiresAt]);
 
   useEffect(() => {
     if (props.status !== 'PROGRESS') return;
     const id = setInterval(() => {
-      setTimer(new Date(props.completedAt).getTime() - Date.now());
+      setTimer(props.expiresAt - Date.now());
     }, 1000);
 
     return () => {
@@ -30,35 +32,40 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
   }, [props.status]);
   return (
     <li
-      className={cn('w-22 group relative flex h-auto flex-col items-center justify-center gap-1 overflow-hidden rounded p-1.5', {
-        'border-2 border-red-500/5 bg-red-500/5': props.status === 'FAILED',
-        'border-2 border-green-500/5 bg-green-500/5': props.status === 'PROGRESS',
-        'border-muted/10 bg-muted/10 border-2': props.status === 'PENDING',
-        'opacity-80 saturate-50': isPending,
-      })}
+      className={cn(
+        'w-26 group relative  flex flex-col h-auto select-none items-center  gap-1  rounded p-1.5',
+        {
+          'border-2 border-red-500/5 bg-red-500/5': props.status === 'FAILED',
+          'border-2 border-green-500/5 bg-green-500/5': props.status === 'PROGRESS',
+          'border-muted/10 bg-muted/10 border-2': props.status === 'PENDING',
+          'opacity-80 saturate-50': isPending,
+        },
+      )}
     >
-      {/* <GameItemImg className="size-10" image={props.craftItemMap[props.craftItemId]?.gameItem?.image} />
-      <p className="line-clamp-1 text-sm">{props.craftItemMap[props.craftItemId]?.gameItem?.name}</p> */}
+      <GameItemImg image={template.image}  className='size-9'/>
+      <div className='flex flex-col items-center '>
+        <h2 className=' text-[15px] truncate'>{template.name}</h2>
+        <p
+          className={cn('text-sm', {
+            'text-muted': props.status === 'PENDING',
+            'text-green-500': props.status === 'PROGRESS',
+            'text-red-500': props.status === 'FAILED',
+          })}
+        >
+          {props.status.toLocaleLowerCase()}
+        </p>
+        <p
+          className={cn('text-sm text-yellow-300 opacity-0', {
+            'opacity-100': props.status === 'PROGRESS',
+          })}
+        >
+          {Math.max(0, Math.ceil(timer / 1000))} сек
+        </p>
+      </div>
 
-      <p
-        className={cn('text-sm', {
-          'text-muted': props.status === 'PENDING',
-          'text-green-500': props.status === 'PROGRESS',
-          'text-red-500': props.status === 'FAILED',
-        })}
-      >
-        {props.status.toLocaleLowerCase()}
-      </p>
-      <p
-        className={cn('text-sm text-yellow-300 opacity-0', {
-          'opacity-100': props.status === 'PROGRESS',
-        })}
-      >
-        {Math.max(0, Math.ceil(timer / 1000))} сек
-      </p>
       {/* <button
         disabled={isPending}
-        onClick={() => mutate({ queueCraftItemId: props.id, buildingType: props.buildingType })}
+        onClick={() => mutate({ queueCraftItemId: props.id})}
         className={cn('absolute inset-0 hidden items-center justify-center bg-black/90 group-hover:flex')}
       >
         <X size={30} className="text-red-500" />

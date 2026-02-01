@@ -3,8 +3,8 @@ import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
 import { heroService } from './hero-service';
-import { itemTemplateService } from './item-template-service';
 import { itemInstanceService } from './item-instance-service';
+import { itemTemplateService } from './item-template-service';
 
 interface IObtainItem {
   itemContainerId: string;
@@ -53,8 +53,19 @@ export const itemContainerService = {
     const container = this.getContainer(containerId);
 
     if (container.capacity <= container.itemsInstance.length) {
-      throw new HTTPException(409, { message: 'Container is full!' });
+      throw new HTTPException(409, { message: 'Container is full!', cause: { canShow: true } });
     }
+  },
+  checkRequirementsItems(heroId: string, itemTemplateId: string, quantity: number) {
+    const backpack = this.getBackpack(heroId);
+    const template = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
+    const amount = backpack.itemsInstance.reduce((acc, item) => {
+      if (item.itemTemplateId === itemTemplateId) {
+        acc += item.quantity;
+      }
+      return acc;
+    }, 0);
+    if (amount < quantity) throw new HTTPException(409, { message: `not onoth item ${template.name}`, cause: { canShow: true } });
   },
 
   buyItem({ itemContainerId, heroId, itemTemplateId, quantity }: IObtainItem) {
