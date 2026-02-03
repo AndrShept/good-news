@@ -1,8 +1,10 @@
+import { socketEvents } from '@/shared/socket-events';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
 import type { QueueCraftStatusType, RecipeTemplate, TItemContainer } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
+import { io } from '..';
 import { serverState } from '../game/state/server-state';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
@@ -91,5 +93,19 @@ export const queueCraftService = {
     const queue = queuesCrafts.find((q) => q.id === queueCraftId);
     if (!queue) return;
     queue.status = status;
+  },
+  setNextQueue(heroId: string, nextQueueId: string, timeMs: number) {
+    const now = Date.now();
+    const nextQueueData = {
+      type: 'UPDATE',
+      payload: {
+        status: 'PROGRESS',
+        queueItemCraftId: nextQueueId,
+        expiresAt: now + timeMs,
+      },
+    };
+
+    this.updateStatus(heroId, nextQueueId, 'PROGRESS');
+    io.to(heroId).emit(socketEvents.queueCraft(), nextQueueData);
   },
 };

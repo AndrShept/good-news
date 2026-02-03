@@ -918,6 +918,13 @@ export const heroRouter = new Hono<Context>()
       const recipe = recipeTemplateById[recipeId];
       const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[recipe.itemTemplateId];
 
+      if (queueCraft.length >= 4) {
+        throw new HTTPException(400, {
+          message: 'You cannot queue more than 4 craft items.',
+          cause: { canShow: true },
+        });
+      }
+
       queueCraftService.canStartCraft(hero.id, coreResourceId, recipeId);
       const now = Date.now();
       if (!queueCraft.length) {
@@ -956,6 +963,36 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id, queueCraftItemId } = c.req.valid('param');
+      const hero = heroService.getHero(id);
+
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      const queueCraft = queueCraftService.getQueueCraft(hero.id);
+      const findIndex = queueCraft.findIndex((q) => q.id === queueCraftItemId);
+
+      if (findIndex === -1) throw new HTTPException(404, { message: 'queueCraft findIndex not found' });
+      const [deletedItem] = queueCraft.splice(findIndex, 1);
+      const next = queueCraft.at(0);
+      const now = Date.now();
+      if (deletedItem.status === 'PROGRESS') {
+        let acc = 0;
+        for (const queue of queueCraft) {
+          acc += recipeTemplateById[queue.recipeId].timeMs;
+          queue.expiresAt = now + acc;
+        }
+        if (next) {
+          queueCraftService.setNextQueue(hero.id, next.id, recipeTemplateById[next.recipeId].timeMs);
+        }
+      } else {
+        let acc = 0;
+        for (const queue of queueCraft) {
+          if (queue.status === 'PROGRESS') {
+            acc = queue.expiresAt - now;
+            continue;
+          }
+          acc += recipeTemplateById[queue.recipeId].timeMs;
+          queue.expiresAt = now + acc;
+        }
+      }
 
       return c.json<SuccessResponse>({
         message: 'queue craft item deleted',

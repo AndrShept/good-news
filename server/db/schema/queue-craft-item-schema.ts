@@ -5,7 +5,7 @@ import { heroTable } from './hero-schema';
 
 
 
-export const queueCraftStatusEnum = pgEnum('queue_craft_status_enum', ['PENDING', 'PROGRESS', 'COMPLETE', 'FAILED']);
+export const queueCraftStatusEnum = pgEnum('queue_craft_status_enum', ['PENDING', 'PROGRESS']);
 
 export const queueCraftItemTable = pgTable('queue-craft-item', {
   id: uuid().primaryKey().defaultRandom().notNull(),

@@ -58,6 +58,6 @@ export const skillService = {
     const template = skillTemplateById[skill.skillTemplateId];
 
     if (skill.level < level)
-      throw new HTTPException(409, { message: `You need more skill level  ${template.name}`, cause: { canShow: true } });
+      throw new HTTPException(409, { message: `Your ${template.name} skill level is too low.`, cause: { canShow: true } });
   },
 };

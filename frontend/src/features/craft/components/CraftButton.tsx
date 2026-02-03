@@ -27,7 +27,7 @@ export const CraftButton = ({ recipeId }: Props) => {
       }
     >
       <GameIcon className='size-6.5' image={imageConfig.icon.state.BLACKSMITHING} />
-      Create
+      Add
     </Button>
   );
 };

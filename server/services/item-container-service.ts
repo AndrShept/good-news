@@ -65,7 +65,7 @@ export const itemContainerService = {
       }
       return acc;
     }, 0);
-    if (amount < quantity) throw new HTTPException(409, { message: `not onoth item ${template.name}`, cause: { canShow: true } });
+    if (amount < quantity) throw new HTTPException(409, { message: `Not enough ${template.name}.`, cause: { canShow: true } });
   },
 
   createItem({ itemContainerId, heroId, itemTemplateId, quantity }: ICreateItem) {
