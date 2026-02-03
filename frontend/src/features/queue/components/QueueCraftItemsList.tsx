@@ -15,7 +15,7 @@ export const QueueCraftItemsList = () => {
   const { data: queueCraftItems } = useQuery(getQueueCraftItemOptions(heroId));
   if (!queueCraftItems?.length) return;
   return (
-    <section className="mt-2 flex flex-col min-w-0 max-w-[400px] w-full ">
+    <section className="mt-2 flex w-full min-w-0 max-w-[400px] flex-col">
       <div className="text-muted mx-auto flex">
         <span
           className={cn('', {
@@ -26,11 +26,9 @@ export const QueueCraftItemsList = () => {
         </span>
         /<span>{maxQueueCraftCount}</span>
       </div>
-      <ScrollArea className='w-full '>
-      <ul className="flex  gap-2 py-2  ">
-        {queueCraftItems?.map((queueItem) => <QueueCraftItemCard key={queueItem.id} {...queueItem} />)}
-      </ul>
-    <ScrollBar orientation="horizontal"/>
+      <ScrollArea className="w-full">
+        <ul className="flex gap-2 py-2">{queueCraftItems?.map((queueItem) => <QueueCraftItemCard key={queueItem.id} {...queueItem} />)}</ul>
+        <ScrollBar orientation="horizontal" />
       </ScrollArea>
     </section>
   );

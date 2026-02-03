@@ -19,32 +19,37 @@ export const useQueueCraftListener = () => {
   const { updateQueueCraftItems, removeQueueCraftItems } = useQueueCraftItem();
   const setGameMessage = useSetGameMessage();
   useEffect(() => {
-    const listener = async (data: QueueCraftItemSocketData) => {
+    const listener = (data: QueueCraftItemSocketData) => {
       switch (data.type) {
-        case 'QUEUE_CRAFT_ITEM_COMPLETE':
-          removeQueueCraftItems(data.payload.queueItemCraftId, data.payload.buildingType);
+        case 'COMPLETE':
+          removeQueueCraftItems(data.payload.queueItemCraftId);
 
-          await queryClient.invalidateQueries({
+          queryClient.invalidateQueries({
             queryKey: getItemContainerOptions(heroId, backpackId).queryKey,
           });
-          await queryClient.invalidateQueries({
+          queryClient.invalidateQueries({
             queryKey: getSkillsOptions(heroId).queryKey,
           });
-          setGameMessage({ type: 'SUCCESS', text: 'You create new item', data: [{ name: data.payload.gameItemName }] });
-          if (data.payload.craftExpMessage) {
-            setGameMessage({
-              type: 'SKILL_EXP',
-              text: data.payload.isLuckyCraft ? `${data.payload.craftExpMessage} 🔥` : data.payload.craftExpMessage,
-            });
-          }
+          setGameMessage({ type: 'SUCCESS', text: data.payload.message, data: [{ name: data.payload.itemName }] });
+          // if (data.payload.craftExpMessage) {
+          //   setGameMessage({
+          //     type: 'SKILL_EXP',
+          //     text: data.payload.isLuckyCraft ? `${data.payload.craftExpMessage} 🔥` : data.payload.craftExpMessage,
+          //   });
+          // }
 
           break;
-        case 'QUEUE_CRAFT_ITEM_STATUS_UPDATE':
-          updateQueueCraftItems(data.payload.queueItemCraftId, data.payload.buildingType, {
+        case 'UPDATE':
+          updateQueueCraftItems(data.payload.queueItemCraftId, {
             status: data.payload.status,
-            completedAt: data.payload.completedAt,
+            expiresAt: data.payload.expiresAt,
           });
           break;
+
+        case 'FAILED':
+          removeQueueCraftItems(data.payload.queueItemCraftId);
+
+          setGameMessage({ type: 'ERROR', text: data.payload.message });
       }
     };
     socket.on(socketEvents.queueCraft(), listener);

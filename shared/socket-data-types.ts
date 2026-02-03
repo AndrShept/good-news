@@ -12,26 +12,26 @@ export type SocketGroupResponse = {
 
 export type MapUpdateEvent =
   | {
-    type: 'HERO_ENTER_PLACE';
-    payload: {
-      heroId: string;
-      placeId: string;
-    };
-  }
+      type: 'HERO_ENTER_PLACE';
+      payload: {
+        heroId: string;
+        placeId: string;
+      };
+    }
   | {
-    type: 'HERO_LEAVE_PLACE';
-    payload: { hero: MapHero; mapId: string; heroId: string };
-  };
+      type: 'HERO_LEAVE_PLACE';
+      payload: { hero: MapHero; mapId: string; heroId: string };
+    };
 
 export type PlaceUpdateEvent =
   | {
-    type: 'HERO_ENTER_PLACE';
-    payload: HeroSidebarItem;
-  }
+      type: 'HERO_ENTER_PLACE';
+      payload: HeroSidebarItem;
+    }
   | {
-    type: 'HERO_LEAVE_PLACE';
-    payload: { heroId: string; mapId: string };
-  };
+      type: 'HERO_LEAVE_PLACE';
+      payload: { heroId: string; mapId: string };
+    };
 
 export type HeroOfflineData = {
   type: 'HERO_OFFLINE';
@@ -44,39 +44,44 @@ export type HeroOnlineData = {
 
 export type QueueCraftItemSocketData =
   | {
-    type: 'QUEUE_CRAFT_ITEM_COMPLETE';
-    payload: {
-      queueItemCraftId: string;
-      gameItemName: string;
-      craftExpMessage: string;
-      buildingType: BuildingType;
-      isLuckyCraft: boolean;
-    };
-  }
+      type: 'COMPLETE';
+      payload: {
+        queueItemCraftId: string;
+        itemName: string;
+        message: string;
+        isLuckyCraft: boolean;
+      };
+    }
   | {
-    type: 'QUEUE_CRAFT_ITEM_STATUS_UPDATE';
-    payload: { queueItemCraftId: string; status: QueueCraftStatusType; completedAt: string; buildingType: BuildingType };
-  };
+      type: 'FAILED';
+      payload: {
+        itemName?: string;
+        queueItemCraftId: string;
+        message: string;
+      };
+    }
+  | {
+      type: 'UPDATE';
+      payload: { queueItemCraftId: string; status: QueueCraftStatusType, expiresAt: number };
+    };
 
 export type SelfMessageData = { message: string; type: GameMessageType };
 
-
-
-export type SelfHeroData = RemoveBuffData | SkillUpData
+export type SelfHeroData = RemoveBuffData | SkillUpData;
 
 export type RemoveBuffData = {
-  type: 'REMOVE_BUFF'
+  type: 'REMOVE_BUFF';
   payload: {
-    buffInstanceId: string
-  }
+    buffInstanceId: string;
+  };
 };
 export type SkillUpData = {
-  type: 'SKILL_UP',
+  type: 'SKILL_UP';
   payload: {
-    skillInstanceId: string
-    message: string
-  }
-}
+    skillInstanceId: string;
+    message: string;
+  };
+};
 
 export type WalkMapStartData = {
   type: 'WALK_MAP_START';

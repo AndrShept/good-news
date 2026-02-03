@@ -71,6 +71,7 @@ import { itemContainerService } from '../services/item-container-service';
 import { itemInstanceService } from '../services/item-instance-service';
 import { itemTemplateService } from '../services/item-template-service';
 import { itemUseService } from '../services/item-use-service';
+import { queueCraftService } from '../services/queue-craft-service';
 import { skillService } from '../services/skill-service';
 
 export const heroRouter = new Hono<Context>()
@@ -109,9 +110,10 @@ export const heroRouter = new Hono<Context>()
         const buffs = await db.query.buffInstanceTable.findMany({
           where: eq(buffInstanceTable.ownerHeroId, hero.id),
         });
+        serverState.user.set(userId, hero.id);
         serverState.skill.set(hero.id, skills);
         serverState.buff.set(hero.id, buffs);
-        serverState.user.set(userId, hero.id);
+        serverState.queueCraft.set(hero.id, []);
 
         const setData = { ...hero, equipments: equipments ?? [], buffs: [] };
         serverState.hero.set(hero.id, setData as Hero);
@@ -389,16 +391,15 @@ export const heroRouter = new Hono<Context>()
         throw new HTTPException(409, { message: 'this a not a shop' });
       }
 
-      const itemTemlateById = itemTemplateService.getAllItemsTemplateMapIds();
       const { needCapacity, sumPriceGold } = items.reduce(
         (acc, item) => {
-          const tempalte = itemTemlateById[item.id];
-          const buyPrice = tempalte.buyPrice ?? 0;
+          const template = itemTemplateService.getAllItemsTemplateMapIds()[item.id];
+          const buyPrice = template.buyPrice ?? 0;
           acc.sumPriceGold += item.quantity * buyPrice;
-          if (!tempalte.stackable) {
+          if (!template.stackable) {
             acc.needCapacity += item.quantity;
           } else {
-            acc.needCapacity += Math.ceil(item.quantity / (tempalte.maxStack ?? 1));
+            acc.needCapacity += Math.ceil(item.quantity / (template.maxStack ?? 1));
           }
           return acc;
         },
@@ -409,9 +410,9 @@ export const heroRouter = new Hono<Context>()
       heroService.assertHasEnoughGold(hero.id, sumPriceGold);
       const returnData = [];
       for (const item of items) {
-        const template = itemTemlateById[item.id];
+        const template = itemTemplateService.getAllItemsTemplateMapIds()[item.id];
         returnData.push({ name: template.name, quantity: item.quantity });
-        itemContainerService.buyItem({
+        itemContainerService.createItem({
           heroId: hero.id,
           itemContainerId: backpack.id,
           itemTemplateId: template.id,
@@ -846,29 +847,29 @@ export const heroRouter = new Hono<Context>()
     },
   )
 
-  .put(
-    '/:id/state',
-    loggedIn,
-    zValidator('param', z.object({ id: z.string() })),
-    zValidator('json', z.object({ type: z.enum(stateTypeEnum.enumValues) })),
+  // .put(
+  //   '/:id/state',
+  //   loggedIn,
+  //   zValidator('param', z.object({ id: z.string() })),
+  //   zValidator('json', z.object({ type: z.enum(stateTypeEnum.enumValues) })),
 
-    async (c) => {
-      const user = c.get('user');
-      const { id } = c.req.valid('param');
-      const { type } = c.req.valid('json');
+  //   async (c) => {
+  //     const user = c.get('user');
+  //     const { id } = c.req.valid('param');
+  //     const { type } = c.req.valid('json');
 
-      const hero = heroService.getHero(id);
+  //     const hero = heroService.getHero(id);
 
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+  //     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      hero.state = type;
+  //     hero.state = type;
 
-      return c.json<SuccessResponse>({
-        message: 'state changed',
-        success: true,
-      });
-    },
-  )
+  //     return c.json<SuccessResponse>({
+  //       message: 'state changed',
+  //       success: true,
+  //     });
+  //   },
+  // )
   .get(
     '/:id/queue-craft',
     loggedIn,
@@ -885,12 +886,12 @@ export const heroRouter = new Hono<Context>()
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      const queueCraftItems = serverState.queueCraft.get(hero.id);
-
+      const queueCraftItems = queueCraftService.getQueueCraft(hero.id);
+      // const returnData = queueCraftItems.toSorted((a, b) => b.expiresAt - a.expiresAt);
       return c.json<SuccessResponse<QueueCraft[]>>({
         message: 'craft item add to queue',
         success: true,
-        data: queueCraftItems ?? [],
+        data: queueCraftItems,
       });
     },
   )
@@ -912,67 +913,29 @@ export const heroRouter = new Hono<Context>()
       const { recipeId, coreResourceId } = c.req.valid('json');
       const hero = heroService.getHero(id);
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-      const queueCraft = serverState.queueCraft.get(hero.id);
+      const queueCraft = queueCraftService.getQueueCraft(hero.id);
 
       const recipe = recipeTemplateById[recipeId];
-      const recipeTemplate = itemTemplateService.getAllItemsTemplateMapIds()[recipe.itemTemplateId];
+      const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[recipe.itemTemplateId];
 
-      const place = placeTemplate.find((p) => p.id === hero.location.placeId);
-
-      heroService.checkFreeBackpackCapacity(hero.id);
-
-      const validateRequiredBuilding = place?.buildings?.some((b) => b.type === recipe.requirement.building);
-
-      for (const reqSkill of recipe.requirement.skills) {
-        skillService.checkSkillRequirement(hero.id, reqSkill.skillId, reqSkill.level);
-      }
-      for (const reqResource of recipe.requirement.resources) {
-        itemContainerService.checkRequirementsItems(hero.id, reqResource.templateId, reqResource.amount);
-      }
-
-      if (!validateRequiredBuilding) {
-        throw new HTTPException(400, {
-          message: 'You are not inside the required place building.',
-          cause: { canShow: true },
-        });
-      }
-
-      if (recipe.requirement.coreResource && !coreResourceId) {
-        throw new HTTPException(400, {
-          message: 'You need select core resource for this craft item.',
-          cause: { canShow: true },
-        });
-      }
-
-      if (coreResourceId && recipe.requirement.coreResource) {
-        const coreResourceTemplate = itemTemplateService.getAllItemsTemplateMapIds()[coreResourceId];
-
-        if (recipe.requirement.category !== coreResourceTemplate.resourceInfo?.category) {
-          throw new HTTPException(400, {
-            message: 'Invalid base resource for this craft item.',
-            cause: { canShow: true },
-          });
-        }
-      }
+      queueCraftService.canStartCraft(hero.id, coreResourceId, recipeId);
       const now = Date.now();
-      if (!queueCraft?.length) {
-        serverState.queueCraft.set(hero.id, [
-          {
-            id: generateRandomUuid(),
-            recipeId,
-            coreResourceId,
-            expiresAt: now + recipe.timeMs,
-            craftBuildingType: recipe.requirement.building,
-            status: 'PROGRESS',
-          },
-        ]);
+      if (!queueCraft.length) {
+        queueCraft.push({
+          id: generateRandomUuid(),
+          recipeId,
+          coreResourceId,
+          expiresAt: now + recipe.timeMs,
+          craftBuildingType: recipe.requirement.building,
+          status: 'PROGRESS',
+        });
       } else {
         const last = queueCraft.at(-1)?.expiresAt;
         queueCraft.push({
           id: generateRandomUuid(),
           recipeId,
           coreResourceId,
-          expiresAt: now + Math.max((last ?? 0) - now, 0),
+          expiresAt: now + Math.max((last ?? 0) - now, 0) + recipe.timeMs,
           craftBuildingType: recipe.requirement.building,
           status: 'PENDING',
         });

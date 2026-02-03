@@ -6,7 +6,7 @@ import { heroService } from './hero-service';
 import { itemInstanceService } from './item-instance-service';
 import { itemTemplateService } from './item-template-service';
 
-interface IObtainItem {
+interface ICreateItem {
   itemContainerId: string;
   itemTemplateId: string;
   quantity: number;
@@ -68,7 +68,7 @@ export const itemContainerService = {
     if (amount < quantity) throw new HTTPException(409, { message: `not onoth item ${template.name}`, cause: { canShow: true } });
   },
 
-  buyItem({ itemContainerId, heroId, itemTemplateId, quantity }: IObtainItem) {
+  createItem({ itemContainerId, heroId, itemTemplateId, quantity }: ICreateItem) {
     const container = this.getContainer(itemContainerId);
     const templateById = itemTemplateService.getAllItemsTemplateMapIds();
     const template = templateById[itemTemplateId];
