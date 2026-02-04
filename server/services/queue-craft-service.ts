@@ -6,6 +6,7 @@ import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
 import { serverState } from '../game/state/server-state';
+import { clamp } from '../lib/utils';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
@@ -107,5 +108,35 @@ export const queueCraftService = {
 
     this.updateStatus(heroId, nextQueueId, 'PROGRESS');
     io.to(heroId).emit(socketEvents.queueCraft(), nextQueueData);
+  },
+  getCraftChance(skill: number, recipeMin: number): number {
+    const baseChance = 35;
+    const gainPerLevel = 2.5;
+
+    const diff = skill - recipeMin;
+
+    if (diff < 0) return 0;
+
+    return Math.min(100, baseChance + diff * gainPerLevel);
+  },
+  getBaseCraftExp(recipe: RecipeTemplate): number {
+    return Math.floor(
+      // recipe.tier * 40 +
+      recipe.requirement.skills[0].level * 8 + (recipe.timeMs / 1000) * 0.5,
+    );
+  },
+
+  calculateCraftExp(recipeExp: number, chance: number, success: boolean): number {
+    let exp = recipeExp;
+
+    // Множник за складність
+    exp *= clamp(1.2 - chance / 100, 0.3, 1);
+
+    // Множник за результат
+    if (!success) {
+      exp *= 0.3;
+    }
+
+    return Math.max(1, Math.floor(exp));
   },
 };

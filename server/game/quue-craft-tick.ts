@@ -1,11 +1,14 @@
 import type { QueueCraftItemSocketData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
+import { skillTemplateById } from '@/shared/templates/skill-template';
 
 import { io } from '..';
+import { rollChance } from '../lib/utils';
 import { itemContainerService } from '../services/item-container-service';
 import { itemTemplateService } from '../services/item-template-service';
 import { queueCraftService } from '../services/queue-craft-service';
+import { skillService } from '../services/skill-service';
 import { serverState } from './state/server-state';
 
 export const queueCraftTick = (now: number) => {
@@ -27,17 +30,7 @@ export const queueCraftTick = (now: number) => {
         result.message = error.message;
         result.success = false;
       }
-      let nextQueueData: QueueCraftItemSocketData | undefined;
-      if (next) {
-        nextQueueData = {
-          type: 'UPDATE',
-          payload: {
-            status: 'PROGRESS',
-            queueItemCraftId: next.id,
-            expiresAt: now + recipe.timeMs,
-          },
-        };
-      }
+
       if (!result.success) {
         const socketData: QueueCraftItemSocketData = {
           type: 'FAILED',
@@ -47,29 +40,40 @@ export const queueCraftTick = (now: number) => {
           },
         };
         io.to(heroId).emit(socketEvents.queueCraft(), socketData);
-        if (nextQueueData) {
-          queueCraftService.updateStatus(heroId, nextQueueData.payload.queueItemCraftId, 'PROGRESS');
-          io.to(heroId).emit(socketEvents.queueCraft(), nextQueueData);
+        if (next) {
+          queueCraftService.setNextQueue(heroId, next.id, recipeTemplateById[next.recipeId].timeMs);
         }
         return;
       }
 
-      itemContainerService.createItem({ itemContainerId: backpack.id, heroId, quantity: 1, itemTemplateId: template.id });
+      const skill = skillService.getSkillById(heroId, recipe.requirement.skills[0].skillId);
+      const skillKey = skillTemplateById[skill.skillTemplateId].key;
+      const chance = queueCraftService.getCraftChance(skill.level, recipe.requirement.skills[0].level);
+      const successCraft = rollChance(chance);
+      const baseExp = queueCraftService.getBaseCraftExp(recipe);
+      const finalExp = queueCraftService.calculateCraftExp(baseExp, chance, successCraft);
+      const expResult = skillService.setSkillExp(heroId, skillKey, finalExp);
+      if (successCraft) {
+        itemContainerService.createItem({ itemContainerId: backpack.id, heroId, quantity: 1, itemTemplateId: template.id });
+        result.message = 'Success complete craft item';
+      } else {
+        result.message = 'Crafting failed! The materials were lost in the process';
+      }
 
       queueCraftService.consumeAllItemsForCraft(queue.coreResourceId, backpack, recipe);
       const socketData: QueueCraftItemSocketData = {
         type: 'COMPLETE',
         payload: {
-          message: 'Success complete craft item',
+          message: result.message,
           itemName: template.name,
+          successCraft,
           queueItemCraftId: queue.id,
-          isLuckyCraft: false,
+          expResult,
         },
       };
       io.to(heroId).emit(socketEvents.queueCraft(), socketData);
-      if (nextQueueData) {
-        queueCraftService.updateStatus(heroId, nextQueueData.payload.queueItemCraftId, 'PROGRESS');
-        io.to(heroId).emit(socketEvents.queueCraft(), nextQueueData);
+      if (next) {
+        queueCraftService.setNextQueue(heroId, next.id, recipeTemplateById[next.recipeId].timeMs);
       }
     }
   }

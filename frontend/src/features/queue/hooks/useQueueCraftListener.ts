@@ -30,13 +30,18 @@ export const useQueueCraftListener = () => {
           queryClient.invalidateQueries({
             queryKey: getSkillsOptions(heroId).queryKey,
           });
-          setGameMessage({ type: 'SUCCESS', text: data.payload.message, data: [{ name: data.payload.itemName }] });
-          // if (data.payload.craftExpMessage) {
-          //   setGameMessage({
-          //     type: 'SKILL_EXP',
-          //     text: data.payload.isLuckyCraft ? `${data.payload.craftExpMessage} 🔥` : data.payload.craftExpMessage,
-          //   });
-          // }
+          setGameMessage({
+            type: data.payload.successCraft ? 'SUCCESS' : 'ERROR',
+            text: data.payload.message,
+            data: [{ name: data.payload.itemName }],
+          });
+          if (data.payload.expResult) {
+            setGameMessage({
+              type: 'SKILL_EXP',
+              text: data.payload.expResult.message,
+              expAmount: data.payload.expResult.amount,
+            });
+          }
 
           break;
         case 'UPDATE':

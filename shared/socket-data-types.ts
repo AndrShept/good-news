@@ -49,7 +49,8 @@ export type QueueCraftItemSocketData =
         queueItemCraftId: string;
         itemName: string;
         message: string;
-        isLuckyCraft: boolean;
+        successCraft: boolean;
+        expResult: { message: string; amount: number; isLevelUp: boolean };
       };
     }
   | {
@@ -62,7 +63,7 @@ export type QueueCraftItemSocketData =
     }
   | {
       type: 'UPDATE';
-      payload: { queueItemCraftId: string; status: QueueCraftStatusType, expiresAt: number };
+      payload: { queueItemCraftId: string; status: QueueCraftStatusType; expiresAt: number };
     };
 
 export type SelfMessageData = { message: string; type: GameMessageType };

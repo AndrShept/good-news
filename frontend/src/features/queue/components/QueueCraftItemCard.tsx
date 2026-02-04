@@ -1,4 +1,5 @@
 import { GameItemImg } from '@/components/GameItemImg';
+import { Button } from '@/components/ui/button';
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { cn } from '@/lib/utils';
 import { QueueCraft } from '@/shared/types';
@@ -58,13 +59,15 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
         </p>
       </div>
 
-      <button
+      <Button
+        variant={'ghost'}
+        size="icon"
         disabled={isPending}
         onClick={() => mutate({ queueCraftItemId: props.id })}
-        className={cn('absolute border border-red-500/30 inset-0 hidden items-center justify-center bg-black/50 group-hover:flex')}
+        className={cn('text-red-500/40 hover:text-red-500/60 absolute right-0.5 top-1 size-6 p-1 hover:bg-transparent')}
       >
-        <X size={30} className="text-red-500/70" />
-      </button>
+        <X className="size-6" />
+      </Button>
     </li>
   );
 });

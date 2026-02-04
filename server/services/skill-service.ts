@@ -1,12 +1,8 @@
-import type { SkillUpData } from '@/shared/socket-data-types';
-import { socketEvents } from '@/shared/socket-events';
 import { type SkillKey, skillTemplateById, skillTemplateByKey } from '@/shared/templates/skill-template';
 import { HTTPException } from 'hono/http-exception';
 
-import { io } from '..';
 import { serverState } from '../game/state/server-state';
 import { skillExpConfig } from '../lib/config/skill-exp-config';
-import { heroService } from './hero-service';
 
 export const skillService = {
   getSkillById(heroId: string, skillTemplateId: string) {
@@ -33,24 +29,21 @@ export const skillService = {
     skill.currentExperience += amount;
 
     const result = {
-      message: `Your gain skill ${skillKey.toLowerCase()}  ${amount} EXP`,
+      message: `Your gain skill ${skillKey.toLowerCase()}`,
       isLevelUp: false,
+      amount,
+      skillInstanceId: skill.id,
     };
 
     if (skill.currentExperience >= expToLevel) {
       skill.level++;
       skill.currentExperience = 0;
       skill.expToLvl = this.getExpSkillToNextLevel(skillKey, skill.level);
-      result.message = `Congtatulation! your  skill ${skillKey.toLowerCase()} up to level ${skill.level} 🔥`;
+      result.message = `Congratulation! your  skill ${skillKey.toLowerCase()} up to level ${skill.level} 🔥`;
       result.isLevelUp = true;
     }
-    if (result.isLevelUp) {
-      const socketData: SkillUpData = {
-        type: 'SKILL_UP',
-        payload: { skillInstanceId: skill.id, message: result.message },
-      };
-      io.to(heroId).emit(socketEvents.selfData(), socketData);
-    }
+
+    return result;
   },
 
   checkSkillRequirement(heroId: string, skillId: string, level: number) {

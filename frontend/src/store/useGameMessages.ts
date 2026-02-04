@@ -15,6 +15,7 @@ export type GameMessageType = (typeof gameMessageValues)[number];
 export interface IGameMessage {
   text: string;
   data?: { name: string; quantity?: number }[];
+  expAmount?: number;
   success?: boolean;
   type: GameMessageType;
   createdAt?: number;

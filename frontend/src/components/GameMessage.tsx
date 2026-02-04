@@ -45,11 +45,16 @@ export const GameMessage = memo(() => {
                 'text-purple-500': message.type === 'LEVEL_EXP',
               })}
             >
-              <div>
+              <div className="space-x-1">
                 <time className="text-primary">{getTimeFns(message.createdAt!)} </time>
                 <span>{message.text}</span>
+                {!!message.expAmount && (
+                  <>
+                    <span className="text-primary">{message.expAmount}</span>
+                    <span className="text-violet-500">EXP</span>
+                  </>
+                )}
               </div>
-
 
               {!!message.data?.length && (
                 <ul className="text-primary inline-flex flex-wrap gap-0.5">

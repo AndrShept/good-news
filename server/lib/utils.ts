@@ -82,8 +82,11 @@ export const getRandomValue = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-export const rand = (num: number) => {
-  return Math.floor(Math.random() * num);
+export const rollChance = (chance: number) => {
+  return Math.random() * 100 < chance;
+};
+export const clamp = (value: number, min: number, max: number) => {
+  return Math.min(max, Math.max(min, value));
 };
 
 export const getTileExists = (mapId: string, index: number, tileType: TileType) => {

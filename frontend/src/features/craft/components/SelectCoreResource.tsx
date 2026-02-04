@@ -46,7 +46,7 @@ export const SelectCoreResource = ({ type }: Props) => {
           )}
         </GameItemSlot>
       </PopoverTrigger>
-      <PopoverContent className="flex w-fit select-none items-center gap-1 rounded-none p-1">
+      <PopoverContent side="top" className="flex w-fit select-none items-center gap-1 rounded-none p-1">
         {items.length > 0 ? (
           items.map(([id, amount]) => {
             const template = itemsTemplateById[id];

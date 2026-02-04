@@ -37,10 +37,10 @@ export const recipeTemplate = [
 
     defaultUnlocked: true,
     itemTemplateId: resourceTemplateByKey.COPPER_INGOT.id,
-    timeMs: 10_000,
+    timeMs: 15_000,
     requirement: {
-      resources: [{ templateId: resourceTemplateByKey.COPPER_ORE.id, amount: 3 }],
-      skills: [{ skillId: skillTemplateByKey.SMELTING.id, level: 2 }],
+      resources: [{ templateId: resourceTemplateByKey.COPPER_ORE.id, amount: 4 }],
+      skills: [{ skillId: skillTemplateByKey.SMELTING.id, level: 1 }],
       building: 'FORGE',
       category: 'ORE',
     },
