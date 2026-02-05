@@ -25,7 +25,7 @@ export const skillService = {
 
   setSkillExp(heroId: string, skillKey: SkillKey, amount: number) {
     const skill = this.getSkillByKey(heroId, skillKey);
-    const expToLevel = this.getExpSkillToNextLevel(skillKey, skill.level);
+    let expToLevel = this.getExpSkillToNextLevel(skillKey, skill.level);
     skill.currentExperience += amount;
 
     const result = {
@@ -35,10 +35,11 @@ export const skillService = {
       skillInstanceId: skill.id,
     };
 
-    if (skill.currentExperience >= expToLevel) {
+    while (skill.currentExperience >= expToLevel) {
       skill.level++;
-      skill.currentExperience = 0;
-      skill.expToLvl = this.getExpSkillToNextLevel(skillKey, skill.level);
+      skill.currentExperience -= expToLevel
+      expToLevel = this.getExpSkillToNextLevel(skillKey, skill.level);
+      skill.expToLvl = expToLevel
       result.message = `Congratulation! your  skill ${skillKey.toLowerCase()} up to level ${skill.level} 🔥`;
       result.isLevelUp = true;
     }

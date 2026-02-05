@@ -77,15 +77,18 @@ export const queueCraftService = {
       }
     }
     for (const regResource of copyReqResources) {
-      for (const item of backpack.itemsInstance) {
-        if (regResource.templateId === item.itemTemplateId) {
-          itemContainerService.consumeItem({
-            quantity: regResource.amount,
-            itemInstanceId: item.id,
-            itemContainerId: backpack.id,
-          });
-        }
+      const item = backpack.itemsInstance.find((i) => i.itemTemplateId === regResource.templateId);
+
+      if (!item) {
+        throw new Error('Not enough items');
       }
+
+      itemContainerService.consumeItem({
+        quantity: regResource.amount,
+        itemInstanceId: item.id, 
+        itemContainerId: backpack.id,
+        mode: 'all',
+      });
     }
   },
   updateStatus(heroId: string, queueCraftId: string, status: QueueCraftStatusType) {

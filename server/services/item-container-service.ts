@@ -110,47 +110,73 @@ export const itemContainerService = {
     }
   },
 
-  consumeItem({ itemContainerId, itemInstanceId, quantity }: { itemContainerId: string; itemInstanceId: string; quantity: number }) {
-    const container = this.getContainer(itemContainerId);
-    const itemInstance = itemInstanceService.getItemInstance(itemContainerId, itemInstanceId);
-    const templateById = itemTemplateService.getAllItemsTemplateMapIds();
-    const template = templateById[itemInstance.itemTemplateId];
+ consumeItem({
+  itemContainerId,
+  itemInstanceId,
+  quantity,
+  mode,
+}: {
+  itemContainerId: string;
+  itemInstanceId: string;
+  quantity: number;
+  mode: 'use' | 'all';
+}) {
+  const container = this.getContainer(itemContainerId);
+  const itemInstance = itemInstanceService.getItemInstance(itemContainerId, itemInstanceId);
+  const template = itemTemplateService
+    .getAllItemsTemplateMapIds()[itemInstance.itemTemplateId];
 
-    let remaining = quantity;
+  // ❌ non-stackable
+  if (!template.stackable) {
+    itemContainerService.removeItem(itemContainerId, itemInstanceId);
+    return;
+  }
 
-    // ❌ non-stackable
-    if (!template.stackable) {
-      const instances = container.itemsInstance.filter((i) => i.itemTemplateId === template.id);
-
-      if (instances.length < quantity) {
-        throw new Error('Not enough items');
-      }
-
-      for (let i = 0; i < quantity; i++) {
-        itemContainerService.removeItem(itemContainerId, itemInstanceId);
-      }
-
-      return;
+  // 🧪 USE MODE — тільки один стек
+  if (mode === 'use') {
+    if (itemInstance.quantity < quantity) {
+      throw new Error('Not enough items in this stack');
     }
 
-    // ✅ stackable — знімаємо з існуючих стеків
-    for (const inst of container.itemsInstance) {
-      if (inst.itemTemplateId !== template.id) continue;
+    itemInstance.quantity -= quantity;
 
-      const take = Math.min(inst.quantity, remaining);
-      inst.quantity -= take;
-      remaining -= take;
-
-      if (inst.quantity === 0) {
-        itemContainerService.removeItem(itemContainerId, itemInstanceId);
-      }
-
-      if (remaining === 0) return;
+    if (itemInstance.quantity === 0) {
+      itemContainerService.removeItem(itemContainerId, itemInstance.id);
     }
 
-    // ❗ Якщо не вистачило айтемів
-    if (remaining > 0) {
-      throw new Error('Not enough items');
+    return;
+  }
+
+  // 🏗 CRAFT MODE — можна брати з усіх стеків
+  let remaining = quantity;
+
+  // 1️⃣ клікнутий перший
+  const takeFirst = Math.min(itemInstance.quantity, remaining);
+  itemInstance.quantity -= takeFirst;
+  remaining -= takeFirst;
+
+  if (itemInstance.quantity === 0) {
+    itemContainerService.removeItem(itemContainerId, itemInstance.id);
+  }
+
+  // 2️⃣ інші
+  for (const inst of container.itemsInstance) {
+    if (remaining === 0) break;
+    if (inst.itemTemplateId !== template.id) continue;
+    if (inst.id === itemInstance.id) continue;
+
+    const take = Math.min(inst.quantity, remaining);
+    inst.quantity -= take;
+    remaining -= take;
+
+    if (inst.quantity === 0) {
+      itemContainerService.removeItem(itemContainerId, inst.id);
     }
-  },
+  }
+
+  if (remaining > 0) {
+    throw new Error('Not enough items');
+  }
+}
+
 };

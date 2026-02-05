@@ -47,6 +47,7 @@ export const itemUseService = {
       itemContainerId: backpack.id,
       itemInstanceId,
       quantity: 1,
+      mode: 'use'
     });
     return result;
   },
