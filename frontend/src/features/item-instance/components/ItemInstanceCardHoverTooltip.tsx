@@ -13,13 +13,9 @@ type Props = ItemInstance & {
 export const ItemInstanceCardHoverTooltip = memo((props: Props) => {
   return (
     <section className={cn('bg-secondary/80 flex flex-col items-center justify-center truncate rounded border px-4 py-2')}>
-      <h3 className="truncate text-base capitalize">{props.itemTemplate.name}</h3>
-      {/*{props.coreMaterial && (
-          <div>
-            <span>material: </span>
-            <span className={cn(materialConfig[props.coreMaterial]?.color)}>{props.coreMaterial?.split('-')[0]}</span>
-          </div>
-        )}*/}
+      <h3 className={cn('truncate text-base capitalize', props.coreResource && materialConfig[props.coreResource]?.color)}>
+        {props.displayName ?? props.itemTemplate.name}
+      </h3>
 
       <p className="text-muted-foreground">{props.itemTemplate.type.toLocaleLowerCase()}</p>
       <EquipInfo
@@ -28,7 +24,7 @@ export const ItemInstanceCardHoverTooltip = memo((props: Props) => {
         equipInfo={props.itemTemplate.equipInfo}
       />
       {!!props.itemTemplate.potionInfo && <PotionInfo potionInfo={props.itemTemplate.potionInfo} />}
-      <ModifierInfoCard modifiersArgs={[props.itemTemplate.coreModifier]} />
+      <ModifierInfoCard modifiersArgs={[props.itemTemplate.coreModifier, props.coreResourceModifier ?? {}]} />
     </section>
   );
 });

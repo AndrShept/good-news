@@ -6,6 +6,7 @@ import { GameItemSlot } from '@/features/item-instance/components/GameItemSlot';
 import { imageConfig } from '@/shared/config/image-config';
 import { ResourceCategoryType, SelectCoreResourceBuildingType } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
+import { X } from 'lucide-react';
 import { useState } from 'react';
 
 interface Props {
@@ -19,8 +20,8 @@ export const SelectCoreResource = ({ type }: Props) => {
   const coreResourceId = useCraftItemStore((state) => state.coreResourceId);
   const [isOpen, setIsOpen] = useState(false);
   const slotImage = {
-    BLACKSMITH: imageConfig.icon.RESOURCES['IRON-INGOT'],
-    TAILOR: imageConfig.icon.RESOURCES['REGULAR-LEATHER'],
+    BLACKSMITH: imageConfig.icon.RESOURCES['IRON_INGOT'],
+    TAILOR: imageConfig.icon.RESOURCES['REGULAR_LEATHER'],
   } satisfies Record<SelectCoreResourceBuildingType, string>;
   const craftCategory = {
     BLACKSMITH: 'INGOT',
@@ -46,29 +47,34 @@ export const SelectCoreResource = ({ type }: Props) => {
           )}
         </GameItemSlot>
       </PopoverTrigger>
-      <PopoverContent side="top" className="flex w-fit select-none items-center gap-1 rounded-none p-1">
-        {items.length > 0 ? (
-          items.map(([id, amount]) => {
-            const template = itemsTemplateById[id];
-            if (template.resourceInfo?.category === craftCategory[type])
-              return (
-                <div
-                  onClick={() => {
-                    setCoreResourceId(id);
-                    setIsOpen(false);
-                  }}
-                  key={id}
-                  className="group relative opacity-80"
-                >
-                  <GameItemImg className="group-hover:saturate-110 size-10 group-hover:opacity-100" image={template.image} />
+      <PopoverContent side="top" className="bg-secondary/70 flex w-fit select-none items-center gap-1 rounded p-1">
+        {items?.map(([id, amount]) => {
+          const template = itemsTemplateById[id];
+          if (template.resourceInfo?.category === craftCategory[type])
+            return (
+              <div
+                onClick={() => {
+                  setCoreResourceId(id);
+                  setIsOpen(false);
+                }}
+                key={id}
+                className="group relative opacity-80"
+              >
+                <GameItemImg className="group-hover:saturate-110 size-10 group-hover:opacity-100" image={template.image} />
 
-                  {<div className="absolute bottom-0 right-1 text-[12px] font-semibold">{amount}</div>}
-                </div>
-              );
-          })
-        ) : (
-          <p>Missing required resources in backpack</p>
-        )}
+                {<div className="absolute bottom-0 right-1 text-[12px] font-semibold">{amount}</div>}
+              </div>
+            );
+        })}
+        <GameItemSlot className="flex size-10 border-none">
+          <X
+            onClick={() => {
+              setCoreResourceId(undefined);
+              setIsOpen(false);
+            }}
+            className="m-auto size-10 text-red-500/30 hover:text-red-500/50"
+          />
+        </GameItemSlot>
       </PopoverContent>
     </Popover>
   );

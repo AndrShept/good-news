@@ -10,10 +10,10 @@ import { locationTable } from './location-schema';
 import { modifierTable } from './modifier-schema';
 
 export const stateTypeEnum = pgEnum('state_type_enum', [
-  'CHARACTER',
   'IDLE',
   'BATTLE',
   'BLACKSMITHING',
+  'ALCHEMY',
   'FISHING',
   'LUMBERJACKING',
   'MINING',

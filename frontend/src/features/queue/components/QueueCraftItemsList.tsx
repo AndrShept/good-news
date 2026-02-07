@@ -3,7 +3,6 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { getQueueCraftItemOptions } from '@/features/queue/api/getQueueCraftItems';
 import { cn } from '@/lib/utils';
-import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQuery } from '@tanstack/react-query';
 
 import { QueueCraftItemCard } from './QueueCraftItemCard';
@@ -11,7 +10,6 @@ import { QueueCraftItemCard } from './QueueCraftItemCard';
 export const QueueCraftItemsList = () => {
   const heroId = useHeroId();
   const maxQueueCraftCount = useHero((data) => data?.maxQueueCraftCount ?? 4);
-  // const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
   const { data: queueCraftItems } = useQuery(getQueueCraftItemOptions(heroId));
   if (!queueCraftItems?.length) return;
   return (

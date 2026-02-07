@@ -17,6 +17,16 @@ export const usePlaceHeroesUpdate = (placeId: string) => {
     },
     [placeId],
   );
+  const updateHeroes = useCallback(
+    (heroId: string, data: Partial<HeroSidebarItem>) => {
+      queryClient.setQueriesData<ApiGetPlaceHeroes>({ queryKey: getPlaceHeroesLocationOptions(placeId).queryKey }, (oldData) => {
+        if (!oldData) return;
+
+        return oldData.map((h) => (h.id === heroId ? { ...h, ...data } : h));
+      });
+    },
+    [placeId],
+  );
 
   const addHeroes = useCallback(
     (hero: HeroSidebarItem) => {
@@ -33,5 +43,6 @@ export const usePlaceHeroesUpdate = (placeId: string) => {
   return {
     removeHeroes,
     addHeroes,
+    updateHeroes,
   };
 };

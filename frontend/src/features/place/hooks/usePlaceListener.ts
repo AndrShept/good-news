@@ -3,7 +3,7 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
 import { joinRoomClient } from '@/lib/utils';
-import { HeroOfflineData, HeroOnlineData, PlaceUpdateEvent } from '@/shared/socket-data-types';
+import { HeroOfflineData, HeroOnlineData, HeroUpdateStateData, PlaceUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useGameMessages, useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect, useRef } from 'react';
@@ -16,7 +16,7 @@ export const usePlaceListener = () => {
   const id = useHeroId();
   const { socket } = useSocket();
   const { updateHero } = useHeroUpdate();
-  const { addHeroes, removeHeroes } = usePlaceHeroesUpdate(placeId);
+  const { addHeroes, removeHeroes, updateHeroes } = usePlaceHeroesUpdate(placeId);
   const prevTownIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export const usePlaceListener = () => {
     });
   }, [placeId, setGameMessage, socket]);
   useEffect(() => {
-    const listener = (data: PlaceUpdateEvent | HeroOfflineData | HeroOnlineData) => {
+    const listener = (data: PlaceUpdateEvent | HeroOfflineData | HeroOnlineData | HeroUpdateStateData) => {
       switch (data.type) {
         case 'HERO_LEAVE_PLACE':
           if (data.payload.heroId === id) {
@@ -51,6 +51,12 @@ export const usePlaceListener = () => {
           break;
         case 'HERO_ONLINE':
           addHeroes(data.payload);
+          break;
+        case 'UPDATE_STATE':
+          if (data.payload.heroId === id) {
+            updateHero({ state: data.payload.state });
+          }
+          updateHeroes(data.payload.heroId, { state: data.payload.state });
           break;
       }
     };

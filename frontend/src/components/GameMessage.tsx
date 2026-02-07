@@ -33,9 +33,9 @@ export const GameMessage = memo(() => {
     <section className="bg-background/80 backdrop-blur-xs h-[250px]">
       <ScrollArea className="h-full p-1">
         <ul ref={ref} className="flex flex-col pl-2 pt-1">
-          {gameMessages.map((message) => (
+          {gameMessages.map((message, idx) => (
             <div
-              key={message.createdAt!.toString()}
+              key={(message.createdAt?.toString() ?? '') + idx}
               className={cn('inline-flex flex-wrap gap-1 text-sm text-green-400', {
                 'text-red-400': message.type === 'ERROR',
                 'text-green-400': message.type === 'SUCCESS',
@@ -59,8 +59,8 @@ export const GameMessage = memo(() => {
               {!!message.data?.length && (
                 <ul className="text-primary inline-flex flex-wrap gap-0.5">
                   [
-                  {message.data.map((m) => (
-                    <li key={m.name}>
+                  {message.data.map((m, idx) => (
+                    <li key={`${message.createdAt}-${m.name}-${idx}`}>
                       <span className="">{m.name}</span>
                       {!!m.quantity && <span className="ml-1 text-yellow-300">{`x${m.quantity}`}</span>}
                       {!!m.quantity && (message.data?.length ?? 1) > 1 && <span className="mr-0.5">,</span>}

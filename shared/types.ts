@@ -17,11 +17,16 @@ import {
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
-import type { itemInstanceTable, rarityEnum, slotEnum } from '../server/db/schema/item-instance-schema';
+import type {
+  clothTypeEnum,
+  coreResourceTypeEnum,
+  itemInstanceTable,
+  rarityEnum,
+  slotEnum,
+} from '../server/db/schema/item-instance-schema';
 import type {
   armorCategoryEnum,
   armorTypeEnum,
-  coreMaterialTypeEnum,
   ingotTypeEnum,
   itemTemplateEnum,
   leatherTypeEnum,
@@ -164,7 +169,8 @@ export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];
 export type OreType = (typeof oreTypeEnum.enumValues)[number];
 export type LeatherType = (typeof leatherTypeEnum.enumValues)[number];
 export type IngotType = (typeof ingotTypeEnum.enumValues)[number];
-export type CoreMaterialType = (typeof coreMaterialTypeEnum.enumValues)[number];
+export type ClothType = (typeof clothTypeEnum.enumValues)[number];
+export type CoreResourceType = (typeof coreResourceTypeEnum.enumValues)[number];
 export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[number];
 export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
 export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number];
@@ -188,12 +194,12 @@ export type TPlace = {
 };
 
 export interface QueueCraft {
-  id: string
+  id: string;
   recipeId: string;
   expiresAt: number;
   coreResourceId?: string;
   craftBuildingType: CraftBuildingType;
-  status: typeof queueCraftStatusEnum.enumValues[number];
+  status: (typeof queueCraftStatusEnum.enumValues)[number];
 }
 
 export const buildingValues = ['MAGIC-SHOP', 'TEMPLE', 'BANK', 'BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY'] as const;

@@ -14,17 +14,19 @@ export const weaponTypeEnum = pgEnum('weapon_type_enum', ['DAGGER', 'SWORD', 'AX
 
 export const weaponHandEnum = pgEnum('weapon_hand_enum', ['ONE_HANDED', 'TWO_HANDED']);
 
-const oreValues = ['IRON-ORE', 'COPPER-ORE', 'SILVER-ORE', 'GOLD-ORE', 'MITHRIL-ORE', 'ADAMANTINE-ORE'] as const;
-const leatherValues = ['REGULAR-LEATHER'] as const;
-const ingotValues = ['IRON-INGOT', 'COPPER-INGOT', 'SILVER-INGOT', 'GOLD-INGOT', 'MITHRIL-INGOT', 'ADAMANTINE-INGOT'] as const;
+const oreValues = ['IRON_ORE', 'COPPER_ORE', 'SILVER_ORE', 'GOLD_ORE', 'MITHRIL_ORE', 'ADAMANTINE_ORE'] as const;
+const leatherValues = ['REGULAR_LEATHER'] as const;
+const ingotValues = ['IRON_INGOT', 'COPPER_INGOT', 'SILVER_INGOT', 'GOLD_INGOT', 'MITHRIL_INGOT', 'ADAMANTINE_INGOT'] as const;
+const clothValues = ['REGULAR_CLOTH'] as const;
 
 export const ingotTypeEnum = pgEnum('ingot_type_enum', [...ingotValues]);
 export const oreTypeEnum = pgEnum('ore_type_enum', [...oreValues]);
 export const leatherTypeEnum = pgEnum('leather_type_enum', [...leatherValues]);
+export const clothTypeEnum = pgEnum('leather_type_enum', [...clothValues]);
 
-export const resourceTypeEnum = pgEnum('resource_type_enum', [...oreValues, ...leatherValues, ...ingotValues]);
-export const coreMaterialTypeEnum = pgEnum('core_material_enum', [...leatherValues, ...ingotValues]);
-export const resourceCategoryEnum = pgEnum('resource_category_enum', ['ORE', 'WOOD', 'HERB', 'LEATHER', 'INGOT']);
+export const resourceTypeEnum = pgEnum('resource_type_enum', [...oreValues, ...leatherValues, ...ingotValues, ...clothValues]);
+export const coreResourceTypeEnum = pgEnum('core_resource_enum', [...leatherValues, ...ingotValues, ...clothValues]);
+export const resourceCategoryEnum = pgEnum('resource_category_enum', ['ORE', 'WOOD', 'HERB', 'LEATHER', 'INGOT', 'CLOTH']);
 
 //////////////
 
@@ -46,12 +48,13 @@ export const slotEnum = pgEnum('equipment_slot_enum', [
 ]);
 export const itemInstanceTable = pgTable('item_instance', {
   id: uuid().primaryKey().defaultRandom().notNull(),
+  displayName: text(),
   ownerHeroId: uuid().references(() => heroTable.id, { onDelete: 'cascade' }),
   itemContainerId: uuid().references(() => itemContainerTable.id, { onDelete: 'cascade' }),
   itemTemplateId: uuid().notNull(),
   location: itemLocationEnum().notNull(),
-  coreMaterial: coreMaterialTypeEnum(),
-  materialModifier: jsonb('materialModifier').$type<Partial<OmitModifier>>(),
+  coreResource: coreResourceTypeEnum(),
+  coreResourceModifier: jsonb('coreResourceModifier').$type<Partial<OmitModifier>>(),
   slot: slotEnum(),
   marketPrice: integer(),
   durability: integer(),

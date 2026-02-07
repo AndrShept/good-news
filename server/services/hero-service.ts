@@ -4,10 +4,10 @@ import type { Hero, OmitModifier } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
-import { sumAllModifier } from '../lib/utils';
+import { calculate } from '../lib/calculate';
+import { getModifierByResourceKey, sumAllModifier } from '../lib/utils';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
-import { calculate } from '../lib/calculate';
 
 export const heroService = {
   getHero(heroId: string) {
@@ -38,20 +38,12 @@ export const heroService = {
   getHeroStatsWithModifiers(heroId: string) {
     const hero = this.getHero(heroId);
     const buffs = serverState.buff.get(heroId) ?? [];
-    const coreMaterialModifiers: Partial<OmitModifier>[] = [];
-    // for (const item of equipments) {
-    //   const coreMaterialModifier = craftItemService(db).getMaterialModifier(item.gameItem, item.gameItem.coreMaterial);
-    //   if (coreMaterialModifier) {
-    //     coreMaterialModifiers.push(coreMaterialModifier);
-    //   }
-    // }
-    // sadsad
+
     const itemsMapIds = itemTemplateService.getAllItemsTemplateMapIds();
     const modifiers = [
-      // ...(hero.buffs ?? []).map((b) => buffTemplateMapIds[b.buffTemplateId].modifier),
       ...buffs.map((b) => buffTemplateMapIds[b.buffTemplateId].modifier),
       ...(hero.equipments ?? []).map((e) => itemsMapIds[e.itemTemplateId].coreModifier),
-      ...coreMaterialModifiers,
+      ...(hero.equipments ?? []).map((e) => e.coreResourceModifier),
     ];
 
     const sumModifier = sumAllModifier(...modifiers);
@@ -81,24 +73,22 @@ export const heroService = {
     });
     hero.maxHealth = maxHealth;
     hero.maxMana = maxMana;
-    hero.currentHealth = Math.min(maxHealth, hero.currentHealth)
-    hero.currentMana = Math.min(maxMana, hero.currentMana)
+    hero.currentHealth = Math.min(maxHealth, hero.currentHealth);
+    hero.currentMana = Math.min(maxMana, hero.currentMana);
     hero.modifier = { ...hero.modifier, ...sumModifier };
 
-    const healthTimeMs = calculate.healthRegenTime(sumStatAndModifier.constitution)
-    const manaTimeMs = calculate.manaRegenTime(sumStatAndModifier.wisdom)
-    hero.regen.manaTimeMs = manaTimeMs
-    hero.regen.healthTimeMs = healthTimeMs
+    const healthTimeMs = calculate.healthRegenTime(sumStatAndModifier.constitution);
+    const manaTimeMs = calculate.manaRegenTime(sumStatAndModifier.wisdom);
+    hero.regen.manaTimeMs = manaTimeMs;
+    hero.regen.healthTimeMs = healthTimeMs;
   },
   updateRegenTime(heroId: string) {
     const hero = this.getHero(heroId);
     const { sumModifier, sumStatAndModifier } = this.getHeroStatsWithModifiers(heroId);
-    const healthTimeMs = calculate.manaRegenTime(sumStatAndModifier.constitution)
-    const manaTimeMs = calculate.manaRegenTime(sumStatAndModifier.wisdom)
-    hero.regen.manaTimeMs = manaTimeMs
-    hero.regen.healthTimeMs = healthTimeMs
-
-
+    const healthTimeMs = calculate.manaRegenTime(sumStatAndModifier.constitution);
+    const manaTimeMs = calculate.manaRegenTime(sumStatAndModifier.wisdom);
+    hero.regen.manaTimeMs = manaTimeMs;
+    hero.regen.healthTimeMs = healthTimeMs;
   },
   spendGold(heroId: string, amount: number) {
     const hero = this.getHero(heroId);

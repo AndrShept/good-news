@@ -5,6 +5,7 @@ import { useItemUseMutation } from '@/features/hero/hooks/useItemUseMutation';
 import { imageConfig } from '@/shared/config/image-config';
 import { ItemInstance, ItemTemplate, ItemTemplateType } from '@/shared/types';
 import { useModalStore } from '@/store/useModalStore';
+import { useSelectItemInstanceStore } from '@/store/useSelectItemInstanceStore';
 import { X } from 'lucide-react';
 import { ReactElement } from 'react';
 
@@ -20,12 +21,14 @@ const buttonIconVariants: Record<Exclude<ItemTemplateType, 'MISC' | 'RESOURCES'>
 };
 export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
   const itemUseMutation = useItemUseMutation();
+  const setItemInstance = useSelectItemInstanceStore((state) => state.setItemInstance);
   const { setModalData } = useModalStore();
   const onItemUse = () => {
     itemUseMutation.mutate({
       itemInstanceId: props.id,
       itemTemplateId: props.itemTemplateId,
     });
+    setItemInstance(null);
   };
   const icon = buttonIconVariants[props.itemTemplate.type as Exclude<ItemTemplateType, 'MISC' | 'RESOURCES'>];
   const onDeleteInventoryItem = () => {
@@ -45,8 +48,8 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
       )}
 
       {(props.location === 'BACKPACK' || props.location === 'BANK') && (
-        <Button className="p-0  hover:bg-transparent" variant="ghost" onClick={onDeleteInventoryItem} disabled={itemUseMutation.isPending}>
-            <GameIcon className="size-7.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.close} />
+        <Button className="p-0 hover:bg-transparent" variant="ghost" onClick={onDeleteInventoryItem} disabled={itemUseMutation.isPending}>
+          <GameIcon className="size-7.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.close} />
         </Button>
       )}
     </>

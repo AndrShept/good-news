@@ -1,8 +1,9 @@
 import { GameItemImg } from '@/components/GameItemImg';
 import { Button } from '@/components/ui/button';
 import { useGameData } from '@/features/hero/hooks/useGameData';
+import { materialConfig } from '@/lib/config';
 import { cn } from '@/lib/utils';
-import { QueueCraft } from '@/shared/types';
+import { CoreResourceType, QueueCraft } from '@/shared/types';
 import { X } from 'lucide-react';
 import React, { memo, useEffect, useState } from 'react';
 
@@ -15,6 +16,7 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
   const { itemsTemplateById, recipeTemplateById } = useGameData();
   const recipe = recipeTemplateById[props.recipeId];
   const template = itemsTemplateById[recipe.itemTemplateId];
+  const coreResource = props.coreResourceId && itemsTemplateById[props.coreResourceId];
   const [timer, setTimer] = useState(props.expiresAt - Date.now());
 
   useEffect(() => {
@@ -42,6 +44,7 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
       <GameItemImg image={template.image} className="size-10" />
       <div className="flex flex-col items-center">
         <h2 className="truncate text-[15px]">{template.name}</h2>
+        {coreResource && <p className={cn('text-xs truncate', materialConfig[coreResource.key as CoreResourceType]?.color)}>{coreResource.name}</p>}
         <p
           className={cn('text-sm', {
             'text-muted': props.status === 'PENDING',
@@ -50,6 +53,7 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
         >
           {props.status.toLocaleLowerCase()}
         </p>
+
         <p
           className={cn('text-sm text-yellow-300 opacity-0', {
             'opacity-100': props.status === 'PROGRESS',
@@ -64,7 +68,7 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
         size="icon"
         disabled={isPending}
         onClick={() => mutate({ queueCraftItemId: props.id })}
-        className={cn('text-red-500/40 hover:text-red-500/60 absolute right-0.5 top-1 size-6 p-1 hover:bg-transparent')}
+        className={cn('absolute right-0.5 top-1 size-6 p-1 text-red-500/40 hover:bg-transparent hover:text-red-500/60')}
       >
         <X className="size-6" />
       </Button>

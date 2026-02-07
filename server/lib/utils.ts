@@ -1,13 +1,17 @@
 import { BASE_HEALTH_REGEN_TIME, BASE_MANA_REGEN_TIME, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
 import type { IMapJson } from '@/shared/json-types';
 import { mapTemplate } from '@/shared/templates/map-template';
-import type { Modifier, OmitModifier, TileType } from '@/shared/types';
+import { resourceTemplateById } from '@/shared/templates/resource-template';
+import type { ClothType, CraftBuildingType, IngotType, LeatherType, Modifier, OmitModifier, StateType, TileType } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
 import { sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import nodemailer from 'nodemailer';
 import z from 'zod';
+
+import { itemTemplateService } from '../services/item-template-service';
+import { materialModifierConfig } from './config/material-modifier-config';
 
 const schema = z.object({
   DATABASE_URL: z.string(),
@@ -139,4 +143,51 @@ export const sumAllModifier = <T extends Partial<Modifier> | null | undefined>(.
 
 export const delay = (time: number) => {
   return new Promise((resolve) => setTimeout(resolve, time));
+};
+
+export const getModifierByResourceKey = (resourceKey: string, itemTemplateId: string) => {
+  const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
+
+  switch (itemTemplate.type) {
+    case 'ARMOR': {
+      switch (itemTemplate.equipInfo!.armorCategory) {
+        case 'PLATE':
+          return materialModifierConfig.ARMOR.PLATE[resourceKey as IngotType];
+        case 'LEATHER':
+          return materialModifierConfig.ARMOR.LEATHER[resourceKey as LeatherType];
+        case 'MAIL':
+          return materialModifierConfig.ARMOR.MAIL[resourceKey as IngotType];
+        case 'CLOTH':
+          return materialModifierConfig.ARMOR.CLOTH[resourceKey as ClothType];
+        default:
+          return null;
+      }
+    }
+
+    case 'WEAPON':
+      return materialModifierConfig.WEAPON[resourceKey as IngotType];
+    case 'SHIELD':
+      return materialModifierConfig.SHIELD[resourceKey as IngotType];
+    default:
+      return null;
+  }
+};
+
+export const getDisplayName = (itemTemplateId: string, resourceId: string | undefined) => {
+  const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
+  if (!resourceId) return;
+  const resource = resourceTemplateById[resourceId];
+  const displayName = `${resource.name.split(' ')[0]} ${itemTemplate.name}`;
+  return displayName;
+};
+
+export const getStateWithCraftBuildingType = (craftBuildingType: CraftBuildingType) => {
+  const stateData: Record<CraftBuildingType, StateType> = {
+    BLACKSMITH: 'BLACKSMITHING',
+    ALCHEMY: 'ALCHEMY',
+    FORGE: 'SMELTING',
+    TAILOR: 'TAILORING',
+  };
+
+  return stateData[craftBuildingType];
 };

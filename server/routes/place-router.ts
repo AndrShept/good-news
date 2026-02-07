@@ -9,6 +9,7 @@ import { z } from 'zod';
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { heroTable, locationTable } from '../db/schema';
+import { serverState } from '../game/state/server-state';
 import { loggedIn } from '../middleware/loggedIn';
 
 export const placeRouter = new Hono<Context>()
@@ -56,25 +57,24 @@ export const placeRouter = new Hono<Context>()
         });
       }
 
-      const placeHeroes = await db
-        .select({
-          id: heroTable.id,
-          name: heroTable.name,
-          level: heroTable.level,
-          state: heroTable.state,
-          avatarImage: heroTable.avatarImage,
-          // x: locationTable.x,
-          // y: locationTable.y,
-          // placeId: locationTable.placeId,
-        })
-        .from(heroTable)
-        .innerJoin(locationTable, eq(locationTable.heroId, heroTable.id))
-        .where(and(eq(locationTable.placeId, place.id), eq(heroTable.isOnline, true)));
+      let heroesData: HeroSidebarItem[] = [];
+
+      for (const hero of serverState.hero.values()) {
+        if (hero.location.placeId === id) {
+          heroesData.push({
+            id: hero.id,
+            avatarImage: hero.avatarImage,
+            level: hero.level,
+            name: hero.name,
+            state: hero.state,
+          });
+        }
+      }
 
       return c.json<SuccessResponse<HeroSidebarItem[]>>({
         message: 'place heroes fetched!',
         success: true,
-        data: placeHeroes,
+        data: heroesData,
       });
     },
   );

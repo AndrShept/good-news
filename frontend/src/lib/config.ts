@@ -1,5 +1,5 @@
 import { imageConfig } from '@/shared/config/image-config';
-import { ArmorType, EquipmentSlotType, ResourceCategoryType, ResourceType, WeaponType } from '@/shared/types';
+import { ArmorType, CoreResourceType, EquipmentSlotType, ResourceCategoryType, ResourceType, WeaponType } from '@/shared/types';
 
 export const parentVariants = {
   hidden: { opacity: 0 },
@@ -50,44 +50,44 @@ interface MaterialProps {
   bg: string;
 }
 
-export const materialConfig: Partial<Record<ResourceType, MaterialProps>> = {
-  'IRON-INGOT': {
+export const materialConfig: Partial<Record<CoreResourceType, MaterialProps>> = {
+  'IRON_INGOT': {
     color: 'text-gray-400',
     border: 'border-gray-500/50',
     glow: 'shadow-[0_0_15px_rgba(156,163,175,0.3)] animate-pulse',
     bg: 'bg-gray-700/10',
   },
-  'COPPER-INGOT': {
+  'COPPER_INGOT': {
     color: 'text-orange-500',
     border: 'border-orange-600/50',
     glow: 'shadow-[0_0_18px_rgba(249,115,22,0.4)] animate-pulse',
     bg: 'bg-orange-500/10',
   },
-  'SILVER-INGOT': {
+  'SILVER_INGOT': {
     color: 'text-slate-300',
     border: 'border-slate-400/50',
     glow: 'shadow-[0_0_20px_rgba(203,213,225,0.4)] animate-[glow_silver_2s_ease-in-out_infinite]',
     bg: 'bg-slate-200/10',
   },
-  'GOLD-INGOT': {
+  'GOLD_INGOT': {
     color: 'text-yellow-400',
     border: 'border-yellow-500/50',
     glow: 'shadow-[0_0_25px_rgba(250,204,21,0.5)] animate-[glow_gold_2s_ease-in-out_infinite]',
     bg: 'bg-yellow-400/10',
   },
-  'MITHRIL-INGOT': {
+  'MITHRIL_INGOT': {
     color: 'text-sky-400',
     border: 'border-sky-500/50',
     glow: 'shadow-[0_0_28px_rgba(56,189,248,0.55)] animate-[glow_mithril_2s_ease-in-out_infinite]',
     bg: 'bg-sky-400/10',
   },
-  'ADAMANTINE-INGOT': {
+  'ADAMANTINE_INGOT': {
     color: 'text-emerald-400',
     border: 'border-emerald-500/50',
     glow: 'shadow-[0_0_30px_rgba(52,211,153,0.6)] animate-[glow_adamantine_2s_ease-in-out_infinite]',
     bg: 'bg-emerald-400/10',
   },
-  'REGULAR-LEATHER': {
+  'REGULAR_LEATHER': {
     color: 'text-gray-400',
     border: 'border-gray-500/50',
     glow: 'shadow-[0_0_15px_rgba(156,163,175,0.3)] animate-pulse',

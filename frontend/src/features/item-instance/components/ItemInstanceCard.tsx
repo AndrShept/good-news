@@ -1,11 +1,10 @@
 import { CustomTooltip } from '@/components/CustomTooltip';
 import { GameItemImg } from '@/components/GameItemImg';
-
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ItemInstance, ItemTemplate } from '@/shared/types';
+import { useSelectItemInstanceStore } from '@/store/useSelectItemInstanceStore';
 import { useDraggable } from '@dnd-kit/core';
-
-import {memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import { useMoveItemInstance } from '../hooks/useMoveItemInstance';
 import { GameItemSlot } from './GameItemSlot';
@@ -20,6 +19,7 @@ type Props = ItemInstance & {
 
 export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
   const moveItemMutation = useMoveItemInstance();
+  const setItemInstance = useSelectItemInstanceStore((state) => state.setItemInstance);
   const { attributes, listeners, setNodeRef, isDragging, over } = useDraggable({
     id: props.id,
     data: props,
@@ -34,6 +34,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
   useEffect(() => {
     if (isDragging) {
       setIsOpen(false);
+      setItemInstance(null);
     }
   }, [isDragging]);
   return (
@@ -58,7 +59,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
             <CustomTooltip.Content>
               {!props.isSelect && !isDragging && !over?.id && <ItemInstanceCardHoverTooltip {...props} />}
             </CustomTooltip.Content>
-            <PopoverContent className="bg-secondary flex w-fit h-11 gap-2 select-none items-center  rounded px-2">
+            <PopoverContent className="bg-secondary flex h-11 w-fit select-none items-center gap-2 rounded px-2">
               <ItemInstanceCardDropdownMenu {...props} />
             </PopoverContent>
           </CustomTooltip>

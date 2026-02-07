@@ -126,23 +126,23 @@ export const imageConfig = {
     },
     RESOURCES: {
       //ORE
-      'IRON-ORE': '/sprites/icons/resources/ores/iron-ore.png',
-      'COPPER-ORE': '/sprites/icons/resources/ores/copper-ore.png',
-      'SILVER-ORE': '/sprites/icons/resources/ores/silver-ore.png',
-      'GOLD-ORE': '/sprites/icons/resources/ores/gold-ore.png',
-      'MITHRIL-ORE': '/sprites/icons/resources/ores/mithril-ore.png',
-      'ADAMANTINE-ORE': '/sprites/icons/resources/ores/adamantine-ore.png',
+      'IRON_ORE': '/sprites/icons/resources/ores/iron-ore.png',
+      'COPPER_ORE': '/sprites/icons/resources/ores/copper-ore.png',
+      'SILVER_ORE': '/sprites/icons/resources/ores/silver-ore.png',
+      'GOLD_ORE': '/sprites/icons/resources/ores/gold-ore.png',
+      'MITHRIL_ORE': '/sprites/icons/resources/ores/mithril-ore.png',
+      'ADAMANTINE_ORE': '/sprites/icons/resources/ores/adamantine-ore.png',
 
       //INGOT
-      'IRON-INGOT': '/sprites/icons/resources/ingots/iron-ingot.png',
-      'COPPER-INGOT': '/sprites/icons/resources/ingots/copper-ingot.png',
-      'SILVER-INGOT': '/sprites/icons/resources/ingots/silver-ingot.png',
-      'GOLD-INGOT': '/sprites/icons/resources/ingots/gold-ingot.png',
-      'MITHRIL-INGOT': '/sprites/icons/resources/ingots/mithril-ingot.png',
-      'ADAMANTINE-INGOT': '/sprites/icons/resources/ingots/adamantine-ingot.png',
+      'IRON_INGOT': '/sprites/icons/resources/ingots/iron-ingot.png',
+      'COPPER_INGOT': '/sprites/icons/resources/ingots/copper-ingot.png',
+      'SILVER_INGOT': '/sprites/icons/resources/ingots/silver-ingot.png',
+      'GOLD_INGOT': '/sprites/icons/resources/ingots/gold-ingot.png',
+      'MITHRIL_INGOT': '/sprites/icons/resources/ingots/mithril-ingot.png',
+      'ADAMANTINE_INGOT': '/sprites/icons/resources/ingots/adamantine-ingot.png',
 
       //LEATHER
-      'REGULAR-LEATHER': '/sprites/icons/resources/leathers/regular-leather.png',
+      'REGULAR_LEATHER': '/sprites/icons/resources/leathers/regular-leather.png',
     } as Record<ResourceType, string>,
   },
   bg: {

@@ -97,3 +97,4 @@ export function buildPathWithObstacles(from: IPosition, to: IPosition, layers: L
 
   return [];
 }
+

@@ -4,11 +4,13 @@ import { recipeTemplateById } from '@/shared/templates/recipe-template';
 import { skillTemplateById } from '@/shared/templates/skill-template';
 
 import { io } from '..';
-import { rollChance } from '../lib/utils';
+import { getDisplayName, rollChance } from '../lib/utils';
+import { heroService } from '../services/hero-service';
 import { itemContainerService } from '../services/item-container-service';
 import { itemTemplateService } from '../services/item-template-service';
 import { queueCraftService } from '../services/queue-craft-service';
 import { skillService } from '../services/skill-service';
+import { socketService } from '../services/socket-servive';
 import { serverState } from './state/server-state';
 
 export const queueCraftTick = (now: number) => {
@@ -19,6 +21,7 @@ export const queueCraftTick = (now: number) => {
       const queue = queueCraftItems.shift();
       if (!queue) continue;
       const backpack = itemContainerService.getBackpack(heroId);
+      const hero = heroService.getHero(heroId);
       const recipe = recipeTemplateById[queue.recipeId];
       const next = queueCraftItems.at(0);
       const template = itemTemplateService.getAllItemsTemplateMapIds()[recipe.itemTemplateId];
@@ -43,6 +46,10 @@ export const queueCraftTick = (now: number) => {
         if (next) {
           queueCraftService.setNextQueue(heroId, next.id, recipeTemplateById[next.recipeId].timeMs);
         }
+        if (!queueCraftItems.length) {
+          socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, 'IDLE');
+          hero.state = 'IDLE';
+        }
         return;
       }
 
@@ -53,8 +60,15 @@ export const queueCraftTick = (now: number) => {
       const baseExp = queueCraftService.getBaseCraftExp(recipe);
       const finalExp = queueCraftService.calculateCraftExp(baseExp, chance, successCraft);
       const expResult = skillService.setSkillExp(heroId, skillKey, finalExp);
+      const displayName = getDisplayName(recipe.itemTemplateId, queue.coreResourceId);
       if (successCraft) {
-        itemContainerService.createItem({ itemContainerId: backpack.id, heroId, quantity: 1, itemTemplateId: template.id });
+        itemContainerService.createItem({
+          itemContainerId: backpack.id,
+          heroId,
+          quantity: 1,
+          itemTemplateId: template.id,
+          coreResourceId: queue.coreResourceId,
+        });
         result.message = 'Success complete craft item';
       } else {
         result.message = 'Crafting failed! The materials were lost in the process';
@@ -65,7 +79,7 @@ export const queueCraftTick = (now: number) => {
         type: 'COMPLETE',
         payload: {
           message: result.message,
-          itemName: template.name,
+          itemName: displayName ?? template.name,
           successCraft,
           queueItemCraftId: queue.id,
           expResult,
@@ -74,6 +88,10 @@ export const queueCraftTick = (now: number) => {
       io.to(heroId).emit(socketEvents.queueCraft(), socketData);
       if (next) {
         queueCraftService.setNextQueue(heroId, next.id, recipeTemplateById[next.recipeId].timeMs);
+      }
+      if (!queueCraftItems.length) {
+        socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, 'IDLE');
+        hero.state = 'IDLE';
       }
     }
   }

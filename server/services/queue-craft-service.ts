@@ -70,7 +70,7 @@ export const queueCraftService = {
 
   consumeAllItemsForCraft(coreResourceId: string | undefined, backpack: TItemContainer, recipe: RecipeTemplate) {
     const copyReqResources = recipe.requirement.resources.map((res) => ({ ...res }));
-    if (coreResourceId) {
+    if (coreResourceId && recipe.requirement.coreResource) {
       const firstRes = copyReqResources.at(0);
       if (firstRes) {
         firstRes.templateId = coreResourceId;
@@ -85,7 +85,7 @@ export const queueCraftService = {
 
       itemContainerService.consumeItem({
         quantity: regResource.amount,
-        itemInstanceId: item.id, 
+        itemInstanceId: item.id,
         itemContainerId: backpack.id,
         mode: 'all',
       });

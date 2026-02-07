@@ -34,7 +34,7 @@ export const DeleteItemInstanceModal = () => {
         <div className="mx-auto">
           {modalData && modalData.itemInstance && (
             <p className="font-semibold">
-              {modalData.itemInstance.itemTemplate.name}
+              {modalData.itemInstance.displayName ?? modalData.itemInstance.itemTemplate.name}
               {modalData.itemInstance.quantity > 1 && (
                 <span className="font-normal text-yellow-300"> x{modalData.itemInstance.quantity}</span>
               )}
@@ -42,7 +42,6 @@ export const DeleteItemInstanceModal = () => {
           )}
         </div>
         <DialogFooter>
-
           <AcceptButton disabled={isPending} onClick={handleSubmit} />
           <DialogClose asChild>
             <CancelButton disabled={isPending} />

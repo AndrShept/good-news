@@ -1,4 +1,4 @@
-import type { BuildingType, CoreMaterialType, IPosition, ResourceType } from './types';
+import type { BuildingType, IPosition, ResourceType } from './types';
 
 export const jobName = {
   'hero-offline': 'HERO_OFFLINE',
@@ -10,8 +10,7 @@ export const jobName = {
 
 export type JobNameType = (typeof jobName)[keyof typeof jobName];
 
-export type ActionJobEvent =  HeroOfflineJob | BuffCreateJob | RegenHealthJob | RegenManaJob | QueueCraftItemJob;
-
+export type ActionJobEvent =  HeroOfflineJob | BuffCreateJob | RegenHealthJob | RegenManaJob 
 
 
 export type HeroOfflineJob = {
@@ -46,16 +45,4 @@ export type RegenManaJob = {
   };
 };
 
-export type QueueCraftItemJob = {
-  jobName: 'QUEUE_CRAFT_ITEM';
-  payload: {
-    heroId: string;
-    queueCraftItemId: string;
-    coreMaterialType?: CoreMaterialType;
-    craftExpMessage?: string;
-    completedAt?: string;
-    gameItemName?: string;
-    isLuckyCraft?: boolean;
-    buildingType: BuildingType;
-  };
-};
+

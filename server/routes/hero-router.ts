@@ -1,7 +1,14 @@
-import { BANK_CONTAINER_COST, BASE_STATS, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT, RESET_STATS_COST } from '@/shared/constants';
-import { type QueueCraftItemJob, type RegenHealthJob, type RegenManaJob, jobName } from '@/shared/job-types';
+import {
+  BANK_CONTAINER_COST,
+  BASE_STATS,
+  HP_MULTIPLIER_COST,
+  MANA_MULTIPLIER_INT,
+  MAX_QUEUE_CRAFT_ITEM,
+  RESET_STATS_COST,
+} from '@/shared/constants';
 import type {
   HeroOnlineData,
+  HeroUpdateStateData,
   MapUpdateEvent,
   PlaceUpdateEvent,
   QueueCraftItemSocketData,
@@ -16,12 +23,14 @@ import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-te
 import { skillsTemplate } from '@/shared/templates/skill-template';
 import {
   type BuffInstance,
+  type CraftBuildingType,
   type EquipmentSlotType,
   type ErrorResponse,
   type Hero,
   type ItemInstance,
   type PathNode,
   type QueueCraft,
+  type StateType,
   type SuccessResponse,
   type THeroRegen,
   type TItemContainer,
@@ -45,7 +54,6 @@ import type { Context } from '../context';
 import { db } from '../db/db';
 import {
   buffInstanceTable,
-  coreMaterialTypeEnum,
   craftRecipeTable,
   heroTable,
   itemContainerTable,
@@ -61,7 +69,7 @@ import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
 import { serverState } from '../game/state/server-state';
 import { calculate } from '../lib/calculate';
 import { heroOnline } from '../lib/heroOnline';
-import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
+import { generateRandomUuid, getStateWithCraftBuildingType, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
@@ -73,6 +81,7 @@ import { itemTemplateService } from '../services/item-template-service';
 import { itemUseService } from '../services/item-use-service';
 import { queueCraftService } from '../services/queue-craft-service';
 import { skillService } from '../services/skill-service';
+import { socketService } from '../services/socket-servive';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -417,6 +426,7 @@ export const heroRouter = new Hono<Context>()
           itemContainerId: backpack.id,
           itemTemplateId: template.id,
           quantity: item.quantity,
+          coreResourceId: undefined,
         });
       }
       heroService.spendGold(hero.id, sumPriceGold);
@@ -491,10 +501,11 @@ export const heroRouter = new Hono<Context>()
         message: '',
       };
       const equipItem = hero.equipments.find((e) => e.id === itemInstanceId);
+
       if (equipItem) {
         equipmentService.unEquipItem(hero.id, itemInstanceId);
         result.message = 'You have unequipped the item';
-        result.name = template[equipItem.itemTemplateId].name;
+        result.name = equipItem.displayName ?? template[equipItem.itemTemplateId].name;
       } else {
         const itemInstance = itemInstanceService.getItemInstance(backpack.id, itemInstanceId);
         switch (template[itemInstance.itemTemplateId].type) {
@@ -510,7 +521,7 @@ export const heroRouter = new Hono<Context>()
           case 'SHIELD': {
             equipmentService.equipItem(hero.id, itemInstanceId);
             result.message = 'You have equipped the item';
-            result.name = template[itemInstance.itemTemplateId].name;
+            result.name = itemInstance.displayName ?? template[itemInstance.itemTemplateId].name;
             break;
           }
         }
@@ -847,29 +858,6 @@ export const heroRouter = new Hono<Context>()
     },
   )
 
-  // .put(
-  //   '/:id/state',
-  //   loggedIn,
-  //   zValidator('param', z.object({ id: z.string() })),
-  //   zValidator('json', z.object({ type: z.enum(stateTypeEnum.enumValues) })),
-
-  //   async (c) => {
-  //     const user = c.get('user');
-  //     const { id } = c.req.valid('param');
-  //     const { type } = c.req.valid('json');
-
-  //     const hero = heroService.getHero(id);
-
-  //     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-  //     hero.state = type;
-
-  //     return c.json<SuccessResponse>({
-  //       message: 'state changed',
-  //       success: true,
-  //     });
-  //   },
-  // )
   .get(
     '/:id/queue-craft',
     loggedIn,
@@ -887,7 +875,7 @@ export const heroRouter = new Hono<Context>()
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
       const queueCraftItems = queueCraftService.getQueueCraft(hero.id);
-      // const returnData = queueCraftItems.toSorted((a, b) => b.expiresAt - a.expiresAt);
+
       return c.json<SuccessResponse<QueueCraft[]>>({
         message: 'craft item add to queue',
         success: true,
@@ -917,8 +905,14 @@ export const heroRouter = new Hono<Context>()
 
       const recipe = recipeTemplateById[recipeId];
       const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[recipe.itemTemplateId];
-
-      if (queueCraft.length >= 4) {
+      const last = queueCraft.at(-1);
+      if (last && last.craftBuildingType !== recipe.requirement.building) {
+        throw new HTTPException(400, {
+          message: 'You must work only one building',
+          cause: { canShow: true },
+        });
+      }
+      if (queueCraft.length >= MAX_QUEUE_CRAFT_ITEM) {
         throw new HTTPException(400, {
           message: 'You cannot queue more than 4 craft items.',
           cause: { canShow: true },
@@ -931,17 +925,20 @@ export const heroRouter = new Hono<Context>()
         queueCraft.push({
           id: generateRandomUuid(),
           recipeId,
-          coreResourceId,
+          coreResourceId: recipe.requirement.coreResource ? coreResourceId : undefined,
           expiresAt: now + recipe.timeMs,
           craftBuildingType: recipe.requirement.building,
           status: 'PROGRESS',
         });
+        const stateData = getStateWithCraftBuildingType(recipe.requirement.building);
+        hero.state = stateData;
+        socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, stateData);
       } else {
         const last = queueCraft.at(-1)?.expiresAt;
         queueCraft.push({
           id: generateRandomUuid(),
           recipeId,
-          coreResourceId,
+          coreResourceId: recipe.requirement.coreResource ? coreResourceId : undefined,
           expiresAt: now + Math.max((last ?? 0) - now, 0) + recipe.timeMs,
           craftBuildingType: recipe.requirement.building,
           status: 'PENDING',
@@ -993,7 +990,10 @@ export const heroRouter = new Hono<Context>()
           queue.expiresAt = now + acc;
         }
       }
-
+      if (!queueCraft.length) {
+        socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, 'IDLE');
+        hero.state = 'IDLE';
+      }
       return c.json<SuccessResponse>({
         message: 'queue craft item deleted',
         success: true,
