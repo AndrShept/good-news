@@ -1,7 +1,9 @@
 import { useHero } from '@/features/hero/hooks/useHero';
 import { HeroSidebarList } from '@/features/map/components/HeroSidebarList';
+import { PlaceEntrance } from '@/shared/types';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import { getPlaceOptions } from '../api/get-place';
 import { getPlaceHeroesLocationOptions } from '../api/get-place-heroes';
@@ -13,11 +15,13 @@ export const Place = () => {
   const placeData = useQuery(getPlaceOptions(placeId));
   const placeHeroes = useQuery(getPlaceHeroesLocationOptions(placeId));
   const selectedBuilding = useSelectBuildingStore();
+  const [entrances, setEntrances] = useState<PlaceEntrance[] | null>(null);
   if (placeData.isLoading) return <p>LOADING ...</p>;
   return (
     <section className="mx-auto flex w-full">
-      <PlaceSidebar place={placeData.data} />
-      <SelectedBuildingPage place={placeData.data} />
+      <PlaceSidebar entrances={entrances} setEntrances={setEntrances} place={placeData.data} />
+      {!!entrances?.length && <div>ENTANCE</div>}
+      <SelectedBuildingPage entrances={entrances} place={placeData.data} />
       {selectedBuilding.selectBuilding?.type !== 'BANK' && <HeroSidebarList isLoading={placeHeroes.isLoading} heroes={placeHeroes.data} />}
     </section>
   );

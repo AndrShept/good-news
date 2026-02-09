@@ -1,5 +1,5 @@
 import { ShopItems } from '@/features/shop/components/ShopItems';
-import { TPlace } from '@/shared/types';
+import { PlaceEntrance, TPlace } from '@/shared/types';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 
 import { Bank } from './buildings/Bank';
@@ -8,9 +8,10 @@ import { Temple } from './buildings/Temple';
 
 type Props = {
   place: TPlace | undefined | null;
+  entrances: PlaceEntrance[] | null;
 };
 
-export const SelectedBuildingPage = ({ place }: Props) => {
+export const SelectedBuildingPage = ({ place, entrances }: Props) => {
   const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
   const isMagicShop = selectBuilding?.type === 'MAGIC-SHOP';
   const isTemple = selectBuilding?.type === 'TEMPLE';
@@ -22,7 +23,7 @@ export const SelectedBuildingPage = ({ place }: Props) => {
     selectBuilding?.type === 'TAILOR';
   return (
     <section className="flex min-w-0 flex-1 p-1.5">
-      {!selectBuilding && <p>{place?.name}</p>}
+      {!selectBuilding && !entrances && <p>{place?.name}</p>}
       {isMagicShop && <ShopItems buildingType={selectBuilding.type} />}
       {isTemple && <Temple />}
       {isBank && <Bank place={place} />}

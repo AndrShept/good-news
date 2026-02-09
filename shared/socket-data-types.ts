@@ -10,26 +10,26 @@ export type SocketGroupResponse = {
   updateType: 'leave' | 'kick' | 'remove' | 'new-member';
 };
 
-export type MapUpdateEvent =
+export type MapUpdateData =
   | {
-      type: 'HERO_ENTER_PLACE';
+      type: 'REMOVE_HERO';
       payload: {
         heroId: string;
         placeId: string;
       };
     }
   | {
-      type: 'HERO_LEAVE_PLACE';
+      type: 'ADD_HERO';
       payload: { hero: MapHero; mapId: string; heroId: string };
     };
 
-export type PlaceUpdateEvent =
+export type PlaceUpdateData =
   | {
-      type: 'HERO_ENTER_PLACE';
+      type: 'ADD_HERO';
       payload: HeroSidebarItem;
     }
   | {
-      type: 'HERO_LEAVE_PLACE';
+      type: 'REMOVE_HERO';
       payload: { heroId: string; mapId: string };
     };
 

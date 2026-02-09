@@ -87,6 +87,10 @@ export const imageConfig = {
       'magic-shop': '/sprites/icons/buildings/magic-shop.png',
       temple: '/sprites/icons/buildings/temple.png',
     },
+    entrance: {
+      portal: '/sprites/icons/entrance/portal.png',
+      mine: '/sprites/icons/entrance/mine.png',
+    },
     WEAPON: {
       SWORD: '/sprites/icons/weapon/sword.png',
       AXE: '/sprites/icons/weapon/axe.png',
@@ -126,29 +130,30 @@ export const imageConfig = {
     },
     RESOURCES: {
       //ORE
-      'IRON_ORE': '/sprites/icons/resources/ores/iron-ore.png',
-      'COPPER_ORE': '/sprites/icons/resources/ores/copper-ore.png',
-      'SILVER_ORE': '/sprites/icons/resources/ores/silver-ore.png',
-      'GOLD_ORE': '/sprites/icons/resources/ores/gold-ore.png',
-      'MITHRIL_ORE': '/sprites/icons/resources/ores/mithril-ore.png',
-      'ADAMANTINE_ORE': '/sprites/icons/resources/ores/adamantine-ore.png',
+      IRON_ORE: '/sprites/icons/resources/ores/iron-ore.png',
+      COPPER_ORE: '/sprites/icons/resources/ores/copper-ore.png',
+      SILVER_ORE: '/sprites/icons/resources/ores/silver-ore.png',
+      GOLD_ORE: '/sprites/icons/resources/ores/gold-ore.png',
+      MITHRIL_ORE: '/sprites/icons/resources/ores/mithril-ore.png',
+      ADAMANTINE_ORE: '/sprites/icons/resources/ores/adamantine-ore.png',
 
       //INGOT
-      'IRON_INGOT': '/sprites/icons/resources/ingots/iron-ingot.png',
-      'COPPER_INGOT': '/sprites/icons/resources/ingots/copper-ingot.png',
-      'SILVER_INGOT': '/sprites/icons/resources/ingots/silver-ingot.png',
-      'GOLD_INGOT': '/sprites/icons/resources/ingots/gold-ingot.png',
-      'MITHRIL_INGOT': '/sprites/icons/resources/ingots/mithril-ingot.png',
-      'ADAMANTINE_INGOT': '/sprites/icons/resources/ingots/adamantine-ingot.png',
+      IRON_INGOT: '/sprites/icons/resources/ingots/iron-ingot.png',
+      COPPER_INGOT: '/sprites/icons/resources/ingots/copper-ingot.png',
+      SILVER_INGOT: '/sprites/icons/resources/ingots/silver-ingot.png',
+      GOLD_INGOT: '/sprites/icons/resources/ingots/gold-ingot.png',
+      MITHRIL_INGOT: '/sprites/icons/resources/ingots/mithril-ingot.png',
+      ADAMANTINE_INGOT: '/sprites/icons/resources/ingots/adamantine-ingot.png',
 
       //LEATHER
-      'REGULAR_LEATHER': '/sprites/icons/resources/leathers/regular-leather.png',
+      REGULAR_LEATHER: '/sprites/icons/resources/leathers/regular-leather.png',
     } as Record<ResourceType, string>,
   },
   bg: {
     shrine: '/sprites/bg/shrine.png',
     map: {
       SolmereValley: '/sprites/bg/map/solmer-valley.png',
+      solmerMine: '/sprites/bg/map/solmer-mine.png',
     },
   },
 } as const;

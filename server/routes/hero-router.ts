@@ -9,8 +9,6 @@ import {
 import type {
   HeroOnlineData,
   HeroUpdateStateData,
-  MapUpdateEvent,
-  PlaceUpdateEvent,
   QueueCraftItemSocketData,
   SelfHeroData,
   SelfMessageData,
@@ -755,26 +753,8 @@ export const heroRouter = new Hono<Context>()
       heroState.location.mapId = null;
       heroState.location.placeId = place.id;
 
-      const socketPlaceData: PlaceUpdateEvent = {
-        type: 'HERO_ENTER_PLACE',
-        payload: {
-          id: heroState.id,
-          avatarImage: heroState.avatarImage,
-          level: heroState.level,
-          name: heroState.name,
-          state: heroState.state,
-        },
-      };
-      const socketMapData: MapUpdateEvent = {
-        type: 'HERO_ENTER_PLACE',
-        payload: {
-          placeId: place.id,
-          heroId: id,
-        },
-      };
-
-      io.to(place.mapId).emit(socketEvents.mapUpdate(), socketMapData);
-      io.to(place.id).emit(socketEvents.placeUpdate(), socketPlaceData);
+      socketService.sendMapRemoveHero(heroState.id, place.mapId, place.id);
+      socketService.sendPlaceAddHero(heroState.id,  place.id);
 
       return c.json<SuccessResponse>({
         message: 'enter town success',
@@ -823,33 +803,8 @@ export const heroRouter = new Hono<Context>()
       heroState.location.x = place.x;
       heroState.location.y = place.y;
 
-      const socketMapData: MapUpdateEvent = {
-        type: 'HERO_LEAVE_PLACE',
-        payload: {
-          heroId: id,
-          mapId: place.mapId,
-          hero: {
-            id: heroState.id,
-            name: heroState.name,
-            avatarImage: heroState.avatarImage,
-            characterImage: heroState.characterImage,
-            level: heroState.level,
-            state: heroState.state,
-            x: heroState.location.x,
-            y: heroState.location.y,
-          },
-        },
-      };
-      const socketTownData: PlaceUpdateEvent = {
-        type: 'HERO_LEAVE_PLACE',
-        payload: {
-          heroId: id,
-          mapId: place.mapId,
-        },
-      };
-
-      io.to(place.id).emit(socketEvents.placeUpdate(), socketTownData);
-      io.to(place.mapId).emit(socketEvents.mapUpdate(), socketMapData);
+      socketService.sendMapAddHero(heroState.id, place.mapId);
+      socketService.sendPlaceRemoveHero(heroState.id, place.mapId, place.id);
 
       return c.json<SuccessResponse>({
         message: 'leave place success ',

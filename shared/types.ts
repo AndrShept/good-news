@@ -179,18 +179,55 @@ export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
 export type TLocation = typeof locationTable.$inferSelect;
 
-export const placeValues = ['TOWN', 'DUNGEON', 'MINE'] as const;
-export type PlaceType = (typeof placeValues)[number];
+// export const placeValues = ['TOWN', 'DUNGEON', 'MINE'] as const;
+// export type PlaceType = (typeof placeValues)[number];
+export type TileType = (typeof tileTypeValues)[number];
+
+export const placeEntranceValues = ['DUNGEON', 'MINE'] as const;
+export type PlaceEntranceType = (typeof placeEntranceValues)[number];
+
+type BaseEntrance = {
+  id: string;
+  key: string;
+  image: string;
+  minLevel?: number;
+};
+
+export type PlaceEntrance = BaseEntrance & {
+  mapId: string;
+};
+export type MapEntrance = BaseEntrance & {
+  placeId?: string;
+  mapId?: string;
+  x: number;
+  y: number;
+};
+
+export type Entrance = PlaceEntrance | MapEntrance;
+
+export type TMap = {
+  id: string;
+  width: number;
+  height: number;
+  tileHeight: number;
+  tileWidth: number;
+  image: string;
+  name: string;
+  layers: Layer[];
+  places: TPlace[];
+  entrances: MapEntrance[];
+};
 
 export type TPlace = {
   id: string;
-  type: PlaceType;
+  // type: PlaceType;
   name: string;
   image: string;
   x: number;
   y: number;
   mapId: string;
   buildings: Building[];
+  entrances: PlaceEntrance[];
 };
 
 export interface QueueCraft {
@@ -204,7 +241,17 @@ export interface QueueCraft {
 
 export const buildingValues = ['MAGIC-SHOP', 'TEMPLE', 'BANK', 'BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY'] as const;
 export const craftBuildingValues = ['BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY'] as const;
-export const tileTypeValues = ['OBJECT', 'WATER', 'GROUND'] as const;
+export const tileTypeValues = [
+  'OBJECT',
+  'WATER',
+  'GROUND',
+  'ORE_VEIN',
+  'ENHANCED_ORE_VEIN',
+  'TREE_PATCH',
+  'ENHANCED_TREE_PATCH',
+  'HERB_PATCH',
+  'ENHANCED_HERB_PATCH',
+] as const;
 export type BuildingType = (typeof buildingValues)[number];
 export type CraftBuildingType = Extract<BuildingType, 'BLACKSMITH' | 'FORGE' | 'TAILOR' | 'ALCHEMY'>;
 export type SelectCoreResourceBuildingType = Extract<CraftBuildingType, 'TAILOR' | 'BLACKSMITH'>;
@@ -215,20 +262,6 @@ export type Building = {
   type: BuildingType;
   workingResourceCategory?: ResourceCategoryType;
   image: string;
-};
-
-export type TileType = (typeof tileTypeValues)[number];
-
-export type TMap = {
-  id: string;
-  width: number;
-  height: number;
-  tileHeight: number;
-  tileWidth: number;
-  image: string;
-  name: string;
-  places: TPlace[];
-  layers: Layer[];
 };
 
 export type OmitModifier = Omit<Modifier, 'id' | 'heroId'>;

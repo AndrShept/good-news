@@ -3,7 +3,7 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
 import { joinRoomClient } from '@/lib/utils';
-import { HeroOfflineData, HeroOnlineData, MapUpdateEvent } from '@/shared/socket-data-types';
+import { HeroOfflineData, HeroOnlineData, MapUpdateData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useGameMessages } from '@/store/useGameMessages';
 import { useEffect, useRef } from 'react';
@@ -14,7 +14,6 @@ export const useMapListener = () => {
   const setGameMessage = useGameMessages((state) => state.setGameMessage);
   const { mapId } = useHero((data) => ({
     mapId: data?.location?.mapId ?? '',
-
   }));
   const { socket } = useSocket();
   const { deleteHeroes, addHeroes } = useMapHeroesUpdate(mapId);
@@ -33,9 +32,9 @@ export const useMapListener = () => {
     });
   }, [mapId, setGameMessage, socket]);
   useEffect(() => {
-    const listener = (data: MapUpdateEvent | HeroOfflineData | HeroOnlineData) => {
+    const listener = (data: MapUpdateData | HeroOfflineData | HeroOnlineData) => {
       switch (data.type) {
-        case 'HERO_ENTER_PLACE':
+        case 'REMOVE_HERO':
           if (id === data.payload.heroId) {
             setGameMessage({
               type: 'SUCCESS',
@@ -45,7 +44,7 @@ export const useMapListener = () => {
           }
           deleteHeroes(data.payload.heroId);
           break;
-        case 'HERO_LEAVE_PLACE':
+        case 'ADD_HERO':
           if (id === data.payload.heroId) {
             console.log('');
           }
@@ -60,8 +59,6 @@ export const useMapListener = () => {
 
           break;
         }
-
-
       }
     };
     socket.on(socketEvents.mapUpdate(), listener);
