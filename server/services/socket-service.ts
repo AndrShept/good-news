@@ -1,11 +1,21 @@
 import type { HeroUpdateStateData, MapUpdateData, PlaceUpdateData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import type { StateType } from '@/shared/types';
+import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
+import { serverState } from '../game/state/server-state';
 import { heroService } from './hero-service';
 
 export const socketService = {
+  getSocket(heroId: string) {
+    const socket = serverState.socket.get(heroId);
+    if (!socket) {
+      throw new HTTPException(404, { message: 'socket not found' });
+    }
+    return socket;
+  },
+
   sendToPlaceUpdateState(heroId: string, placeId: string | null, state: StateType) {
     if (!placeId) return;
     const socketData: HeroUpdateStateData = {
@@ -18,11 +28,12 @@ export const socketService = {
     io.to(placeId).emit(socketEvents.placeUpdate(), socketData);
   },
   sendMapAddHero(heroId: string, mapId: string) {
+    const socket = this.getSocket(heroId);
+
     const hero = heroService.getHero(heroId);
     const data: MapUpdateData = {
       type: 'ADD_HERO',
       payload: {
-        heroId: hero.id,
         mapId,
         hero: {
           id: hero.id,
@@ -36,46 +47,52 @@ export const socketService = {
         },
       },
     };
-
+    socket.join(mapId);
     io.to(mapId).emit(socketEvents.mapUpdate(), data);
   },
-  sendMapRemoveHero(heroId: string, mapId: string, placeId: string) {
+  sendMapRemoveHero(heroId: string, mapId: string) {
+    const socket = this.getSocket(heroId);
+
     const hero = heroService.getHero(heroId);
     const data: MapUpdateData = {
       type: 'REMOVE_HERO',
       payload: {
-        placeId,
         heroId: hero.id,
       },
     };
-
+    socket.leave(mapId);
     io.to(mapId).emit(socketEvents.mapUpdate(), data);
   },
-  sendPlaceRemoveHero(heroId: string, mapId: string, placeId: string) {
+  sendPlaceRemoveHero(heroId: string, placeId: string) {
+    const socket = this.getSocket(heroId);
+
     const hero = heroService.getHero(heroId);
     const data: PlaceUpdateData = {
       type: 'REMOVE_HERO',
       payload: {
         heroId: hero.id,
-        mapId,
       },
     };
-
+    socket.leave(placeId);
     io.to(placeId).emit(socketEvents.placeUpdate(), data);
   },
   sendPlaceAddHero(heroId: string, placeId: string) {
+    const socket = this.getSocket(heroId);
     const hero = heroService.getHero(heroId);
     const data: PlaceUpdateData = {
       type: 'ADD_HERO',
       payload: {
-        id: hero.id,
-        avatarImage: hero.avatarImage,
-        level: hero.level,
-        name: hero.name,
-        state: hero.state,
+        hero: {
+          id: hero.id,
+          avatarImage: hero.avatarImage,
+          level: hero.level,
+          name: hero.name,
+          state: hero.state,
+        },
+        placeId,
       },
     };
-
+    socket.join(placeId);
     io.to(placeId).emit(socketEvents.placeUpdate(), data);
   },
 };

@@ -19,11 +19,16 @@ export const useHeroActions = ({ heroPosX, heroPosY, map }: Props) => {
     }, {});
   }, [map]);
 
-  const isHeroOnTownTile = useMemo(() => {
-    return map?.places?.some((town) => {
-      return town.x === heroPosX && town.y === heroPosY;
+  const placeTile = useMemo(() => {
+    return map?.places?.find((place) => {
+      return place.x === heroPosX && place.y === heroPosY;
     });
   }, [heroPosX, heroPosY, map?.places]);
+  const entranceTile = useMemo(() => {
+    return map?.entrances?.find((entrance) => {
+      return entrance.x === heroPosX && entrance.y === heroPosY;
+    });
+  }, [heroPosX, heroPosY, map?.entrances]);
 
   const canFish = useMemo(() => {
     const around = getTilesAroundHero({ x: heroPosX, y: heroPosY }, 1);
@@ -33,6 +38,7 @@ export const useHeroActions = ({ heroPosX, heroPosY, map }: Props) => {
 
   return {
     canFish,
-    isHeroOnTownTile,
+    placeTile,
+    entranceTile
   };
 };

@@ -1,10 +1,19 @@
-import type { BuffInstance, BuffTemplate, CraftBuildingType, Hero, PathNode, QueueCraft, SkillInstance, TItemContainer } from '@/shared/types';
+import type {
+  BuffInstance,
+  BuffTemplate,
+  CraftBuildingType,
+  Hero,
+  PathNode,
+  QueueCraft,
+  SkillInstance,
+  TItemContainer,
+} from '@/shared/types';
+import type { Socket } from 'socket.io';
 
 export type HeroRuntime = Hero & {
   paths?: PathNode[];
   offlineTimer?: number;
 };
-
 
 export const serverState = {
   hero: new Map<string, HeroRuntime>(),
@@ -14,5 +23,6 @@ export const serverState = {
   user: new Map<string, string>(),
   pathPersistQueue: new Map<string, { x: number; y: number }>(),
   queueCraft: new Map<string, QueueCraft[]>(),
+  socket: new Map<string, Socket>(),
 };
 console.log('SERVER STATE INIT', new Date().toLocaleTimeString());

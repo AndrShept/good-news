@@ -1,5 +1,5 @@
 import { ShopItems } from '@/features/shop/components/ShopItems';
-import { PlaceEntrance, TPlace } from '@/shared/types';
+import {  Entrance, TPlace } from '@/shared/types';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 
 import { Bank } from './buildings/Bank';
@@ -8,7 +8,7 @@ import { Temple } from './buildings/Temple';
 
 type Props = {
   place: TPlace | undefined | null;
-  entrances: PlaceEntrance[] | null;
+  entrances: Entrance[] | null;
 };
 
 export const SelectedBuildingPage = ({ place, entrances }: Props) => {

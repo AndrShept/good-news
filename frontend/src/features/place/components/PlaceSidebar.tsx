@@ -1,21 +1,22 @@
 import { GameIcon } from '@/components/GameIcon';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { capitalize, cn } from '@/lib/utils';
+
 import { imageConfig } from '@/shared/config/image-config';
 import { buildingTemplate } from '@/shared/templates/building-template';
-import { BuildingType, CraftBuildingType, PlaceEntrance, StateType, TPlace } from '@/shared/types';
+import { CraftBuildingType, Entrance, StateType, TPlace } from '@/shared/types';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { Dispatch, SetStateAction, memo, startTransition, useEffect } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 
 import { useLeavePlace } from '../hooks/useLeavePlace';
 import { PlaceSidebarButton } from './PlaceSidebarButton';
+import { cn } from '@/lib/utils';
 
 interface Props {
   place: TPlace | undefined;
-  setEntrances: Dispatch<SetStateAction<PlaceEntrance[] | null>>;
-  entrances: PlaceEntrance[] | null;
+  setEntrances: Dispatch<SetStateAction<Entrance[] | null>>;
+  entrances: Entrance[] | null;
 }
 const stateToBuildingMap: Partial<Record<StateType, CraftBuildingType>> = {
   SMELTING: 'FORGE',
@@ -61,25 +62,27 @@ export const PlaceSidebar = memo(({ place, entrances, setEntrances }: Props) => 
             />
             {matches && <p>Place Info</p>}
           </PlaceSidebarButton>
-          <PlaceSidebarButton
-            disabled={isButtonDisabled}
-            matches={matches}
-            variant={(entrances?.length ?? 0) > 0 ? 'secondary' : 'ghost'}
-            size={matches ? 'default' : 'icon'}
-            onClick={() => {
-              if (!place) return;
-              setEntrances(place.entrances);
-              setSelectBuilding(null);
-            }}
-          >
-            <GameIcon
-              className={cn('size-7.5', {
-                'size-8.5': !matches,
-              })}
-              image={imageConfig.icon.entrance.portal}
-            />
-            {matches && <p>Portal</p>}
-          </PlaceSidebarButton>
+          {!!place?.entrances.length && (
+            <PlaceSidebarButton
+              disabled={isButtonDisabled}
+              matches={matches}
+              variant={(entrances?.length ?? 0) > 0 ? 'secondary' : 'ghost'}
+              size={matches ? 'default' : 'icon'}
+              onClick={() => {
+                if (!place) return;
+                setEntrances(place.entrances);
+                setSelectBuilding(null);
+              }}
+            >
+              <GameIcon
+                className={cn('size-7.5', {
+                  'size-8.5': !matches,
+                })}
+                image={imageConfig.icon.entrance.portal}
+              />
+              {matches && <p>Portal</p>}
+            </PlaceSidebarButton>
+          )}
 
           {place?.buildings?.map((building) => (
             <PlaceSidebarButton

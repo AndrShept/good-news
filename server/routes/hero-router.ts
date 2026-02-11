@@ -79,7 +79,7 @@ import { itemTemplateService } from '../services/item-template-service';
 import { itemUseService } from '../services/item-use-service';
 import { queueCraftService } from '../services/queue-craft-service';
 import { skillService } from '../services/skill-service';
-import { socketService } from '../services/socket-servive';
+import { socketService } from '../services/socket-service';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -107,6 +107,7 @@ export const heroRouter = new Hono<Context>()
           });
         }
         heroId = hero.id;
+
         console.log('FETCH HERO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         const equipments = await db.query.itemInstanceTable.findMany({
           where: and(eq(itemInstanceTable.ownerHeroId, hero.id), eq(itemInstanceTable.location, 'EQUIPMENT')),
@@ -121,6 +122,7 @@ export const heroRouter = new Hono<Context>()
         serverState.skill.set(hero.id, skills);
         serverState.buff.set(hero.id, buffs);
         serverState.queueCraft.set(hero.id, []);
+
 
         const setData = { ...hero, equipments: equipments ?? [], buffs: [] };
         serverState.hero.set(hero.id, setData as Hero);
@@ -717,47 +719,125 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post(
-    '/:id/action/enter-place',
+    '/:id/action/travel',
     loggedIn,
-    zValidator('param', z.object({ id: z.string() })),
+    zValidator('param', z.object({ id: z.string().uuid() })),
+    zValidator(
+      'json',
+      z.object({ type: z.enum(['PLACE', 'ENTRANCE']), placeId: z.string().uuid().optional(), entranceId: z.string().uuid().optional() }),
+    ),
 
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
+      const { type, entranceId, placeId } = c.req.valid('json');
 
-      const heroState = heroService.getHero(id);
-      verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
+      const hero = heroService.getHero(id);
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      if (heroState.state !== 'IDLE') {
+      if (hero.state !== 'IDLE') {
         throw new HTTPException(409, {
           message: 'Hero is currently busy with another action',
         });
       }
-      const heroPosX = heroState.location.x;
-      const heroPosY = heroState.location.y;
-      const place = placeTemplate.find((p) => p.x === heroPosX && p.y === heroPosY);
-      if (!place) {
-        throw new HTTPException(404, {
-          message: 'place not found',
-        });
+      const heroPosX = hero.location.x;
+      const heroPosY = hero.location.y;
+
+      switch (type) {
+        case 'PLACE': {
+          const place = placeTemplate.find((p) => p.id === placeId);
+          if (!place) {
+            throw new HTTPException(404, {
+              message: 'place not found',
+            });
+          }
+          if (place.mapId !== hero.location.mapId) {
+            throw new HTTPException(404, {
+              message: 'Hero is not located on this map ',
+            });
+          }
+          if (place.x !== heroPosX && place.y !== heroPosY) {
+            throw new HTTPException(404, {
+              message: 'Hero must be at the place entrance to enter',
+            });
+          }
+          await db
+            .update(locationTable)
+            .set({
+              mapId: null,
+              placeId: place.id,
+            })
+            .where(eq(locationTable.heroId, id));
+
+          hero.location.mapId = null;
+          hero.location.placeId = place.id;
+
+          socketService.sendMapRemoveHero(hero.id, place.mapId);
+          socketService.sendPlaceAddHero(hero.id, place.id);
+
+          break;
+        }
+        case 'ENTRANCE': {
+          if (hero.location.placeId) {
+            const place = placeTemplate.find((p) => p.id === hero.location.placeId);
+            if (!place) {
+              throw new HTTPException(404, {
+                message: 'place not found',
+              });
+            }
+            const entrance = place.entrances.find((e) => e.id === entranceId);
+            if (!entrance) {
+              throw new HTTPException(404, {
+                message: 'entrance not found',
+              });
+            }
+            hero.location.mapId = entrance.targetMapId;
+            hero.location.placeId = null;
+            hero.location.x = entrance.targetX;
+            hero.location.y = entrance.targetY;
+            socketService.sendPlaceRemoveHero(hero.id, place.id);
+            socketService.sendMapAddHero(hero.id, entrance.targetMapId);
+          } else {
+            const map = mapTemplate.find((m) => m.id === hero.location.mapId);
+            if (!map) {
+              throw new HTTPException(404, {
+                message: 'map not found',
+              });
+            }
+            const entrance = map.entrances.find((e) => e.id === entranceId);
+            if (!entrance) {
+              throw new HTTPException(404, {
+                message: 'entrance not found',
+              });
+            }
+            if (entrance.targetPlaceId) {
+              hero.location.mapId = null;
+              hero.location.placeId = entrance.targetPlaceId;
+              // hero.location.x = entrance.x;
+              // hero.location.y = entrance.y;
+              socketService.sendMapRemoveHero(hero.id, map.id);
+              socketService.sendPlaceAddHero(hero.id, entrance.targetPlaceId);
+            }
+            if (entrance.targetMapId) {
+              hero.location.mapId = entrance.targetMapId;
+              hero.location.x = entrance.targetX ?? 0;
+              hero.location.y = entrance.targetY ?? 0;
+              hero.location.placeId = null;
+              socketService.sendMapRemoveHero(hero.id, map.id);
+              socketService.sendMapAddHero(hero.id, entrance.targetMapId);
+            }
+          }
+
+          break;
+        }
+        default:
+          throw new HTTPException(400, {
+            message: 'something went wrong',
+          });
       }
 
-      await db
-        .update(locationTable)
-        .set({
-          mapId: null,
-          placeId: place.id,
-        })
-        .where(eq(locationTable.heroId, id));
-
-      heroState.location.mapId = null;
-      heroState.location.placeId = place.id;
-
-      socketService.sendMapRemoveHero(heroState.id, place.mapId, place.id);
-      socketService.sendPlaceAddHero(heroState.id,  place.id);
-
       return c.json<SuccessResponse>({
-        message: 'enter town success',
+        message: 'travel success',
         success: true,
       });
     },
@@ -771,18 +851,16 @@ export const heroRouter = new Hono<Context>()
       const user = c.get('user');
       const { id } = c.req.valid('param');
 
-      const heroState = heroService.getHero(id);
-      if (!heroState.location.placeId) {
-        throw new HTTPException(404, { message: 'heroState.location.placeId not found' });
-      }
-      if (heroState.state !== 'IDLE') {
+      const hero = heroService.getHero(id);
+
+      if (hero.state !== 'IDLE') {
         throw new HTTPException(409, {
           message: 'Hero is currently busy with another action',
         });
       }
-      verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      const place = placeTemplate.find((p) => p.id === heroState.location.placeId);
+      const place = placeTemplate.find((p) => p.id === hero.location.placeId);
       if (!place) {
         throw new HTTPException(404, {
           message: 'place not found',
@@ -798,13 +876,13 @@ export const heroRouter = new Hono<Context>()
           placeId: null,
         })
         .where(eq(locationTable.heroId, id));
-      heroState.location.mapId = place.mapId;
-      heroState.location.placeId = null;
-      heroState.location.x = place.x;
-      heroState.location.y = place.y;
+      hero.location.mapId = place.mapId;
+      hero.location.placeId = null;
+      hero.location.x = place.x;
+      hero.location.y = place.y;
 
-      socketService.sendMapAddHero(heroState.id, place.mapId);
-      socketService.sendPlaceRemoveHero(heroState.id, place.mapId, place.id);
+      socketService.sendPlaceRemoveHero(hero.id, place.id);
+      socketService.sendMapAddHero(hero.id, place.mapId);
 
       return c.json<SuccessResponse>({
         message: 'leave place success ',

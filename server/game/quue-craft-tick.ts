@@ -10,7 +10,7 @@ import { itemContainerService } from '../services/item-container-service';
 import { itemTemplateService } from '../services/item-template-service';
 import { queueCraftService } from '../services/queue-craft-service';
 import { skillService } from '../services/skill-service';
-import { socketService } from '../services/socket-servive';
+import { socketService } from '../services/socket-service';
 import { serverState } from './state/server-state';
 
 export const queueCraftTick = (now: number) => {

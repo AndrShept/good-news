@@ -41,5 +41,5 @@ export const useHeroListener = () => {
     return () => {
       socket.off(socketEvents.selfData(), listener);
     };
-  }, []);
+  }, [heroId, removeBuff, setGameMessage, socket, updateHero]);
 };

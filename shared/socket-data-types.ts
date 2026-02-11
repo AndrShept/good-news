@@ -1,5 +1,4 @@
 import type { GameMessageType } from '../frontend/src/store/useGameMessages';
-import type { BuffCreateJob, RegenHealthJob, RegenManaJob } from './job-types';
 import type { BuildingType, HeroSidebarItem, MapHero, QueueCraftStatusType, StateType } from './types';
 
 export type SocketGroupResponse = {
@@ -15,22 +14,24 @@ export type MapUpdateData =
       type: 'REMOVE_HERO';
       payload: {
         heroId: string;
-        placeId: string;
       };
     }
   | {
       type: 'ADD_HERO';
-      payload: { hero: MapHero; mapId: string; heroId: string };
+      payload: { hero: MapHero; mapId: string };
     };
 
 export type PlaceUpdateData =
   | {
       type: 'ADD_HERO';
-      payload: HeroSidebarItem;
+      payload: {
+        hero: HeroSidebarItem;
+        placeId: string;
+      };
     }
   | {
       type: 'REMOVE_HERO';
-      payload: { heroId: string; mapId: string };
+      payload: { heroId: string };
     };
 
 export type HeroOfflineData = {

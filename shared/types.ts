@@ -186,24 +186,18 @@ export type TileType = (typeof tileTypeValues)[number];
 export const placeEntranceValues = ['DUNGEON', 'MINE'] as const;
 export type PlaceEntranceType = (typeof placeEntranceValues)[number];
 
-type BaseEntrance = {
+export type Entrance = {
   id: string;
   key: string;
   image: string;
   minLevel?: number;
-};
-
-export type PlaceEntrance = BaseEntrance & {
-  mapId: string;
-};
-export type MapEntrance = BaseEntrance & {
-  placeId?: string;
-  mapId?: string;
+  targetPlaceId?: string;
+  targetMapId?: string;
   x: number;
   y: number;
+  targetX?: number;
+  targetY?: number;
 };
-
-export type Entrance = PlaceEntrance | MapEntrance;
 
 export type TMap = {
   id: string;
@@ -215,7 +209,7 @@ export type TMap = {
   name: string;
   layers: Layer[];
   places: TPlace[];
-  entrances: MapEntrance[];
+  entrances: Entrance[];
 };
 
 export type TPlace = {
@@ -227,7 +221,7 @@ export type TPlace = {
   y: number;
   mapId: string;
   buildings: Building[];
-  entrances: PlaceEntrance[];
+  entrances: Entrance[];
 };
 
 export interface QueueCraft {

@@ -2,15 +2,12 @@ import type { HeroOnlineData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 
 import { io } from '..';
-
-import { serverState } from '../game/state/server-state';
 import { heroService } from '../services/hero-service';
-
+import { socketService } from '../services/socket-service';
 
 export const heroOnline = async (heroId: string) => {
-
-  const heroState = heroService.getHero(heroId)
-  heroState.offlineTimer = undefined
+  const heroState = heroService.getHero(heroId);
+  heroState.offlineTimer = undefined;
   const socketData: HeroOnlineData = {
     type: 'HERO_ONLINE',
     payload: {
@@ -25,10 +22,9 @@ export const heroOnline = async (heroId: string) => {
     },
   };
 
-
-
   if (heroState.location.mapId) {
     io.to(heroState.location.mapId).emit(socketEvents.mapUpdate(), socketData);
+
   }
   if (heroState.location.placeId) {
     io.to(heroState.location.placeId).emit(socketEvents.placeUpdate(), socketData);

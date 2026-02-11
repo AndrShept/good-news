@@ -5,46 +5,31 @@ import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
 import { joinRoomClient } from '@/lib/utils';
 import { HeroOfflineData, HeroOnlineData, HeroUpdateStateData, PlaceUpdateData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import { useGameMessages, useSetGameMessage } from '@/store/useGameMessages';
+import { useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect, useRef } from 'react';
 
 import { usePlaceHeroesUpdate } from './usePlaceHeroesUpdate';
 
 export const usePlaceListener = () => {
-  const setGameMessage = useSetGameMessage();
   const placeId = useHero((data) => data?.location?.placeId ?? '');
   const id = useHeroId();
   const { socket } = useSocket();
   const { updateHero } = useHeroUpdate();
   const { addHeroes, removeHeroes, updateHeroes } = usePlaceHeroesUpdate(placeId);
-  const prevTownIdRef = useRef<string | null>(null);
 
-  useEffect(() => {
-    joinRoomClient({
-      id: placeId,
-      prevRefId: prevTownIdRef,
-      socket,
-      setGameMessage,
-      joinMessage: 'join town room',
-      leaveMessage: 'leave town room',
-    });
-  }, [placeId, setGameMessage, socket]);
+
   useEffect(() => {
     const listener = (data: PlaceUpdateData | HeroOfflineData | HeroOnlineData | HeroUpdateStateData) => {
       switch (data.type) {
         case 'REMOVE_HERO':
-          if (data.payload.heroId === id) {
-            setGameMessage({
-              type: 'SUCCESS',
-              text: `You have leave a town.`,
-            });
-            updateHero({ state: 'IDLE', location: { mapId: data.payload.mapId, placeId: null } });
-          }
           removeHeroes(data.payload.heroId);
           break;
 
         case 'ADD_HERO':
-          addHeroes(data.payload);
+          if (data.payload.hero.id === id) {
+            updateHero({ state: 'IDLE', location: { placeId: data.payload.placeId, mapId: null } });
+          }
+          addHeroes(data.payload.hero);
           break;
         case 'HERO_OFFLINE':
           removeHeroes(data.payload.heroId);
@@ -65,5 +50,5 @@ export const usePlaceListener = () => {
     return () => {
       socket.off(socketEvents.placeUpdate(), listener);
     };
-  }, [addHeroes, id, removeHeroes, setGameMessage, socket, updateHero]);
+  }, [addHeroes, id, removeHeroes, socket, updateHero, updateHeroes]);
 };

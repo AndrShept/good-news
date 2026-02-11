@@ -15,8 +15,8 @@ export const GameMessage = memo(() => {
   const gameMessages = useGameMessages((state) => state.gameMessages);
   const ref = useRef<null | HTMLUListElement>(null);
   useGroupListener();
-  useMapListener();
   useWalkMapListener();
+  useMapListener();
   usePlaceListener();
   useRegeneration();
   useSelfMessage();

@@ -8,7 +8,7 @@ import { serveStatic } from 'hono/bun';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 
 import { type Context } from './context';
 import { db } from './db/db';
@@ -122,16 +122,24 @@ await db.update(locationTable).set({
   targetY: null,
 });
 
-gameLoop();
-
 io.on('connection', async (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };
   const { heroId } = socket.handshake.query as { heroId: string };
-
+  serverState.socket.set(heroId, socket);
   socket.join(heroId);
-  inviteGroup(socket);
-  joinRoom(socket);
-  leaveRoom(socket);
+  socket.join('global');
+  const hero = serverState.hero.get(heroId);
+  if (hero) {
+    if (hero.location.placeId) {
+      socket.join(hero.location.placeId);
+    }
+    if (hero.location.mapId) {
+      socket.join(hero.location.mapId);
+    }
+  }
+  // inviteGroup(socket);
+  // joinRoom(socket);
+  // leaveRoom(socket);
 
   console.info('connected ' + username);
   socket.on('disconnect', async () => {
@@ -142,5 +150,6 @@ io.on('connection', async (socket) => {
     }
   });
 });
+gameLoop();
 
 console.info('Server Running on port 🚀', process.env['PORT'] || 3000);

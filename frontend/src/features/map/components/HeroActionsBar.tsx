@@ -1,22 +1,32 @@
 import { Separator } from '@/components/ui/separator';
-import { StateType } from '@/shared/types';
+import { useHeroActions } from '@/features/hero/hooks/useHeroActions';
+import { StateType, TMap } from '@/shared/types';
 import { memo } from 'react';
 
-import { EnterTownButton } from './EnterTownButton';
 import { FishingButton } from './FishingButton';
+import { TravelButton } from './TravelButton';
 
 interface Props {
-  isHeroOnTownTile: boolean | undefined;
-  canFish: boolean;
+  map: TMap | undefined;
+  heroPosX: number;
+  heroPosY: number;
   state: StateType;
 }
 
-export const HeroActionsBar = memo(({ isHeroOnTownTile, canFish, state }: Props) => {
+export const HeroActionsBar = memo(({ heroPosX, heroPosY, map, state }: Props) => {
+  const { entranceTile, placeTile, canFish } = useHeroActions({
+    heroPosX,
+    heroPosY,
+    map,
+  });
+  const entranceId = entranceTile?.id;
+  const placeId = placeTile?.id;
+  const type = entranceId ? 'ENTRANCE' : 'PLACE';
   return (
     <>
-      {isHeroOnTownTile && <EnterTownButton disabled={state !== 'IDLE'} />}
+      {(entranceTile || placeTile) && <TravelButton type={type} placeId={placeId} entranceId={entranceId} disabled={state !== 'IDLE'} />}
       {canFish && <FishingButton disabled={state !== 'IDLE'} />}
-      {(isHeroOnTownTile || isHeroOnTownTile) && <Separator className="hidden sm:block" />}
+      {(entranceTile || placeTile) && <Separator className="hidden sm:block" />}
     </>
   );
 });

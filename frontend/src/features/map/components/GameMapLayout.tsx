@@ -1,5 +1,4 @@
 import { useHero } from '@/features/hero/hooks/useHero';
-import { useHeroActions } from '@/features/hero/hooks/useHeroActions';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
@@ -22,18 +21,13 @@ export const GameMapLayout = () => {
   const { data: mapHeroes, isLoading } = useQuery(getMapHeroesLocationOptions(hero.mapId));
 
   const map = useGameMap({ mapId: hero.mapId });
-  const { isHeroOnTownTile, canFish } = useHeroActions({
-    heroPosX: hero.x,
-    heroPosY: hero.y,
-    map: map.data,
-  });
 
   const heroesAtPosition = useMemo(() => mapHeroes?.filter((p) => p.x === hero.x && p.y === hero.y), [hero.x, hero.y, mapHeroes]);
 
   return (
     <section className="flex w-full flex-col gap-2 p-1 sm:flex-row">
       <aside className="flex w-full max-w-[150px] gap-2 sm:flex-col">
-        <HeroActionsBar canFish={canFish} isHeroOnTownTile={isHeroOnTownTile} state={hero.state} />
+        <HeroActionsBar heroPosX={hero.x} heroPosY={hero.y} map={map.data} state={hero.state} />
         <HeroSidebarList heroes={heroesAtPosition} isLoading={isLoading} />
       </aside>
       <div className="relative aspect-video w-full overflow-hidden">

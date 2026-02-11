@@ -3,7 +3,6 @@ import type { TMap } from '@/shared/types';
 
 import solverMine from '../../server/data/json/solmer-mine.json';
 import solverValley from '../../server/data/json/solmer-valley.json';
-import { mapEntranceTemplateByKey } from './map-entrance-template';
 import { placeTemplate, placeTemplateByName } from './place-template';
 
 export const mapTemplate: TMap[] = [
@@ -29,6 +28,15 @@ export const mapTemplate: TMap[] = [
     image: imageConfig.bg.map.solmerMine,
     layers: solverMine.layers,
     places: [],
-    entrances: [mapEntranceTemplateByKey.FROM_MAP_TO_PLACE_SOLMER_MINE],
+    entrances: [
+      {
+        id: '019c444d-a69c-7512-bd7d-745f3048509e',
+        targetPlaceId: placeTemplateByName['Solmer Mine'].id,
+        key: 'FROM_MAP_TO_PLACE_SOLMER_MINE',
+        x: 2,
+        y: 2,
+        image: imageConfig.icon.entrance.portal,
+      },
+    ],
   },
 ];

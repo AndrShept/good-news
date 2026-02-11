@@ -2,16 +2,14 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
-import { joinRoomClient } from '@/lib/utils';
 import { HeroOfflineData, HeroOnlineData, MapUpdateData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import { useGameMessages } from '@/store/useGameMessages';
-import { useEffect, useRef } from 'react';
+
+import { useEffect } from 'react';
 
 import { useMapHeroesUpdate } from './useMapHeroesUpdate';
 
 export const useMapListener = () => {
-  const setGameMessage = useGameMessages((state) => state.setGameMessage);
   const { mapId } = useHero((data) => ({
     mapId: data?.location?.mapId ?? '',
   }));
@@ -19,34 +17,16 @@ export const useMapListener = () => {
   const { deleteHeroes, addHeroes } = useMapHeroesUpdate(mapId);
   const { updateHero } = useHeroUpdate();
   const id = useHeroId();
-  const prevMapIdRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    joinRoomClient({
-      id: mapId,
-      prevRefId: prevMapIdRef,
-      socket,
-      setGameMessage,
-      joinMessage: 'join map room',
-      leaveMessage: 'leave map room',
-    });
-  }, [mapId, setGameMessage, socket]);
+ 
   useEffect(() => {
     const listener = (data: MapUpdateData | HeroOfflineData | HeroOnlineData) => {
       switch (data.type) {
         case 'REMOVE_HERO':
-          if (id === data.payload.heroId) {
-            setGameMessage({
-              type: 'SUCCESS',
-              text: `You have entered a town.`,
-            });
-            updateHero({ state: 'IDLE', location: { mapId: null, placeId: data.payload.placeId } });
-          }
           deleteHeroes(data.payload.heroId);
           break;
         case 'ADD_HERO':
-          if (id === data.payload.heroId) {
-            console.log('');
+          if (id === data.payload.hero.id) {
+            updateHero({ state: 'IDLE', location: { placeId: null, mapId: data.payload.mapId } });
           }
           addHeroes(data.payload.hero);
           break;
@@ -66,5 +46,5 @@ export const useMapListener = () => {
     return () => {
       socket.off(socketEvents.mapUpdate(), listener);
     };
-  }, [addHeroes, deleteHeroes, id, setGameMessage, socket, updateHero]);
+  }, [addHeroes, deleteHeroes, id, socket, updateHero]);
 };

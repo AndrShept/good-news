@@ -62,5 +62,5 @@ export const useQueueCraftListener = () => {
     return () => {
       socket.off(socketEvents.queueCraft(), listener);
     };
-  }, [socket]);
+  }, [backpackId, heroId, removeQueueCraftItems, setGameMessage, socket, updateQueueCraftItems]);
 };

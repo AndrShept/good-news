@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const useLeavePlace = () => {
   const id = useHeroId();
-    const queryClient = useQueryClient()
+    
   return useMutation({
     mutationFn: async() =>
       client.hero[':id'].action['leave-place'].$post({
