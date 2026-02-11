@@ -35,6 +35,8 @@ export const mapTemplate: TMap[] = [
         key: 'FROM_MAP_TO_PLACE_SOLMER_MINE',
         x: 2,
         y: 2,
+        targetX: placeTemplateByName['Solmer Mine'].x,
+        targetY: placeTemplateByName['Solmer Mine'].y,
         image: imageConfig.icon.entrance.portal,
       },
     ],

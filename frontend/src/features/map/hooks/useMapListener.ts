@@ -4,7 +4,6 @@ import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
 import { HeroOfflineData, HeroOnlineData, MapUpdateData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-
 import { useEffect } from 'react';
 
 import { useMapHeroesUpdate } from './useMapHeroesUpdate';
@@ -17,7 +16,7 @@ export const useMapListener = () => {
   const { deleteHeroes, addHeroes } = useMapHeroesUpdate(mapId);
   const { updateHero } = useHeroUpdate();
   const id = useHeroId();
- 
+
   useEffect(() => {
     const listener = (data: MapUpdateData | HeroOfflineData | HeroOnlineData) => {
       switch (data.type) {
@@ -26,7 +25,10 @@ export const useMapListener = () => {
           break;
         case 'ADD_HERO':
           if (id === data.payload.hero.id) {
-            updateHero({ state: 'IDLE', location: { placeId: null, mapId: data.payload.mapId } });
+            updateHero({
+              state: 'IDLE',
+              location: { placeId: null, mapId: data.payload.mapId, x: data.payload.hero.x, y: data.payload.hero.y },
+            });
           }
           addHeroes(data.payload.hero);
           break;

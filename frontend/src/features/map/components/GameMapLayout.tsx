@@ -46,6 +46,7 @@ export const GameMapLayout = () => {
           heroState={hero.state}
           mapHeroes={mapHeroes}
           places={map.data?.places}
+          entrances={map.data?.entrances}
         />
       </div>
     </section>

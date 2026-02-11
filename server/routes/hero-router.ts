@@ -123,7 +123,6 @@ export const heroRouter = new Hono<Context>()
         serverState.buff.set(hero.id, buffs);
         serverState.queueCraft.set(hero.id, []);
 
-
         const setData = { ...hero, equipments: equipments ?? [], buffs: [] };
         serverState.hero.set(hero.id, setData as Hero);
         heroOnline(hero.id);
@@ -813,8 +812,8 @@ export const heroRouter = new Hono<Context>()
             if (entrance.targetPlaceId) {
               hero.location.mapId = null;
               hero.location.placeId = entrance.targetPlaceId;
-              // hero.location.x = entrance.x;
-              // hero.location.y = entrance.y;
+              hero.location.x = entrance.targetX ?? 0;
+              hero.location.y = entrance.targetY ?? 0;
               socketService.sendMapRemoveHero(hero.id, map.id);
               socketService.sendPlaceAddHero(hero.id, entrance.targetPlaceId);
             }

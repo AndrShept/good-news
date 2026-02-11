@@ -12,7 +12,7 @@ interface Props extends MapHero {
 export const HeroTile = memo(function HeroTile({ x, y, id, characterImage, name, state, TILE_SIZE }: Props) {
   return (
     <div
-      className="relative"
+      className="relative drop-shadow-outline-sm"
       style={{
         position: 'absolute',
         left: x * TILE_SIZE,
@@ -25,7 +25,7 @@ export const HeroTile = memo(function HeroTile({ x, y, id, characterImage, name,
         <GameIcon className="size-3" image={imageConfig.icon.state[state]} />
         <p>{name}</p>
       </div>
-      <TileImg className="drop-shadow-lg/40" image={characterImage} />
+      <TileImg className="" image={characterImage} />
     </div>
   );
 });

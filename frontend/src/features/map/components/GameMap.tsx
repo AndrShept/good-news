@@ -1,5 +1,5 @@
 import { Layer } from '@/shared/json-types';
-import { MapHero, TPlace, StateType } from '@/shared/types';
+import { Entrance, MapHero, StateType, TPlace } from '@/shared/types';
 import { buildPathWithObstacles } from '@/shared/utils';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { memo, useEffect, useRef, useState } from 'react';
@@ -7,6 +7,7 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { useDragOnMap } from '../hooks/useDragOnMap';
 import { useScaleMap } from '../hooks/useScaleMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
+import { EntranceTile } from './EntranceTile';
 import { HeroTile } from './HeroTile';
 import { MovablePathTile } from './MovablePathTile';
 import { PlaceTile } from './PlaceTile';
@@ -19,6 +20,7 @@ interface Props {
   heroState: StateType;
   mapHeroes: MapHero[] | undefined;
   places: TPlace[] | undefined;
+  entrances: Entrance[] | undefined;
   tileWidth: number;
   height: number;
   width: number;
@@ -38,6 +40,7 @@ export const GameMap = memo(
     heroPosY,
     mapHeroes,
     places,
+    entrances,
     isLoading,
     layers,
     heroTargetX,
@@ -72,7 +75,7 @@ export const GameMap = memo(
     const { setMovementPathTiles, movementPathTiles } = useMovementPathTileStore();
 
     useEffect(() => {
-      if (heroTargetY  && layers.length) {
+      if (heroTargetY && layers.length) {
         const path = buildPathWithObstacles(
           { x: heroPosX, y: heroPosY },
           { x: heroTargetX, y: heroTargetY },
@@ -113,9 +116,11 @@ export const GameMap = memo(
           }}
         >
           {places?.map((place) => <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} />)}
-          {movementPathTiles?.map((position) => <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} />)}
-
+          {entrances?.map((entrance) => (
+            <EntranceTile key={entrance.id} x={entrance.x} y={entrance.y} image={entrance.image} TILE_SIZE={TILE_SIZE} />
+          ))}
           {mapHeroes?.map((hero) => <HeroTile key={hero.id} {...hero} TILE_SIZE={TILE_SIZE} />)}
+          {movementPathTiles?.map((position) => <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} />)}
 
           {hoverIndex !== null && !isDragging && heroState === 'IDLE' && (
             <div

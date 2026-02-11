@@ -99,6 +99,9 @@
   --color-rarity-epic: var(--rarity-epic);
   --color-rarity-legendary: var(--rarity-legendary);
 
+  --drop-shadow-outline-sm: 0 0 0.75px rgba(0, 0, 0, 0.8);
+  --drop-shadow-outline: 0 0 1px rgba(0, 0, 0, 0.9);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
