@@ -356,7 +356,7 @@ export type SkillTemplate = {
   id: string;
   name: string;
   image: string;
-  key: SkillKey;
+  key: string;
 };
 
 export type IPosition = {

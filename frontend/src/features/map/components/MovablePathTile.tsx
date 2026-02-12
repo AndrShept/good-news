@@ -29,7 +29,7 @@ export const MovablePathTile = memo(function MovablePathTile({ x, y, TILE_SIZE }
       drop-shadow(0 -0.3px 0 rgba(0,0,0,0.4))
 `,
           }}
-          className=""
+      
         />
       </div>
     </>

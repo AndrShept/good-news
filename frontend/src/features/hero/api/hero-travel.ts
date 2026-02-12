@@ -3,16 +3,14 @@ import { ErrorResponse } from '@/shared/types';
 
 export interface HeroTravel {
   heroId: string;
-  type: 'PLACE' | 'ENTRANCE';
   entranceId?: string;
   placeId?: string;
 }
 
-export const heroTravel = async ({ heroId, type, entranceId, placeId }: HeroTravel) => {
+export const heroTravel = async ({ heroId, entranceId, placeId }: HeroTravel) => {
   const res = await client.hero[':id'].action.travel.$post({
     param: { id: heroId },
     json: {
-      type,
       entranceId,
       placeId,
     },

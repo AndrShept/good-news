@@ -2,11 +2,10 @@ import { client } from '@/lib/utils';
 import { IPosition } from '@/shared/types';
 import { useMutation } from '@tanstack/react-query';
 
-
 import { useHeroId } from './useHeroId';
 import { useHeroUpdate } from './useHeroUpdate';
 
-export const useWalkMapMutation = () => {
+export const useWalkMapMutation = (setFinishTime: (num: number) => void) => {
   const id = useHeroId();
   const { updateHero } = useHeroUpdate();
   return useMutation({
@@ -22,8 +21,9 @@ export const useWalkMapMutation = () => {
 
       return data;
     },
-    onSuccess: async (_, { x, y }) => {
+    onSuccess: async (res, { x, y }) => {
       updateHero({ location: { targetX: x, targetY: y } });
+      setFinishTime(res.data?.finishWalkTime ?? 0);
     },
   });
 };

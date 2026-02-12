@@ -17,13 +17,6 @@ export const calculate = {
     const delay = Math.max(BASE_WALK_TIME / (1 + dexterity / dexterityFactor), MIN_WALK_TIME);
     return delay;
   },
-  // maxValues(data: { constitution: number; intelligence: number; bonusMaxHealth: number; bonusMaxMana: number }) {
-  //   const { constitution, intelligence, bonusMaxHealth, bonusMaxMana } = data;
-  //   const maxHealth = constitution * HP_MULTIPLIER_COST + bonusMaxHealth;
-  //   const maxMana = intelligence * MANA_MULTIPLIER_INT + bonusMaxMana;
-
-  //   return { maxHealth, maxMana };
-  // },
 
   healthRegenTime(constitution: number) {
     const time = BASE_HEALTH_REGEN_TIME - constitution * 20;

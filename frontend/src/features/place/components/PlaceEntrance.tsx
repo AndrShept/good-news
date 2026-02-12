@@ -13,7 +13,7 @@ export const PlaceEntrance = ({ entrances }: Props) => {
     <section>
       {entrances?.map((entrance) => (
         <div>
-          <Button disabled={isPending} onClick={() => mutate({ type: 'ENTRANCE', entranceId: entrance.id })}>
+          <Button disabled={isPending} onClick={() => mutate({  entranceId: entrance.id })}>
             <GameIcon image={entrance.image} />
             to mine
           </Button>

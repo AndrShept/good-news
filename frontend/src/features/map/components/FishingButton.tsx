@@ -1,5 +1,7 @@
-import { FishIcon } from '@/components/game-icons/FichIcon';
+
+import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
+import { imageConfig } from '@/shared/config/image-config';
 
 interface Props {
   disabled: boolean;
@@ -8,7 +10,7 @@ interface Props {
 export const FishingButton = ({ disabled }: Props) => {
   return (
     <Button variant={'secondary'} disabled={disabled}>
-      <FishIcon />
+      <GameIcon className='size-6' image={imageConfig.icon.state.FISHING}/>
       <p className="truncate">Fishing</p>
     </Button>
   );

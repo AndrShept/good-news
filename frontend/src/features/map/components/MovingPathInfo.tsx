@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useWalkMapMutation } from '@/features/hero/hooks/useWalkMapMutation';
 import { StateType } from '@/shared/types';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import { useCancelWalkMutation } from '../hooks/useCancelWalkMutation';
 
@@ -16,21 +16,38 @@ type Props = {
 export const MovingPathInfo = memo(function MovingPathInfo({ heroState }: Props) {
   const { movementPathTiles, setMovementPathTiles } = useMovementPathTileStore();
   const targetPos = movementPathTiles.at(-1);
-  const { mutate, isPending } = useWalkMapMutation();
+  const [timer, setTimer] = useState(Date.now());
+  const [finishTime, setFinishTime] = useState(Date.now());
+  const { mutate, isPending } = useWalkMapMutation(setFinishTime);
   const cancelWalkMutation = useCancelWalkMutation();
+  const resultTime = Math.max(Math.ceil((finishTime - timer) / 1000), 0);
   const onCLick = () => {
     if (!targetPos) return;
     mutate(targetPos);
   };
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setTimer(Date.now());
+    }, 1000);
+    return () => {
+      clearInterval(id);
+    };
+  }, []);
+  useEffect(() => {
+    return () => {
+      setMovementPathTiles([]);
+    };
+  }, [setMovementPathTiles]);
   if (!movementPathTiles.length) return;
   return (
     <section className="bg-secondary absolute left-1/2 z-50 flex h-fit w-fit -translate-x-1/2 flex-col items-center gap-2 rounded-b px-4 py-3 text-sm">
       <div className="flex gap-1">
         <span className="text-muted-foreground">
-          tile: <span className="text-primary">{movementPathTiles.length}</span>
+          step: <span className="text-primary">{movementPathTiles.length}</span>
         </span>
         <span className="text-muted-foreground">
-          time: <span className="text-primary">{'40sec'}</span>
+          time: <span className="text-primary">{resultTime ? `${resultTime.toFixed(0)}s` : '???'}</span>
         </span>
       </div>
 
@@ -44,7 +61,15 @@ export const MovingPathInfo = memo(function MovingPathInfo({ heroState }: Props)
         <>
           <AnimatedShinyText>moving...</AnimatedShinyText>
 
-          <Button onClick={() => cancelWalkMutation.mutate()} disabled={cancelWalkMutation.isPending} className="h-2 p-3">
+          <Button
+            onClick={() => {
+              cancelWalkMutation.mutate();
+              setFinishTime(Date.now());
+              setTimer(Date.now());
+            }}
+            disabled={cancelWalkMutation.isPending}
+            className="h-2 p-3"
+          >
             Cancel
           </Button>
         </>

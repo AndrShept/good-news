@@ -17,11 +17,29 @@ export const skillExpConfig = {
   ALCHEMY: {
     difficultyMultiplier: 2.1,
   },
+  FISHING: {
+    difficultyMultiplier: 1.5,
+  },
+  LUMBERJACKING: {
+    difficultyMultiplier: 1.5,
+  },
   MEDITATION: {
     difficultyMultiplier: 2.5,
   },
   REGENERATION: {
     difficultyMultiplier: 2.6,
+  },
+  CLOTH_LORE: {
+    difficultyMultiplier: 2.2,
+  },
+  INGOT_LORE: {
+    difficultyMultiplier: 2.2,
+  },
+  LEATHER_LORE: {
+    difficultyMultiplier: 2.2,
+  },
+  WOOD_LORE: {
+    difficultyMultiplier: 2.2,
   },
 } as const satisfies Record<SkillKey, { difficultyMultiplier: number }>;
 
