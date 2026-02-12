@@ -364,6 +364,27 @@ export type IPosition = {
   y: number;
 };
 
+export const gameSysMessageObj = {
+  info: 'INFO',
+  warning: 'WARNING',
+  error: 'ERROR',
+  success: 'SUCCESS',
+  skillExp: 'SKILL_EXP',
+  levelExp: 'LEVEL_EXP',
+} as const;
+
+export const gameSysMessageValues = Object.values(gameSysMessageObj);
+
+export type GameSysMessageType = (typeof gameSysMessageValues)[number];
+export interface GameSysMessage {
+  text: string;
+  data?: { name: string; quantity?: number }[];
+  expAmount?: number;
+  success?: boolean;
+  type: GameSysMessageType;
+  createdAt?: number;
+}
+
 //API RESPONSE
 export type ApiGetHeroResponse = InferResponseType<(typeof client.hero)['$get']>['data'];
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];

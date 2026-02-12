@@ -1,13 +1,9 @@
 import { Layer } from '@/shared/json-types';
-import { socketEvents } from '@/shared/socket-events';
 import { IPosition, OmitModifier, TileType } from '@/shared/types';
-import { IGameMessage } from '@/store/useGameMessages';
 import { type ClassValue, clsx } from 'clsx';
 import { format, intervalToDuration } from 'date-fns';
 import { hc } from 'hono/client';
-import { RefObject } from 'react';
 import toast from 'react-hot-toast';
-import type { Socket } from 'socket.io-client';
 import { twMerge } from 'tailwind-merge';
 
 import type { ApiRoutes } from '../../../server';
@@ -24,15 +20,6 @@ export const client = hc<ApiRoutes>('/', {
     }),
 }).api;
 
-type TJoinRoomParams = {
-  socket: Socket;
-  id: string;
-  joinMessage?: string;
-  leaveMessage?: string;
-  prevRefId: RefObject<string | null>;
-  setGameMessage: (message: IGameMessage) => void;
-};
-
 export const getFormatDateTime = (time: string | undefined) => {
   if (!time) return;
   return format(time, 'dd.MM.yyyy HH:mm:ss');
@@ -45,7 +32,7 @@ export const getTimeFns = (timestamp: number) => {
 };
 
 export const formatDurationFromSeconds = (seconds: number) => {
-  const duration = intervalToDuration({ start: 0, end: seconds});
+  const duration = intervalToDuration({ start: 0, end: seconds });
 
   const h = duration.hours ?? 0;
   const m = duration.minutes ?? 0;
@@ -64,30 +51,6 @@ export const formatDurationFromSeconds = (seconds: number) => {
 
 export const toastError = (msg = 'Something went wrong') => {
   toast.error(msg);
-};
-
-export const joinRoomClient = ({ socket, id, joinMessage, leaveMessage, prevRefId, setGameMessage }: TJoinRoomParams) => {
-  if (id) {
-    socket.emit(socketEvents.joinRoom(), id, (cb: { accept: boolean }) => {
-      if (cb.accept && joinMessage) {
-        setGameMessage({
-          text: `${joinMessage} ${id}`,
-          type: 'INFO',
-        });
-      }
-    });
-    prevRefId.current = id;
-  }
-  if (prevRefId.current && !id) {
-    socket.emit(socketEvents.leaveRoom(), prevRefId.current, (cb: { accept: boolean }) => {
-      if (cb.accept && leaveMessage) {
-        setGameMessage({
-          text: `${leaveMessage} ${prevRefId.current}`,
-          type: 'ERROR',
-        });
-      }
-    });
-  }
 };
 
 export const getTilesAroundHero = (pos: IPosition, radius = 1) => {

@@ -1,6 +1,6 @@
 import type { HeroUpdateStateData, MapUpdateData, PlaceUpdateData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import type { StateType } from '@/shared/types';
+import type { GameSysMessage, StateType } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
@@ -94,5 +94,9 @@ export const socketService = {
     };
     socket.join(placeId);
     io.to(placeId).emit(socketEvents.placeUpdate(), data);
+  },
+  sendToClientSysMessage(heroId: string, msgData: GameSysMessage) {
+    const socket = this.getSocket(heroId);
+    socket.emit(socketEvents.selfMessage(), msgData);
   },
 };

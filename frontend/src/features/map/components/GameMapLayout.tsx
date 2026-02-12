@@ -34,7 +34,7 @@ export const GameMapLayout = () => {
         <MovingPathInfo heroState={hero.state} />
         <GameMap
           width={map.data?.width ?? 0}
-          height={map.data?.width ?? 0}
+          height={map.data?.height ?? 0}
           layers={map.data?.layers ?? []}
           image={map.data?.image ?? ''}
           tileWidth={map.data?.tileWidth ?? 32}

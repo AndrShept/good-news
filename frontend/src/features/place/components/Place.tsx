@@ -2,8 +2,9 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { HeroSidebarList } from '@/features/map/components/HeroSidebarList';
 import { Entrance } from '@/shared/types';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
+import { useShopItemStore } from '@/store/useShopItemStore';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { getPlaceOptions } from '../api/get-place';
 import { getPlaceHeroesLocationOptions } from '../api/get-place-heroes';
@@ -16,7 +17,14 @@ export const Place = () => {
   const placeData = useQuery(getPlaceOptions(placeId));
   const placeHeroes = useQuery(getPlaceHeroesLocationOptions(placeId));
   const selectedBuilding = useSelectBuildingStore();
+  const clearAllItems = useShopItemStore((state) => state.clearAllItems);
   const [entrances, setEntrances] = useState<Entrance[] | null>(null);
+  useEffect(() => {
+    return () => {
+      selectedBuilding.setSelectBuilding(null);
+      clearAllItems();
+    };
+  }, []);
   if (placeData.isLoading) return <p>LOADING ...</p>;
   return (
     <section className="mx-auto flex w-full">

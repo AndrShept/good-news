@@ -2,11 +2,9 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
-import { joinRoomClient } from '@/lib/utils';
 import { HeroOfflineData, HeroOnlineData, HeroUpdateStateData, PlaceUpdateData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import { useSetGameMessage } from '@/store/useGameMessages';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import { usePlaceHeroesUpdate } from './usePlaceHeroesUpdate';
 
@@ -16,7 +14,6 @@ export const usePlaceListener = () => {
   const { socket } = useSocket();
   const { updateHero } = useHeroUpdate();
   const { addHeroes, removeHeroes, updateHeroes } = usePlaceHeroesUpdate(placeId);
-
 
   useEffect(() => {
     const listener = (data: PlaceUpdateData | HeroOfflineData | HeroOnlineData | HeroUpdateStateData) => {

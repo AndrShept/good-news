@@ -40,7 +40,7 @@ export const GameMessage = memo(() => {
                 'text-red-400': message.type === 'ERROR',
                 'text-green-400': message.type === 'SUCCESS',
                 'text-muted-foreground': message.type === 'INFO',
-                'text-yellow-400': message.type === 'WARNING',
+                'text-yellow-300': message.type === 'WARNING',
                 'text-blue-400': message.type === 'SKILL_EXP',
                 'text-purple-500': message.type === 'LEVEL_EXP',
               })}

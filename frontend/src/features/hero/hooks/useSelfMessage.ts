@@ -1,6 +1,6 @@
 import { useSocket } from '@/components/providers/SocketProvider';
-import { SelfMessageData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
+import { GameSysMessage } from '@/shared/types';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect } from 'react';
 
@@ -9,11 +9,9 @@ export const useSelfMessage = () => {
   const setGameMessage = useSetGameMessage();
 
   useEffect(() => {
-    
-    const listener = (data: SelfMessageData) => {
+    const listener = (data: GameSysMessage) => {
       setGameMessage({
-        text: data.message,
-        type: data.type,
+        ...data,
       });
     };
     socket.on(socketEvents.selfMessage(), listener);

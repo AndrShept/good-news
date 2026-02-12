@@ -16,24 +16,25 @@ type Props = {
 export const MovingPathInfo = memo(function MovingPathInfo({ heroState }: Props) {
   const { movementPathTiles, setMovementPathTiles } = useMovementPathTileStore();
   const targetPos = movementPathTiles.at(-1);
-  const [timer, setTimer] = useState(Date.now());
-  const [finishTime, setFinishTime] = useState(Date.now());
+  const [now, setNow] = useState(0);
+  const [finishTime, setFinishTime] = useState(0);
   const { mutate, isPending } = useWalkMapMutation(setFinishTime);
   const cancelWalkMutation = useCancelWalkMutation();
-  const resultTime = Math.max(Math.ceil((finishTime - timer) / 1000), 0);
+  const resultTime = Math.max(Math.ceil((finishTime - now) / 1000), 0);
   const onCLick = () => {
     if (!targetPos) return;
     mutate(targetPos);
+    setNow(Date.now());
   };
-
   useEffect(() => {
+    if (heroState !== 'WALK') return;
     const id = setInterval(() => {
-      setTimer(Date.now());
+      setNow(Date.now());
     }, 1000);
     return () => {
       clearInterval(id);
     };
-  }, []);
+  }, [heroState]);
   useEffect(() => {
     return () => {
       setMovementPathTiles([]);
@@ -65,7 +66,7 @@ export const MovingPathInfo = memo(function MovingPathInfo({ heroState }: Props)
             onClick={() => {
               cancelWalkMutation.mutate();
               setFinishTime(Date.now());
-              setTimer(Date.now());
+              setNow(Date.now());
             }}
             disabled={cancelWalkMutation.isPending}
             className="h-2 p-3"

@@ -6,15 +6,7 @@ import {
   MAX_QUEUE_CRAFT_ITEM,
   RESET_STATS_COST,
 } from '@/shared/constants';
-import type {
-  HeroOnlineData,
-  HeroUpdateStateData,
-  QueueCraftItemSocketData,
-  SelfHeroData,
-  SelfMessageData,
-  WalkMapCompleteData,
-  WalkMapStartData,
-} from '@/shared/socket-data-types';
+import type { WalkMapCompleteData, WalkMapStartData } from '@/shared/socket-data-types';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
@@ -770,6 +762,7 @@ export const heroRouter = new Hono<Context>()
 
         socketService.sendMapRemoveHero(hero.id, place.mapId);
         socketService.sendPlaceAddHero(hero.id, place.id);
+        socketService.sendToClientSysMessage(hero.id, { type: 'WARNING', text: `Success enter to ${place.name}` });
       }
 
       if (entranceId) {
@@ -812,11 +805,18 @@ export const heroRouter = new Hono<Context>()
           }
           if (entrance.targetPlaceId) {
             hero.location.mapId = null;
+            const place = placeTemplate.find((p) => p.id === entrance.targetPlaceId);
             hero.location.placeId = entrance.targetPlaceId;
+            if (!place) {
+              throw new HTTPException(404, {
+                message: 'place not found',
+              });
+            }
             hero.location.x = entrance.targetX ?? 0;
             hero.location.y = entrance.targetY ?? 0;
             socketService.sendMapRemoveHero(hero.id, map.id);
             socketService.sendPlaceAddHero(hero.id, entrance.targetPlaceId);
+            socketService.sendToClientSysMessage(hero.id, { type: 'WARNING', text: `Success enter to ${place.name}` });
           }
           if (entrance.targetMapId) {
             hero.location.mapId = entrance.targetMapId;

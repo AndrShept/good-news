@@ -1,11 +1,10 @@
-import type { GameMessageType } from '../frontend/src/store/useGameMessages';
-import type { BuildingType, HeroSidebarItem, MapHero, QueueCraftStatusType, StateType } from './types';
+import type { BuildingType, GameSysMessageType, HeroSidebarItem, MapHero, QueueCraftStatusType, StateType } from './types';
 
 export type SocketGroupResponse = {
   message: string;
   groupId?: string;
   memberId?: string;
-  messageType?: GameMessageType;
+  messageType?: GameSysMessageType;
   updateType: 'leave' | 'kick' | 'remove' | 'new-member';
 };
 
@@ -66,8 +65,6 @@ export type QueueCraftItemSocketData =
       type: 'UPDATE';
       payload: { queueItemCraftId: string; status: QueueCraftStatusType; expiresAt: number };
     };
-
-export type SelfMessageData = { message: string; type: GameMessageType };
 
 export type SelfHeroData = RemoveBuffData | SkillUpData | HeroUpdateStateData;
 
