@@ -12,12 +12,14 @@ import { ReactElement } from 'react';
 interface Props extends ItemInstance {
   itemTemplate: ItemTemplate;
 }
-const buttonIconVariants: Record<Exclude<ItemTemplateType, 'MISC' | 'RESOURCES'>, ReactElement> = {
+const buttonIconVariants: Record<Exclude<ItemTemplateType, 'MISC' | 'RESOURCES' >, ReactElement> = {
   WEAPON: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
+  TOOL: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
   SHIELD: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
   ACCESSORY: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
   ARMOR: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
   POTION: <GameIcon className="size-7 opacity-70 hover:opacity-100" image={imageConfig.icon.action.drink} />,
+  'SKILL_BOOK': <GameIcon className="size-7 opacity-70 hover:opacity-100" image={imageConfig.icon.action.read} />,
 };
 export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
   const itemUseMutation = useItemUseMutation();

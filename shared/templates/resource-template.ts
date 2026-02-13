@@ -170,12 +170,12 @@ export const resourceTemplateById = resourceTemplate.reduce(
 );
 
 const resourceKeys = resourceTemplate.map((r) => r.key);
-export type ItemTemplateKey = (typeof resourceKeys)[number];
+export type ResourceKey = (typeof resourceKeys)[number];
 
 export const resourceTemplateByKey = resourceTemplate.reduce(
   (acc, template) => {
     acc[template.key] = template;
     return acc;
   },
-  {} as Record<ItemTemplateKey, ItemTemplate>,
+  {} as Record<ResourceKey, ItemTemplate>,
 );

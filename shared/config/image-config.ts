@@ -46,6 +46,7 @@ export const imageConfig = {
       equip: '/sprites/icons/action/equip.png',
       unEquip: '/sprites/icons/action/unEquip.png',
       drink: '/sprites/icons/action/drink.png',
+      read: '/sprites/icons/action/read.png',
     },
     stat: {
       strength: '/sprites/icons/stats/strength.png',
@@ -96,6 +97,10 @@ export const imageConfig = {
     entrance: {
       portal: '/sprites/icons/entrance/portal.png',
       mine: '/sprites/icons/entrance/mine.png',
+    },
+    book: {
+      'unlock-skill': '/sprites/icons/books/unlock-skill.png',
+      'train-skill': '/sprites/icons/books/train-skill.png',
     },
     WEAPON: {
       SWORD: '/sprites/icons/weapon/sword.png',
@@ -160,6 +165,15 @@ export const imageConfig = {
     map: {
       SolmereValley: '/sprites/bg/map/solmer-valley.png',
       solmerMine: '/sprites/bg/map/solmer-mine.png',
+    },
+  },
+
+  equipments: {
+    tools: {
+      'blacksmith-hammer': '/sprites/equipments/tools/blacksmith-hammer.png',
+      'fishing-rod': '/sprites/equipments/tools/fishing-rod.png',
+      'lumber-axe': '/sprites/equipments/tools/lumber-axe.png',
+      'mining-pickaxe': '/sprites/equipments/tools/mining-pickaxe.png',
     },
   },
 } as const;

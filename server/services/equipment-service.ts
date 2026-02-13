@@ -64,21 +64,48 @@ export const equipmentService = {
     switch (itemTemplate.type) {
       case 'ARMOR':
         return itemTemplate.equipInfo?.armorType;
-      case 'SHIELD':
+      case 'SHIELD': {
+        const existRightSlot = this.findEquipItemBySlot('RIGHT_HAND', heroId);
+        if (existRightSlot && itemTemplateById[existRightSlot.itemTemplateId].equipInfo?.weaponHand === 'TWO_HANDED') {
+          this.unEquipItem(hero.id, existRightSlot.id);
+        }
+
         return 'LEFT_HAND';
+      }
+
+      case 'TOOL':
       case 'WEAPON': {
-        const isTwoHanded = itemTemplate.equipInfo?.weaponHand === 'TWO_HANDED';
-        const isOneHanded = itemTemplate.equipInfo?.weaponHand === 'ONE_HANDED';
-        const existLeftSlot = this.findEquipItemBySlot('LEFT_HAND', heroId);
-        if (isTwoHanded && existLeftSlot) {
-          this.unEquipItem(hero.id, existLeftSlot.id);
+        const weaponHand = itemTemplate.equipInfo?.weaponHand;
+
+        const leftItem = this.findEquipItemBySlot('LEFT_HAND', heroId);
+        const rightItem = this.findEquipItemBySlot('RIGHT_HAND', heroId);
+
+        const rightIsTwoHanded = rightItem && itemTemplateById[rightItem.itemTemplateId].equipInfo?.weaponHand === 'TWO_HANDED';
+
+        // TWO HANDED
+        if (weaponHand === 'TWO_HANDED') {
+          if (leftItem) this.unEquipItem(hero.id, leftItem.id);
+          if (rightItem) this.unEquipItem(hero.id, rightItem.id);
           return 'RIGHT_HAND';
         }
-        if (isOneHanded && !existLeftSlot) {
-          return 'LEFT_HAND';
+
+        // ONE HANDED
+        if (weaponHand === 'ONE_HANDED') {
+          if (rightIsTwoHanded) {
+            this.unEquipItem(hero.id, rightItem.id);
+            return 'RIGHT_HAND';
+          }
+
+          if (!rightItem) return 'RIGHT_HAND';
+          if (!leftItem) return 'LEFT_HAND';
+
+          return 'RIGHT_HAND';
         }
-        return 'RIGHT_HAND';
+
+        break;
       }
+      default:
+        throw new HTTPException(400, { message: 'Invalid item type for equipping' });
     }
   },
 };

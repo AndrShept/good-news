@@ -509,12 +509,15 @@ export const heroRouter = new Hono<Context>()
           case 'ACCESSORY':
           case 'ARMOR':
           case 'WEAPON':
+          case 'TOOL':
           case 'SHIELD': {
             equipmentService.equipItem(hero.id, itemInstanceId);
             result.message = 'You have equipped the item';
             result.name = itemInstance.displayName ?? template[itemInstance.itemTemplateId].name;
             break;
           }
+          default:
+            throw new HTTPException(400, { message: 'Invalid item type for equipping' });
         }
       }
 

@@ -1,5 +1,5 @@
 import { useGameData } from '@/features/hero/hooks/useGameData';
-import { TPotionInfo } from '@/shared/types';
+import { PotionInfo as TPotionInfo } from '@/shared/types';
 
 import { ModifierInfoCard } from './ModifierInfoCard';
 

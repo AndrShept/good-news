@@ -96,7 +96,6 @@ export const socketService = {
     io.to(placeId).emit(socketEvents.placeUpdate(), data);
   },
   sendToClientSysMessage(heroId: string, msgData: GameSysMessage) {
-    const socket = this.getSocket(heroId);
-    socket.emit(socketEvents.selfMessage(), msgData);
+    io.to(heroId).emit(socketEvents.selfMessage(), msgData);
   },
 };

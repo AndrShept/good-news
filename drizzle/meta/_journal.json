@@ -5,120 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1767652011982,
-      "tag": "0000_neat_warlock",
+      "when": 1771010334797,
+      "tag": "0000_clumsy_colossus",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1767720926211,
-      "tag": "0001_broken_photon",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1768051816256,
-      "tag": "0002_exotic_preak",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1768063239321,
-      "tag": "0003_amazing_dorian_gray",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1768132295799,
-      "tag": "0004_fixed_ogun",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1768169720023,
-      "tag": "0005_lazy_surge",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1768336270887,
-      "tag": "0006_nebulous_amazoness",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1768336722807,
-      "tag": "0007_wealthy_shocker",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1768948654572,
-      "tag": "0008_woozy_starbolt",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1769028019523,
-      "tag": "0009_tearful_misty_knight",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1769094746143,
-      "tag": "0010_bumpy_surge",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "7",
-      "when": 1769098041199,
-      "tag": "0011_bitter_cerise",
-      "breakpoints": true
-    },
-    {
-      "idx": 12,
-      "version": "7",
-      "when": 1770373435012,
-      "tag": "0012_majestic_slipstream",
-      "breakpoints": true
-    },
-    {
-      "idx": 13,
-      "version": "7",
-      "when": 1770373521559,
-      "tag": "0013_thin_riptide",
-      "breakpoints": true
-    },
-    {
-      "idx": 14,
-      "version": "7",
-      "when": 1770373800273,
-      "tag": "0014_square_guardian",
-      "breakpoints": true
-    },
-    {
-      "idx": 15,
-      "version": "7",
-      "when": 1770375642173,
-      "tag": "0015_empty_blue_shield",
-      "breakpoints": true
-    },
-    {
-      "idx": 16,
-      "version": "7",
-      "when": 1770383819090,
-      "tag": "0016_cynical_klaw",
+      "when": 1771014642778,
+      "tag": "0001_confused_giant_girl",
       "breakpoints": true
     }
   ]

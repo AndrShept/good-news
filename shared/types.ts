@@ -283,22 +283,35 @@ export type RecipeTemplate = {
 
 export type CraftItem = RecipeTemplate;
 
-export type TEquipInfo = {
+export type EquipInfo = {
   weaponType?: WeaponType;
   weaponHand?: WeaponHandType;
   armorType?: ArmorType;
   armorCategory?: ArmorCategoryType;
 };
-export type TResourceInfo = {
+export type ResourceInfo = {
   category: ResourceCategoryType;
 };
-export type TPotionInfo = {
+export type BookInfo = {
+  kind: 'UNLOCK' | 'TRAIN';
+  skillTemplateId: string;
+  duration?: number;
+  expReward?: number;
+};
+export type ToolInfo = {
+  skillTemplateId: string;
+};
+export type PotionInfo = {
   type: 'BUFF' | 'RESTORE';
   restore?: { health?: number; mana?: number };
   buffTemplateId?: string;
 };
 
 export type ItemLocationType = (typeof itemLocationEnum.enumValues)[number];
+export type ItemDurability = {
+  current: number;
+  max: number;
+};
 
 export type ItemInstance = typeof itemInstanceTable.$inferSelect;
 export type ItemTemplate = {
@@ -308,12 +321,15 @@ export type ItemTemplate = {
   image: string;
   key: string;
   stackable: boolean;
+  description?: string;
   maxStack?: number;
   buyPrice?: number;
 
-  equipInfo?: TEquipInfo;
-  resourceInfo?: TResourceInfo;
-  potionInfo?: TPotionInfo;
+  equipInfo?: EquipInfo;
+  resourceInfo?: ResourceInfo;
+  bookInfo?: BookInfo;
+  potionInfo?: PotionInfo;
+  toolInfo?: ToolInfo;
   coreModifier?: Partial<OmitModifier>;
 };
 
@@ -410,15 +426,20 @@ export type THeroRegen = {
   healthTimeMs: number;
   manaTimeMs: number;
 };
+export type ActiveSkillTraining = {
+  skillTemplateId: string;
+  gainSkillExp: number;
+  finishAt: number;
+};
 export type IHeroStatEnum = keyof IHeroStat;
 
 export const statsSchema = createSelectSchema(modifierTable, {
-  strength: z.number(),
-  constitution: z.number(),
-  intelligence: z.number(),
-  dexterity: z.number(),
-  luck: z.number(),
-  wisdom: z.number(),
+  strength: z.number().int().positive(),
+  constitution: z.number().int().positive(),
+  intelligence: z.number().int().positive(),
+  dexterity: z.number().int().positive(),
+  luck: z.number().int().positive(),
+  wisdom: z.number().int().positive(),
 }).pick({
   constitution: true,
   dexterity: true,
@@ -433,7 +454,7 @@ export const createHeroSchema = createInsertSchema(heroTable, {
     .min(3)
     .max(20)
     .regex(/^[a-zA-Z0-9_]+$/, 'hero name can only contain letters, numbers, and underscores'),
-  freeStatPoints: z.number(),
+  freeStatPoints: z.number().int().positive(),
   avatarImage: z.string().min(1),
   // characterImage: z.string().min(1),
 })
@@ -445,16 +466,16 @@ export const createHeroSchema = createInsertSchema(heroTable, {
   })
   .extend({
     stat: z.object({
-      constitution: z.number(),
-      dexterity: z.number(),
-      wisdom: z.number(),
-      luck: z.number(),
-      intelligence: z.number(),
-      strength: z.number(),
+      constitution: z.number().int().positive(),
+      dexterity: z.number().int().positive(),
+      wisdom: z.number().int().positive(),
+      luck: z.number().int().positive(),
+      intelligence: z.number().int().positive(),
+      strength: z.number().int().positive(),
     }),
   });
 export const changeStatSchema = statsSchema.extend({
-  freeStatPoints: z.number(),
+  freeStatPoints: z.number().int().positive(),
 });
 
 export const buyItemsSchema = z.object({

@@ -1,5 +1,5 @@
 {
-  "id": "6aa93b44-3a2f-453f-9a23-30170e8f3c73",
+  "id": "10d173c3-0725-47c7-b4b5-26a26b9614db",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -77,6 +77,51 @@
           ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.session": {
+      "name": "session",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "session_user_id_user_id_fk": {
+          "name": "session_user_id_user_id_fk",
+          "tableFrom": "session",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -177,6 +222,194 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.post": {
+      "name": "post",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points": {
+          "name": "points",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "comment_count": {
+          "name": "comment_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "author_id": {
+          "name": "author_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "post_author_id_user_id_fk": {
+          "name": "post_author_id_user_id_fk",
+          "tableFrom": "post",
+          "tableTo": "user",
+          "columnsFrom": [
+            "author_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.comment_upvotes": {
+      "name": "comment_upvotes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "comment_id": {
+          "name": "comment_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "comment_upvotes_comment_id_comment_id_fk": {
+          "name": "comment_upvotes_comment_id_comment_id_fk",
+          "tableFrom": "comment_upvotes",
+          "tableTo": "comment",
+          "columnsFrom": [
+            "comment_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.post_upvotes": {
+      "name": "post_upvotes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "post_id": {
+          "name": "post_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "post_upvotes_post_id_post_id_fk": {
+          "name": "post_upvotes_post_id_post_id_fk",
+          "tableFrom": "post_upvotes",
+          "tableTo": "post",
+          "columnsFrom": [
+            "post_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -297,6 +530,18 @@
           "primaryKey": false,
           "notNull": true
         },
+        "regen": {
+          "name": "regen",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "activeSkillTraining ": {
+          "name": "activeSkillTraining ",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
         "groupId": {
           "name": "groupId",
           "type": "uuid",
@@ -401,6 +646,13 @@
         },
         "intelligence": {
           "name": "intelligence",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "wisdom": {
+          "name": "wisdom",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -530,13 +782,6 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
         }
       },
       "indexes": {},
@@ -553,239 +798,6 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.comment_upvotes": {
-      "name": "comment_upvotes",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "comment_id": {
-          "name": "comment_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "comment_upvotes_comment_id_comment_id_fk": {
-          "name": "comment_upvotes_comment_id_comment_id_fk",
-          "tableFrom": "comment_upvotes",
-          "tableTo": "comment",
-          "columnsFrom": [
-            "comment_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.post_upvotes": {
-      "name": "post_upvotes",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "post_id": {
-          "name": "post_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "post_upvotes_post_id_post_id_fk": {
-          "name": "post_upvotes_post_id_post_id_fk",
-          "tableFrom": "post_upvotes",
-          "tableTo": "post",
-          "columnsFrom": [
-            "post_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.post": {
-      "name": "post",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "content": {
-          "name": "content",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "url": {
-          "name": "url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "points": {
-          "name": "points",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "comment_count": {
-          "name": "comment_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "author_id": {
-          "name": "author_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "post_author_id_user_id_fk": {
-          "name": "post_author_id_user_id_fk",
-          "tableFrom": "post",
-          "tableTo": "user",
-          "columnsFrom": [
-            "author_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.session": {
-      "name": "session",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "session_user_id_user_id_fk": {
-          "name": "session_user_id_user_id_fk",
-          "tableFrom": "session",
-          "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -836,15 +848,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "usedSlots": {
-          "name": "usedSlots",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "maxSlots": {
-          "name": "maxSlots",
+        "capacity": {
+          "name": "capacity",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -891,6 +896,12 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "displayName": {
+          "name": "displayName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "ownerHeroId": {
           "name": "ownerHeroId",
           "type": "uuid",
@@ -907,7 +918,7 @@
           "name": "itemTemplateId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "location": {
           "name": "location",
@@ -916,15 +927,34 @@
           "primaryKey": false,
           "notNull": true
         },
-        "price": {
-          "name": "price",
-          "type": "integer",
+        "coreResource": {
+          "name": "coreResource",
+          "type": "core_resource_enum",
+          "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true,
-          "default": 0
+          "notNull": false
+        },
+        "coreResourceModifier": {
+          "name": "coreResourceModifier",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
         },
         "durability": {
           "name": "durability",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "slot": {
+          "name": "slot",
+          "type": "equipment_slot_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "marketPrice": {
+          "name": "marketPrice",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -971,19 +1001,6 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
-        },
-        "item_instance_itemTemplateId_item_template_id_fk": {
-          "name": "item_instance_itemTemplateId_item_template_id_fk",
-          "tableFrom": "item_instance",
-          "tableTo": "item_template",
-          "columnsFrom": [
-            "itemTemplateId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -992,83 +1009,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.item_template": {
-      "name": "item_template",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "type": {
-          "name": "type",
-          "type": "item_template_enum",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "image": {
-          "name": "image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "stackable": {
-          "name": "stackable",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "maxStack": {
-          "name": "maxStack",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 1
-        },
-        "sell": {
-          "name": "sell",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "equipData": {
-          "name": "equipData",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "resourceData": {
-          "name": "resourceData",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "coreModifier": {
-          "name": "coreModifier",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.buff": {
-      "name": "buff",
+    "public.buff_instance": {
+      "name": "buff_instance",
       "schema": "",
       "columns": {
         "id": {
@@ -1078,45 +1020,14 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "name": {
-          "name": "name",
-          "type": "text",
+        "ownerHeroId": {
+          "name": "ownerHeroId",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "image": {
-          "name": "image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "gameItemId": {
-          "name": "gameItemId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "duration": {
-          "name": "duration",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "type": {
-          "name": "type",
-          "type": "buff_type_enum",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "modifier": {
-          "name": "modifier",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "heroId": {
-          "name": "heroId",
+        "buffTemplateId": {
+          "name": "buffTemplateId",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -1128,21 +1039,21 @@
           "notNull": true,
           "default": "now()"
         },
-        "completed_at": {
-          "name": "completed_at",
-          "type": "timestamp with time zone",
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "buff_heroId_hero_id_fk": {
-          "name": "buff_heroId_hero_id_fk",
-          "tableFrom": "buff",
+        "buff_instance_ownerHeroId_hero_id_fk": {
+          "name": "buff_instance_ownerHeroId_hero_id_fk",
+          "tableFrom": "buff_instance",
           "tableTo": "hero",
           "columnsFrom": [
-            "heroId"
+            "ownerHeroId"
           ],
           "columnsTo": [
             "id"
@@ -1346,8 +1257,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.skill": {
-      "name": "skill",
+    "public.skill_instance": {
+      "name": "skill_instance",
       "schema": "",
       "columns": {
         "id": {
@@ -1356,19 +1267,6 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "type": {
-          "name": "type",
-          "type": "skill_type_enum",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
         },
         "level": {
           "name": "level",
@@ -1384,8 +1282,27 @@
           "notNull": true,
           "default": 0
         },
+        "expToLvl": {
+          "name": "expToLvl",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expAcc": {
+          "name": "expAcc",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
         "heroId": {
           "name": "heroId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "skillTemplateId": {
+          "name": "skillTemplateId",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -1400,9 +1317,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "skill_heroId_hero_id_fk": {
-          "name": "skill_heroId_hero_id_fk",
-          "tableFrom": "skill",
+        "skill_instance_heroId_hero_id_fk": {
+          "name": "skill_instance_heroId_hero_id_fk",
+          "tableFrom": "skill_instance",
           "tableTo": "hero",
           "columnsFrom": [
             "heroId"
@@ -1419,6 +1336,59 @@
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
+    },
+    "public.craft_recipe": {
+      "name": "craft_recipe",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "heroId": {
+          "name": "heroId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recipeId": {
+          "name": "recipeId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "craft_recipe_heroId_hero_id_fk": {
+          "name": "craft_recipe_heroId_hero_id_fk",
+          "tableFrom": "craft_recipe",
+          "tableTo": "hero",
+          "columnsFrom": [
+            "heroId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     }
   },
   "enums": {
@@ -1426,10 +1396,15 @@
       "name": "state_type_enum",
       "schema": "public",
       "values": [
-        "CHARACTER",
         "IDLE",
         "BATTLE",
-        "CRAFT",
+        "BLACKSMITHING",
+        "ALCHEMY",
+        "FISHING",
+        "LUMBERJACKING",
+        "MINING",
+        "SMELTING",
+        "TAILORING",
         "WALK"
       ]
     },
@@ -1439,28 +1414,6 @@
       "values": [
         "BACKPACK",
         "BANK"
-      ]
-    },
-    "public.item_location_enum": {
-      "name": "item_location_enum",
-      "schema": "public",
-      "values": [
-        "BANK",
-        "BACKPACK",
-        "EQUIPMENT",
-        "LOOT",
-        "MARKET"
-      ]
-    },
-    "public.rarity_enum": {
-      "name": "rarity_enum",
-      "schema": "public",
-      "values": [
-        "COMMON",
-        "MAGIC",
-        "EPIC",
-        "RARE",
-        "LEGENDARY"
       ]
     },
     "public.armor_category_enum": {
@@ -1482,32 +1435,52 @@
         "LEGS",
         "BELT",
         "BOOTS",
-        "GLOVES"
+        "GLOVES",
+        "SHIELD"
       ]
     },
-    "public.core_material_enum": {
-      "name": "core_material_enum",
+    "public.leather_type_enum": {
+      "name": "leather_type_enum",
       "schema": "public",
       "values": [
-        "REGULAR-LEATHER",
-        "IRON-INGOT",
-        "COPPER-INGOT",
-        "SILVER-INGOT",
-        "GOLD-INGOT",
-        "MITHRIL-INGOT",
-        "ADAMANTINE-INGOT"
+        "REGULAR_LEATHER"
+      ]
+    },
+    "public.core_resource_enum": {
+      "name": "core_resource_enum",
+      "schema": "public",
+      "values": [
+        "REGULAR_LEATHER",
+        "IRON_INGOT",
+        "COPPER_INGOT",
+        "SILVER_INGOT",
+        "GOLD_INGOT",
+        "MITHRIL_INGOT",
+        "ADAMANTINE_INGOT",
+        "REGULAR_CLOTH"
       ]
     },
     "public.ingot_type_enum": {
       "name": "ingot_type_enum",
       "schema": "public",
       "values": [
-        "IRON-INGOT",
-        "COPPER-INGOT",
-        "SILVER-INGOT",
-        "GOLD-INGOT",
-        "MITHRIL-INGOT",
-        "ADAMANTINE-INGOT"
+        "IRON_INGOT",
+        "COPPER_INGOT",
+        "SILVER_INGOT",
+        "GOLD_INGOT",
+        "MITHRIL_INGOT",
+        "ADAMANTINE_INGOT"
+      ]
+    },
+    "public.item_location_enum": {
+      "name": "item_location_enum",
+      "schema": "public",
+      "values": [
+        "BANK",
+        "BACKPACK",
+        "EQUIPMENT",
+        "LOOT",
+        "MARKET"
       ]
     },
     "public.item_template_enum": {
@@ -1520,26 +1493,32 @@
         "POTION",
         "RESOURCES",
         "MISC",
-        "ACCESSORY"
-      ]
-    },
-    "public.leather_type_enum": {
-      "name": "leather_type_enum",
-      "schema": "public",
-      "values": [
-        "REGULAR-LEATHER"
+        "ACCESSORY",
+        "SKILL_BOOK",
+        "INSTRUMENT"
       ]
     },
     "public.ore_type_enum": {
       "name": "ore_type_enum",
       "schema": "public",
       "values": [
-        "IRON-ORE",
-        "COPPER-ORE",
-        "SILVER-ORE",
-        "GOLD-ORE",
-        "MITHRIL-ORE",
-        "ADAMANTINE-ORE"
+        "IRON_ORE",
+        "COPPER_ORE",
+        "SILVER_ORE",
+        "GOLD_ORE",
+        "MITHRIL_ORE",
+        "ADAMANTINE_ORE"
+      ]
+    },
+    "public.rarity_enum": {
+      "name": "rarity_enum",
+      "schema": "public",
+      "values": [
+        "COMMON",
+        "MAGIC",
+        "EPIC",
+        "RARE",
+        "LEGENDARY"
       ]
     },
     "public.resource_category_enum": {
@@ -1550,26 +1529,28 @@
         "WOOD",
         "HERB",
         "LEATHER",
-        "INGOT"
+        "INGOT",
+        "CLOTH"
       ]
     },
     "public.resource_type_enum": {
       "name": "resource_type_enum",
       "schema": "public",
       "values": [
-        "IRON-ORE",
-        "COPPER-ORE",
-        "SILVER-ORE",
-        "GOLD-ORE",
-        "MITHRIL-ORE",
-        "ADAMANTINE-ORE",
-        "REGULAR-LEATHER",
-        "IRON-INGOT",
-        "COPPER-INGOT",
-        "SILVER-INGOT",
-        "GOLD-INGOT",
-        "MITHRIL-INGOT",
-        "ADAMANTINE-INGOT"
+        "IRON_ORE",
+        "COPPER_ORE",
+        "SILVER_ORE",
+        "GOLD_ORE",
+        "MITHRIL_ORE",
+        "ADAMANTINE_ORE",
+        "REGULAR_LEATHER",
+        "IRON_INGOT",
+        "COPPER_INGOT",
+        "SILVER_INGOT",
+        "GOLD_INGOT",
+        "MITHRIL_INGOT",
+        "ADAMANTINE_INGOT",
+        "REGULAR_CLOTH"
       ]
     },
     "public.equipment_slot_enum": {
@@ -1586,7 +1567,8 @@
         "AMULET",
         "RING_LEFT",
         "RING_RIGHT",
-        "BELT"
+        "BELT",
+        "SHIELD"
       ]
     },
     "public.weapon_hand_enum": {
@@ -1604,15 +1586,8 @@
         "DAGGER",
         "SWORD",
         "AXE",
-        "STAFF"
-      ]
-    },
-    "public.buff_type_enum": {
-      "name": "buff_type_enum",
-      "schema": "public",
-      "values": [
-        "POSITIVE",
-        "NEGATIVE"
+        "STAFF",
+        "MACE"
       ]
     },
     "public.queue_craft_status_enum": {
@@ -1620,22 +1595,7 @@
       "schema": "public",
       "values": [
         "PENDING",
-        "PROGRESS",
-        "COMPLETE",
-        "FAILED"
-      ]
-    },
-    "public.skill_type_enum": {
-      "name": "skill_type_enum",
-      "schema": "public",
-      "values": [
-        "BLACKSMITHING",
-        "MINING",
-        "SMELTING",
-        "ALCHEMY",
-        "TAILORING",
-        "REGENERATION",
-        "MEDITATION"
+        "PROGRESS"
       ]
     }
   },

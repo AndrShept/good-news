@@ -1,4 +1,4 @@
-import { TEquipInfo } from '@/shared/types';
+import { EquipInfo as TEquipInfo } from '@/shared/types';
 import React from 'react';
 
 interface Props {

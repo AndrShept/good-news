@@ -1,4 +1,4 @@
-import type { IHeroStat, THeroRegen, TLocation } from '@/shared/types';
+import type { ActiveSkillTraining, IHeroStat, THeroRegen, TLocation } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { boolean, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
@@ -41,6 +41,7 @@ export const heroTable = pgTable('hero', {
   maxMana: integer().default(0).notNull(),
   stat: jsonb('stat').$type<IHeroStat>().notNull(),
   regen: jsonb('regen').$type<THeroRegen>().notNull(),
+  activeSkillTraining : jsonb('activeSkillTraining ').$type<ActiveSkillTraining>(),
 
   groupId: uuid().references(() => groupTable.id, {
     onDelete: 'set null',
