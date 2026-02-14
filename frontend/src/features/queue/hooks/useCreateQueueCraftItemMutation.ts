@@ -1,15 +1,14 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { client } from '@/lib/utils';
 import { ErrorResponse } from '@/shared/types';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
-import { getQueueCraftItemOptions } from '../api/getQueueCraftItems';
 import { useQueueCraftItem } from './useQueueCraftItem';
 
 export const useCreateQueueCraftItemMutation = () => {
   const id = useHeroId();
-  const queryClient = useQueryClient();
-  const { addQueueCraftItems } = useQueueCraftItem();
+
+  const { setQueueCraftItems } = useQueueCraftItem();
   return useMutation({
     mutationFn: async ({ recipeId, coreResourceId }: { recipeId: string; coreResourceId: string | undefined }) => {
       const res = await client.hero[':id']['queue-craft']['add'].$post({
@@ -28,10 +27,8 @@ export const useCreateQueueCraftItemMutation = () => {
       return await res.json();
     },
     onSuccess: ({ data }) => {
-      queryClient.invalidateQueries({ queryKey: getQueueCraftItemOptions(id).queryKey });
-      // if (data) {
-      //   addQueueCraftItems(data.buildingType, data);
-      // }
+
+      setQueueCraftItems(data);
     },
   });
 };

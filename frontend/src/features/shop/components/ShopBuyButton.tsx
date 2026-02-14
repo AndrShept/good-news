@@ -1,14 +1,14 @@
 import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
-import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { shopBuyItems } from '@/features/hero/api/shopBuyItems';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { getItemContainerOptions } from '@/features/item-container/api/get-item-container';
+import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
 import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
+import { useItemContainerUpdate } from '@/features/item-container/hooks/useItemContainerUpdate';
 import { imageConfig } from '@/shared/config/image-config';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useShopItemStore } from '@/store/useShopItemStore';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 interface Props {
   items: { id: string; quantity: number }[];
@@ -18,24 +18,21 @@ export const ShopBuyButton = ({ items }: Props) => {
   const setGameMessage = useSetGameMessage();
   const heroId = useHeroId();
   const backpackId = useGetBackpackId();
-  const queryClient = useQueryClient();
   const { clearAllItems, onClose } = useShopItemStore();
+  const { updateHero } = useHeroUpdate();
+  const { updateItemContainer } = useItemContainerUpdate();
   const { mutate, isPending } = useMutation({
     mutationFn: shopBuyItems,
 
     async onSuccess({ message, data }) {
-      queryClient.invalidateQueries({
-        queryKey: getItemContainerOptions(heroId, backpackId).queryKey,
-      });
-      queryClient.invalidateQueries({
-        queryKey: getHeroOptions().queryKey,
-      });
+      updateHero({ goldCoins: data?.goldCoins });
+      updateItemContainer(backpackId, data?.itemContainer);
       onClose();
       clearAllItems();
       setGameMessage({
         text: message,
-        type: 'SUCCESS',
-        data: data,
+        type: 'WARNING',
+        data: data?.messageData,
       });
     },
   });
@@ -52,7 +49,7 @@ export const ShopBuyButton = ({ items }: Props) => {
       variant={'outline'}
       className="flex-1"
     >
-      <GameIcon image={imageConfig.icon.ui['gold-bag']} /> Buy
+      <GameIcon className="size-6" image={imageConfig.icon.ui.buy} /> Buy
     </Button>
   );
 };

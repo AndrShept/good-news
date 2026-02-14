@@ -272,7 +272,7 @@ export type RecipeTemplate = {
   timeMs: number;
   requirement: {
     resources: { templateId: string; amount: number }[];
-    skills: { skillId: string; level: number }[];
+    skills: { skillTemplateId: string; level: number }[];
     building: CraftBuildingType;
     category: ResourceCategoryType;
     coreResource?: boolean;

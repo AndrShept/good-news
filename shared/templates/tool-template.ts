@@ -69,7 +69,7 @@ export const toolsTemplate = [
   },
   {
     id: '6a6bbd66-fce8-40b4-902c-7409801aa84d',
-    name: 'mining-pickaxe',
+    name: 'mining pickaxe',
     key: 'Mining_Pickaxe',
     image: imageConfig.equipments.tools['mining-pickaxe'],
     type: 'TOOL',

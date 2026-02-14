@@ -64,7 +64,7 @@ export const ShopItemCardButton = () => {
           </div>
           <ShopBuyButton items={items} />
           <Button onClick={() => clearAllItems()} variant={'outline'} className="mt-1">
-            <X className="text-red-500/70" /> Clear All
+            <X className="text-red-500/70 size-6" /> Clear All
           </Button>
         </div>
       </SheetContent>

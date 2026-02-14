@@ -49,12 +49,12 @@ export const CraftRecipeItemCard = ({ recipeId }: Props) => {
           <ul className="flex gap-1">
             {recipe.requirement.skills.map((skill) => (
               <li
-                key={skill.skillId}
+                key={skill.skillTemplateId}
                 className={cn('flex items-center gap-1', {
-                  'text-red-600': (skillMap?.[skill.skillId].level ?? 0) < skill.level,
+                  'text-red-600': (skillMap?.[skill.skillTemplateId].level ?? 0) < skill.level,
                 })}
               >
-                <p>{skillsTemplateById[skill.skillId].name}</p>
+                <p>{skillsTemplateById[skill.skillTemplateId].name}</p>
                 <p>({skill.level})</p>
               </li>
             ))}

@@ -61,7 +61,7 @@ export const queueCraftService = {
     }
 
     for (const reqSkill of recipe.requirement.skills) {
-      skillService.checkSkillRequirement(hero.id, reqSkill.skillId, reqSkill.level);
+      skillService.checkSkillRequirement(hero.id, reqSkill.skillTemplateId, reqSkill.level);
     }
     for (const reqResource of copyReqResources) {
       itemContainerService.checkRequirementsItems(hero.id, reqResource.templateId, reqResource.amount);

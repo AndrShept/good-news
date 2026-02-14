@@ -5,9 +5,15 @@ import { serverState } from '../game/state/server-state';
 import { skillExpConfig } from '../lib/config/skill-exp-config';
 
 export const skillService = {
-  getSkillById(heroId: string, skillTemplateId: string) {
+  getSkillBySkillTemplateId(heroId: string, skillTemplateId: string) {
     const skills = serverState.skill.get(heroId);
     const skill = skills?.find((s) => s.skillTemplateId === skillTemplateId);
+    if (!skill) throw new HTTPException(404, { message: 'skill not found!' });
+    return skill;
+  },
+  getSkillByInstanceId(heroId: string, instanceSkillId: string) {
+    const skills = serverState.skill.get(heroId);
+    const skill = skills?.find((s) => s.id === instanceSkillId);
     if (!skill) throw new HTTPException(404, { message: 'skill not found!' });
     return skill;
   },
@@ -37,9 +43,9 @@ export const skillService = {
 
     while (skill.currentExperience >= expToLevel) {
       skill.level++;
-      skill.currentExperience -= expToLevel
+      skill.currentExperience -= expToLevel;
       expToLevel = this.getExpSkillToNextLevel(skillKey, skill.level);
-      skill.expToLvl = expToLevel
+      skill.expToLvl = expToLevel;
       result.message = `Congratulation! your  skill ${skillKey.toLowerCase()} up to level ${skill.level} 🔥`;
       result.isLevelUp = true;
     }
@@ -47,8 +53,8 @@ export const skillService = {
     return result;
   },
 
-  checkSkillRequirement(heroId: string, skillId: string, level: number) {
-    const skill = this.getSkillById(heroId, skillId);
+  checkSkillRequirement(heroId: string, skillTemplateId: string, level: number) {
+    const skill = this.getSkillBySkillTemplateId(heroId, skillTemplateId);
     const template = skillTemplateById[skill.skillTemplateId];
 
     if (skill.level < level)

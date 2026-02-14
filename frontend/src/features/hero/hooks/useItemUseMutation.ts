@@ -1,43 +1,64 @@
-import { getItemContainerOptions } from '@/features/item-container/api/get-item-container';
+
 import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
+import { useItemContainerUpdate } from '@/features/item-container/hooks/useItemContainerUpdate';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { getHeroOptions } from '../api/get-hero';
-import { itemUse } from '../api/item-use';
-import { useHeroId } from './useHeroId';
-import { useGameData } from './useGameData';
 import { getBuffOptions } from '../api/get-buff';
+import { itemUse } from '../api/item-use';
+import { useGameData } from './useGameData';
+import { useHeroId } from './useHeroId';
+import { useHeroUpdate } from './useHeroUpdate';
 
 export const useItemUseMutation = () => {
   const setGameMessage = useSetGameMessage();
   const queryClient = useQueryClient();
   const heroId = useHeroId();
   const backpackId = useGetBackpackId();
-  const { itemsTemplateById } = useGameData()
+  const { updateHero } = useHeroUpdate();
+  const { updateItemContainer } = useItemContainerUpdate();
+  const { itemsTemplateById, buffTemplateById } = useGameData();
   return useMutation({
-    mutationFn: ({ itemInstanceId }: { itemInstanceId: string, itemTemplateId: string }) => itemUse({ heroId, itemInstanceId }),
+    mutationFn: ({ itemInstanceId }: { itemInstanceId: string; itemTemplateId: string }) => itemUse({ heroId, itemInstanceId }),
 
     async onSuccess(data, { itemTemplateId }) {
-      const template = itemsTemplateById[itemTemplateId]
+      const template = itemsTemplateById[itemTemplateId];
 
-      queryClient.invalidateQueries({
-        queryKey: getHeroOptions().queryKey,
-      });
-      queryClient.invalidateQueries({
-        queryKey: getItemContainerOptions(heroId, backpackId).queryKey,
-      });
-      if (template.potionInfo?.type === 'BUFF') {
-        queryClient.invalidateQueries({
-          queryKey: getBuffOptions(heroId).queryKey,
-        });
+      switch (template.type) {
+        case 'ACCESSORY':
+        case 'ARMOR':
+        case 'SHIELD':
+        case 'TOOL':
+        case 'WEAPON':
+          updateHero({
+            ...data.data?.hero,
+          });
+          updateItemContainer(backpackId, data.data?.backpack);
+          setGameMessage({
+            success: true,
+            type: 'INFO',
+            text: data.message,
+            data: [{ name: data.data?.equipItemName ?? '' }],
+          });
+          break;
+        case 'POTION': {
+          updateItemContainer(backpackId, data.data?.backpack);
+                 updateHero({
+            ...data.data?.hero,
+          });
+          setGameMessage({
+            success: true,
+            type: 'INFO',
+            text: data.message,
+            data: [{ name: template.name }],
+          });
+          if (template.potionInfo?.type === 'BUFF') {
+            queryClient.invalidateQueries({
+              queryKey: getBuffOptions(heroId).queryKey,
+            });
+          }
+        }
       }
-      setGameMessage({
-        success: true,
-        type: 'INFO',
-        text: data.message,
-        data: [{ name: data.data?.name ?? '' }],
-      });
     },
   });
 };

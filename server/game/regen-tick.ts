@@ -22,9 +22,10 @@ export const regenTick = (now: number, TICK_RATE: number) => {
         const result = skillService.setSkillExp(heroId, 'REGENERATION', gain);
 
         if (result.isLevelUp) {
+          const skill = skillService.getSkillByInstanceId(heroId, result.skillInstanceId);
           const socketData: SkillUpData = {
             type: 'SKILL_UP',
-            payload: { skillInstanceId: result.skillInstanceId, message: result.message },
+            payload: { skill, message: result.message },
           };
           io.to(heroId).emit(socketEvents.selfData(), socketData);
         }
@@ -43,9 +44,10 @@ export const regenTick = (now: number, TICK_RATE: number) => {
         const result = skillService.setSkillExp(heroId, 'MEDITATION', gain);
 
         if (result.isLevelUp) {
+          const skill = skillService.getSkillByInstanceId(heroId, result.skillInstanceId);
           const socketData: SkillUpData = {
             type: 'SKILL_UP',
-            payload: { skillInstanceId: result.skillInstanceId, message: result.message },
+            payload: { skill, message: result.message },
           };
           io.to(heroId).emit(socketEvents.selfData(), socketData);
         }

@@ -15,6 +15,7 @@ export const useHeroUpdate = () => {
 
   const updateHero = useCallback((data: OmitDeepHero) => {
     queryClient.setQueriesData<Hero>({ queryKey: getHeroOptions().queryKey }, (oldData) => {
+      console.log('dad', data);
       if (!oldData) return;
       return {
         ...oldData,
@@ -27,7 +28,7 @@ export const useHeroUpdate = () => {
         },
         group: { ...oldData.group, ...data.group },
         regen: { ...oldData.regen, ...data.regen },
-      }
+      };
     });
   }, []);
 

@@ -52,25 +52,25 @@ export const Stats = memo(({ reset, setCurrentStats, currentStats, freePoints, s
                 <p>{stat.name}</p>
               </div>
 
-              <div className="flex items-center gap-0.5">
+              <div className="flex items-center gap-0.5 select-none">
                 <Button
                   onClick={() => onDecrement(stat)}
                   disabled={stat.value === baseStats[stat.name]}
                   type="button"
-                  className="size-6 p-0.5"
+                  className="size-6 p-0.5 "
                   variant={'ghost'}
                   size={'icon'}
                 >
                   -
                 </Button>
 
-                <p className={stat.value > baseStats[stat.name] ? 'text-yellow-400' : ''}>{stat.value}</p>
+                <p className={stat.value > baseStats[stat.name] ? 'text-yellow-400 ' : ''}>{stat.value}</p>
 
                 <Button
                   onClick={() => onIncrement(stat)}
                   disabled={freePoints === 0}
                   type="button"
-                  className="size-6 p-0.5"
+                  className="size-6 p-0.5 "
                   variant={'ghost'}
                   size={'icon'}
                 >

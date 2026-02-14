@@ -1,7 +1,7 @@
 import type { QueueCraftItemSocketData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
-import { skillTemplateById, type SkillKey } from '@/shared/templates/skill-template';
+import { type SkillKey, skillTemplateById } from '@/shared/templates/skill-template';
 
 import { io } from '..';
 import { getDisplayName, rollChance } from '../lib/utils';
@@ -53,8 +53,8 @@ export const queueCraftTick = (now: number) => {
         return;
       }
 
-      const skill = skillService.getSkillById(heroId, recipe.requirement.skills[0].skillId);
-      const skillKey = skillTemplateById[skill.skillTemplateId].key as SkillKey
+      const skill = skillService.getSkillBySkillTemplateId(heroId, recipe.requirement.skills[0].skillTemplateId);
+      const skillKey = skillTemplateById[skill.skillTemplateId].key as SkillKey;
       const chance = queueCraftService.getCraftChance(skill.level, recipe.requirement.skills[0].level);
       const successCraft = rollChance(chance);
       const baseExp = queueCraftService.getBaseCraftExp(recipe);

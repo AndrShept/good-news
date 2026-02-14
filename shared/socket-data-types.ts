@@ -1,4 +1,4 @@
-import type { BuildingType, GameSysMessageType, HeroSidebarItem, MapHero, QueueCraftStatusType, StateType } from './types';
+import type { BuildingType, GameSysMessageType, HeroSidebarItem, MapHero, QueueCraftStatusType, SkillInstance, StateType } from './types';
 
 export type SocketGroupResponse = {
   message: string;
@@ -85,7 +85,7 @@ export type RemoveBuffData = {
 export type SkillUpData = {
   type: 'SKILL_UP';
   payload: {
-    skillInstanceId: string;
+    skill: SkillInstance;
     message: string;
   };
 };

@@ -1,5 +1,6 @@
 import { useSocket } from '@/components/providers/SocketProvider';
 import { getSkillsOptions } from '@/features/skill/api/get-skills';
+import { useSkillUpdate } from '@/features/skill/hooks/useSkillUpdate';
 import { SelfHeroData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useSetGameMessage } from '@/store/useGameMessages';
@@ -16,6 +17,7 @@ export const useHeroListener = () => {
   const { socket } = useSocket();
   const { removeBuff } = useBuff();
   const { updateHero } = useHeroUpdate();
+  const { updateSkill } = useSkillUpdate();
   const heroId = useHeroId();
   const queryClient = useQueryClient();
   const setGameMessage = useSetGameMessage();
@@ -27,7 +29,7 @@ export const useHeroListener = () => {
           removeBuff(data.payload.buffInstanceId);
           break;
         case 'SKILL_UP':
-          queryClient.invalidateQueries({ queryKey: getSkillsOptions(heroId).queryKey });
+          updateSkill(data.payload.skill.id, data.payload.skill);
           setGameMessage({ type: 'SKILL_EXP', text: data.payload.message });
           break;
         case 'UPDATE_STATE':
@@ -41,5 +43,5 @@ export const useHeroListener = () => {
     return () => {
       socket.off(socketEvents.selfData(), listener);
     };
-  }, [heroId, removeBuff, setGameMessage, socket, updateHero]);
+  }, [heroId, removeBuff, setGameMessage, socket, updateHero, updateSkill]);
 };

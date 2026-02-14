@@ -408,10 +408,14 @@ export const heroRouter = new Hono<Context>()
       heroService.checkFreeBackpackCapacity(hero.id, needCapacity);
 
       heroService.assertHasEnoughGold(hero.id, sumPriceGold);
-      const returnData = [];
+      const returnData = {
+        goldCoins: hero.goldCoins,
+        itemContainer: backpack,
+        messageData: [] as { name: string; quantity: number }[],
+      };
       for (const item of items) {
         const template = itemTemplateService.getAllItemsTemplateMapIds()[item.id];
-        returnData.push({ name: template.name, quantity: item.quantity });
+        returnData.messageData.push({ name: template.name, quantity: item.quantity });
         itemContainerService.createItem({
           heroId: hero.id,
           itemContainerId: backpack.id,
@@ -423,7 +427,7 @@ export const heroRouter = new Hono<Context>()
       heroService.spendGold(hero.id, sumPriceGold);
 
       return c.json<SuccessResponse<typeof returnData>>({
-        message: `success buy items`,
+        message: `You have successfully purchased the items.`,
         success: true,
         data: returnData,
       });
@@ -486,24 +490,27 @@ export const heroRouter = new Hono<Context>()
       if (hero.state === 'BATTLE') {
         throw new HTTPException(403, { message: 'You cannot use item during some action.', cause: { canShow: true } });
       }
+
       const template = itemTemplateService.getAllItemsTemplateMapIds();
+
       const result = {
-        name: '',
+        equipItemName: '',
         message: '',
+        isEquip: false,
       };
       const equipItem = hero.equipments.find((e) => e.id === itemInstanceId);
 
       if (equipItem) {
         equipmentService.unEquipItem(hero.id, itemInstanceId);
         result.message = 'You have unequipped the item';
-        result.name = equipItem.displayName ?? template[equipItem.itemTemplateId].name;
+        result.equipItemName = equipItem.displayName ?? template[equipItem.itemTemplateId].name;
+        result.isEquip = true;
       } else {
         const itemInstance = itemInstanceService.getItemInstance(backpack.id, itemInstanceId);
         switch (template[itemInstance.itemTemplateId].type) {
           case 'POTION': {
             const useResult = itemUseService.drink(hero.id, itemInstanceId);
             result.message = useResult.message;
-            result.name = useResult.name;
             break;
           }
           case 'ACCESSORY':
@@ -513,18 +520,34 @@ export const heroRouter = new Hono<Context>()
           case 'SHIELD': {
             equipmentService.equipItem(hero.id, itemInstanceId);
             result.message = 'You have equipped the item';
-            result.name = itemInstance.displayName ?? template[itemInstance.itemTemplateId].name;
+            result.equipItemName = itemInstance.displayName ?? template[itemInstance.itemTemplateId].name;
+            result.isEquip = true;
             break;
           }
+
           default:
             throw new HTTPException(400, { message: 'Invalid item type for equipping' });
         }
       }
+      const returnData = {
+        equipItemName: result.equipItemName,
+        backpack,
+        hero: {
+          currentHealth: hero.currentHealth,
+          currentMana: hero.currentMana,
+          maxHealth: hero.maxHealth,
+          maxMana: hero.maxMana,
+          stat: hero.stat,
+          regen: hero.regen,
+          modifier: hero.modifier,
+          equipments: result.isEquip ? hero.equipments : undefined,
+        },
+      };
 
-      return c.json<SuccessResponse<{ name: string }>>({
+      return c.json<SuccessResponse<typeof returnData>>({
         success: true,
         message: result.message,
-        data: { name: result.name },
+        data: returnData,
       });
     },
   )
@@ -584,9 +607,10 @@ export const heroRouter = new Hono<Context>()
         });
       }
 
-      return c.json<SuccessResponse>({
+      return c.json<SuccessResponse<{ toContainer: TItemContainer }>>({
         success: true,
         message: 'success move item',
+        data: { toContainer },
       });
     },
   )
@@ -765,7 +789,7 @@ export const heroRouter = new Hono<Context>()
 
         socketService.sendMapRemoveHero(hero.id, place.mapId);
         socketService.sendPlaceAddHero(hero.id, place.id);
-        socketService.sendToClientSysMessage(hero.id, { type: 'WARNING', text: `Success enter to ${place.name}` });
+        socketService.sendToClientSysMessage(hero.id, { type: 'SUCCESS', text: `You have entered ${place.name}.` });
       }
 
       if (entranceId) {
@@ -819,7 +843,7 @@ export const heroRouter = new Hono<Context>()
             hero.location.y = entrance.targetY ?? 0;
             socketService.sendMapRemoveHero(hero.id, map.id);
             socketService.sendPlaceAddHero(hero.id, entrance.targetPlaceId);
-            socketService.sendToClientSysMessage(hero.id, { type: 'WARNING', text: `Success enter to ${place.name}` });
+            socketService.sendToClientSysMessage(hero.id, { type: 'SUCCESS', text: `You have entered ${place.name}.` });
           }
           if (entrance.targetMapId) {
             hero.location.mapId = entrance.targetMapId;
