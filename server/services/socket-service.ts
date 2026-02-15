@@ -1,4 +1,4 @@
-import type { HeroUpdateStateData, MapUpdateData, PlaceUpdateData } from '@/shared/socket-data-types';
+import type { HeroUpdateStateData, MapUpdateData, PlaceUpdateData, SkillUpData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import type { GameSysMessage, StateType } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
@@ -6,6 +6,13 @@ import { HTTPException } from 'hono/http-exception';
 import { io } from '..';
 import { serverState } from '../game/state/server-state';
 import { heroService } from './hero-service';
+import { skillService } from './skill-service';
+
+interface SendToClientExpResult {
+  heroId: string;
+  expResult: ReturnType<typeof skillService.setSkillExp>;
+  onlyLevelUp?: boolean;
+}
 
 export const socketService = {
   getSocket(heroId: string) {
@@ -97,5 +104,15 @@ export const socketService = {
   },
   sendToClientSysMessage(heroId: string, msgData: GameSysMessage) {
     io.to(heroId).emit(socketEvents.selfMessage(), msgData);
+  },
+  sendToClientExpResult({ expResult, heroId, onlyLevelUp = false }: SendToClientExpResult) {
+    if (!onlyLevelUp || expResult.isLevelUp) {
+      const skill = skillService.getSkillByInstanceId(heroId, expResult.skillInstanceId);
+      const socketData: SkillUpData = {
+        type: 'SKILL_UP',
+        payload: { skill, message: expResult.message, expAmount: expResult.amount },
+      };
+      io.to(heroId).emit(socketEvents.selfData(), socketData);
+    }
   },
 };

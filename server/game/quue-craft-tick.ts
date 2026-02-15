@@ -82,9 +82,10 @@ export const queueCraftTick = (now: number) => {
           itemName: displayName ?? template.name,
           successCraft,
           queueItemCraftId: queue.id,
-          expResult,
+          backpack,
         },
       };
+      socketService.sendToClientExpResult({ expResult, heroId });
       io.to(heroId).emit(socketEvents.queueCraft(), socketData);
       if (next) {
         queueCraftService.setNextQueue(heroId, next.id, recipeTemplateById[next.recipeId].timeMs);

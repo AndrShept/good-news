@@ -1,4 +1,14 @@
-import type { BuildingType, GameSysMessageType, HeroSidebarItem, MapHero, QueueCraftStatusType, SkillInstance, StateType } from './types';
+import type {
+  BuildingType,
+  GameSysMessageType,
+  Hero,
+  HeroSidebarItem,
+  MapHero,
+  QueueCraftStatusType,
+  SkillInstance,
+  StateType,
+  TItemContainer,
+} from './types';
 
 export type SocketGroupResponse = {
   message: string;
@@ -50,7 +60,8 @@ export type QueueCraftItemSocketData =
         itemName: string;
         message: string;
         successCraft: boolean;
-        expResult: { message: string; amount: number; isLevelUp: boolean };
+        backpack: TItemContainer;
+        // expResult: { message: string; amount: number; isLevelUp: boolean };
       };
     }
   | {
@@ -80,6 +91,7 @@ export type RemoveBuffData = {
   type: 'REMOVE_BUFF';
   payload: {
     buffInstanceId: string;
+    hero: Pick<Hero, 'currentHealth' | 'maxHealth' | 'currentMana' | 'maxMana' | 'modifier'>
   };
 };
 export type SkillUpData = {
@@ -87,6 +99,7 @@ export type SkillUpData = {
   payload: {
     skill: SkillInstance;
     message: string;
+    expAmount: number;
   };
 };
 

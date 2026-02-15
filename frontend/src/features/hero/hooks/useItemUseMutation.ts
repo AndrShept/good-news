@@ -1,6 +1,6 @@
-
 import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
 import { useItemContainerUpdate } from '@/features/item-container/hooks/useItemContainerUpdate';
+import { buffTemplate, buffTemplateMapIds } from '@/shared/templates/buff-template';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -17,7 +17,7 @@ export const useItemUseMutation = () => {
   const backpackId = useGetBackpackId();
   const { updateHero } = useHeroUpdate();
   const { updateItemContainer } = useItemContainerUpdate();
-  const { itemsTemplateById, buffTemplateById } = useGameData();
+  const { itemsTemplateById } = useGameData();
   return useMutation({
     mutationFn: ({ itemInstanceId }: { itemInstanceId: string; itemTemplateId: string }) => itemUse({ heroId, itemInstanceId }),
 
@@ -43,20 +43,22 @@ export const useItemUseMutation = () => {
           break;
         case 'POTION': {
           updateItemContainer(backpackId, data.data?.backpack);
-                 updateHero({
+          updateHero({
             ...data.data?.hero,
           });
-          setGameMessage({
-            success: true,
-            type: 'INFO',
-            text: data.message,
-            data: [{ name: template.name }],
-          });
+          const name = template.potionInfo?.buffTemplateId ? buffTemplateMapIds[template.potionInfo.buffTemplateId].name : template.name;
           if (template.potionInfo?.type === 'BUFF') {
             queryClient.invalidateQueries({
               queryKey: getBuffOptions(heroId).queryKey,
             });
           }
+          setGameMessage({
+            success: true,
+            type: 'INFO',
+            text: data.message,
+            data: [{ name }],
+          });
+          break;
         }
       }
     },

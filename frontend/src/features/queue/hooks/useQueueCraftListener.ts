@@ -1,12 +1,10 @@
 import { useSocket } from '@/components/providers/SocketProvider';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { getItemContainerOptions } from '@/features/item-container/api/get-item-container';
 import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
-import { getSkillsOptions } from '@/features/skill/api/get-skills';
+import { useItemContainerUpdate } from '@/features/item-container/hooks/useItemContainerUpdate';
 import { QueueCraftItemSocketData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useSetGameMessage } from '@/store/useGameMessages';
-import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import { useQueueCraftItem } from './useQueueCraftItem';
@@ -14,8 +12,8 @@ import { useQueueCraftItem } from './useQueueCraftItem';
 export const useQueueCraftListener = () => {
   const { socket } = useSocket();
   const heroId = useHeroId();
-  const queryClient = useQueryClient();
   const backpackId = useGetBackpackId();
+  const { updateItemContainer } = useItemContainerUpdate();
   const { updateQueueCraftItems, removeQueueCraftItems } = useQueueCraftItem();
   const setGameMessage = useSetGameMessage();
   useEffect(() => {
@@ -23,25 +21,12 @@ export const useQueueCraftListener = () => {
       switch (data.type) {
         case 'COMPLETE':
           removeQueueCraftItems(data.payload.queueItemCraftId);
-
-          queryClient.invalidateQueries({
-            queryKey: getItemContainerOptions(heroId, backpackId).queryKey,
-          });
-          queryClient.invalidateQueries({
-            queryKey: getSkillsOptions(heroId).queryKey,
-          });
+          updateItemContainer(backpackId, data.payload.backpack);
           setGameMessage({
             type: data.payload.successCraft ? 'SUCCESS' : 'ERROR',
             text: data.payload.message,
             data: [{ name: data.payload.itemName }],
           });
-          if (data.payload.expResult) {
-            setGameMessage({
-              type: 'SKILL_EXP',
-              text: data.payload.expResult.message,
-              expAmount: data.payload.expResult.amount,
-            });
-          }
 
           break;
         case 'UPDATE':
@@ -53,7 +38,6 @@ export const useQueueCraftListener = () => {
 
         case 'FAILED':
           removeQueueCraftItems(data.payload.queueItemCraftId);
-
           setGameMessage({ type: 'ERROR', text: data.payload.message });
       }
     };
@@ -62,5 +46,5 @@ export const useQueueCraftListener = () => {
     return () => {
       socket.off(socketEvents.queueCraft(), listener);
     };
-  }, [backpackId, heroId, removeQueueCraftItems, setGameMessage, socket, updateQueueCraftItems]);
+  }, [backpackId, heroId, removeQueueCraftItems, setGameMessage, socket, updateItemContainer, updateQueueCraftItems]);
 };

@@ -25,12 +25,13 @@ export const useHeroListener = () => {
     const listener = async (data: SelfHeroData) => {
       switch (data.type) {
         case 'REMOVE_BUFF':
-          queryClient.invalidateQueries({ queryKey: getHeroOptions().queryKey });
+          updateHero({ ...data.payload.hero });
+          // queryClient.invalidateQueries({ queryKey: getHeroOptions().queryKey });
           removeBuff(data.payload.buffInstanceId);
           break;
         case 'SKILL_UP':
           updateSkill(data.payload.skill.id, data.payload.skill);
-          setGameMessage({ type: 'SKILL_EXP', text: data.payload.message });
+          setGameMessage({ type: 'SKILL_EXP', text: data.payload.message, expAmount: data.payload.expAmount });
           break;
         case 'UPDATE_STATE':
           updateHero({ state: data.payload.state });
