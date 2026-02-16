@@ -967,7 +967,7 @@ export const heroRouter = new Hono<Context>()
       }
       if (queueCraft.length >= MAX_QUEUE_CRAFT_ITEM) {
         throw new HTTPException(400, {
-          message: 'You cannot queue more than 4 craft items.',
+          message: `You cannot queue more than ${MAX_QUEUE_CRAFT_ITEM} craft items.`,
           cause: { canShow: true },
         });
       }
@@ -978,7 +978,7 @@ export const heroRouter = new Hono<Context>()
         queueCraft.push({
           id: generateRandomUuid(),
           recipeId,
-          coreResourceId: recipe.requirement.coreResource ? coreResourceId : undefined,
+          coreResourceId: recipe.requirement.isCore ? coreResourceId : undefined,
           expiresAt: now + recipe.timeMs,
           craftBuildingType: recipe.requirement.building,
           status: 'PROGRESS',
@@ -991,7 +991,7 @@ export const heroRouter = new Hono<Context>()
         queueCraft.push({
           id: generateRandomUuid(),
           recipeId,
-          coreResourceId: recipe.requirement.coreResource ? coreResourceId : undefined,
+          coreResourceId: recipe.requirement.isCore ? coreResourceId : undefined,
           expiresAt: now + Math.max((last ?? 0) - now, 0) + recipe.timeMs,
           craftBuildingType: recipe.requirement.building,
           status: 'PENDING',

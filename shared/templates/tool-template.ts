@@ -90,14 +90,14 @@ export const toolsTemplate = [
   },
 ] as const satisfies ItemTemplate[];
 
-// const toolKeys = toolsTemplate.map((w) => w.key);
+const toolKeys = toolsTemplate.map((w) => w.key);
 
-// type ToolKeyType = (typeof toolKeys)[number];
-// export const toolTemplateByKey = toolsTemplate.reduce(
-//   (acc, item) => {
-//     acc[item.key] = item;
+type ToolKeyType = (typeof toolKeys)[number];
+export const toolTemplateByKey = toolsTemplate.reduce(
+  (acc, item) => {
+    acc[item.key] = item;
 
-//     return acc;
-//   },
-//   {} as Record<ToolKeyType, ItemTemplate>,
-// );
+    return acc;
+  },
+  {} as Record<ToolKeyType, ItemTemplate>,
+);

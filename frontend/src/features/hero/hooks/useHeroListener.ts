@@ -4,11 +4,8 @@ import { useSkillUpdate } from '@/features/skill/hooks/useSkillUpdate';
 import { SelfHeroData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useSetGameMessage } from '@/store/useGameMessages';
-import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
-import { getBuffOptions } from '../api/get-buff';
-import { getHeroOptions } from '../api/get-hero';
 import { useBuff } from './useBuff';
 import { useHeroId } from './useHeroId';
 import { useHeroUpdate } from './useHeroUpdate';
@@ -19,14 +16,12 @@ export const useHeroListener = () => {
   const { updateHero } = useHeroUpdate();
   const { updateSkill } = useSkillUpdate();
   const heroId = useHeroId();
-  const queryClient = useQueryClient();
   const setGameMessage = useSetGameMessage();
   useEffect(() => {
     const listener = async (data: SelfHeroData) => {
       switch (data.type) {
         case 'REMOVE_BUFF':
           updateHero({ ...data.payload.hero });
-          // queryClient.invalidateQueries({ queryKey: getHeroOptions().queryKey });
           removeBuff(data.payload.buffInstanceId);
           break;
         case 'SKILL_UP':

@@ -10,7 +10,7 @@ import { skillService } from './skill-service';
 
 interface SendToClientExpResult {
   heroId: string;
-  expResult: ReturnType<typeof skillService.setSkillExp>;
+  expResult: ReturnType<typeof skillService.addExp>;
   onlyLevelUp?: boolean;
 }
 

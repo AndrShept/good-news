@@ -16,6 +16,7 @@ export const stateTypeEnum = pgEnum('state_type_enum', [
   'ALCHEMY',
   'FISHING',
   'LUMBERJACKING',
+  'GATHERING',
   'MINING',
   'SMELTING',
   'TAILORING',
@@ -41,7 +42,7 @@ export const heroTable = pgTable('hero', {
   maxMana: integer().default(0).notNull(),
   stat: jsonb('stat').$type<IHeroStat>().notNull(),
   regen: jsonb('regen').$type<THeroRegen>().notNull(),
-  activeSkillTraining : jsonb('activeSkillTraining ').$type<ActiveSkillTraining>(),
+  activeSkillTraining: jsonb('activeSkillTraining ').$type<ActiveSkillTraining>(),
 
   groupId: uuid().references(() => groupTable.id, {
     onDelete: 'set null',

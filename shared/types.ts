@@ -41,7 +41,7 @@ import { postTable } from '../server/db/schema/posts-schema';
 import type { queueCraftItemTable, queueCraftStatusEnum } from '../server/db/schema/queue-craft-item-schema';
 import type { skillInstanceTable } from '../server/db/schema/skill-instance-schema';
 import type { Layer } from './json-types';
-import type { SkillKey } from './templates/skill-template';
+import type { SkillKey, skillCategoryValues } from './templates/skill-template';
 
 export interface SuccessResponse<T = undefined> {
   success: true;
@@ -275,7 +275,7 @@ export type RecipeTemplate = {
     skills: { skillTemplateId: string; level: number }[];
     building: CraftBuildingType;
     category: ResourceCategoryType;
-    coreResource?: boolean;
+    isCore?: boolean;
   };
 
   defaultUnlocked: boolean;
@@ -321,6 +321,7 @@ export type ItemTemplate = {
   image: string;
   key: string;
   stackable: boolean;
+  rarity?: RarityType;
   description?: string;
   maxStack?: number;
   buyPrice?: number;
@@ -367,10 +368,12 @@ export type MapHero = HeroSidebarItem & {
 };
 
 export type SkillInstance = typeof skillInstanceTable.$inferSelect;
+export type SkillCategory = (typeof skillCategoryValues)[number];
 
 export type SkillTemplate = {
   id: string;
   name: string;
+  category: SkillCategory;
   image: string;
   key: string;
 };

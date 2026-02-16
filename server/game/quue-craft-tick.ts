@@ -1,13 +1,14 @@
 import type { QueueCraftItemSocketData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
-import { type SkillKey, skillTemplateById } from '@/shared/templates/skill-template';
+import { type SkillKey, skillTemplateById, skillTemplateByKey } from '@/shared/templates/skill-template';
 
 import { io } from '..';
 import { getDisplayName, rollChance } from '../lib/utils';
 import { heroService } from '../services/hero-service';
 import { itemContainerService } from '../services/item-container-service';
 import { itemTemplateService } from '../services/item-template-service';
+import { progressionService } from '../services/progression-service';
 import { queueCraftService } from '../services/queue-craft-service';
 import { skillService } from '../services/skill-service';
 import { socketService } from '../services/socket-service';
@@ -53,13 +54,32 @@ export const queueCraftTick = (now: number) => {
         return;
       }
 
-      const skill = skillService.getSkillBySkillTemplateId(heroId, recipe.requirement.skills[0].skillTemplateId);
-      const skillKey = skillTemplateById[skill.skillTemplateId].key as SkillKey;
-      const chance = queueCraftService.getCraftChance(skill.level, recipe.requirement.skills[0].level);
+      const skillInstance = skillService.getSkillBySkillTemplateId(heroId, recipe.requirement.skills[0].skillTemplateId);
+      const skillKey = skillTemplateById[skillInstance.skillTemplateId].key as SkillKey;
+      const loreSkillKey = skillService.getLoreSkillKey(recipe, queue.coreResourceId);
+      const loreSkillInstance = skillService.getSkillByKey(heroId, loreSkillKey);
+      const chance = queueCraftService.getCraftChance({
+        coreResourceId: queue.coreResourceId,
+        recipeMin: recipe.requirement.skills[0].level,
+        craftSkillLevel: skillInstance.level,
+        loreSkillLevel: loreSkillInstance.level,
+      });
       const successCraft = rollChance(chance);
-      const baseExp = queueCraftService.getBaseCraftExp(recipe);
-      const finalExp = queueCraftService.calculateCraftExp(baseExp, chance, successCraft);
-      const expResult = skillService.setSkillExp(heroId, skillKey, finalExp);
+      const finalExp = progressionService.calculateCraftExp({
+        chance,
+        recipe,
+        success: successCraft,
+        coreResourceId: queue.coreResourceId,
+      });
+      const finalExpLoreSkill = progressionService.calculateLoreExp({
+        chance,
+        coreResourceId: queue.coreResourceId,
+        recipe,
+        success: successCraft,
+      });
+      const expResult = skillService.addExp(heroId, skillKey, finalExp);
+      const expResultLoreSkill = skillService.addExp(heroId, loreSkillKey, finalExpLoreSkill);
+
       const displayName = getDisplayName(recipe.itemTemplateId, queue.coreResourceId);
       if (successCraft) {
         itemContainerService.createItem({
@@ -86,6 +106,7 @@ export const queueCraftTick = (now: number) => {
         },
       };
       socketService.sendToClientExpResult({ expResult, heroId });
+      socketService.sendToClientExpResult({ expResult: expResultLoreSkill, heroId });
       io.to(heroId).emit(socketEvents.queueCraft(), socketData);
       if (next) {
         queueCraftService.setNextQueue(heroId, next.id, recipeTemplateById[next.recipeId].timeMs);

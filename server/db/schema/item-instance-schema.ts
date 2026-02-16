@@ -5,7 +5,17 @@ import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-
 import { heroTable } from './hero-schema';
 import { itemContainerTable } from './item-container-schema';
 
-export const itemTemplateEnum = pgEnum('item_template_enum', ['WEAPON', 'ARMOR', 'SHIELD', 'POTION', 'RESOURCES', 'MISC', 'ACCESSORY', 'SKILL_BOOK', 'TOOL']);
+export const itemTemplateEnum = pgEnum('item_template_enum', [
+  'WEAPON',
+  'ARMOR',
+  'SHIELD',
+  'POTION',
+  'RESOURCES',
+  'MISC',
+  'ACCESSORY',
+  'SKILL_BOOK',
+  'TOOL',
+]);
 
 export const armorCategoryEnum = pgEnum('armor_category_enum', ['PLATE', 'MAIL', 'LEATHER', 'CLOTH']);
 export const armorTypeEnum = pgEnum('armor_type_enum', ['HELMET', 'CHEST', 'LEGS', 'BELT', 'BOOTS', 'GLOVES', 'SHIELD']);
@@ -31,7 +41,7 @@ export const resourceCategoryEnum = pgEnum('resource_category_enum', ['ORE', 'WO
 //////////////
 
 export const itemLocationEnum = pgEnum('item_location_enum', ['BANK', 'BACKPACK', 'EQUIPMENT', 'LOOT', 'MARKET']);
-export const rarityEnum = pgEnum('rarity_enum', ['COMMON', 'MAGIC', 'EPIC', 'RARE', 'LEGENDARY']);
+export const rarityEnum = pgEnum('rarity_enum', ['COMMON', 'UNCOMMON', 'MAGIC', 'RARE', 'EPIC', 'LEGENDARY']);
 export const slotEnum = pgEnum('equipment_slot_enum', [
   'RIGHT_HAND',
   'LEFT_HAND',

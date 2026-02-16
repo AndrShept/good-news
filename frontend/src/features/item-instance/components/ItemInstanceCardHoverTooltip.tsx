@@ -18,6 +18,14 @@ export const ItemInstanceCardHoverTooltip = memo((props: Props) => {
       </h3>
 
       <p className="text-muted-foreground">{props.itemTemplate.type.toLocaleLowerCase()}</p>
+      {!!props.durability && (
+        <div>
+          <span className="mr-1"> durability:</span>
+          <span className={cn(props.durability.current <= 10 && 'text-red-500')}>{props.durability.current}</span>
+
+          <span>/{props.durability.max}</span>
+        </div>
+      )}
       <EquipInfo
         minDamage={props.itemTemplate.coreModifier?.minDamage}
         maxDamage={props.itemTemplate.coreModifier?.maxDamage}

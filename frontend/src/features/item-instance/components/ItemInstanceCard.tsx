@@ -23,12 +23,12 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
   const { attributes, listeners, setNodeRef, isDragging, over } = useDraggable({
     id: props.id,
     data: props,
-    disabled: props.location === 'EQUIPMENT',
+    disabled: props.location === 'EQUIPMENT' || moveItemMutation.isPending,
   });
   const [isOpen, setIsOpen] = useState(false);
   const style: React.CSSProperties = {
     // transform: CSS.Translate.toString(transform),
-    opacity: isDragging || moveItemMutation.isPending ? 0.5 : 1,
+    opacity: isDragging || moveItemMutation.isPending ? 0.4 : 1,
     touchAction: 'none',
   };
   useEffect(() => {

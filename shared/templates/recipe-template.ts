@@ -16,7 +16,7 @@ export const recipeTemplate = [
       skills: [{ skillTemplateId: skillTemplateByKey.BLACKSMITHING.id, level: 1 }],
       building: 'BLACKSMITH',
       category: 'INGOT',
-      coreResource: true,
+      isCore: true,
     },
   },
   {

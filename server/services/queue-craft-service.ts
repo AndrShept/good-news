@@ -1,16 +1,26 @@
 import { socketEvents } from '@/shared/socket-events';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
-import type { QueueCraftStatusType, RecipeTemplate, TItemContainer } from '@/shared/types';
+import { resourceTemplateById } from '@/shared/templates/resource-template';
+import type { SkillKey } from '@/shared/templates/skill-template';
+import type { CoreResourceType, QueueCraftStatusType, RecipeTemplate, ResourceCategoryType, TItemContainer } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
 import { serverState } from '../game/state/server-state';
+import { rarityConfig } from '../lib/config/rarity-config';
 import { clamp } from '../lib/utils';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
 import { skillService } from './skill-service';
+
+interface GetCraftChance {
+  craftSkillLevel: number;
+  loreSkillLevel: number;
+  coreResourceId: string | undefined;
+  recipeMin: number;
+}
 
 export const queueCraftService = {
   getQueueCraft(heroId: string) {
@@ -39,14 +49,14 @@ export const queueCraftService = {
       });
     }
 
-    if (recipe.requirement.coreResource && !coreResourceId) {
+    if (recipe.requirement.isCore && !coreResourceId) {
       throw new HTTPException(400, {
         message: 'You need select core resource for this craft item.',
         cause: { canShow: true },
       });
     }
     const copyReqResources = recipe.requirement.resources.map((res) => ({ ...res }));
-    if (coreResourceId && recipe.requirement.coreResource) {
+    if (coreResourceId && recipe.requirement.isCore) {
       const coreResourceTemplate = itemTemplateService.getAllItemsTemplateMapIds()[coreResourceId];
       const firstRes = copyReqResources.at(0);
       if (firstRes) {
@@ -70,7 +80,7 @@ export const queueCraftService = {
 
   consumeAllItemsForCraft(coreResourceId: string | undefined, backpack: TItemContainer, recipe: RecipeTemplate) {
     const copyReqResources = recipe.requirement.resources.map((res) => ({ ...res }));
-    if (coreResourceId && recipe.requirement.coreResource) {
+    if (coreResourceId && recipe.requirement.isCore) {
       const firstRes = copyReqResources.at(0);
       if (firstRes) {
         firstRes.templateId = coreResourceId;
@@ -112,34 +122,32 @@ export const queueCraftService = {
     this.updateStatus(heroId, nextQueueId, 'PROGRESS');
     io.to(heroId).emit(socketEvents.queueCraft(), nextQueueData);
   },
-  getCraftChance(skill: number, recipeMin: number): number {
+  getCraftChance({ coreResourceId, recipeMin, craftSkillLevel, loreSkillLevel }: GetCraftChance): number {
     const baseChance = 35;
     const gainPerLevel = 2.5;
 
-    const diff = skill - recipeMin;
+    let effectiveRecipeMin = recipeMin;
+
+    if (coreResourceId) {
+      const template = itemTemplateService.getAllItemsTemplateMapIds()[coreResourceId];
+
+      const rarity = template?.rarity ?? 'COMMON';
+      const rarityValue = rarityConfig[rarity].value;
+
+      const rarityPenalty = rarityValue * 5; // 3 - EASY   5 -BALANCE 7-10 - HARDCORE
+
+      effectiveRecipeMin += rarityPenalty;
+    }
+
+    const diff = craftSkillLevel - effectiveRecipeMin;
 
     if (diff < 0) return 0;
 
-    return Math.min(100, baseChance + diff * gainPerLevel);
-  },
-  getBaseCraftExp(recipe: RecipeTemplate): number {
-    return Math.floor(
-      // recipe.tier * 40 +
-      recipe.requirement.skills[0].level * 8 + (recipe.timeMs / 1000) * 0.5,
-    );
-  },
+    let loreBonus = loreSkillLevel * 0.4;
 
-  calculateCraftExp(recipeExp: number, chance: number, success: boolean): number {
-    let exp = recipeExp;
-
-    // Множник за складність
-    exp *= clamp(1.2 - chance / 100, 0.3, 1);
-
-    // Множник за результат
-    if (!success) {
-      exp *= 0.3;
-    }
-
-    return Math.max(1, Math.floor(exp));
+    console.log('craftSkillLevel', craftSkillLevel);
+    console.log('loreSkillLevel', loreSkillLevel);
+    console.log('CRAFT CHANCE', Math.min(100, baseChance + diff * gainPerLevel + loreBonus));
+    return Math.min(100, baseChance + diff * gainPerLevel + loreBonus);
   },
 };

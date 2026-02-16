@@ -1,8 +1,10 @@
 import { resourceTemplateById } from '@/shared/templates/resource-template';
-import type { CoreResourceType, ItemInstance, ItemLocationType, OmitModifier } from '@/shared/types';
+import type { CoreResourceType, ItemInstance, ItemLocationType, OmitModifier, WeaponType } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
+import { EquipInfo } from '../../frontend/src/features/item-instance/components/EquipInfo';
 import { materialConfig } from '../../frontend/src/lib/config';
+import { itemDurabilityConfig } from '../lib/config/item-dutability-config';
 import { materialModifierConfig } from '../lib/config/material-modifier-config';
 import { generateRandomUuid, getDisplayName, getModifierByResourceKey } from '../lib/utils';
 import { heroService } from './hero-service';
@@ -38,6 +40,7 @@ export const itemInstanceService = {
       coreResourceModifier = getModifierByResourceKey(coreResource, itemTemplateId);
       displayName = getDisplayName(itemTemplateId, resource.id) as string | null;
     }
+    const durability = this.getDurability(itemTemplateId);
     const newItem: ItemInstance = {
       id: generateRandomUuid(),
       displayName,
@@ -50,15 +53,32 @@ export const itemInstanceService = {
       coreResourceModifier,
       coreResource,
       slot: null,
-      durability: null,
+      durability: durability ? { current: durability, max: durability } : null,
       createdAt: new Date().toISOString(),
     };
     const container = itemContainerService.getContainer(itemContainerId);
     container.itemsInstance.push(newItem);
     return newItem;
   },
+  getDurability(itemTemplateId: string) {
+    const template = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
+    if (!template.equipInfo) return;
+    switch (template.type) {
+      case 'WEAPON':
+      case 'TOOL': {
+        if (!template.equipInfo?.weaponHand || !template.equipInfo.weaponType) return;
 
-  consume() {},
+        return itemDurabilityConfig['WEAPON'][template.equipInfo.weaponHand][template.equipInfo.weaponType];
+      }
+      case 'ARMOR': {
+        if (!template.equipInfo?.armorCategory || !template.equipInfo.armorType) return;
+        return itemDurabilityConfig['ARMOR'][template.equipInfo.armorCategory][template.equipInfo.armorType];
+      }
+      case 'SHIELD':
+        return itemDurabilityConfig['SHIELD'];
 
-  move() {},
+      default:
+        return;
+    }
+  },
 };
