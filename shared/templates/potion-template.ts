@@ -2,7 +2,7 @@ import { imageConfig } from '@/shared/config/image-config';
 import { DEFAULT_ITEM_STACK } from '@/shared/constants';
 import type { ItemTemplate } from '@/shared/types';
 
-import { buffTemplateMap } from './buff-template';
+import { buffTemplateMapByName } from './buff-template';
 
 export const potionTemplate = [
   {
@@ -16,7 +16,7 @@ export const potionTemplate = [
     buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
-      buffTemplateId: buffTemplateMap['Effect of Might'].id,
+      buffTemplateId: buffTemplateMapByName['Effect of Might'].id,
     },
   },
   {
@@ -30,7 +30,7 @@ export const potionTemplate = [
     buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
-      buffTemplateId: buffTemplateMap['Effect of Vitality'].id,
+      buffTemplateId: buffTemplateMapByName['Effect of Vitality'].id,
     },
   },
   {
@@ -44,7 +44,7 @@ export const potionTemplate = [
     buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
-      buffTemplateId: buffTemplateMap['Effect of Arcane'].id,
+      buffTemplateId: buffTemplateMapByName['Effect of Arcane'].id,
     },
   },
   {
@@ -58,7 +58,7 @@ export const potionTemplate = [
     buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
-      buffTemplateId: buffTemplateMap['Effect of Clarity'].id,
+      buffTemplateId: buffTemplateMapByName['Effect of Clarity'].id,
     },
   },
   {
@@ -72,7 +72,7 @@ export const potionTemplate = [
     buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
-      buffTemplateId: buffTemplateMap['Effect of Agility'].id,
+      buffTemplateId: buffTemplateMapByName['Effect of Agility'].id,
     },
   },
   {
@@ -86,7 +86,7 @@ export const potionTemplate = [
     buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
-      buffTemplateId: buffTemplateMap['Effect of Fortune'].id,
+      buffTemplateId: buffTemplateMapByName['Effect of Fortune'].id,
     },
   },
   {

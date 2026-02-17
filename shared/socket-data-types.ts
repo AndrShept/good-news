@@ -91,7 +91,7 @@ export type RemoveBuffData = {
   type: 'REMOVE_BUFF';
   payload: {
     buffInstanceId: string;
-    hero: Pick<Hero, 'currentHealth' | 'maxHealth' | 'currentMana' | 'maxMana' | 'modifier'>
+    hero?: Pick<Hero, 'currentHealth' | 'maxHealth' | 'currentMana' | 'maxMana' | 'modifier'>;
   };
 };
 export type SkillUpData = {

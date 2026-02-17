@@ -9,6 +9,7 @@ export const resourceTemplate = [
     name: 'iron ore',
     image: imageConfig.icon.RESOURCES['IRON_ORE'],
     type: 'RESOURCES',
+    rarity: 'COMMON',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.RESOURCE,
     resourceInfo: {
@@ -18,6 +19,7 @@ export const resourceTemplate = [
   {
     id: '0199df74-c722-7695-96d9-59a701689d03',
     key: 'COPPER_ORE',
+    rarity: 'UNCOMMON',
     name: 'copper ore',
     image: imageConfig.icon.RESOURCES['COPPER_ORE'],
     type: 'RESOURCES',
@@ -30,6 +32,7 @@ export const resourceTemplate = [
   {
     id: '019ac735-a9c0-7e79-98cb-e392af762b03',
     key: 'SILVER_ORE',
+    rarity: 'UNCOMMON',
     name: 'silver ore',
     image: imageConfig.icon.RESOURCES['SILVER_ORE'],
     type: 'RESOURCES',
@@ -42,6 +45,7 @@ export const resourceTemplate = [
   {
     id: '019ac738-6ec9-7763-b633-d5ed4046b6f0',
     key: 'GOLD_ORE',
+    rarity: 'MAGIC',
     name: 'gold ore',
     image: imageConfig.icon.RESOURCES['GOLD_ORE'],
     type: 'RESOURCES',
@@ -54,6 +58,7 @@ export const resourceTemplate = [
   {
     id: '019ac738-e2f2-79a0-9f96-968231e0853e',
     key: 'MITHRIL_ORE',
+    rarity: 'RARE',
     name: 'mithril ore',
     image: imageConfig.icon.RESOURCES['MITHRIL_ORE'],
     type: 'RESOURCES',
@@ -66,6 +71,7 @@ export const resourceTemplate = [
   {
     id: '019ac739-be74-7813-9a75-8e8b0710a51e',
     key: 'ADAMANTINE_ORE',
+    rarity: 'EPIC',
     name: 'adamantine ore',
     image: imageConfig.icon.RESOURCES['ADAMANTINE_ORE'],
     type: 'RESOURCES',
@@ -81,6 +87,7 @@ export const resourceTemplate = [
     name: 'iron ingot',
     image: imageConfig.icon.RESOURCES['IRON_INGOT'],
     type: 'RESOURCES',
+    rarity: 'COMMON',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.RESOURCE,
     resourceInfo: {
@@ -90,6 +97,7 @@ export const resourceTemplate = [
   {
     id: '019ac73d-200f-7bf0-9afc-567a9fbe6a37',
     key: 'COPPER_INGOT',
+    rarity: 'UNCOMMON',
     name: 'copper ingot',
     image: imageConfig.icon.RESOURCES['COPPER_INGOT'],
     type: 'RESOURCES',
@@ -102,6 +110,7 @@ export const resourceTemplate = [
   {
     id: '019ac73d-d28e-7d2f-87ed-3de08098de4f',
     key: 'SILVER_INGOT',
+    rarity: 'UNCOMMON',
     name: 'silver ingot',
     image: imageConfig.icon.RESOURCES['SILVER_INGOT'],
     type: 'RESOURCES',
@@ -117,6 +126,7 @@ export const resourceTemplate = [
     name: 'gold ingot',
     image: imageConfig.icon.RESOURCES['GOLD_INGOT'],
     type: 'RESOURCES',
+    rarity: 'MAGIC',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.RESOURCE,
     resourceInfo: {
@@ -128,6 +138,7 @@ export const resourceTemplate = [
     key: 'MITHRIL_INGOT',
     name: 'mithril ingot',
     image: imageConfig.icon.RESOURCES['MITHRIL_INGOT'],
+    rarity: 'RARE',
     type: 'RESOURCES',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.RESOURCE,
@@ -141,6 +152,7 @@ export const resourceTemplate = [
     name: 'adamantine ingot',
     image: imageConfig.icon.RESOURCES['ADAMANTINE_INGOT'],
     type: 'RESOURCES',
+    rarity: 'EPIC',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.RESOURCE,
     resourceInfo: {

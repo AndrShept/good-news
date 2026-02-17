@@ -1,6 +1,7 @@
 import type { ItemTemplate, SkillTemplate } from '@/shared/types';
 
 import { imageConfig } from '../config/image-config';
+import { buffTemplateMapByName } from './buff-template';
 import { skillTemplateByKey } from './skill-template';
 
 export const skillBooks = [
@@ -14,24 +15,10 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      skillTemplateId: skillTemplateByKey.ALCHEMY.id,
+      unlockSkillKey: skillTemplateByKey.ALCHEMY.key,
     },
   },
-  {
-    id: 'a3e0b8e7-8bfe-4224-a88f-f0fadf6a33c1',
-    name: 'Alchemy skill book',
-    image: imageConfig.icon.book['unlock-skill'],
-    key: 'Alchemy_Skill_Book',
-    type: 'SKILL_BOOK',
-    description: 'Unlocks the Alchemy skill. Allows you to begin training and gaining experience in Alchemy.',
-    stackable: false,
-    bookInfo: {
-      kind: 'TRAIN',
-      skillTemplateId: skillTemplateByKey.ALCHEMY.id,
-      duration: 60 * 1000 * 60 * 3,
-      expReward: 1000,
-    },
-  },
+
   {
     id: 'f495f264-ddb6-4449-9159-b14759dc4953',
     name: 'Blacksmithing skill book',
@@ -42,7 +29,7 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      skillTemplateId: skillTemplateByKey.BLACKSMITHING.id,
+      unlockSkillKey: skillTemplateByKey.BLACKSMITHING.key,
     },
   },
   {
@@ -55,7 +42,7 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      skillTemplateId: skillTemplateByKey.FISHING.id,
+      unlockSkillKey: skillTemplateByKey.FISHING.key,
     },
   },
   {
@@ -68,7 +55,7 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      skillTemplateId: skillTemplateByKey.LUMBERJACKING.id,
+      unlockSkillKey: skillTemplateByKey.LUMBERJACKING.key,
     },
   },
   {
@@ -81,7 +68,7 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      skillTemplateId: skillTemplateByKey.MINING.id,
+      unlockSkillKey: skillTemplateByKey.MINING.key,
     },
   },
   {
@@ -94,7 +81,7 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      skillTemplateId: skillTemplateByKey.SMELTING.id,
+      unlockSkillKey: skillTemplateByKey.SMELTING.key,
     },
   },
   {
@@ -107,7 +94,7 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      skillTemplateId: skillTemplateByKey.TAILORING.id,
+      unlockSkillKey: skillTemplateByKey.TAILORING.key,
     },
   },
   {
@@ -120,7 +107,7 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      skillTemplateId: skillTemplateByKey.CLOTH_LORE.id,
+      unlockSkillKey: skillTemplateByKey.CLOTH_LORE.key,
     },
   },
   {
@@ -133,7 +120,7 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      skillTemplateId: skillTemplateByKey.INGOT_LORE.id,
+      unlockSkillKey: skillTemplateByKey.INGOT_LORE.key,
     },
   },
   {
@@ -146,7 +133,7 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      skillTemplateId: skillTemplateByKey.LEATHER_LORE.id,
+      unlockSkillKey: skillTemplateByKey.LEATHER_LORE.key,
     },
   },
   {
@@ -159,7 +146,7 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      skillTemplateId: skillTemplateByKey.WOOD_LORE.id,
+      unlockSkillKey: skillTemplateByKey.WOOD_LORE.key,
     },
   },
   {
@@ -172,7 +159,7 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      skillTemplateId: skillTemplateByKey.REGENERATION.id,
+      unlockSkillKey: skillTemplateByKey.REGENERATION.key,
     },
   },
   {
@@ -185,7 +172,22 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      skillTemplateId: skillTemplateByKey.MEDITATION.id,
+      unlockSkillKey: skillTemplateByKey.MEDITATION.key,
+    },
+  },
+
+  //// TRAIN BOOK  //////
+  {
+    id: 'a3e0b8e7-8bfe-4224-a88f-f0fadf6a33c1',
+    name: 'Alchemy training tome',
+    image: imageConfig.icon.book['train-skill'],
+    key: 'Alchemy_Training_Tome',
+    type: 'SKILL_BOOK',
+    description: 'A comprehensive tome filled with advanced alchemical knowledge. After several hours of study, grants Alchemy experience.',
+    stackable: false,
+    bookInfo: {
+      kind: 'TRAIN_BUFF',
+      buffTemplateId: buffTemplateMapByName['Alchemist’s Insight'].id,
     },
   },
 ] as const satisfies ItemTemplate[];

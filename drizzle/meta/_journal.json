@@ -15,6 +15,13 @@
       "when": 1771014642778,
       "tag": "0001_confused_giant_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1771282925000,
+      "tag": "0002_bouncy_leper_queen",
+      "breakpoints": true
     }
   ]
 }

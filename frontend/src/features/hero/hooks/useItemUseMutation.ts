@@ -41,6 +41,7 @@ export const useItemUseMutation = () => {
             data: [{ name: data.data?.equipItemName ?? '' }],
           });
           break;
+
         case 'POTION': {
           updateItemContainer(backpackId, data.data?.backpack);
           updateHero({
@@ -58,6 +59,25 @@ export const useItemUseMutation = () => {
             text: data.message,
             data: [{ name }],
           });
+          break;
+        }
+        case 'SKILL_BOOK': {
+          updateItemContainer(backpackId, data.data?.backpack);
+
+          if (template.bookInfo?.kind === 'TRAIN_BUFF') {
+            queryClient.invalidateQueries({
+              queryKey: getBuffOptions(heroId).queryKey,
+            });
+          }
+          const name = template.bookInfo?.buffTemplateId ? buffTemplateMapIds[template.bookInfo.buffTemplateId].name : template.name;
+
+          setGameMessage({
+            success: true,
+            type: 'INFO',
+            text: data.message,
+            data: [{ name }],
+          });
+
           break;
         }
       }

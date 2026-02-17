@@ -497,6 +497,7 @@ export const heroRouter = new Hono<Context>()
         equipItemName: '',
         message: '',
         isEquip: false,
+        isHero: true,
       };
       const equipItem = hero.equipments.find((e) => e.id === itemInstanceId);
 
@@ -513,6 +514,11 @@ export const heroRouter = new Hono<Context>()
             result.message = useResult.message;
             break;
           }
+          case 'SKILL_BOOK':
+            const useResult = itemUseService.readSkillBook(hero.id, itemInstanceId);
+            result.message = useResult.message;
+            result.isHero = false;
+            break;
           case 'ACCESSORY':
           case 'ARMOR':
           case 'WEAPON':
@@ -532,18 +538,19 @@ export const heroRouter = new Hono<Context>()
       const returnData = {
         equipItemName: result.equipItemName,
         backpack,
-        hero: {
-          currentHealth: hero.currentHealth,
-          currentMana: hero.currentMana,
-          maxHealth: hero.maxHealth,
-          maxMana: hero.maxMana,
-          stat: hero.stat,
-          regen: hero.regen,
-          modifier: hero.modifier,
-          equipments: result.isEquip ? hero.equipments : undefined,
-        },
+        hero: result.isHero
+          ? {
+              currentHealth: hero.currentHealth,
+              currentMana: hero.currentMana,
+              maxHealth: hero.maxHealth,
+              maxMana: hero.maxMana,
+              stat: hero.stat,
+              regen: hero.regen,
+              modifier: hero.modifier,
+              equipments: result.isEquip ? hero.equipments : undefined,
+            }
+          : undefined,
       };
-
       return c.json<SuccessResponse<typeof returnData>>({
         success: true,
         message: result.message,

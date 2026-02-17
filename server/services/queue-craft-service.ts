@@ -141,13 +141,13 @@ export const queueCraftService = {
 
     const diff = craftSkillLevel - effectiveRecipeMin;
 
-    if (diff < 0) return 0;
-
     let loreBonus = loreSkillLevel * 0.4;
 
     console.log('craftSkillLevel', craftSkillLevel);
     console.log('loreSkillLevel', loreSkillLevel);
     console.log('CRAFT CHANCE', Math.min(100, baseChance + diff * gainPerLevel + loreBonus));
+    if (diff < 0) return 0;
+
     return Math.min(100, baseChance + diff * gainPerLevel + loreBonus);
   },
 };

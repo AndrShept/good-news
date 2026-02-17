@@ -20,7 +20,7 @@ export const regenTick = (now: number, TICK_RATE: number) => {
       if (gain > 0) {
         hero.currentHealth = Math.min(hero.currentHealth + gain, hero.maxHealth);
         hero.regen.healthAcc -= gain;
-        const result = skillService.setSkillExp(heroId, 'REGENERATION', gain);
+        const result = skillService.addExp(heroId, 'REGENERATION', gain);
 
         socketService.sendToClientExpResult({
           expResult: result,
@@ -36,10 +36,8 @@ export const regenTick = (now: number, TICK_RATE: number) => {
       const gain = Math.floor(hero.regen.manaAcc);
       if (gain > 0) {
         hero.currentMana = Math.min(hero.currentMana + gain, hero.maxMana);
-        skillService.setSkillExp(heroId, 'MEDITATION', gain);
         hero.regen.manaAcc -= gain;
-
-        const result = skillService.setSkillExp(heroId, 'MEDITATION', gain);
+        const result = skillService.addExp(heroId, 'MEDITATION', gain);
 
         socketService.sendToClientExpResult({
           expResult: result,

@@ -3,6 +3,7 @@ import type { RecipeTemplate } from '@/shared/types';
 import { rarityConfig } from '../lib/config/rarity-config';
 import { clamp } from '../lib/utils';
 import { itemTemplateService } from './item-template-service';
+import { skillService } from './skill-service';
 
 interface CalculateCraftExp {
   recipe: RecipeTemplate;
@@ -60,6 +61,19 @@ export const progressionService = {
     if (!success) {
       exp *= 0.7;
     }
+
+    return Math.max(1, Math.floor(exp));
+  },
+
+  calculateBookExp(skillLevel: number, durationMs: number): number {
+    
+    const hours = durationMs / (1000 * 60 * 60);
+
+    const basePerHour = 300;
+
+    const levelScaling = 1 / (1 + skillLevel * 0.05);
+
+    const exp = basePerHour * hours * levelScaling;
 
     return Math.max(1, Math.floor(exp));
   },

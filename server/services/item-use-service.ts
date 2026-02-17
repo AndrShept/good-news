@@ -4,8 +4,8 @@ import { HTTPException } from 'hono/http-exception';
 import { buffInstanceService } from './buff-instance-service';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
-import { itemTemplateService } from './item-template-service';
 import { itemInstanceService } from './item-instance-service';
+import { itemTemplateService } from './item-template-service';
 
 export const itemUseService = {
   drink(heroId: string, itemInstanceId: string) {
@@ -47,7 +47,32 @@ export const itemUseService = {
       itemContainerId: backpack.id,
       itemInstanceId,
       quantity: 1,
-      mode: 'use'
+      mode: 'use',
+    });
+    return result;
+  },
+  readSkillBook(heroId: string, itemInstanceId: string) {
+    const hero = heroService.getHero(heroId);
+    const backpack = itemContainerService.getBackpack(hero.id);
+    const findItemInstance = itemInstanceService.getItemInstance(backpack.id, itemInstanceId);
+    const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[findItemInstance.itemTemplateId];
+    const result = { name: '', message: '' };
+    switch (itemTemplate.bookInfo?.kind) {
+      case 'TRAIN_BUFF': {
+        if (!itemTemplate.bookInfo.buffTemplateId) return result;
+        const buffTemplate = buffTemplateMapIds[itemTemplate.bookInfo.buffTemplateId];
+        buffInstanceService.createBuff(heroId, itemTemplate.bookInfo.buffTemplateId);
+        result.message = 'You obtain new buff';
+        result.name = buffTemplate.name;
+        break;
+      }
+    }
+
+    itemContainerService.consumeItem({
+      itemContainerId: backpack.id,
+      itemInstanceId,
+      quantity: 1,
+      mode: 'use',
     });
     return result;
   },

@@ -293,10 +293,9 @@ export type ResourceInfo = {
   category: ResourceCategoryType;
 };
 export type BookInfo = {
-  kind: 'UNLOCK' | 'TRAIN';
-  skillTemplateId: string;
-  duration?: number;
-  expReward?: number;
+  kind: 'UNLOCK' | 'TRAIN_BUFF';
+  unlockSkillKey?: SkillKey;
+  buffTemplateId?: string;
 };
 export type ToolInfo = {
   skillTemplateId: string;
@@ -334,14 +333,20 @@ export type ItemTemplate = {
   coreModifier?: Partial<OmitModifier>;
 };
 
+export type EffectSource = 'POTION' | 'BOOK' | 'FOOD' | 'SKILL' | 'ZONE' | 'EVENT';
+
 export type BuffInstance = typeof buffInstanceTable.$inferSelect;
 export type BuffTemplate = {
   id: string;
   name: string;
   image: string;
   type: 'POSITIVE' | 'NEGATIVE';
+  source: EffectSource;
   duration: number;
   modifier: Partial<OmitModifier>;
+  reward?: {
+    skillKey: SkillKey;
+  };
 };
 
 export type Hero = InferSelectModel<typeof heroTable> & {
@@ -375,7 +380,7 @@ export type SkillTemplate = {
   name: string;
   category: SkillCategory;
   image: string;
-  key: string;
+  key: SkillKey;
 };
 
 export type IPosition = {

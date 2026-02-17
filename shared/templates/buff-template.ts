@@ -7,6 +7,7 @@ export const buffTemplate = [
     name: 'Effect of Might',
     image: imageConfig.icon.POTION.buff.strength,
     type: 'POSITIVE',
+    source: 'POTION',
     duration: 60 * 60 * 1000,
     modifier: { strength: 8 },
   },
@@ -15,6 +16,7 @@ export const buffTemplate = [
     name: 'Effect of Vitality',
     image: imageConfig.icon.POTION.buff.constitution,
     type: 'POSITIVE',
+    source: 'POTION',
     duration: 60 * 60 * 1000,
     modifier: { constitution: 8 },
   },
@@ -23,6 +25,7 @@ export const buffTemplate = [
     name: 'Effect of Clarity',
     image: imageConfig.icon.POTION.buff.wisdom,
     type: 'POSITIVE',
+    source: 'POTION',
     duration: 10000,
     modifier: { wisdom: 8 },
   },
@@ -31,6 +34,7 @@ export const buffTemplate = [
     name: 'Effect of Arcane',
     image: imageConfig.icon.POTION.buff.intelligence,
     type: 'POSITIVE',
+    source: 'POTION',
     duration: 60 * 60 * 1000,
     modifier: { intelligence: 8 },
   },
@@ -39,6 +43,7 @@ export const buffTemplate = [
     name: 'Effect of Agility',
     image: imageConfig.icon.POTION.buff.dexterity,
     type: 'POSITIVE',
+    source: 'POTION',
     duration: 60 * 60 * 1000,
     modifier: { dexterity: 8 },
   },
@@ -47,15 +52,28 @@ export const buffTemplate = [
     name: 'Effect of Fortune',
     image: imageConfig.icon.POTION.buff.luck,
     type: 'POSITIVE',
+    source: 'POTION',
     duration: 60 * 60 * 1000,
     modifier: { luck: 8 },
+  },
+  {
+    id: '03adc725-4f7c-4cc4-aef0-e4af71651b39',
+    name: 'Alchemist’s Insight',
+    image: imageConfig.icon.book['train-skill'],
+    type: 'POSITIVE',
+    source: 'BOOK',
+    reward: {
+      skillKey: 'ALCHEMY',
+    },
+    duration: 10000,
+    modifier: {},
   },
 ] as const satisfies BuffTemplate[];
 
 const names = buffTemplate.map((i) => i.name);
 type BuffTemplateName = (typeof names)[number];
 
-export const buffTemplateMap = buffTemplate.reduce(
+export const buffTemplateMapByName = buffTemplate.reduce(
   (acc, template) => {
     acc[template.name] = template;
     return acc;

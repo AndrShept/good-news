@@ -2,6 +2,27 @@ import { imageConfig } from '@/shared/config/image-config';
 import type { SkillTemplate } from '@/shared/types';
 
 export const skillCategoryValues = ['GATHERING', 'PROCESSING', 'CRAFTING', 'LORE', 'COMBAT', 'UTILITY'] as const;
+export const skillKeyValues = [
+  'BLACKSMITHING',
+  'ALCHEMY',
+  'FISHING',
+  'LUMBERJACKING',
+  'MINING',
+  'SMELTING',
+  'TAILORING',
+  'CARPENTRY',
+  'SKINNING',
+  'CLOTH_LORE',
+  'INGOT_LORE',
+  'LEATHER_LORE',
+  'WOOD_LORE',
+  'HERB_LORE',
+  'ORE_LORE',
+  'REGENERATION',
+  'MEDITATION',
+] as const;
+
+export type SkillKey = (typeof skillKeyValues)[number];
 
 export const skillsTemplate = [
   {
@@ -127,8 +148,8 @@ export const skillsTemplate = [
   },
 ] as const satisfies SkillTemplate[];
 
-export const skillKeyValues = skillsTemplate.map((s) => s.key);
-export type SkillKey = (typeof skillKeyValues)[number];
+// export const skillKeyValues = skillsTemplate.map((s) => s.key);
+// export type SkillKey = (typeof skillKeyValues)[number];
 
 export const skillTemplateById = skillsTemplate.reduce(
   (acc, template) => {

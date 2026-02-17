@@ -27,11 +27,9 @@ export const skillExpConfig = {
   LUMBERJACKING: {
     difficultyMultiplier: 1.5,
   },
-  HERBALISM: {
-    difficultyMultiplier: 1.5
-  },
+
   SKINNING: {
-    difficultyMultiplier: 1.5
+    difficultyMultiplier: 1.5,
   },
 
   CLOTH_LORE: {
@@ -59,4 +57,3 @@ export const skillExpConfig = {
     difficultyMultiplier: 2.6,
   },
 } as const satisfies Record<SkillKey, { difficultyMultiplier: number }>;
-

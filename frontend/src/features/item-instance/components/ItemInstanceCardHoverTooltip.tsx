@@ -12,12 +12,12 @@ type Props = ItemInstance & {
 };
 export const ItemInstanceCardHoverTooltip = memo((props: Props) => {
   return (
-    <section className={cn('bg-secondary/80 flex flex-col items-center justify-center truncate rounded border px-4 py-2')}>
+    <section className={cn('bg-secondary/80 flex max-w-sm flex-col items-center justify-center truncate rounded border px-4 py-2')}>
       <h3 className={cn('truncate text-base capitalize', props.coreResource && materialConfig[props.coreResource]?.color)}>
         {props.displayName ?? props.itemTemplate.name}
       </h3>
 
-      <p className="text-muted-foreground">{props.itemTemplate.type.toLocaleLowerCase()}</p>
+      <p className="text-muted-foreground">{props.itemTemplate.type.toLocaleLowerCase().replace('_', ' ')}</p>
       {!!props.durability && (
         <div>
           <span className="mr-1"> durability:</span>
@@ -26,6 +26,7 @@ export const ItemInstanceCardHoverTooltip = memo((props: Props) => {
           <span>/{props.durability.max}</span>
         </div>
       )}
+      {props.itemTemplate.description && <p className="text-muted-foreground text-wrap text-center">{props.itemTemplate.description}</p>}
       <EquipInfo
         minDamage={props.itemTemplate.coreModifier?.minDamage}
         maxDamage={props.itemTemplate.coreModifier?.maxDamage}

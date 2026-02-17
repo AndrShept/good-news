@@ -5,9 +5,6 @@ import {
   HP_MULTIPLIER_COST,
   MANA_MULTIPLIER_INT,
 } from '../../shared/constants';
-import type { SkillKey } from '../../shared/templates/skill-template';
-import type { RarityType } from '../../shared/types';
-import { rarityXpRewards, skillExpConfig } from './config/skill-exp-config';
 
 export const calculate = {
   walkTime(dexterity: number) {
@@ -28,14 +25,5 @@ export const calculate = {
   },
 
 
-  getCraftSkillXp(skillKey: SkillKey, skillLevel: number, coreMaterialRarity: RarityType) {
-    // Чим більший skillLevel — тим повільніша прокачка
-    const rarityBaseXp = rarityXpRewards[coreMaterialRarity];
-    const difficultyScale = Math.pow(skillLevel, skillExpConfig[skillKey].difficultyMultiplier);
 
-    // Фінальний XP за крафт
-    const xp = rarityBaseXp / (1 + difficultyScale / 50);
-
-    return Math.floor(xp);
-  },
 };
