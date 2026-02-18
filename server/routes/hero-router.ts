@@ -10,7 +10,7 @@ import type { WalkMapCompleteData, WalkMapStartData } from '@/shared/socket-data
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
-import { skillsTemplate } from '@/shared/templates/skill-template';
+import { gatheringSkillKeysValues, skillsTemplate } from '@/shared/templates/skill-template';
 import {
   type BuffInstance,
   type CraftBuildingType,
@@ -31,7 +31,7 @@ import {
   createHeroSchema,
   statsSchema,
 } from '@/shared/types';
-import { buildPathWithObstacles } from '@/shared/utils';
+import { buildPathWithObstacles, getHeroStateWithGatherSkillKey } from '@/shared/utils';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq, lt, lte, ne, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -913,6 +913,31 @@ export const heroRouter = new Hono<Context>()
 
       return c.json<SuccessResponse>({
         message: 'leave place success ',
+        success: true,
+      });
+    },
+  )
+  .post(
+    '/:id/action/gather/:skillKey',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string(), skillKey: z.enum(gatheringSkillKeysValues) })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id, skillKey } = c.req.valid('param');
+      const hero = heroService.getHero(id);
+
+      if (hero.state !== 'IDLE') {
+        throw new HTTPException(409, {
+          message: 'Hero is currently busy with another action',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      const state = getHeroStateWithGatherSkillKey(skillKey);
+
+      return c.json<SuccessResponse>({
+        message: 'gathering starting ',
         success: true,
       });
     },

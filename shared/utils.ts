@@ -1,5 +1,6 @@
 import type { Layer } from './json-types';
-import type { IPosition } from './types';
+import type { GatheringCategorySkillKey } from './templates/skill-template';
+import type { IHeroStat, IPosition, StateType } from './types';
 
 function isBlocked(x: number, y: number, layers: Layer[]): boolean {
   return layers.some((layer) => {
@@ -98,3 +99,13 @@ export function buildPathWithObstacles(from: IPosition, to: IPosition, layers: L
   return [];
 }
 
+export const getHeroStateWithGatherSkillKey = (skillKey: GatheringCategorySkillKey) => {
+  const state: Record<GatheringCategorySkillKey, StateType> = {
+    FISHING: 'FISHING',
+    HERBALISM: 'HERBALISM',
+    LUMBERJACKING: 'LUMBERJACKING',
+    MINING: 'MINING',
+    SKINNING: 'SKINNING',
+  };
+  return state[skillKey];
+};

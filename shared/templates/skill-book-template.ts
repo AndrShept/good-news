@@ -192,20 +192,20 @@ export const skillBooks = [
   },
 ] as const satisfies ItemTemplate[];
 
-//  const skillBookKeyValues = skillBooks.map((s) => s.key);
-//  type SkillBookKey = (typeof skillBookKeyValues)[number];
+const skillBookValues = skillBooks.map((s) => s.key);
+type SkillBookKey = (typeof skillBookValues)[number];
 
-// export const skillBooksTemplateById = skillBooks.reduce(
-//   (acc, template) => {
-//     acc[template.id] = template;
-//     return acc;
-//   },
-//   {} as Record<string, SkillTemplate>,
-// );
-// export const skillUnlockBooksTemplateByKey = skillBooks.reduce(
-//   (acc, template) => {
-//     acc[template.key] = template;
-//     return acc;
-//   },
-//   {} as Record<SkillBookKey, SkillTemplate>,
-// );
+export const skillBookTemplateById = skillBooks.reduce(
+  (acc, template) => {
+    acc[template.id] = template;
+    return acc;
+  },
+  {} as Record<string, ItemTemplate>,
+);
+export const skillBookTemplateByKey = skillBooks.reduce(
+  (acc, template) => {
+    acc[template.key] = template;
+    return acc;
+  },
+  {} as Record<SkillBookKey, ItemTemplate>,
+);

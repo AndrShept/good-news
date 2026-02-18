@@ -3,15 +3,16 @@ import type { SkillTemplate } from '@/shared/types';
 
 export const skillCategoryValues = ['GATHERING', 'PROCESSING', 'CRAFTING', 'LORE', 'COMBAT', 'UTILITY'] as const;
 export const skillKeyValues = [
+  'SMELTING',
   'BLACKSMITHING',
+  'TAILORING',
   'ALCHEMY',
+  'CARPENTRY',
   'FISHING',
   'LUMBERJACKING',
   'MINING',
-  'SMELTING',
-  'TAILORING',
-  'CARPENTRY',
   'SKINNING',
+  'HERBALISM',
   'CLOTH_LORE',
   'INGOT_LORE',
   'LEATHER_LORE',
@@ -23,6 +24,10 @@ export const skillKeyValues = [
 ] as const;
 
 export type SkillKey = (typeof skillKeyValues)[number];
+export type GatheringCategorySkillKey = Extract<SkillKey, 'FISHING' | 'LUMBERJACKING' | 'MINING' | 'SKINNING' | 'HERBALISM'>;
+export type CraftingCategorySkillKey = Extract<SkillKey, 'BLACKSMITHING' | 'TAILORING' | 'ALCHEMY' | 'CARPENTRY'>;
+
+export const gatheringSkillKeysValues = ['FISHING', 'HERBALISM', 'LUMBERJACKING', 'MINING', 'SKINNING'] as const satisfies GatheringCategorySkillKey[]
 
 export const skillsTemplate = [
   {
@@ -87,6 +92,13 @@ export const skillsTemplate = [
     image: imageConfig.icon.skill['SKINNING'],
     category: 'GATHERING',
     key: 'SKINNING',
+  },
+  {
+    id: 'a6ed4a4a-4ae9-4245-9b3a-cc0c37428493',
+    name: 'Herbalism',
+    image: imageConfig.icon.skill['HERBALISM'],
+    category: 'GATHERING',
+    key: 'HERBALISM',
   },
 
   {

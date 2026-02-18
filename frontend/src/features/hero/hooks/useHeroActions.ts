@@ -1,4 +1,4 @@
-import { getTilesAroundHero } from '@/lib/utils';
+import { getMapLayerNameAtHeroPos, getTilesAroundHero } from '@/lib/utils';
 import { TMap } from '@/shared/types';
 import { useMemo } from 'react';
 
@@ -36,9 +36,15 @@ export const useHeroActions = ({ heroPosX, heroPosY, map }: Props) => {
     return around.some((pos) => water?.[pos.y * MAP_WIDTH + pos.x]);
   }, [MAP_WIDTH, heroPosX, heroPosY, layersByName]);
 
+  const gatheringTiles = useMemo(() => {
+    const tiles = getMapLayerNameAtHeroPos(map?.id, { x: heroPosX, y: heroPosY });
+    return tiles;
+  }, [heroPosX, heroPosY, map?.id]);
+
   return {
     canFish,
     placeTile,
-    entranceTile
+    entranceTile,
+    gatheringTiles,
   };
 };

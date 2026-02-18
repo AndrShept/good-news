@@ -344,6 +344,7 @@ export type BuffTemplate = {
   source: EffectSource;
   duration: number;
   modifier: Partial<OmitModifier>;
+  description?: string,
   reward?: {
     skillKey: SkillKey;
   };

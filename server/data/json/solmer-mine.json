@@ -118,7 +118,7 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
          "height":20,
          "id":3,
-         "name":"ORE_VEIL",
+         "name":"ORE_VEIN",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,

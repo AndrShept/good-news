@@ -1,9 +1,9 @@
 import { Separator } from '@/components/ui/separator';
 import { useHeroActions } from '@/features/hero/hooks/useHeroActions';
-import { StateType, TMap } from '@/shared/types';
+import { StateType, TMap, TileType } from '@/shared/types';
 import { memo } from 'react';
 
-import { FishingButton } from './FishingButton';
+import { GatherResourceButton } from './GatherResourceButton';
 import { TravelButton } from './TravelButton';
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
 }
 
 export const HeroActionsBar = memo(({ heroPosX, heroPosY, map, state }: Props) => {
-  const { entranceTile, placeTile, canFish } = useHeroActions({
+  const { entranceTile, placeTile, gatheringTiles } = useHeroActions({
     heroPosX,
     heroPosY,
     map,
@@ -22,12 +22,16 @@ export const HeroActionsBar = memo(({ heroPosX, heroPosY, map, state }: Props) =
   const entranceId = entranceTile?.id;
   const placeId = placeTile?.id;
   const image = entranceTile ? entranceTile.image : placeTile?.image;
+
   return (
     <>
       {(entranceTile || placeTile) && (
         <TravelButton image={image ?? ''} placeId={placeId} entranceId={entranceId} disabled={state !== 'IDLE'} />
       )}
-      {canFish && <FishingButton disabled={state !== 'IDLE'} />}
+      {!!gatheringTiles.length &&
+        gatheringTiles.map((tileType) => (
+          <GatherResourceButton key={tileType} tileType={tileType as Exclude<TileType, 'GROUND' | 'OBJECT'>} disabled={state !== 'IDLE'} />
+        ))}
       {(entranceTile || placeTile) && <Separator className="hidden sm:block" />}
     </>
   );

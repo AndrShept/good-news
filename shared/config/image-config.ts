@@ -66,6 +66,9 @@ export const imageConfig = {
       MINING: '/sprites/icons/state/mining.png',
       SMELTING: '/sprites/icons/state/smelting.png',
       TAILORING: '/sprites/icons/state/tailoring.png',
+      SKINNING: '/sprites/icons/skills/skinning.png',
+      HERBALISM: '/sprites/icons/skills/herb-lore.png',
+      ALCHEMY: '/sprites/icons/skills/alchemy.png',
     } as Record<StateType, string>,
     skill: {
       SMELTING: '/sprites/icons/skills/smelting.png',
@@ -77,6 +80,7 @@ export const imageConfig = {
       LUMBERJACKING: '/sprites/icons/skills/lumberjacking.png',
       FISHING: '/sprites/icons/skills/fishing.png',
       SKINNING: '/sprites/icons/skills/skinning.png',
+      HERBALISM: '/sprites/icons/skills/herbalism.png',
       INGOT_LORE: '/sprites/icons/skills/ingot-lore.png',
       LEATHER_LORE: '/sprites/icons/skills/leather-lore.png',
       CLOTH_LORE: '/sprites/icons/skills/cloth-lore.png',

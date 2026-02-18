@@ -62,6 +62,7 @@ export const buffTemplate = [
     image: imageConfig.icon.book['train-skill'],
     type: 'POSITIVE',
     source: 'BOOK',
+    // description: '',
     reward: {
       skillKey: 'ALCHEMY',
     },

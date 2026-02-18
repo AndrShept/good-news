@@ -31,6 +31,9 @@ export const skillExpConfig = {
   SKINNING: {
     difficultyMultiplier: 1.5,
   },
+  HERBALISM: {
+    difficultyMultiplier: 1.5,
+  },
 
   CLOTH_LORE: {
     difficultyMultiplier: 2.2,

@@ -43,6 +43,9 @@ export const BuffCard = memo(function BuffCard(props: Props) {
                 {props.buffTemplate.name.charAt(0).toUpperCase() + props.buffTemplate.name.slice(1)}
               </h3>
               <p className="text-muted-foreground text-xs">{props.buffTemplate.type}</p>
+              {props.buffTemplate.description && (
+                <p className="text-muted-foreground text-wrap text-center">{props.buffTemplate.description}</p>
+              )}
             </div>
             <ModifierInfoCard modifiersArgs={[props.buffTemplate.modifier]} />
             <p className="text-muted-foreground text-xs">Expires in: {time.toFixed(0)} minutes</p>
