@@ -1,5 +1,5 @@
-import { getMapLayerNameAtHeroPos, getTilesAroundHero } from '@/lib/utils';
 import { TMap } from '@/shared/types';
+import { getMapLayerNameAtHeroPos, getTilesAroundHero } from '@/shared/utils';
 import { useMemo } from 'react';
 
 interface Props {
@@ -9,15 +9,15 @@ interface Props {
 }
 
 export const useHeroActions = ({ heroPosX, heroPosY, map }: Props) => {
-  const MAP_WIDTH = map?.width ?? 0;
+  // const MAP_WIDTH = map?.width ?? 0;
 
-  const layersByName = useMemo(() => {
-    if (!map?.layers) return {};
-    return map.layers.reduce<Record<string, (typeof map.layers)[number]>>((acc, layer) => {
-      acc[layer.name] = layer;
-      return acc;
-    }, {});
-  }, [map]);
+  // const layersByName = useMemo(() => {
+  //   if (!map?.layers) return {};
+  //   return map.layers.reduce<Record<string, (typeof map.layers)[number]>>((acc, layer) => {
+  //     acc[layer.name] = layer;
+  //     return acc;
+  //   }, {});
+  // }, [map]);
 
   const placeTile = useMemo(() => {
     return map?.places?.find((place) => {
@@ -30,11 +30,11 @@ export const useHeroActions = ({ heroPosX, heroPosY, map }: Props) => {
     });
   }, [heroPosX, heroPosY, map?.entrances]);
 
-  const canFish = useMemo(() => {
-    const around = getTilesAroundHero({ x: heroPosX, y: heroPosY }, 1);
-    const water = layersByName['WATER']?.data;
-    return around.some((pos) => water?.[pos.y * MAP_WIDTH + pos.x]);
-  }, [MAP_WIDTH, heroPosX, heroPosY, layersByName]);
+  // const canFish = useMemo(() => {
+  //   const around = getTilesAroundHero({ x: heroPosX, y: heroPosY }, 1);
+  //   const water = layersByName['WATER']?.data;
+  //   return around.some((pos) => water?.[pos.y * MAP_WIDTH + pos.x]);
+  // }, [MAP_WIDTH, heroPosX, heroPosY, layersByName]);
 
   const gatheringTiles = useMemo(() => {
     const tiles = getMapLayerNameAtHeroPos(map?.id, { x: heroPosX, y: heroPosY });
@@ -42,7 +42,6 @@ export const useHeroActions = ({ heroPosX, heroPosY, map }: Props) => {
   }, [heroPosX, heroPosY, map?.id]);
 
   return {
-    canFish,
     placeTile,
     entranceTile,
     gatheringTiles,

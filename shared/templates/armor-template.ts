@@ -13,7 +13,7 @@ export const armorTemplate = [
       armorCategory: 'PLATE',
     },
     coreModifier: {
-      defense: 20,
+      armor: 20,
       evasion: -30,
       constitution: 10
     },

@@ -11,6 +11,7 @@ import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
 import { gatheringSkillKeysValues, skillsTemplate } from '@/shared/templates/skill-template';
+import { toolTemplateByKey } from '@/shared/templates/tool-template';
 import {
   type BuffInstance,
   type CraftBuildingType,
@@ -64,6 +65,7 @@ import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
 import { equipmentService } from '../services/equipment-service';
+import { gatheringService } from '../services/gathering-service';
 import { heroService } from '../services/hero-service';
 import { itemContainerService } from '../services/item-container-service';
 import { itemInstanceService } from '../services/item-instance-service';
@@ -933,6 +935,15 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      gatheringService.canStartGathering(hero.id, skillKey);
+      switch (skillKey) {
+        case 'MINING': {
+          break;
+        }
+
+        default:
+          throw new HTTPException(400, { message: 'skillKey not correct' });
+      }
 
       const state = getHeroStateWithGatherSkillKey(skillKey);
 
@@ -962,7 +973,7 @@ export const heroRouter = new Hono<Context>()
       const queueCraftItems = queueCraftService.getQueueCraft(hero.id);
 
       return c.json<SuccessResponse<QueueCraft[]>>({
-        message: 'craft item add to queue',
+        message: 'queue fetched',
         success: true,
         data: queueCraftItems,
       });

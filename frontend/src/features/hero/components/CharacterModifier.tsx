@@ -18,7 +18,7 @@ export const CharacterModifier = memo((props: Props) => {
           <p className="text-stone-600">DEF</p>
         </div>
         <p>
-          <span>defense:</span> {props.defense}
+          <span>armor:</span> {props.armor}
         </p>
         <p>
           <span>evasion:</span> {props.evasion}
@@ -37,13 +37,13 @@ export const CharacterModifier = memo((props: Props) => {
           <span>phys damage:</span> {props.physDamage}
         </p>
         <p>
-          <span>phys hit chance:</span> {props.physHitChance}
+          <span>phys hit rating:</span> {props.physHitRating}
         </p>
         <p>
-          <span>phys crit chance:</span> {props.physCritChance}
+          <span>phys crit rating:</span> {props.physCritRating}
         </p>
         <p>
-          <span>phys crit power:</span> {props.physCritPower}
+          <span>phys crit damage:</span> {props.physCritDamage}
         </p>
       </div>
       <Separator />
@@ -58,13 +58,13 @@ export const CharacterModifier = memo((props: Props) => {
           <span>spell damage:</span> {props.spellDamage}
         </p>
         <p>
-          <span>spell hit chance:</span> {props.spellHitChance}
+          <span>spell hit rating:</span> {props.spellHitRating}
         </p>
         <p>
-          <span>spell crit chance</span> {props.spellCritChance}
+          <span>spell crit rating</span> {props.spellCritRating}
         </p>
         <p>
-          <span>spell crit power</span> {props.spellCritPower}
+          <span>spell crit damage</span> {props.spellCritDamage}
         </p>
       </div>
     </>

@@ -106,7 +106,7 @@ export const jobQueueId = {
 export const sumAllModifier = <T extends Partial<Modifier> | null | undefined>(...args: T[]) => {
   const result: OmitModifier = {
     constitution: 0,
-    defense: 0,
+    armor: 0,
     dexterity: 0,
     evasion: 0,
     healthRegen: 0,
@@ -119,15 +119,17 @@ export const sumAllModifier = <T extends Partial<Modifier> | null | undefined>(.
     maxHealth: 0,
     maxMana: 0,
     minDamage: 0,
-    physCritChance: 0,
-    physCritPower: 0,
     physDamage: 0,
-    physHitChance: 0,
-    spellCritChance: 0,
-    spellCritPower: 0,
     spellDamage: 0,
-    spellHitChance: 0,
     strength: 0,
+    spellCritDamage: 0,
+    spellCritRating: 0,
+    spellHitRating: 0,
+    spellPenetration: 0,
+    physCritDamage: 0,
+    physCritRating: 0,
+    physHitRating: 0,
+    physPenetration: 0
   };
 
   for (const item of args) {

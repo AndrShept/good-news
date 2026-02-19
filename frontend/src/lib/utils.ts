@@ -54,58 +54,7 @@ export const toastError = (msg = 'Something went wrong') => {
   toast.error(msg);
 };
 
-export const getTilesAroundHero = (pos: IPosition, radius = 1) => {
-  const tiles: IPosition[] = [];
-  for (let dx = -radius; dx <= radius; dx++) {
-    for (let dy = -radius; dy <= radius; dy++) {
-      if (dx === 0 && dy === 0) continue;
-      tiles.push({ x: pos.x + dx, y: pos.y + dy });
-    }
-  }
-  return tiles;
-};
-export const getMapLayerNameAtHeroPos = (mapId: string | undefined, pos: IPosition, radius: number = 1): TileType[] => {
-  const map = mapTemplate.find((m) => m.id === mapId);
-  if (!map) return [];
 
-  const index = pos.y * map.width + pos.x;
-
-  const result = new Set<TileType>();
-
-  for (const layer of map.layers) {
-    if (layer.name === 'GROUND' || layer.name === 'DECOR') continue;
-
-    if (layer.data[index]) {
-      result.add(layer.name as TileType);
-    }
-  }
-
-  const around = getTilesAroundHero(pos, radius);
-
-  for (const layer of map.layers) {
-    if (!around.length || layer.name !== 'WATER') continue;
-
-    for (const p of around) {
-      const i = p.y * map.width + p.x;
-      if (layer.data[i]) {
-        result.add(layer.name as TileType);
-      }
-    }
-  }
-
-  return [...result];
-};
-
-interface IGetTileExists {
-  index: number;
-  tileType: TileType;
-  layers: Layer[];
-}
-
-export const getTileExists = ({ index, layers, tileType }: IGetTileExists) => {
-  const tiles = layers.find((l) => l.name === tileType);
-  return tiles?.data[index];
-};
 
 export const modifierChangeName = (modifier: keyof OmitModifier) => {
   const variants: Record<keyof OmitModifier, string> = {
@@ -117,7 +66,7 @@ export const modifierChangeName = (modifier: keyof OmitModifier) => {
     constitution: 'constitution',
     luck: 'luck',
     wisdom: 'wisdom',
-    defense: 'defense',
+    armor: 'armor',
     evasion: 'evasion',
     magicResistance: 'magic resistance',
     healthRegen: 'health regen',
@@ -125,13 +74,15 @@ export const modifierChangeName = (modifier: keyof OmitModifier) => {
     maxHealth: 'max health',
     maxMana: 'max mana',
     physDamage: 'phys damage',
-    physCritChance: 'phys crit chance',
-    physCritPower: 'phys crit power',
-    physHitChance: 'phys hit chance',
+    physCritRating: 'phys crit rating',
+    physCritDamage: 'phys crit damage',
+    physHitRating: 'phys hit rating',
     spellDamage: 'spell damage',
-    spellCritChance: 'spell crit chance',
-    spellCritPower: 'spell crit power',
-    spellHitChance: 'spell hit chance',
+    spellCritRating: 'spell crit rating',
+    spellCritDamage: 'spell crit power',
+    spellHitRating: 'spell hit rating',
+    spellPenetration: 'spell penetration',
+    physPenetration: 'phys penetration',
   };
   return variants[modifier];
 };
@@ -139,13 +90,7 @@ export const modifierChangeName = (modifier: keyof OmitModifier) => {
 export const getModifiers = (...args: Partial<OmitModifier | undefined>[]) => {
   const baseModifier: Omit<OmitModifier, 'minDamage' | 'maxDamage'> = {
     spellDamage: 0,
-    spellCritPower: 0,
-    spellCritChance: 0,
-    spellHitChance: 0,
     physDamage: 0,
-    physCritPower: 0,
-    physCritChance: 0,
-    physHitChance: 0,
     strength: 0,
     wisdom: 0,
     dexterity: 0,
@@ -156,9 +101,17 @@ export const getModifiers = (...args: Partial<OmitModifier | undefined>[]) => {
     maxMana: 0,
     manaRegen: 0,
     healthRegen: 0,
-    defense: 0,
+    armor: 0,
     magicResistance: 0,
     evasion: 0,
+    spellCritDamage: 0,
+    spellCritRating: 0,
+    spellHitRating: 0,
+    spellPenetration: 0,
+    physCritDamage: 0,
+    physCritRating: 0,
+    physHitRating: 0,
+    physPenetration: 0,
   };
   for (const item of args) {
     for (const key in baseModifier) {

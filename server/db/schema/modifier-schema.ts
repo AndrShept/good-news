@@ -22,24 +22,25 @@ export const modifierTable = pgTable('modifier', {
   manaRegen: integer().default(0).notNull(),
   healthRegen: integer().default(0).notNull(),
 
-  defense: integer().default(0).notNull(),
+  armor: integer().default(0).notNull(),
   magicResistance: integer().default(0).notNull(),
   evasion: integer().default(0).notNull(),
 
   spellDamage: integer().default(0).notNull(),
-  spellCritPower: integer().default(0).notNull(),
-  spellCritChance: integer().default(0).notNull(),
-  spellHitChance: integer().default(0).notNull(),
+  spellCritDamage: integer().default(0).notNull(),
+  spellCritRating: integer().default(0).notNull(),
+  spellHitRating: integer().default(0).notNull(),
+  spellPenetration: integer().default(0).notNull(),
 
   physDamage: integer().default(0).notNull(),
-  physCritPower: integer().default(0).notNull(),
-  physCritChance: integer().default(0).notNull(),
-  physHitChance: integer().default(0).notNull(),
+  physCritDamage: integer().default(0).notNull(),
+  physCritRating: integer().default(0).notNull(),
+  physHitRating: integer().default(0).notNull(),
+  physPenetration: integer().default(0).notNull(),
 
   heroId: uuid().references(() => heroTable.id, {
     onDelete: 'cascade',
   }),
-
 });
 
 export const modifierRelations = relations(modifierTable, ({ one }) => ({
@@ -47,5 +48,4 @@ export const modifierRelations = relations(modifierTable, ({ one }) => ({
     fields: [modifierTable.heroId],
     references: [heroTable.id],
   }),
-
 }));

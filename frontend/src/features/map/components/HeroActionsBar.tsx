@@ -22,7 +22,7 @@ export const HeroActionsBar = memo(({ heroPosX, heroPosY, map, state }: Props) =
   const entranceId = entranceTile?.id;
   const placeId = placeTile?.id;
   const image = entranceTile ? entranceTile.image : placeTile?.image;
-
+console.log(gatheringTiles)
   return (
     <>
       {(entranceTile || placeTile) && (

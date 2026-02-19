@@ -1,6 +1,7 @@
 import type { Layer } from './json-types';
+import { mapTemplate } from './templates/map-template';
 import type { GatheringCategorySkillKey } from './templates/skill-template';
-import type { IHeroStat, IPosition, StateType } from './types';
+import type { IHeroStat, IPosition, StateType, TileType } from './types';
 
 function isBlocked(x: number, y: number, layers: Layer[]): boolean {
   return layers.some((layer) => {
@@ -109,3 +110,48 @@ export const getHeroStateWithGatherSkillKey = (skillKey: GatheringCategorySkillK
   };
   return state[skillKey];
 };
+
+
+
+export const getTilesAroundHero = (pos: IPosition, radius = 1) => {
+  const tiles: IPosition[] = [];
+  for (let dx = -radius; dx <= radius; dx++) {
+    for (let dy = -radius; dy <= radius; dy++) {
+      if (dx === 0 && dy === 0) continue;
+      tiles.push({ x: pos.x + dx, y: pos.y + dy });
+    }
+  }
+  return tiles;
+};
+export const getMapLayerNameAtHeroPos = (mapId: string | undefined, pos: IPosition, radius: number = 1): TileType[] => {
+  const map = mapTemplate.find((m) => m.id === mapId);
+  if (!map) return [];
+
+  const index = pos.y * map.width + pos.x;
+
+  const result = new Set<TileType>();
+
+  for (const layer of map.layers) {
+    if (layer.name === 'GROUND' || layer.name === 'DECOR') continue;
+
+    if (layer.data[index]) {
+      result.add(layer.name as TileType);
+    }
+  }
+
+  const around = getTilesAroundHero(pos, radius);
+
+  for (const layer of map.layers) {
+    if (!around.length || layer.name !== 'WATER') continue;
+
+    for (const p of around) {
+      const i = p.y * map.width + p.x;
+      if (layer.data[i]) {
+        result.add(layer.name as TileType);
+      }
+    }
+  }
+
+  return [...result];
+};
+

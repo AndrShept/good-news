@@ -44,6 +44,7 @@ export const heroTable = pgTable('hero', {
   stat: jsonb('stat').$type<IHeroStat>().notNull(),
   regen: jsonb('regen').$type<THeroRegen>().notNull(),
   activeSkillTraining: jsonb('activeSkillTraining ').$type<ActiveSkillTraining>(),
+  gatheringFinishAt: integer(),
 
   groupId: uuid().references(() => groupTable.id, {
     onDelete: 'set null',
