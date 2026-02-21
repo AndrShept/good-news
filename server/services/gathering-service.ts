@@ -62,7 +62,7 @@ export const gatheringService = {
     if (!tileState) {
       tileState = {
         charges: this.setInitialCharges(x, y, WORLD_SEED),
-        respawnAt: Date.now(),
+        respawnAt: this.setRespawnTileState(),
         x,
         y,
       };
@@ -87,7 +87,7 @@ export const gatheringService = {
     return 3 + (hash(x, y, seed) % 5); // 3–7 ударів
   },
   setRespawnTileState() {
-    return Date.now() + 1000 * 60;
+    return Date.now() + 1000 * 20;
   },
   setGatherTileOnMap(heroId: string, gatherSkill: GatheringCategorySkillKey) {
     const hero = heroService.getHero(heroId);
@@ -112,10 +112,7 @@ export const gatheringService = {
         resultTileState = tileState;
         break;
       }
-      if (tileState && tileState.charges < 1 && Date.now() >= tileState.respawnAt) {
-        tileState.charges = gatheringService.setInitialCharges(tile.x, tile.y, WORLD_SEED);
-        tileState.respawnAt = this.setRespawnTileState()
-      }
+
     }
     console.log('resultTileState', resultTileState);
     if (!resultTileState) {

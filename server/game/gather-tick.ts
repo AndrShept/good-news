@@ -1,3 +1,4 @@
+
 import type { FinishGatheringData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 
@@ -19,6 +20,7 @@ export const gatherTick = (now: number) => {
           if (tileState) {
             --tileState.charges;
           }
+     
           break;
       }
       hero.state = 'IDLE';
