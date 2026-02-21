@@ -1,5 +1,4 @@
 import { useSocket } from '@/components/providers/SocketProvider';
-import { getSkillsOptions } from '@/features/skill/api/get-skills';
 import { useSkillUpdate } from '@/features/skill/hooks/useSkillUpdate';
 import { SelfHeroData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
@@ -30,6 +29,11 @@ export const useHeroListener = () => {
           break;
         case 'UPDATE_STATE':
           updateHero({ state: data.payload.state });
+          break;
+
+        case 'FINISH_GATHERING':
+          updateHero({ state: 'IDLE', gatheringFinishAt: null });
+          setGameMessage({ type: 'SUCCESS', text: 'END GATHER' });
           break;
       }
     };

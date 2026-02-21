@@ -2,11 +2,11 @@ import { client } from '@/lib/utils';
 import { GatheringCategorySkillKey } from '@/shared/templates/skill-template';
 import { ErrorResponse } from '@/shared/types';
 
-export const gatherResource = async ({ heroId, skillKey }: { heroId: string; skillKey: GatheringCategorySkillKey }) => {
-  const res = await client.hero[':id'].action.gather[':skillKey'].$post({
+export const gatherResource = async ({ heroId, gatherSkill }: { heroId: string; gatherSkill: GatheringCategorySkillKey }) => {
+  const res = await client.hero[':id'].action.gather[':gatherSkill'].$post({
     param: {
       id: heroId,
-      skillKey,
+      gatherSkill,
     },
   });
   if (!res.ok) {

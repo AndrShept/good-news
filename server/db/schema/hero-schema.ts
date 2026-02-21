@@ -16,7 +16,7 @@ export const stateTypeEnum = pgEnum('state_type_enum', [
   'ALCHEMY',
   'FISHING',
   'LUMBERJACKING',
-  'HERBALISM',
+  'FORAGING',
   'SKINNING',
   'MINING',
   'SMELTING',

@@ -13,10 +13,12 @@ export const useGatherResourceMutation = () => {
   const { updateHero } = useHeroUpdate();
 
   return useMutation({
-    mutationFn: ({ skillKey }: { skillKey: GatheringCategorySkillKey }) => gatherResource({ heroId, skillKey }),
+    mutationFn: ({ gatherSkill }: { gatherSkill: GatheringCategorySkillKey }) => gatherResource({ heroId, gatherSkill }),
 
-    async onSuccess(data, { skillKey }) {
-      
+    async onSuccess(data) {
+      updateHero({ state: data.data?.state, gatheringFinishAt: data.data?.gatheringFinishAt });
+      setGameMessage({ type: 'SUCCESS', text: data.message });
+     
     },
   });
 };

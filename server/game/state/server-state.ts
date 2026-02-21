@@ -13,6 +13,14 @@ import type { Socket } from 'socket.io';
 export type HeroRuntime = Hero & {
   paths?: PathNode[];
   offlineTimer?: number;
+  selectedGatherTile?: TileState;
+};
+
+export type TileState = {
+  charges: number;
+  respawnAt: number;
+  x: number;
+  y: number;
 };
 
 export const serverState = {
@@ -24,5 +32,6 @@ export const serverState = {
   pathPersistQueue: new Map<string, { x: number; y: number }>(),
   queueCraft: new Map<string, QueueCraft[]>(),
   socket: new Map<string, Socket>(),
+  worldResourceTiles: new Map<string, Map<string, TileState>>(),
 };
 console.log('SERVER STATE INIT', new Date().toLocaleTimeString());

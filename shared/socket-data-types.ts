@@ -77,7 +77,7 @@ export type QueueCraftItemSocketData =
       payload: { queueItemCraftId: string; status: QueueCraftStatusType; expiresAt: number };
     };
 
-export type SelfHeroData = RemoveBuffData | SkillUpData | HeroUpdateStateData;
+export type SelfHeroData = RemoveBuffData | SkillUpData | HeroUpdateStateData | FinishGatheringData;
 
 export type HeroUpdateStateData = {
   type: 'UPDATE_STATE';
@@ -93,6 +93,10 @@ export type RemoveBuffData = {
     buffInstanceId: string;
     hero?: Pick<Hero, 'currentHealth' | 'maxHealth' | 'currentMana' | 'maxMana' | 'modifier'>;
   };
+};
+export type FinishGatheringData = {
+  type: 'FINISH_GATHERING';
+  payload: {};
 };
 export type SkillUpData = {
   type: 'SKILL_UP';

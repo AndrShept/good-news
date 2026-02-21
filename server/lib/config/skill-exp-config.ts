@@ -31,7 +31,7 @@ export const skillExpConfig = {
   SKINNING: {
     difficultyMultiplier: 1.5,
   },
-  HERBALISM: {
+  FORAGING: {
     difficultyMultiplier: 1.5,
   },
 

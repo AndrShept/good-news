@@ -6,14 +6,14 @@ import { useWalkMapMutation } from '@/features/hero/hooks/useWalkMapMutation';
 import { StateType } from '@/shared/types';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { memo, useEffect, useState } from 'react';
-
 import { useCancelWalkMutation } from '../hooks/useCancelWalkMutation';
+
 
 type Props = {
   heroState: StateType;
 };
 
-export const MovingPathInfo = memo(function MovingPathInfo({ heroState }: Props) {
+export const MovingPanel = memo(function MovingPathInfo({ heroState }: Props) {
   const { movementPathTiles, setMovementPathTiles } = useMovementPathTileStore();
   const targetPos = movementPathTiles.at(-1);
   const [now, setNow] = useState(0);

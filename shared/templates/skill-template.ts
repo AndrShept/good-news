@@ -12,7 +12,7 @@ export const skillKeyValues = [
   'LUMBERJACKING',
   'MINING',
   'SKINNING',
-  'HERBALISM',
+  'FORAGING',
   'CLOTH_LORE',
   'INGOT_LORE',
   'LEATHER_LORE',
@@ -24,10 +24,10 @@ export const skillKeyValues = [
 ] as const;
 
 export type SkillKey = (typeof skillKeyValues)[number];
-export type GatheringCategorySkillKey = Extract<SkillKey, 'FISHING' | 'LUMBERJACKING' | 'MINING' | 'SKINNING' | 'HERBALISM'>;
+export type GatheringCategorySkillKey = Extract<SkillKey, 'FISHING' | 'LUMBERJACKING' | 'MINING' | 'SKINNING' | 'FORAGING'>;
 export type CraftingCategorySkillKey = Extract<SkillKey, 'BLACKSMITHING' | 'TAILORING' | 'ALCHEMY' | 'CARPENTRY'>;
 
-export const gatheringSkillKeysValues = ['FISHING', 'HERBALISM', 'LUMBERJACKING', 'MINING', 'SKINNING'] as const satisfies GatheringCategorySkillKey[]
+export const gatheringSkillKeysValues = ['FISHING', 'FORAGING', 'LUMBERJACKING', 'MINING', 'SKINNING'] as const satisfies GatheringCategorySkillKey[]
 
 export const skillsTemplate = [
   {
@@ -95,10 +95,10 @@ export const skillsTemplate = [
   },
   {
     id: 'a6ed4a4a-4ae9-4245-9b3a-cc0c37428493',
-    name: 'Herbalism',
+    name: 'FORAGING',
     image: imageConfig.icon.skill['HERBALISM'],
     category: 'GATHERING',
-    key: 'HERBALISM',
+    key: 'FORAGING',
   },
 
   {

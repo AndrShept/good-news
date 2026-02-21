@@ -1,6 +1,5 @@
-import { Layer } from '@/shared/json-types';
-import { mapTemplate } from '@/shared/templates/map-template';
-import { IPosition, OmitModifier, TileType } from '@/shared/types';
+
+import {  OmitModifier } from '@/shared/types';
 import { type ClassValue, clsx } from 'clsx';
 import { format, intervalToDuration } from 'date-fns';
 import { hc } from 'hono/client';

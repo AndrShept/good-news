@@ -1,6 +1,6 @@
 import { CustomTooltip } from '@/components/CustomTooltip';
 import { ModifierInfoCard } from '@/features/item-instance/components/ModifierInfoCard';
-import { cn, formatDurationFromSeconds } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { BuffInstance, BuffTemplate } from '@/shared/types';
 import { memo, useEffect, useState } from 'react';
 

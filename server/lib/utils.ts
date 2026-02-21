@@ -129,7 +129,7 @@ export const sumAllModifier = <T extends Partial<Modifier> | null | undefined>(.
     physCritDamage: 0,
     physCritRating: 0,
     physHitRating: 0,
-    physPenetration: 0
+    physPenetration: 0,
   };
 
   for (const item of args) {
@@ -183,13 +183,10 @@ export const getDisplayName = (itemTemplateId: string, resourceId: string | unde
   return displayName;
 };
 
-export const getStateWithCraftBuildingType = (craftBuildingType: CraftBuildingType) => {
-  const stateData: Record<CraftBuildingType, StateType> = {
-    BLACKSMITH: 'BLACKSMITHING',
-    ALCHEMY: 'ALCHEMY',
-    FORGE: 'SMELTING',
-    TAILOR: 'TAILORING',
-  };
 
-  return stateData[craftBuildingType];
-};
+
+export function hash(x: number, y: number, seed: number) {
+  let n = x * 374761393 + y * 668265263 + seed * 1446647;
+  n = (n ^ (n >> 13)) * 1274126177;
+  return Math.abs(n);
+}

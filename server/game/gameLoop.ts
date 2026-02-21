@@ -1,9 +1,10 @@
 import { performance } from 'node:perf_hooks';
 
 import { buffTick } from './buff-tick';
+import { gatherTick } from './gather-tick';
 import { moveTick } from './move-tick';
-import { regenTick } from './regen-tick';
 import { queueCraftTick } from './quue-craft-tick';
+import { regenTick } from './regen-tick';
 
 const TICK_RATE = 1000; // ms
 const MAX_CATCHUP_TICKS = 5;
@@ -22,7 +23,8 @@ export const gameLoop = () => {
 
     moveTick(lastTick);
     buffTick(lastTick);
-    queueCraftTick(lastTick)
+    queueCraftTick(lastTick);
+    gatherTick(lastTick);
     // regenTick(lastTick, TICK_RATE)
 
     lastTick += TICK_RATE;

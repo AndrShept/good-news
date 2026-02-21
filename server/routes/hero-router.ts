@@ -5,6 +5,7 @@ import {
   MANA_MULTIPLIER_INT,
   MAX_QUEUE_CRAFT_ITEM,
   RESET_STATS_COST,
+  WORLD_SEED,
 } from '@/shared/constants';
 import type { WalkMapCompleteData, WalkMapStartData } from '@/shared/socket-data-types';
 import { mapTemplate } from '@/shared/templates/map-template';
@@ -32,7 +33,13 @@ import {
   createHeroSchema,
   statsSchema,
 } from '@/shared/types';
-import { buildPathWithObstacles, getHeroStateWithGatherSkillKey } from '@/shared/utils';
+import {
+  buildPathWithObstacles,
+  getHeroStateWithGatherSkillKey,
+  getMapLayerNameAtHeroPos,
+  getStateWithCraftBuildingType,
+  getTilesAroundHero,
+} from '@/shared/utils';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq, lt, lte, ne, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -57,10 +64,10 @@ import {
   stateTypeEnum,
 } from '../db/schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
-import { serverState } from '../game/state/server-state';
+import { type TileState, serverState } from '../game/state/server-state';
 import { calculate } from '../lib/calculate';
 import { heroOnline } from '../lib/heroOnline';
-import { generateRandomUuid, getStateWithCraftBuildingType, verifyHeroOwnership } from '../lib/utils';
+import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
@@ -920,13 +927,13 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post(
-    '/:id/action/gather/:skillKey',
+    '/:id/action/gather/:gatherSkill',
     loggedIn,
-    zValidator('param', z.object({ id: z.string(), skillKey: z.enum(gatheringSkillKeysValues) })),
+    zValidator('param', z.object({ id: z.string(), gatherSkill: z.enum(gatheringSkillKeysValues) })),
 
     async (c) => {
       const user = c.get('user');
-      const { id, skillKey } = c.req.valid('param');
+      const { id, gatherSkill } = c.req.valid('param');
       const hero = heroService.getHero(id);
 
       if (hero.state !== 'IDLE') {
@@ -935,24 +942,45 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-      gatheringService.canStartGathering(hero.id, skillKey);
-      switch (skillKey) {
-        case 'MINING': {
-          break;
-        }
 
-        default:
-          throw new HTTPException(400, { message: 'skillKey not correct' });
-      }
+      gatheringService.setGatherTileOnMap(hero.id, gatherSkill);
+      const state = getHeroStateWithGatherSkillKey(gatherSkill);
+      const gatheringTime = Date.now() + 3000;
 
-      const state = getHeroStateWithGatherSkillKey(skillKey);
+      hero.state = state;
+      hero.gatheringFinishAt = gatheringTime;
+      const returnData = {
+        state: hero.state,
+        gatheringFinishAt: hero.gatheringFinishAt,
+      };
 
-      return c.json<SuccessResponse>({
-        message: 'gathering starting ',
+      return c.json<SuccessResponse<typeof returnData>>({
+        message: `You begin ${gatherSkill.toLowerCase()}.`,
         success: true,
+        data: returnData,
       });
     },
   )
+  .post('/:id/gather/cancel', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
+    const user = c.get('user');
+    const { id } = c.req.valid('param');
+    const hero = heroService.getHero(id);
+
+    if (hero.state === 'IDLE') {
+      throw new HTTPException(400, {
+        message: 'You need gathering resource',
+      });
+    }
+    verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+    hero.state = 'IDLE';
+    hero.gatheringFinishAt = null;
+
+    return c.json<SuccessResponse>({
+      message: `You cancel gathering.`,
+      success: true,
+    });
+  })
 
   .get(
     '/:id/queue-craft',
