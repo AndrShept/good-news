@@ -1,4 +1,4 @@
-import type { FinishGatheringData } from '@/shared/socket-data-types';
+import type { FinishGatheringData, HeroUpdateStateData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { HTTPException } from 'hono/http-exception';
 
@@ -6,6 +6,8 @@ import { io } from '..';
 import { gatheringService } from '../services/gathering-service';
 import { itemContainerService } from '../services/item-container-service';
 import { itemTemplateService } from '../services/item-template-service';
+import { progressionService } from '../services/progression-service';
+import { skillService } from '../services/skill-service';
 import { socketService } from '../services/socket-service';
 import { serverState } from './state/server-state';
 
@@ -28,6 +30,13 @@ export const gatherTick = (now: number) => {
 
       hero.state = 'IDLE';
       hero.gatheringFinishAt = null;
+      if (hero.location.mapId) {
+        const socketData: HeroUpdateStateData = {
+          type: 'UPDATE_STATE',
+          payload: { heroId: hero.id, state: hero.state },
+        };
+        io.to(hero.location.mapId).emit(socketEvents.mapUpdate(), socketData);
+      }
 
       const { x, y } = tileState;
       const gatherItem = gatheringService.getGatherReward({
@@ -37,7 +46,13 @@ export const gatherTick = (now: number) => {
         x,
         y,
       });
+
+      const gatherSkillInstance = skillService.getSkillByKey(heroId, gatherSkill);
+
       if (!gatherItem) {
+        const exp = progressionService.calculateGatherExp({ gatherSkillLevel: gatherSkillInstance.level });
+        const expResult = skillService.addExp(heroId, gatherSkill, exp);
+        socketService.sendToClientExpResult({ heroId, expResult });
         const socketData: FinishGatheringData = {
           type: 'FINISH_GATHERING',
           payload: {
@@ -52,12 +67,16 @@ export const gatherTick = (now: number) => {
       if (!itemTemplate) {
         throw new HTTPException(404, { message: 'itemTemplate not found' });
       }
+
+      const luck = hero.stat.luck;
+      const loreSkillKey = skillService.getLoreSkillByItemTemplateId(itemTemplate.id);
+      const lorSkillInstance = loreSkillKey ? skillService.getSkillByKey(heroId, loreSkillKey) : undefined;
       const backpack = itemContainerService.getBackpack(heroId);
 
       const quantity = gatheringService.getGatherRewardQuantity({
-        gatherSkill,
-        heroId,
-        itemTemplateId: itemTemplate.id,
+        luck,
+        gatherSkillLevel: gatherSkillInstance.level,
+        loreSkillLevel: lorSkillInstance?.level,
         maxQuantity: gatherItem.maxGatherQuantity,
       });
 
@@ -70,6 +89,13 @@ export const gatherTick = (now: number) => {
         itemTemplateId: itemTemplate.id,
         quantity,
       });
+      const exp = progressionService.calculateGatherExp({
+        gatherSkillLevel: gatherSkillInstance.level,
+        requiredMinSkill: gatherItem.requiredMinSkill,
+      });
+
+      const expResult = skillService.addExp(heroId, gatherSkill, exp);
+      socketService.sendToClientExpResult({ heroId, expResult });
 
       const socketData: FinishGatheringData = {
         type: 'FINISH_GATHERING',

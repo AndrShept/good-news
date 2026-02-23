@@ -19,6 +19,11 @@ interface CalculateLoreExp {
   coreResourceId: string | undefined;
 }
 
+interface CalculateGatherExp {
+  requiredMinSkill?: number;
+  gatherSkillLevel: number;
+}
+
 export const progressionService = {
   calculateCraftExp({ chance, coreResourceId, recipe, success }: CalculateCraftExp): number {
     let exp = Math.floor(recipe.requirement.skills[0].level * 8 + (recipe.timeMs / 1000) * 0.5);
@@ -66,7 +71,6 @@ export const progressionService = {
   },
 
   calculateBookExp(skillLevel: number, durationMs: number): number {
-    
     const hours = durationMs / (1000 * 60 * 60);
 
     const basePerHour = 300;
@@ -76,5 +80,27 @@ export const progressionService = {
     const exp = basePerHour * hours * levelScaling;
 
     return Math.max(1, Math.floor(exp));
+  },
+
+  calculateGatherExp({ requiredMinSkill, gatherSkillLevel }: CalculateGatherExp) {
+    const isSuccess = requiredMinSkill !== undefined;
+
+    // XP за спробу (для AFK стабільність)
+    const attemptXp = 3 + gatherSkillLevel * 0.03;
+
+    if (!isSuccess) {
+      return Math.floor(attemptXp);
+    }
+
+    const baseXp = 10 + requiredMinSkill * 0.4;
+
+    const levelDiff = gatherSkillLevel - requiredMinSkill;
+    const penalty = levelDiff > 0 ? levelDiff * 0.015 : 0;
+
+    const xpMultiplier = clamp(1 - penalty, 0.1, 1);
+
+    const successXp = baseXp * xpMultiplier;
+
+    return Math.floor(attemptXp + successXp);
   },
 };

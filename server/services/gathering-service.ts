@@ -34,10 +34,10 @@ interface GatheringTilesMap {
   SKINNING: [];
 }
 interface GetGatherRewardQuantity {
-  heroId: string;
-  gatherSkill: GatheringCategorySkillKey;
+  luck: number;
+  gatherSkillLevel: number;
+  loreSkillLevel: number | undefined;
   maxQuantity: number;
-  itemTemplateId: string;
 }
 
 export const gatheringService = {
@@ -187,13 +187,8 @@ export const gatheringService = {
       }
     }
   },
-  getGatherRewardQuantity({ gatherSkill, heroId, itemTemplateId, maxQuantity }: GetGatherRewardQuantity) {
-    const hero = heroService.getHero(heroId);
-    const luck = hero.stat.luck;
-    const loreSkillKey = skillService.getLoreSkillByItemTemplateId(itemTemplateId);
-    const lorSkillInstance = loreSkillKey ? skillService.getSkillByKey(heroId, loreSkillKey) : undefined;
-    const gatherSkillInstance = skillService.getSkillByKey(heroId, gatherSkill);
-    const chance = gatherSkillInstance.level * 0.001 + (lorSkillInstance?.level ?? 0) * 0.002 + luck * 0.0005;
+  getGatherRewardQuantity({ gatherSkillLevel, loreSkillLevel, luck, maxQuantity }: GetGatherRewardQuantity) {
+    const chance = gatherSkillLevel * 0.001 + (loreSkillLevel ?? 0) * 0.002 + luck * 0.0005;
 
     const finalChance = clamp(chance, 0, 0.5);
     if (finalChance > Math.random()) {
