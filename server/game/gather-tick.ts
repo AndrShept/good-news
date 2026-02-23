@@ -1,32 +1,86 @@
-
 import type { FinishGatheringData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
+import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
 import { gatheringService } from '../services/gathering-service';
+import { itemContainerService } from '../services/item-container-service';
+import { itemTemplateService } from '../services/item-template-service';
+import { socketService } from '../services/socket-service';
 import { serverState } from './state/server-state';
 
 export const gatherTick = (now: number) => {
   for (const [heroId, hero] of serverState.hero.entries()) {
     if (!hero.gatheringFinishAt) continue;
     if (now >= hero.gatheringFinishAt) {
-      if (!hero.location.mapId) continue;
+      if (!hero.location.mapId || !hero.selectedGatherTile) continue;
+      const gatherSkill = hero.selectedGatherTile.gatherSkillUsed;
+      const tileState = gatheringService.getGatherTileState(heroId, hero.selectedGatherTile.gatherSkillUsed);
 
-      switch (hero.state) {
-        case 'MINING':
-          break;
-        case 'FISHING':
-          const tileState = gatheringService.getGatherTileState(heroId, 'FISHING');
-          if (tileState) {
-            --tileState.charges;
-          }
-     
-          break;
-      }
+      const gatherActions = {
+        MINING: 'mine',
+        FISHING: 'catch',
+        LUMBERJACKING: 'chop',
+        FORAGING: 'gather',
+        SKINNING: 'skin',
+      };
+      if (!tileState) continue;
+
       hero.state = 'IDLE';
       hero.gatheringFinishAt = null;
 
-      const socketData: FinishGatheringData = { type: 'FINISH_GATHERING', payload: {} };
+      const { x, y } = tileState;
+      const gatherItem = gatheringService.getGatherReward({
+        gatherSkill,
+        heroId,
+        tileType: hero.selectedGatherTile.tileType,
+        x,
+        y,
+      });
+      if (!gatherItem) {
+        const socketData: FinishGatheringData = {
+          type: 'FINISH_GATHERING',
+          payload: {
+            heroId,
+            message: `You failed to ${gatherActions[gatherSkill]} this time.`,
+          },
+        };
+        io.to(heroId).emit(socketEvents.selfData(), socketData);
+        continue;
+      }
+      const itemTemplate = itemTemplateService.getAllItemsTemplate().find((i) => i.key === gatherItem.itemKey);
+      if (!itemTemplate) {
+        throw new HTTPException(404, { message: 'itemTemplate not found' });
+      }
+      const backpack = itemContainerService.getBackpack(heroId);
+
+      const quantity = gatheringService.getGatherRewardQuantity({
+        gatherSkill,
+        heroId,
+        itemTemplateId: itemTemplate.id,
+        maxQuantity: gatherItem.maxGatherQuantity,
+      });
+
+      tileState.charges -= quantity;
+
+      itemContainerService.createItem({
+        heroId,
+        coreResourceId: undefined,
+        itemContainerId: backpack.id,
+        itemTemplateId: itemTemplate.id,
+        quantity,
+      });
+
+      const socketData: FinishGatheringData = {
+        type: 'FINISH_GATHERING',
+        payload: {
+          heroId,
+          backpack,
+          itemName: itemTemplate.name,
+          quantity,
+          message: `You successfully ${gatherActions[gatherSkill]} the `,
+        },
+      };
       io.to(heroId).emit(socketEvents.selfData(), socketData);
     }
   }

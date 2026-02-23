@@ -26,8 +26,15 @@ export const skillKeyValues = [
 export type SkillKey = (typeof skillKeyValues)[number];
 export type GatheringCategorySkillKey = Extract<SkillKey, 'FISHING' | 'LUMBERJACKING' | 'MINING' | 'SKINNING' | 'FORAGING'>;
 export type CraftingCategorySkillKey = Extract<SkillKey, 'BLACKSMITHING' | 'TAILORING' | 'ALCHEMY' | 'CARPENTRY'>;
+export type LoreSkillKey = Extract<SkillKey, 'CLOTH_LORE' | 'INGOT_LORE' | 'LEATHER_LORE' | 'WOOD_LORE' | 'HERB_LORE' | 'ORE_LORE'>;
 
-export const gatheringSkillKeysValues = ['FISHING', 'FORAGING', 'LUMBERJACKING', 'MINING', 'SKINNING'] as const satisfies GatheringCategorySkillKey[]
+export const gatheringSkillKeysValues = [
+  'FISHING',
+  'FORAGING',
+  'LUMBERJACKING',
+  'MINING',
+  'SKINNING',
+] as const satisfies GatheringCategorySkillKey[];
 
 export const skillsTemplate = [
   {

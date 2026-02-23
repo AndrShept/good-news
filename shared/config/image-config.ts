@@ -67,7 +67,7 @@ export const imageConfig = {
       SMELTING: '/sprites/icons/state/smelting.png',
       TAILORING: '/sprites/icons/state/tailoring.png',
       SKINNING: '/sprites/icons/skills/skinning.png',
-      HERBALISM: '/sprites/icons/skills/herb-lore.png',
+      FORAGING: '/sprites/icons/skills/herb-lore.png',
       ALCHEMY: '/sprites/icons/skills/alchemy.png',
     } as Record<StateType, string>,
     skill: {

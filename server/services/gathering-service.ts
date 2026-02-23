@@ -1,21 +1,43 @@
-import { gatheringConfig } from '@/shared/config/gathering-config';
-import { WORLD_SEED } from '@/shared/constants';
+import { TILE_BASE_RESPAWN_TIME, TILE_INITIAL_CHARGES, WORLD_SEED } from '@/shared/constants';
 import { type GatheringCategorySkillKey, skillTemplateByKey } from '@/shared/templates/skill-template';
 import { toolsTemplate } from '@/shared/templates/tool-template';
-import type { IPosition, OmitTileType, TileType } from '@/shared/types';
+import type { FishingTileTpe, ForagingTileTpe, IPosition, LumberTileType, MiningTileType, OmitTileType, TileType } from '@/shared/types';
 import { getMapLayerNameAtHeroPos } from '@/shared/utils';
 import { HTTPException } from 'hono/http-exception';
 
 import { type TileState, serverState } from '../game/state/server-state';
-import { type GatheringTable, MINING_TABLE } from '../lib/config/resource-config';
-import { clamp, hash } from '../lib/utils';
+import { type GatheringItem, MINING_TABLE } from '../lib/config/gathering-tile-table';
+import { clamp, getRandomValue, hash } from '../lib/utils';
 import { heroService } from './hero-service';
+import { itemContainerService } from './item-container-service';
+import { skillService } from './skill-service';
 
 interface GetOrCreateGatherTileState {
   gatherSkill: GatheringCategorySkillKey;
   x: number;
   y: number;
   mapId: string | null;
+}
+interface GetGatherReward {
+  heroId: string;
+  tileType: OmitTileType;
+  gatherSkill: GatheringCategorySkillKey;
+  x: number;
+  y: number;
+}
+
+interface GatheringTilesMap {
+  FISHING: FishingTileTpe[];
+  FORAGING: ForagingTileTpe[];
+  LUMBERJACKING: LumberTileType[];
+  MINING: MiningTileType[];
+  SKINNING: [];
+}
+interface GetGatherRewardQuantity {
+  heroId: string;
+  gatherSkill: GatheringCategorySkillKey;
+  maxQuantity: number;
+  itemTemplateId: string;
 }
 
 export const gatheringService = {
@@ -33,10 +55,10 @@ export const gatheringService = {
     return tileState;
   },
 
-  getTilesTypeByGatherSkill(gatherSkill: GatheringCategorySkillKey) {
-    const tileTypeData: Record<GatheringCategorySkillKey, OmitTileType[]> = {
+  getTilesTypeByGatherSkill<K extends GatheringCategorySkillKey>(gatherSkill: K): GatheringTilesMap[K] {
+    const tileTypeData: GatheringTilesMap = {
       FISHING: ['DEEP_WATER', 'WATER'],
-      FORAGING: ['FOREST', 'MEADOW'],
+      FORAGING: ['FOREST', 'MEADOW', 'PLAINS'],
       LUMBERJACKING: ['FOREST', 'DARK_FOREST'],
       MINING: ['CAVE', 'STONE'],
       SKINNING: [],
@@ -76,18 +98,24 @@ export const gatheringService = {
   canStartGathering(heroId: string, skillKey: GatheringCategorySkillKey) {
     const skillTemplate = skillTemplateByKey[skillKey];
     const hero = heroService.getHero(heroId);
+    const backpack = itemContainerService.getBackpack(hero.id);
     const tool = toolsTemplate.find((t) => t.toolInfo.skillTemplateId === skillTemplate.id);
     if (!tool) throw new HTTPException(404, { message: 'tool not found' });
     if (!hero.location.mapId) throw new HTTPException(400, { message: 'You must be on a map to start gathering.' });
     const equipTool = hero.equipments.find((e) => e.itemTemplateId === tool.id);
-    if (!equipTool)
-      throw new HTTPException(400, { message: `You must equip ${tool.name} to start ${skillTemplate.name}.}`, cause: { canShow: true } });
+    if (!equipTool) {
+      throw new HTTPException(400, {
+        message: `You must equip ${tool.name} to start ${skillTemplate.name.toLowerCase()}.`,
+        cause: { canShow: true },
+      });
+    }
+    itemContainerService.checkFreeContainerCapacity(backpack.id);
   },
   setInitialCharges(x: number, y: number, seed: number) {
-    return 3 + (hash(x, y, seed) % 5); // 3–7 ударів
+    return TILE_INITIAL_CHARGES + (hash(x, y, seed) % 5); // 3–7 ударів
   },
   setRespawnTileState() {
-    return Date.now() + 1000 * 20;
+    return Date.now() + TILE_BASE_RESPAWN_TIME;
   },
   setGatherTileOnMap(heroId: string, gatherSkill: GatheringCategorySkillKey) {
     const hero = heroService.getHero(heroId);
@@ -106,98 +134,71 @@ export const gatheringService = {
     }
 
     let resultTileState: undefined | TileState = undefined;
+    let tileType: OmitTileType | null = null;
     for (const tile of tilesAroundHero) {
       const tileState = gatheringService.getOrCreateGatherTileState({ mapId: hero.location.mapId, x: tile.x, y: tile.y, gatherSkill });
       if (tileState && tileState.charges > 0) {
         resultTileState = tileState;
+        tileType = tile.tileType;
         break;
       }
-
     }
     console.log('resultTileState', resultTileState);
     if (!resultTileState) {
       throw new HTTPException(409, { message: 'This vein has been depleted. Try again later.', cause: { canShow: true } });
     }
-    hero.selectedGatherTile = resultTileState;
+    if (tileType) {
+      hero.selectedGatherTile = { gatherSkillUsed: gatherSkill, x: resultTileState.x, y: resultTileState.y, tileType };
+    }
   },
+  getGatherReward({ gatherSkill, tileType, x, y, heroId }: GetGatherReward) {
+    let table: GatheringItem[] | null = null;
+    const skillInstance = skillService.getSkillByKey(heroId, gatherSkill);
+    switch (gatherSkill) {
+      case 'MINING':
+        table = MINING_TABLE[tileType as MiningTileType];
+        break;
+    }
+    if (!table) return;
+    const totalChance = table.reduce((sum, o) => sum + o.chance, 0);
+    const value = hash(x, y, WORLD_SEED) % totalChance;
+    let cumulative = 0;
+    for (const tableItem of table) {
+      cumulative += tableItem.chance;
+      if (value < cumulative) {
+        const diff = (skillInstance.level - tableItem.requiredMinSkill) / 100;
+        const finishChance = diff < 0 ? diff : diff + 0.25;
+        const successChance = clamp(finishChance, 0.01, 0.95);
+        if (successChance > Math.random()) {
+          console.log('-------PROK-------', tableItem);
+          console.log('tableItem', successChance);
+          return tableItem;
+        }
+      }
+    }
+    {
+      const fallback = table[0];
+      const diff = (skillInstance.level - fallback.requiredMinSkill) / 100;
+      const finishChance = diff < 0 ? diff : diff + 0.25;
+      const successChance = clamp(finishChance, 0.05, 0.95);
+      console.log('FALLBACK', successChance);
+      if (successChance > Math.random()) {
+        return fallback;
+      }
+    }
+  },
+  getGatherRewardQuantity({ gatherSkill, heroId, itemTemplateId, maxQuantity }: GetGatherRewardQuantity) {
+    const hero = heroService.getHero(heroId);
+    const luck = hero.stat.luck;
+    const loreSkillKey = skillService.getLoreSkillByItemTemplateId(itemTemplateId);
+    const lorSkillInstance = loreSkillKey ? skillService.getSkillByKey(heroId, loreSkillKey) : undefined;
+    const gatherSkillInstance = skillService.getSkillByKey(heroId, gatherSkill);
+    const chance = gatherSkillInstance.level * 0.001 + (lorSkillInstance?.level ?? 0) * 0.002 + luck * 0.0005;
 
-  //   getTileType(pos: IPosition, gatherSkillKey: GatheringCategorySkillKey) {
-  //     const tilesAroundHero = getMapLayerNameAtHeroPos(hero.location.mapId, pos);
-  //     let existTile: TileType | null = null;
-  //     for (const tile of tilesAroundHero) {
-  //       if (gatheringConfig[tile as Exclude<TileType, 'GROUND' | 'OBJECT'>].skillKey === skillKey) {
-  //         existTile = tile;
-  //       }
-  //     }
-  //     if (!existTile) {
-  //       throw new HTTPException(400, { message: `There is nothing to gather here.` });
-  //     }
-  //     console.log(tilesAroundHero);
-  //   },
-
-  //   getGatheringResourceType(tileType: OmitTileType, x: number, y: number, seed: number) {
-  //     let table: GatheringTable[] | null = null;
-  //     switch (tileType) {
-  //       case 'STONE':
-  //       case 'CAVE':
-  //         table = MINING_TABLE[tileType];
-  //         break;
-  //     }
-  //     if (!table) return;
-  //     const totalChance = table.reduce((sum, o) => sum + o.chance, 0);
-  //     const value = hash(x, y, seed) % totalChance;
-  //     let cumulative = 0;
-  //     for (const ore of table) {
-  //       cumulative += ore.chance;
-  //       if (value < cumulative) return ore;
-  //     }
-  //     return table[0];
-  //   },
-  //    getInitialCharges(x: number, y: number, seed: number) {
-  //   return 3 + (hash(x, y, seed) % 5) // 3–7 ударів
-  // }
-
-  //   mine(heroId: string) {
-  //   const hero = heroService.getHero(heroId);
-  //   const { x, y, mapId } = hero.location;
-
-  //   const ore = this.getGatheringResourceType(x, y, WORLD_SEED);
-  //   const vein = getOrCreateVeinState(mapId, x, y);
-
-  //   if (vein.charges <= 0) {
-  //     if (Date.now() < vein.respawnAt) return 'EMPTY';
-  //     vein.charges = this.getInitialCharges(x, y, WORLD_SEED);
-  //   }
-
-  //   const diff = hero.mining - ore.requiredMinSkill;
-
-  //   // якщо скіл менший — даємо downgrade до Iron
-  //   if (diff < 0) {
-  //     const fallback = ORE_TABLE[0]; // IRON
-  //     const baseChance = clamp(hero.mining / 100, 0.05, 0.8);
-
-  //     if (Math.random() > baseChance)
-  //       return 'FAIL';
-
-  //     vein.charges--;
-  //     return fallback.oreType;
-  //   }
-
-  //   // нормальний success roll
-  //   const successChance = clamp(
-  //     0.5 + diff / 100,   // чим більший diff — тим стабільніше
-  //     0.1,
-  //     0.98
-  //   );
-
-  //   if (Math.random() > successChance)
-  //     return 'FAIL';
-
-  //   vein.charges--;
-
-  //   if (vein.charges <= 0)
-  //     vein.respawnAt = Date.now() + 10 * 60 * 1000;
-
-  //   return ore.oreType;
-  // }
+    const finalChance = clamp(chance, 0, 0.5);
+    if (finalChance > Math.random()) {
+      return getRandomValue(2, maxQuantity);
+    }
+    return 1;
+  },
 };

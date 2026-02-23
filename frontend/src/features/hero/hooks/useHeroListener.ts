@@ -1,4 +1,6 @@
 import { useSocket } from '@/components/providers/SocketProvider';
+import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
+import { useItemContainerUpdate } from '@/features/item-container/hooks/useItemContainerUpdate';
 import { useSkillUpdate } from '@/features/skill/hooks/useSkillUpdate';
 import { SelfHeroData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
@@ -14,6 +16,8 @@ export const useHeroListener = () => {
   const { removeBuff } = useBuff();
   const { updateHero } = useHeroUpdate();
   const { updateSkill } = useSkillUpdate();
+  const { updateItemContainer } = useItemContainerUpdate();
+  const backpackId = useGetBackpackId();
   const heroId = useHeroId();
   const setGameMessage = useSetGameMessage();
   useEffect(() => {
@@ -33,7 +37,15 @@ export const useHeroListener = () => {
 
         case 'FINISH_GATHERING':
           updateHero({ state: 'IDLE', gatheringFinishAt: null });
-          setGameMessage({ type: 'SUCCESS', text: 'END GATHER' });
+          setGameMessage({
+            type: data.payload.itemName ? 'SUCCESS' : 'ERROR',
+            text: data.payload.message,
+            data: data.payload.itemName ? [{ name: data.payload.itemName, quantity: data.payload.quantity }] : undefined,
+          });
+          if (data.payload.backpack && data.payload.itemName) {
+            updateItemContainer(backpackId, { ...data.payload.backpack });
+          }
+
           break;
       }
     };

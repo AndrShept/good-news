@@ -1,4 +1,4 @@
-import { type SkillKey, skillTemplateById, skillTemplateByKey } from '@/shared/templates/skill-template';
+import { type LoreSkillKey, type SkillKey, skillTemplateById, skillTemplateByKey } from '@/shared/templates/skill-template';
 import type { RecipeTemplate, ResourceCategoryType, SkillInstance } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
@@ -63,7 +63,7 @@ export const skillService = {
       throw new HTTPException(409, { message: `Your ${template.name} skill level is too low.`, cause: { canShow: true } });
   },
   getLoreSkillKey(recipe: RecipeTemplate, coreResourceId: string | undefined) {
-    const loreSkillByResourceCategory: Record<ResourceCategoryType, SkillKey> = {
+    const loreSkillByResourceCategory: Record<ResourceCategoryType, LoreSkillKey> = {
       INGOT: 'INGOT_LORE',
       LEATHER: 'LEATHER_LORE',
       CLOTH: 'CLOTH_LORE',
@@ -80,5 +80,19 @@ export const skillService = {
     }
 
     return loreSkillByResourceCategory[recipe.requirement.category];
+  },
+  getLoreSkillByItemTemplateId(itemTemplateId: string) {
+    const template = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
+    if (!template.resourceInfo) return;
+    const loreSkillByResourceCategory: Record<ResourceCategoryType, LoreSkillKey> = {
+      INGOT: 'INGOT_LORE',
+      LEATHER: 'LEATHER_LORE',
+      CLOTH: 'CLOTH_LORE',
+      ORE: 'ORE_LORE',
+      WOOD: 'WOOD_LORE',
+      HERB: 'HERB_LORE',
+    };
+
+    return loreSkillByResourceCategory[template.resourceInfo.category];
   },
 };

@@ -181,10 +181,6 @@ export type TLocation = typeof locationTable.$inferSelect;
 
 // export const placeValues = ['TOWN', 'DUNGEON', 'MINE'] as const;
 // export type PlaceType = (typeof placeValues)[number];
-export type TileType = (typeof tileTypeValues)[number];
-export type OmitTileType = Exclude<TileType, 'OBJECT' | 'GROUND'>;
-export type MiningTileType = Extract<TileType, 'CAVE' | 'STONE'>;
-export type FishingTileTpe = Extract<TileType, 'WATER' | 'DEEP_WATER'>;
 
 export const placeEntranceValues = ['DUNGEON', 'MINE'] as const;
 export type PlaceEntranceType = (typeof placeEntranceValues)[number];
@@ -238,10 +234,28 @@ export interface QueueCraft {
 
 export const buildingValues = ['MAGIC-SHOP', 'TEMPLE', 'BANK', 'BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY'] as const;
 export const craftBuildingValues = ['BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY'] as const;
-export const tileTypeValues = ['OBJECT', 'GROUND', 'WATER', 'DEEP_WATER', 'CAVE', 'STONE', 'FOREST', 'DARK_FOREST', 'MEADOW'] as const;
+export const tileTypeValues = [
+  'OBJECT',
+  'GROUND',
+  'WATER',
+  'DEEP_WATER',
+  'CAVE',
+  'STONE',
+  'FOREST',
+  'DARK_FOREST',
+  'MEADOW',
+  'PLAINS',
+] as const;
 export type BuildingType = (typeof buildingValues)[number];
 export type CraftBuildingType = Extract<BuildingType, 'BLACKSMITH' | 'FORGE' | 'TAILOR' | 'ALCHEMY'>;
 export type SelectCoreResourceBuildingType = Extract<CraftBuildingType, 'TAILOR' | 'BLACKSMITH'>;
+
+export type TileType = (typeof tileTypeValues)[number];
+export type OmitTileType = Exclude<TileType, 'OBJECT' | 'GROUND'>;
+export type MiningTileType = Extract<TileType, 'CAVE' | 'STONE'>;
+export type LumberTileType = Extract<TileType, 'FOREST' | 'DARK_FOREST'>;
+export type FishingTileTpe = Extract<TileType, 'WATER' | 'DEEP_WATER'>;
+export type ForagingTileTpe = Extract<TileType, 'FOREST' | 'MEADOW' | 'PLAINS'>;
 
 export type Building = {
   id: string;

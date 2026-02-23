@@ -1,5 +1,6 @@
 import {
   BANK_CONTAINER_COST,
+  BASE_GATHERING_TIME,
   BASE_STATS,
   HP_MULTIPLIER_COST,
   MANA_MULTIPLIER_INT,
@@ -7,7 +8,7 @@ import {
   RESET_STATS_COST,
   WORLD_SEED,
 } from '@/shared/constants';
-import type { WalkMapCompleteData, WalkMapStartData } from '@/shared/socket-data-types';
+import type { HeroUpdateStateData, WalkMapCompleteData, WalkMapStartData } from '@/shared/socket-data-types';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
@@ -942,13 +943,21 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
+      gatheringService.canStartGathering(hero.id, gatherSkill);
       gatheringService.setGatherTileOnMap(hero.id, gatherSkill);
       const state = getHeroStateWithGatherSkillKey(gatherSkill);
-      const gatheringTime = Date.now() + 3000;
+      const gatheringTime = Date.now() + BASE_GATHERING_TIME;
 
       hero.state = state;
       hero.gatheringFinishAt = gatheringTime;
+
+      if (hero.location.mapId) {
+        const socketData: HeroUpdateStateData = {
+          type: 'UPDATE_STATE',
+          payload: { heroId: hero.id, state },
+        };
+        io.to(hero.location.mapId).emit(socketEvents.mapUpdate(), socketData);
+      }
       const returnData = {
         state: hero.state,
         gatheringFinishAt: hero.gatheringFinishAt,

@@ -1,8 +1,10 @@
+import type { GatheringCategorySkillKey } from '@/shared/templates/skill-template';
 import type {
   BuffInstance,
   BuffTemplate,
   CraftBuildingType,
   Hero,
+  OmitTileType,
   PathNode,
   QueueCraft,
   SkillInstance,
@@ -13,7 +15,12 @@ import type { Socket } from 'socket.io';
 export type HeroRuntime = Hero & {
   paths?: PathNode[];
   offlineTimer?: number;
-  selectedGatherTile?: TileState;
+  selectedGatherTile?: {
+    x: number;
+    y: number;
+    gatherSkillUsed: GatheringCategorySkillKey;
+    tileType: OmitTileType;
+  };
 };
 
 export type TileState = {

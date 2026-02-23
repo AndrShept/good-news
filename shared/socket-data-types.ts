@@ -96,7 +96,7 @@ export type RemoveBuffData = {
 };
 export type FinishGatheringData = {
   type: 'FINISH_GATHERING';
-  payload: {};
+  payload: { heroId: string; backpack?: TItemContainer; itemName?: string; quantity?: number; message: string };
 };
 export type SkillUpData = {
   type: 'SKILL_UP';

@@ -6,7 +6,8 @@ import { memo } from 'react';
 
 import { GatherSkillButton } from './GatherSkillButton';
 import { TravelButton } from './TravelButton';
-import { GatheringPanel } from './gatheringPanel';
+import { GatheringPanel } from './GatheringPanel';
+
 
 interface Props {
   map: TMap | undefined;
