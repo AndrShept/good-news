@@ -28,27 +28,34 @@ export const skillService = {
   },
 
   getExpSkillToNextLevel(skillKey: SkillKey, skillLevel: number) {
-    return Math.floor(100 * Math.pow(skillLevel, skillExpConfig[skillKey].difficultyMultiplier));
+    const baseExp = 10;
+    const growth = 1.08; // наскільки EXP росте з кожним 0.1 рівнем
+    const multiplier = skillExpConfig[skillKey].difficultyMultiplier;
+
+    // skillLevel може бути float (0.0, 0.1, 0.2 ...)
+    return Math.floor(baseExp * Math.pow(skillLevel + 1, growth * multiplier));
   },
 
   addExp(heroId: string, skillKey: SkillKey, amount: number) {
     const skill = this.getSkillByKey(heroId, skillKey);
+    const skillTemplate = skillTemplateByKey[skillKey];
     let expToLevel = this.getExpSkillToNextLevel(skillKey, skill.level);
     skill.currentExperience += amount;
 
     const result = {
-      message: `Your gain skill ${skillKey.toLowerCase()}`,
+      message: `Your gain skill ${skillTemplate.name}`,
       isLevelUp: false,
       amount,
       skillInstanceId: skill.id,
     };
-
+    let increment = 0;
     while (skill.currentExperience >= expToLevel) {
-      skill.level++;
+      skill.level += 0.1;
+      increment += 0.1;
       skill.currentExperience -= expToLevel;
       expToLevel = this.getExpSkillToNextLevel(skillKey, skill.level);
       skill.expToLvl = expToLevel;
-      result.message = `Congratulation! your  skill ${skillKey.toLowerCase()} up to level ${skill.level} 🔥`;
+      result.message = `Your skill in ${skillTemplate.name} has increased by ${increment}. It is now ${skill.level.toFixed(1)}  🔥`;
       result.isLevelUp = true;
     }
 

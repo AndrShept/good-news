@@ -193,7 +193,7 @@ export const gatheringService = {
       return result;
     }
   },
-  getGatherSuccessChance() {},
+ 
   getGatherRewardQuantity({ gatherSkillLevel, loreSkillLevel, luck, maxQuantity }: GetGatherRewardQuantity) {
     const chance = gatherSkillLevel * 0.001 + (loreSkillLevel ?? 0) * 0.002 + luck * 0.0005;
 

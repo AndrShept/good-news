@@ -51,7 +51,7 @@ export const progressionService = {
     const baseXp = 5 + requiredMinSkill * 1.5;
 
     // 2️⃣ Бонус за час
-    const timeBonus = (timeMs / 1000) * 0.4;
+    const timeBonus = 0   // (timeMs / 1000) * 0.4;
 
     // 3️⃣ Якщо рівень сильно перевищує складність — менше EXP
     const levelDiff = (loreSkillLevel ?? 0) - requiredMinSkill;

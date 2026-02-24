@@ -20,7 +20,7 @@ export const MANA_MULTIPLIER_INT = 15;
 export const MAX_QUEUE_CRAFT_ITEM = 3;
 export const WORLD_SEED = 12345;
 
-export const BASE_GATHERING_TIME = 3000;
+export const BASE_GATHERING_TIME = 3_000;
 export const TILE_INITIAL_CHARGES = 3;
 export const TILE_BASE_RESPAWN_TIME = 40_000;
 

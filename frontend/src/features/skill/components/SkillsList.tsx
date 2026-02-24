@@ -17,16 +17,16 @@ export const SkillsList = () => {
           return (
             <li key={skill.id} className="relative flex w-full flex-col gap-1">
               <div className="inline-flex items-center justify-between gap-1 text-[15px]">
-                <div className="flex w-full max-w-[115x] items-center gap-1">
+                <div className="flex w-full  items-center gap-1 truncate">
                   <GameIcon className="size-6" image={template.image} />
                   <span className="text-muted-foreground truncate">{template.name} </span>
                 </div>
 
-                <div className="text-base font-semibold">{skill.level}</div>
+                <div className="text-base ">{skill.level.toFixed(1)}</div>
               </div>
               <div className="relative flex flex-col gap-0.5">
                 <Progress
-                  className="bg-background h-3 rounded border"
+                  className="bg-background h-2 rounded-none border"
                   progressClassName="bg-sky-500"
                   value={(skill.currentExperience / skill.expToLvl) * 100}
                 />
