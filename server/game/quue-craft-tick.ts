@@ -72,9 +72,9 @@ export const queueCraftTick = (now: number) => {
         coreResourceId: queue.coreResourceId,
       });
       const finalExpLoreSkill = progressionService.calculateLoreExp({
-        chance,
-        coreResourceId: queue.coreResourceId,
-        recipe,
+        loreSkillLevel: loreSkillInstance.level,
+        timeMs: recipe.timeMs,
+        requiredMinSkill: recipe.requirement.skills[0].level,
         success: successCraft,
       });
       const expResult = skillService.addExp(heroId, skillKey, finalExp);

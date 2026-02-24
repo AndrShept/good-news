@@ -6,7 +6,7 @@ import { getMapLayerNameAtHeroPos } from '@/shared/utils';
 import { HTTPException } from 'hono/http-exception';
 
 import { type TileState, serverState } from '../game/state/server-state';
-import { type GatheringItem, MINING_TABLE } from '../lib/config/gathering-tile-table';
+import { type GatheringTableItem, MINING_TABLE } from '../lib/table/core-resource-table';
 import { clamp, getRandomValue, hash } from '../lib/utils';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
@@ -151,8 +151,8 @@ export const gatheringService = {
       hero.selectedGatherTile = { gatherSkillUsed: gatherSkill, x: resultTileState.x, y: resultTileState.y, tileType };
     }
   },
-  getGatherReward({ gatherSkill, tileType, x, y, heroId }: GetGatherReward) {
-    let table: GatheringItem[] | null = null;
+  getGatherTableItem({ gatherSkill, tileType, x, y, heroId }: GetGatherReward) {
+    let table: GatheringTableItem[] | null = null;
     const skillInstance = skillService.getSkillByKey(heroId, gatherSkill);
     switch (gatherSkill) {
       case 'MINING':
@@ -163,30 +163,37 @@ export const gatheringService = {
     const totalChance = table.reduce((sum, o) => sum + o.chance, 0);
     const value = hash(x, y, WORLD_SEED) % totalChance;
     let cumulative = 0;
+    const result= { gatherItem: table[0], success: false };
     for (const tableItem of table) {
       cumulative += tableItem.chance;
       if (value < cumulative) {
         const diff = (skillInstance.level - tableItem.requiredMinSkill) / 100;
         const finishChance = diff < 0 ? diff : diff + 0.25;
-        const successChance = clamp(finishChance, 0.01, 0.95);
+        const successChance = clamp(finishChance, 0.0002, 0.95);
+        result.gatherItem = tableItem;
         if (successChance > Math.random()) {
           console.log('-------PROK-------', tableItem);
           console.log('tableItem', successChance);
-          return tableItem;
+          result.success = true;
+          return result;
         }
       }
     }
     {
       const fallback = table[0];
       const diff = (skillInstance.level - fallback.requiredMinSkill) / 100;
+      result.gatherItem = fallback;
       const finishChance = diff < 0 ? diff : diff + 0.25;
       const successChance = clamp(finishChance, 0.05, 0.95);
       console.log('FALLBACK', successChance);
       if (successChance > Math.random()) {
-        return fallback;
+        result.success = true;
       }
+  
+      return result;
     }
   },
+  getGatherSuccessChance() {},
   getGatherRewardQuantity({ gatherSkillLevel, loreSkillLevel, luck, maxQuantity }: GetGatherRewardQuantity) {
     const chance = gatherSkillLevel * 0.001 + (loreSkillLevel ?? 0) * 0.002 + luck * 0.0005;
 

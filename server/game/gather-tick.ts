@@ -1,3 +1,4 @@
+import { BASE_GATHERING_TIME } from '@/shared/constants';
 import type { FinishGatheringData, HeroUpdateStateData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { HTTPException } from 'hono/http-exception';
@@ -39,31 +40,33 @@ export const gatherTick = (now: number) => {
       }
 
       const { x, y } = tileState;
-      const gatherItem = gatheringService.getGatherReward({
+      const gatherResult = gatheringService.getGatherTableItem({
         gatherSkill,
         heroId,
         tileType: hero.selectedGatherTile.tileType,
         x,
         y,
       });
+      if (!gatherResult) continue;
+
+      // if (!gatherResult.success) {
+      //   const exp = progressionService.calculateGatherExp({ gatherSkillLevel: gatherSkillInstance.level });
+      //   const expResult = skillService.addExp(heroId, gatherSkill, exp);
+      //   socketService.sendToClientExpResult({ heroId, expResult });
+      //   const socketData: FinishGatheringData = {
+      //     type: 'FINISH_GATHERING',
+      //     payload: {
+      //       heroId,
+      //       message: `You failed to ${gatherActions[gatherSkill]} this time.`,
+      //     },
+      //   };
+      //   io.to(heroId).emit(socketEvents.selfData(), socketData);
+      //   continue;
+      // }
 
       const gatherSkillInstance = skillService.getSkillByKey(heroId, gatherSkill);
 
-      if (!gatherItem) {
-        const exp = progressionService.calculateGatherExp({ gatherSkillLevel: gatherSkillInstance.level });
-        const expResult = skillService.addExp(heroId, gatherSkill, exp);
-        socketService.sendToClientExpResult({ heroId, expResult });
-        const socketData: FinishGatheringData = {
-          type: 'FINISH_GATHERING',
-          payload: {
-            heroId,
-            message: `You failed to ${gatherActions[gatherSkill]} this time.`,
-          },
-        };
-        io.to(heroId).emit(socketEvents.selfData(), socketData);
-        continue;
-      }
-      const itemTemplate = itemTemplateService.getAllItemsTemplate().find((i) => i.key === gatherItem.itemKey);
+      const itemTemplate = itemTemplateService.getAllItemsTemplate().find((i) => i.key === gatherResult.gatherItem?.itemKey);
       if (!itemTemplate) {
         throw new HTTPException(404, { message: 'itemTemplate not found' });
       }
@@ -77,23 +80,34 @@ export const gatherTick = (now: number) => {
         luck,
         gatherSkillLevel: gatherSkillInstance.level,
         loreSkillLevel: lorSkillInstance?.level,
-        maxQuantity: gatherItem.maxGatherQuantity,
+        maxQuantity: gatherResult.gatherItem.maxGatherQuantity,
       });
+      if (gatherResult.success) {
+        tileState.charges -= quantity;
+        itemContainerService.createItem({
+          heroId,
+          coreResourceId: undefined,
+          itemContainerId: backpack.id,
+          itemTemplateId: itemTemplate.id,
+          quantity,
+        });
+      }
 
-      tileState.charges -= quantity;
-
-      itemContainerService.createItem({
-        heroId,
-        coreResourceId: undefined,
-        itemContainerId: backpack.id,
-        itemTemplateId: itemTemplate.id,
-        quantity,
-      });
       const exp = progressionService.calculateGatherExp({
         gatherSkillLevel: gatherSkillInstance.level,
-        requiredMinSkill: gatherItem.requiredMinSkill,
+        requiredMinSkill: gatherResult.gatherItem.requiredMinSkill,
+        success: gatherResult.success,
       });
-
+      const expLore = progressionService.calculateLoreExp({
+        loreSkillLevel: lorSkillInstance?.level,
+        requiredMinSkill: gatherResult.gatherItem.requiredMinSkill,
+        success: gatherResult.success,
+        timeMs: BASE_GATHERING_TIME,
+      });
+      if (loreSkillKey) {
+        const expLoreResult = skillService.addExp(heroId, loreSkillKey, expLore);
+        socketService.sendToClientExpResult({ heroId, expResult: expLoreResult });
+      }
       const expResult = skillService.addExp(heroId, gatherSkill, exp);
       socketService.sendToClientExpResult({ heroId, expResult });
 
@@ -101,10 +115,12 @@ export const gatherTick = (now: number) => {
         type: 'FINISH_GATHERING',
         payload: {
           heroId,
-          backpack,
-          itemName: itemTemplate.name,
-          quantity,
-          message: `You successfully ${gatherActions[gatherSkill]} the `,
+          backpack: gatherResult.success ? backpack : undefined,
+          itemName: gatherResult.success ? itemTemplate.name : undefined,
+          quantity: gatherResult.success ? quantity : undefined,
+          message: gatherResult.success
+            ? `You successfully ${gatherActions[gatherSkill]} the `
+            : `You failed to ${gatherActions[gatherSkill]} this time.`,
         },
       };
       io.to(heroId).emit(socketEvents.selfData(), socketData);

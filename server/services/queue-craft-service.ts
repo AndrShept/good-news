@@ -8,12 +8,12 @@ import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
 import { serverState } from '../game/state/server-state';
-import { rarityConfig } from '../lib/config/rarity-config';
-import { clamp } from '../lib/utils';
+import { CORE_RESOURCE_TABLE } from '../lib/table/crafting-table';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
 import { skillService } from './skill-service';
+import { clamp } from '../lib/utils';
 
 interface GetCraftChance {
   craftSkillLevel: number;
@@ -123,31 +123,28 @@ export const queueCraftService = {
     io.to(heroId).emit(socketEvents.queueCraft(), nextQueueData);
   },
   getCraftChance({ coreResourceId, recipeMin, craftSkillLevel, loreSkillLevel }: GetCraftChance): number {
-    const baseChance = 35;
-    const gainPerLevel = 2.5;
+    const baseChance = 40; // стартовий шанс
+    const gainPerLevel = 3; // % за рівень вище мінімуму
+    const loreScale = 0.25; // наскільки lore впливає
 
-    let effectiveRecipeMin = recipeMin;
+    let resourceMin = 0;
 
     if (coreResourceId) {
       const template = itemTemplateService.getAllItemsTemplateMapIds()[coreResourceId];
-
-      const rarity = template?.rarity ?? 'COMMON';
-      const rarityValue = rarityConfig[rarity].value;
-
-      const rarityPenalty = rarityValue * 5; // 3 - EASY   5 -BALANCE 7-10 - HARDCORE
-
-      effectiveRecipeMin += rarityPenalty;
+      resourceMin = CORE_RESOURCE_TABLE[template.key as CoreResourceType]?.requiredMinSkill ?? 0;
     }
 
-    const diff = craftSkillLevel - effectiveRecipeMin;
+    // Складність = що складніше: рецепт чи ресурс
+    const effectiveMin = Math.max(recipeMin, resourceMin);
 
-    let loreBonus = loreSkillLevel * 0.4;
+    const diff = craftSkillLevel - effectiveMin;
 
-    console.log('craftSkillLevel', craftSkillLevel);
-    console.log('loreSkillLevel', loreSkillLevel);
-    console.log('CRAFT CHANCE', Math.min(100, baseChance + diff * gainPerLevel + loreBonus));
-    if (diff < 0) return 0;
+    if (diff < 0) return 0; // не дозволяємо крафт нижче мін
 
-    return Math.min(100, baseChance + diff * gainPerLevel + loreBonus);
+    const loreBonus = loreSkillLevel * loreScale;
+
+    const chance = baseChance + diff * gainPerLevel + loreBonus;
+
+    return clamp(chance, 5, 97); // ніколи не 100%
   },
 };

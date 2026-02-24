@@ -1,5 +1,5 @@
 import type { SkillKey } from '@/shared/templates/skill-template';
-import type { RarityType } from '@/shared/types';
+
 
 export const skillExpConfig = {
   SMELTING: {

@@ -1,9 +1,8 @@
-import type { RecipeTemplate } from '@/shared/types';
+import type { CoreResourceType, RecipeTemplate } from '@/shared/types';
 
-import { rarityConfig } from '../lib/config/rarity-config';
+import { CORE_RESOURCE_TABLE } from '../lib/table/crafting-table';
 import { clamp } from '../lib/utils';
 import { itemTemplateService } from './item-template-service';
-import { skillService } from './skill-service';
 
 interface CalculateCraftExp {
   recipe: RecipeTemplate;
@@ -13,58 +12,56 @@ interface CalculateCraftExp {
 }
 
 interface CalculateLoreExp {
-  recipe: RecipeTemplate;
   success: boolean;
-  chance: number;
-  coreResourceId: string | undefined;
+  loreSkillLevel: number | undefined;
+  timeMs: number;
+  requiredMinSkill: number;
 }
 
 interface CalculateGatherExp {
-  requiredMinSkill?: number;
+  requiredMinSkill: number;
   gatherSkillLevel: number;
+  success: boolean;
 }
 
 export const progressionService = {
   calculateCraftExp({ chance, coreResourceId, recipe, success }: CalculateCraftExp): number {
-    let exp = Math.floor(recipe.requirement.skills[0].level * 8 + (recipe.timeMs / 1000) * 0.5);
+    const recipeLevel = recipe.requirement.skills[0].level;
+    let exp = recipeLevel * 6;
 
-    exp *= clamp(1.2 - chance / 100, 0.3, 1);
-
-    // rarity bonus
     if (coreResourceId) {
       const template = itemTemplateService.getAllItemsTemplateMapIds()[coreResourceId];
+      const resourceRequired = CORE_RESOURCE_TABLE[template.key as CoreResourceType].requiredMinSkill;
 
-      const rarity = template?.rarity ?? 'COMMON';
-      const rarityValue = rarityConfig[rarity].value;
-      const rarityBonus = 1 + rarityValue * 0.15;
-
-      exp *= rarityBonus;
+      exp += resourceRequired * 4;
     }
 
+    // ризик-бонус
+    exp *= clamp(1.2 - chance / 100, 0.3, 1);
+
     if (!success) {
-      exp *= 0.3;
+      exp *= 0.25;
     }
 
     return Math.max(1, Math.floor(exp));
   },
 
-  calculateLoreExp({ chance, coreResourceId, recipe, success }: CalculateLoreExp): number {
-    let exp = recipe.requirement.skills[0].level * 2 + (recipe.timeMs / 1000) * 0.2;
+  calculateLoreExp({ timeMs, requiredMinSkill, loreSkillLevel, success }: CalculateLoreExp): number {
+    // 1️⃣ База від складності
+    const baseXp = 5 + requiredMinSkill * 1.5;
 
-    exp *= clamp(1.1 - chance / 100, 0.4, 1);
+    // 2️⃣ Бонус за час
+    const timeBonus = (timeMs / 1000) * 0.4;
 
-    if (coreResourceId) {
-      const template = itemTemplateService.getAllItemsTemplateMapIds()[coreResourceId];
+    // 3️⃣ Якщо рівень сильно перевищує складність — менше EXP
+    const levelDiff = (loreSkillLevel ?? 0) - requiredMinSkill;
+    const overlevelPenalty = levelDiff > 0 ? clamp(1 - levelDiff * 0.03, 0.2, 1) : 1;
 
-      const rarity = template?.rarity ?? 'COMMON';
-      const rarityValue = rarityConfig[rarity].value;
-      const rarityBonus = 1 + rarityValue * 0.1;
+    let exp = (baseXp + timeBonus) * overlevelPenalty;
 
-      exp *= rarityBonus;
-    }
-
+    // 4️⃣ Фейл дає менше
     if (!success) {
-      exp *= 0.7;
+      exp *= 0.5;
     }
 
     return Math.max(1, Math.floor(exp));
@@ -82,13 +79,11 @@ export const progressionService = {
     return Math.max(1, Math.floor(exp));
   },
 
-  calculateGatherExp({ requiredMinSkill, gatherSkillLevel }: CalculateGatherExp) {
-    const isSuccess = requiredMinSkill !== undefined;
-
+  calculateGatherExp({ requiredMinSkill, gatherSkillLevel, success }: CalculateGatherExp) {
     // XP за спробу (для AFK стабільність)
     const attemptXp = 3 + gatherSkillLevel * 0.03;
 
-    if (!isSuccess) {
+    if (!success) {
       return Math.floor(attemptXp);
     }
 
