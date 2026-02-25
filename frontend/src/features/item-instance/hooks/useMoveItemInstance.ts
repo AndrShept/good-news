@@ -12,13 +12,25 @@ interface IUseMoveItemInstance {
 
 export const useMoveItemInstance = () => {
   const heroId = useHeroId();
-  const { updateItemContainer, removeItemInstance } = useItemContainerUpdate();
+  const { removeItemInstance, addItemInstance, updateItemInstance } = useItemContainerUpdate();
   return useMutation({
     mutationFn: ({ itemInstanceId, from, to }: IUseMoveItemInstance) => moveItemInstance({ id: heroId, itemInstanceId, from, to }),
 
     async onSuccess({ data }, { from, to, itemInstanceId }) {
+      console.log(data);
       removeItemInstance(from, itemInstanceId);
-      updateItemContainer(to, data?.toContainer);
+      if (data?.inventoryDeltas) {
+        for (const i of data.inventoryDeltas) {
+          switch (i.type) {
+            case 'CREATE':
+              addItemInstance(i.itemContainerId ?? '', i.item);
+              break;
+            case 'UPDATE':
+              updateItemInstance(i.itemContainerId ?? '', i.itemInstanceId, i.updateData);
+              break;
+          }
+        }
+      }
     },
   });
 };

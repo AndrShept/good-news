@@ -205,6 +205,3 @@ export const gatheringService = {
     return 1;
   },
 };
-function findEquipTool() {
-  throw new Error('Function not implemented.');
-}

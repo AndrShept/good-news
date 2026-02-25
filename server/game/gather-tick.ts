@@ -1,6 +1,7 @@
 import { BASE_GATHERING_TIME } from '@/shared/constants';
-import type { FinishGatheringData, HeroUpdateStateData } from '@/shared/socket-data-types';
+import type { FinishGatheringEvent, HeroUpdateStateData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
+import type { ItemSyncEvent } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
@@ -69,9 +70,10 @@ export const gatherTick = (now: number) => {
         loreSkillLevel: lorSkillInstance?.level,
         maxQuantity: gatherResult.gatherItem.maxGatherQuantity,
       });
+      let inventoryDeltas: ItemSyncEvent[] = [];
       if (gatherResult.success) {
         tileState.charges -= quantity;
-        itemContainerService.createItem({
+        inventoryDeltas = itemContainerService.createItem({
           heroId,
           coreResourceId: undefined,
           itemContainerId: backpack.id,
@@ -79,7 +81,7 @@ export const gatherTick = (now: number) => {
           quantity,
         });
       }
-
+      // console.log(itemEventData);
       const exp = progressionService.calculateGatherExp({
         gatherSkillLevel: gatherSkillInstance.level,
         requiredMinSkill: gatherResult.gatherItem.requiredMinSkill,
@@ -100,21 +102,20 @@ export const gatherTick = (now: number) => {
 
       const equippedTool = equipmentService.findEquipTool(heroId, gatherSkill);
 
-      const durabilityResult = equippedTool?.toolInstance
+      const equipmentDeltas = equippedTool?.toolInstance
         ? itemInstanceService.decrementDurability(heroId, equippedTool.toolInstance.id, 1)
         : undefined;
 
-      const socketData: FinishGatheringData = {
+      const socketData: FinishGatheringEvent = {
         type: 'FINISH_GATHERING',
         payload: {
-          heroId,
-          backpack: gatherResult.success ? backpack : undefined,
           itemName: gatherResult.success ? itemTemplate.name : undefined,
           quantity: gatherResult.success ? quantity : undefined,
           message: gatherResult.success
             ? `You successfully ${gatherActions[gatherSkill]} the `
             : `You failed to ${gatherActions[gatherSkill]} this time.`,
-          itemEquipSyncData: durabilityResult,
+          equipmentDeltas: equipmentDeltas ? [equipmentDeltas] : [],
+          inventoryDeltas,
         },
       };
       io.to(heroId).emit(socketEvents.selfData(), socketData);

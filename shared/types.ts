@@ -227,15 +227,18 @@ export type ItemSyncEvent =
   | {
       type: 'CREATE';
       item: ItemInstance;
+      itemContainerId?: string;
     }
   | {
       type: 'UPDATE';
       itemInstanceId: string;
+      itemContainerId?: string;
       updateData: Partial<ItemInstance>;
     }
   | {
       type: 'DELETE';
       itemInstanceId: string;
+      itemContainerId?: string;
       itemName: string;
     };
 

@@ -1,10 +1,7 @@
 import { resourceTemplateById } from '@/shared/templates/resource-template';
 import type { CoreResourceType, ItemInstance, ItemLocationType, ItemSyncEvent, OmitModifier, WeaponType } from '@/shared/types';
-import { duration } from 'drizzle-orm/gel-core';
 import { HTTPException } from 'hono/http-exception';
 
-import { EquipInfo } from '../../frontend/src/features/item-instance/components/EquipInfo';
-import { materialConfig } from '../../frontend/src/lib/config';
 import { itemDurabilityConfig } from '../lib/config/item-dutability-config';
 import { materialModifierConfig } from '../lib/config/material-modifier-config';
 import { generateRandomUuid, getDisplayName, getModifierByResourceKey } from '../lib/utils';
@@ -96,10 +93,7 @@ export const itemInstanceService = {
       };
 
       if (itemInstance.durability.current <= 0) {
-        const index = hero.equipments.findIndex((e) => e.id === itemInstance.id);
-        if (index === -1) return;
-        hero.equipments.splice(index, 1);
-
+        equipmentService.removeEquipment(heroId, itemInstance.id);
         result = { type: 'DELETE', itemInstanceId: itemInstance.id, itemName: itemInstance.displayName ?? itemTemplate.name };
       }
     }

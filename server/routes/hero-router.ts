@@ -21,6 +21,7 @@ import {
   type ErrorResponse,
   type Hero,
   type ItemInstance,
+  type ItemSyncEvent,
   type PathNode,
   type QueueCraft,
   type StateType,
@@ -606,16 +607,17 @@ export const heroRouter = new Hono<Context>()
       itemContainerService.checkFreeContainerCapacity(toContainer.id);
 
       const existContainer = toContainer.itemsInstance.some((i) => i.itemTemplateId === itemTemplate.id);
-
+      let inventoryDeltas: ItemSyncEvent[] = [];
       if ((!existContainer && itemTemplate.stackable) || !itemTemplate.stackable) {
         itemInstance.itemContainerId = to;
         itemInstance.location = toContainer.type;
         itemInstance.ownerHeroId = hero.id;
         itemContainerService.removeItem(from, itemInstanceId);
         toContainer.itemsInstance.push(itemInstance);
+        inventoryDeltas.push({ type: 'CREATE', itemContainerId: toContainer.id, item: itemInstance });
       } else {
         itemContainerService.removeItem(from, itemInstanceId);
-        itemContainerService.obtainStackableItem({
+        inventoryDeltas = itemContainerService.obtainStackableItem({
           heroId: hero.id,
           itemContainerId: toContainer.id,
           itemTemplateId: itemTemplate.id,
@@ -624,10 +626,10 @@ export const heroRouter = new Hono<Context>()
         });
       }
 
-      return c.json<SuccessResponse<{ toContainer: TItemContainer }>>({
+      return c.json<SuccessResponse<{ inventoryDeltas: typeof inventoryDeltas }>>({
         success: true,
         message: 'success move item',
-        data: { toContainer },
+        data: { inventoryDeltas },
       });
     },
   )

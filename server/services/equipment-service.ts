@@ -65,7 +65,12 @@ export const equipmentService = {
     itemContainerService.addItem(backpack.id, itemInstance);
     heroService.updateModifier(hero.id);
   },
-
+  removeEquipment(heroId: string, itemInstanceId: string) {
+    const hero = heroService.getHero(heroId);
+    const index = hero.equipments.findIndex((e) => e.id === itemInstanceId);
+    if (index === -1) return;
+    hero.equipments.splice(index, 1);
+  },
   getEquipSlot(heroId: string, itemInstanceId: string) {
     const hero = heroService.getHero(heroId);
     const backpack = itemContainerService.getBackpack(hero.id);

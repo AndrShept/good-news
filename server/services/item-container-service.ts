@@ -1,4 +1,4 @@
-import type { ItemInstance, ItemLocationType } from '@/shared/types';
+import type { ItemInstance, ItemLocationType, ItemSyncEvent } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
@@ -73,20 +73,24 @@ export const itemContainerService = {
     const templateById = itemTemplateService.getAllItemsTemplateMapIds();
     const template = templateById[itemTemplateId];
     const location = 'BACKPACK';
+    const result: ItemSyncEvent[] = [];
     if (!template.stackable) {
-      let newItem: ItemInstance | null = null;
       for (let i = 0; i < quantity; i++) {
-        newItem = itemInstanceService.createItem({ heroId, itemContainerId, itemTemplateId, quantity: 1, location, coreResourceId });
+        const newItem = itemInstanceService.createItem({ heroId, itemContainerId, itemTemplateId, quantity: 1, location, coreResourceId });
+        result.push({ type: 'CREATE', itemContainerId, item: newItem });
       }
-      return newItem;
+
+      return result;
     }
-    this.obtainStackableItem({ heroId, itemContainerId, itemTemplateId, location, quantity });
+    const obtainsItemData = this.obtainStackableItem({ heroId, itemContainerId, itemTemplateId, location, quantity });
+    result.push(...(obtainsItemData ?? []));
+    return result;
   },
   obtainStackableItem({ heroId, itemContainerId, itemTemplateId, location, quantity }: IObtainStackableItem) {
     const container = itemContainerService.getContainer(itemContainerId);
     const templateById = itemTemplateService.getAllItemsTemplateMapIds();
     const template = templateById[itemTemplateId];
-
+    const resultData: ItemSyncEvent[] = [];
     let remaining = quantity;
 
     // 1️⃣ Заповнюємо існуючі стеки
@@ -98,17 +102,27 @@ export const itemContainerService = {
 
       const add = Math.min(space, remaining);
       inst.quantity += add;
+      resultData.push({ type: 'UPDATE', itemContainerId, itemInstanceId: inst.id, updateData: { quantity: inst.quantity } });
       remaining -= add;
 
-      if (remaining === 0) return;
+      if (remaining === 0) return resultData;
     }
 
     // 2️⃣ Створюємо нові стеки
     while (remaining > 0) {
       const stackQty = Math.min(template.maxStack ?? 1, remaining);
-      itemInstanceService.createItem({ heroId, itemContainerId, itemTemplateId, quantity: stackQty, location, coreResourceId: undefined });
+      const newItem = itemInstanceService.createItem({
+        heroId,
+        itemContainerId,
+        itemTemplateId,
+        quantity: stackQty,
+        location,
+        coreResourceId: undefined,
+      });
+      resultData.push({ type: 'CREATE', itemContainerId, item: newItem });
       remaining -= stackQty;
     }
+    return resultData;
   },
 
   consumeItem({

@@ -1,6 +1,6 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { getItemContainerOptions } from '@/features/item-container/api/get-item-container';
-import { TItemContainer } from '@/shared/types';
+import { ItemInstance, TItemContainer } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
@@ -31,6 +31,30 @@ export const useItemContainerUpdate = () => {
     },
     [heroId],
   );
+  const addItemInstance = useCallback(
+    (itemContainerId: string, newItem: ItemInstance) => {
+      queryClient.setQueriesData<TItemContainer>({ queryKey: getItemContainerOptions(heroId, itemContainerId).queryKey }, (oldData) => {
+        if (!oldData) return;
+        return {
+          ...oldData,
+          itemsInstance: [...oldData.itemsInstance, newItem],
+        };
+      });
+    },
+    [heroId],
+  );
+  const updateItemInstance = useCallback(
+    (itemContainerId: string, itemInstanceId: string, updateData: Partial<ItemInstance>) => {
+      queryClient.setQueriesData<TItemContainer>({ queryKey: getItemContainerOptions(heroId, itemContainerId).queryKey }, (oldData) => {
+        if (!oldData) return;
+        return {
+          ...oldData,
+          itemsInstance: oldData.itemsInstance.map((i) => (i.id === itemInstanceId ? { ...i, ...updateData } : i)),
+        };
+      });
+    },
+    [heroId],
+  );
 
-  return { updateItemContainer, removeItemInstance };
+  return { updateItemContainer, removeItemInstance, addItemInstance, updateItemInstance };
 };

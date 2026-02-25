@@ -18,7 +18,7 @@ export const useHeroListener = () => {
   const { removeBuff } = useBuff();
   const { updateHero } = useHeroUpdate();
   const { updateSkill } = useSkillUpdate();
-  const { updateItemContainer } = useItemContainerUpdate();
+  const { addItemInstance, updateItemInstance } = useItemContainerUpdate();
   const { updateEquip, removeEquip } = useEquipmentsUpdate();
   const backpackId = useGetBackpackId();
   const heroId = useHeroId();
@@ -45,21 +45,33 @@ export const useHeroListener = () => {
             text: data.payload.message,
             data: data.payload.itemName ? [{ name: data.payload.itemName, quantity: data.payload.quantity }] : undefined,
           });
-          if (data.payload.backpack && data.payload.itemName) {
-            updateItemContainer(backpackId, { ...data.payload.backpack });
+          console.log(data.payload);
+          if (data.payload.inventoryDeltas && data.payload.itemName) {
+            for (const i of data.payload.inventoryDeltas) {
+              switch (i.type) {
+                case 'CREATE':
+                  addItemInstance(i.itemContainerId ?? '', i.item);
+                  break;
+                case 'UPDATE':
+                  updateItemInstance(i.itemContainerId ?? '', i.itemInstanceId, i.updateData);
+                  break;
+              }
+            }
           }
-          if (data.payload.itemEquipSyncData) {
-            switch (data.payload.itemEquipSyncData.type) {
-              case 'UPDATE':
-                updateEquip(data.payload.itemEquipSyncData.itemInstanceId, { ...data.payload.itemEquipSyncData.updateData });
-                break;
-              case 'DELETE':
-                removeEquip(data.payload.itemEquipSyncData.itemInstanceId);
-                setGameMessage({
-                  type: 'ERROR',
-                  text: `Your ${data.payload.itemEquipSyncData.itemName}  has broken! `,
-                });
-                break;
+          if (data.payload.equipmentDeltas) {
+            for (const e of data.payload.equipmentDeltas) {
+              switch (e.type) {
+                case 'UPDATE':
+                  updateEquip(e.itemInstanceId, { ...e.updateData });
+                  break;
+                case 'DELETE':
+                  removeEquip(e.itemInstanceId);
+                  setGameMessage({
+                    type: 'ERROR',
+                    text: `Your ${e.itemName}  has broken! `,
+                  });
+                  break;
+              }
             }
           }
 
