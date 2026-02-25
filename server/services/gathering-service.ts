@@ -8,6 +8,7 @@ import { HTTPException } from 'hono/http-exception';
 import { type TileState, serverState } from '../game/state/server-state';
 import { type GatheringTableItem, MINING_TABLE } from '../lib/table/core-resource-table';
 import { clamp, getRandomValue, hash } from '../lib/utils';
+import { equipmentService } from './equipment-service';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { skillService } from './skill-service';
@@ -95,21 +96,21 @@ export const gatheringService = {
     return tileState;
   },
 
-  canStartGathering(heroId: string, skillKey: GatheringCategorySkillKey) {
-    const skillTemplate = skillTemplateByKey[skillKey];
+  canStartGathering(heroId: string, gatherSkill: GatheringCategorySkillKey) {
     const hero = heroService.getHero(heroId);
     const backpack = itemContainerService.getBackpack(hero.id);
-    const tool = toolsTemplate.find((t) => t.toolInfo.skillTemplateId === skillTemplate.id);
-    if (!tool) throw new HTTPException(404, { message: 'tool not found' });
-    if (!hero.location.mapId) throw new HTTPException(400, { message: 'You must be on a map to start gathering.' });
-    const equipTool = hero.equipments.find((e) => e.itemTemplateId === tool.id);
-    if (!equipTool) {
-      throw new HTTPException(400, {
-        message: `You must equip ${tool.name} to start ${skillTemplate.name.toLowerCase()}.`,
-        cause: { canShow: true },
-      });
-    }
+
     itemContainerService.checkFreeContainerCapacity(backpack.id);
+
+    const result = equipmentService.findEquipTool(heroId, gatherSkill);
+    if (gatherSkill !== 'FORAGING') {
+      if (!result?.toolInstance) {
+        throw new HTTPException(400, {
+          message: `You must equip ${result?.toolTemplate.name} to start ${result?.skillTemplate.name}.`,
+          cause: { canShow: true },
+        });
+      }
+    }
   },
   setInitialCharges(x: number, y: number, seed: number) {
     return TILE_INITIAL_CHARGES + (hash(x, y, seed) % 5); // 3–7 ударів
@@ -163,7 +164,7 @@ export const gatheringService = {
     const totalChance = table.reduce((sum, o) => sum + o.chance, 0);
     const value = hash(x, y, WORLD_SEED) % totalChance;
     let cumulative = 0;
-    const result= { gatherItem: table[0], success: false };
+    const result = { gatherItem: table[0], success: false };
     for (const tableItem of table) {
       cumulative += tableItem.chance;
       if (value < cumulative) {
@@ -189,11 +190,11 @@ export const gatheringService = {
       if (successChance > Math.random()) {
         result.success = true;
       }
-  
+
       return result;
     }
   },
- 
+
   getGatherRewardQuantity({ gatherSkillLevel, loreSkillLevel, luck, maxQuantity }: GetGatherRewardQuantity) {
     const chance = gatherSkillLevel * 0.001 + (loreSkillLevel ?? 0) * 0.002 + luck * 0.0005;
 
@@ -204,3 +205,6 @@ export const gatheringService = {
     return 1;
   },
 };
+function findEquipTool() {
+  throw new Error('Function not implemented.');
+}

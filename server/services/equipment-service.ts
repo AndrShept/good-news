@@ -1,3 +1,5 @@
+import { type GatheringCategorySkillKey, skillTemplateByKey } from '@/shared/templates/skill-template';
+import { toolsTemplate } from '@/shared/templates/tool-template';
 import type { EquipmentSlotType } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
@@ -13,11 +15,21 @@ export const equipmentService = {
 
     return equipItem;
   },
+  findEquipTool(heroId: string, gatherSkill: GatheringCategorySkillKey) {
+    if (gatherSkill === 'FORAGING') return;
+    const hero = heroService.getHero(heroId);
+    const skillTemplate = skillTemplateByKey[gatherSkill];
+    const tool = toolsTemplate.find((t) => t.toolInfo.skillTemplateId === skillTemplate.id);
+    if (!tool) throw new HTTPException(400, { message: 'tool not found' });
+    const equippedTool = hero.equipments.find((e) => e.itemTemplateId === tool.id);
+
+    return { toolInstance: equippedTool, skillTemplate, toolTemplate: tool };
+  },
   findEquipItemByInstanceId(heroId: string, itemInstanceId: string) {
     const hero = heroService.getHero(heroId);
-    const equipedItemInstance = hero.equipments.find((e) => e.id === itemInstanceId);
-    if (!equipedItemInstance) throw new HTTPException(404, { message: 'equipedItemInstance not found' });
-    return equipedItemInstance;
+    const equippedItemInstance = hero.equipments.find((e) => e.id === itemInstanceId);
+    if (!equippedItemInstance) throw new HTTPException(404, { message: 'equippedItemInstance not found' });
+    return equippedItemInstance;
   },
   equipItem(heroId: string, itemInstanceId: string) {
     const hero = heroService.getHero(heroId);
@@ -41,14 +53,14 @@ export const equipmentService = {
   unEquipItem(heroId: string, itemInstanceId: string) {
     const hero = heroService.getHero(heroId);
     const backpack = itemContainerService.getBackpack(hero.id);
-    const equipedItem = this.findEquipItemByInstanceId(heroId, itemInstanceId);
+    const equippedItem = this.findEquipItemByInstanceId(heroId, itemInstanceId);
     heroService.checkFreeBackpackCapacity(heroId);
     const findIndex = hero.equipments.findIndex((e) => e.id === itemInstanceId);
     if (findIndex === -1) throw new HTTPException(404, { message: 'unEquipItem findIndex not found' });
 
-    equipedItem.itemContainerId = backpack.id;
-    equipedItem.location = 'BACKPACK';
-    equipedItem.slot = null;
+    equippedItem.itemContainerId = backpack.id;
+    equippedItem.location = 'BACKPACK';
+    equippedItem.slot = null;
     const [itemInstance] = hero.equipments.splice(findIndex, 1);
     itemContainerService.addItem(backpack.id, itemInstance);
     heroService.updateModifier(hero.id);

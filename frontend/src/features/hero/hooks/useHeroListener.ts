@@ -8,6 +8,8 @@ import { useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect } from 'react';
 
 import { useBuff } from './useBuff';
+import { useEquipmentsUpdate } from './useEquipmentsUpdate';
+import { useGameData } from './useGameData';
 import { useHeroId } from './useHeroId';
 import { useHeroUpdate } from './useHeroUpdate';
 
@@ -17,6 +19,7 @@ export const useHeroListener = () => {
   const { updateHero } = useHeroUpdate();
   const { updateSkill } = useSkillUpdate();
   const { updateItemContainer } = useItemContainerUpdate();
+  const { updateEquip, removeEquip } = useEquipmentsUpdate();
   const backpackId = useGetBackpackId();
   const heroId = useHeroId();
   const setGameMessage = useSetGameMessage();
@@ -44,6 +47,20 @@ export const useHeroListener = () => {
           });
           if (data.payload.backpack && data.payload.itemName) {
             updateItemContainer(backpackId, { ...data.payload.backpack });
+          }
+          if (data.payload.itemEquipSyncData) {
+            switch (data.payload.itemEquipSyncData.type) {
+              case 'UPDATE':
+                updateEquip(data.payload.itemEquipSyncData.itemInstanceId, { ...data.payload.itemEquipSyncData.updateData });
+                break;
+              case 'DELETE':
+                removeEquip(data.payload.itemEquipSyncData.itemInstanceId);
+                setGameMessage({
+                  type: 'ERROR',
+                  text: `Your ${data.payload.itemEquipSyncData.itemName}  has broken! `,
+                });
+                break;
+            }
           }
 
           break;

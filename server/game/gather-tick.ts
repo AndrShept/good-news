@@ -4,8 +4,10 @@ import { socketEvents } from '@/shared/socket-events';
 import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
+import { equipmentService } from '../services/equipment-service';
 import { gatheringService } from '../services/gathering-service';
 import { itemContainerService } from '../services/item-container-service';
+import { itemInstanceService } from '../services/item-instance-service';
 import { itemTemplateService } from '../services/item-template-service';
 import { progressionService } from '../services/progression-service';
 import { skillService } from '../services/skill-service';
@@ -48,21 +50,6 @@ export const gatherTick = (now: number) => {
         y,
       });
       if (!gatherResult) continue;
-
-      // if (!gatherResult.success) {
-      //   const exp = progressionService.calculateGatherExp({ gatherSkillLevel: gatherSkillInstance.level });
-      //   const expResult = skillService.addExp(heroId, gatherSkill, exp);
-      //   socketService.sendToClientExpResult({ heroId, expResult });
-      //   const socketData: FinishGatheringData = {
-      //     type: 'FINISH_GATHERING',
-      //     payload: {
-      //       heroId,
-      //       message: `You failed to ${gatherActions[gatherSkill]} this time.`,
-      //     },
-      //   };
-      //   io.to(heroId).emit(socketEvents.selfData(), socketData);
-      //   continue;
-      // }
 
       const gatherSkillInstance = skillService.getSkillByKey(heroId, gatherSkill);
 
@@ -111,6 +98,12 @@ export const gatherTick = (now: number) => {
       const expResult = skillService.addExp(heroId, gatherSkill, exp);
       socketService.sendToClientExpResult({ heroId, expResult });
 
+      const equippedTool = equipmentService.findEquipTool(heroId, gatherSkill);
+
+      const durabilityResult = equippedTool?.toolInstance
+        ? itemInstanceService.decrementDurability(heroId, equippedTool.toolInstance.id, 1)
+        : undefined;
+
       const socketData: FinishGatheringData = {
         type: 'FINISH_GATHERING',
         payload: {
@@ -121,6 +114,7 @@ export const gatherTick = (now: number) => {
           message: gatherResult.success
             ? `You successfully ${gatherActions[gatherSkill]} the `
             : `You failed to ${gatherActions[gatherSkill]} this time.`,
+          itemEquipSyncData: durabilityResult,
         },
       };
       io.to(heroId).emit(socketEvents.selfData(), socketData);

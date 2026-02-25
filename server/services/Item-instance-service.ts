@@ -1,5 +1,6 @@
 import { resourceTemplateById } from '@/shared/templates/resource-template';
-import type { CoreResourceType, ItemInstance, ItemLocationType, OmitModifier, WeaponType } from '@/shared/types';
+import type { CoreResourceType, ItemInstance, ItemLocationType, ItemSyncEvent, OmitModifier, WeaponType } from '@/shared/types';
+import { duration } from 'drizzle-orm/gel-core';
 import { HTTPException } from 'hono/http-exception';
 
 import { EquipInfo } from '../../frontend/src/features/item-instance/components/EquipInfo';
@@ -7,6 +8,7 @@ import { materialConfig } from '../../frontend/src/lib/config';
 import { itemDurabilityConfig } from '../lib/config/item-dutability-config';
 import { materialModifierConfig } from '../lib/config/material-modifier-config';
 import { generateRandomUuid, getDisplayName, getModifierByResourceKey } from '../lib/utils';
+import { equipmentService } from './equipment-service';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
@@ -76,9 +78,31 @@ export const itemInstanceService = {
       }
       case 'SHIELD':
         return itemDurabilityConfig['SHIELD'];
-
-      default:
-        return;
     }
+  },
+
+  decrementDurability(heroId: string, itemInstanceId: string, value: number) {
+    const hero = heroService.getHero(heroId);
+    const itemInstance = equipmentService.findEquipItemByInstanceId(heroId, itemInstanceId);
+    const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[itemInstance.itemTemplateId];
+
+    let result: ItemSyncEvent | undefined = undefined;
+    if (itemInstance.durability) {
+      itemInstance.durability.current -= value;
+      result = {
+        type: 'UPDATE',
+        itemInstanceId: itemInstance.id,
+        updateData: { durability: { current: itemInstance.durability.current, max: itemInstance.durability.max } },
+      };
+
+      if (itemInstance.durability.current <= 0) {
+        const index = hero.equipments.findIndex((e) => e.id === itemInstance.id);
+        if (index === -1) return;
+        hero.equipments.splice(index, 1);
+
+        result = { type: 'DELETE', itemInstanceId: itemInstance.id, itemName: itemInstance.displayName ?? itemTemplate.name };
+      }
+    }
+    return result;
   },
 };

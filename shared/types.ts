@@ -223,6 +223,22 @@ export type TPlace = {
   entrances: Entrance[];
 };
 
+export type ItemSyncEvent =
+  | {
+      type: 'CREATE';
+      item: ItemInstance;
+    }
+  | {
+      type: 'UPDATE';
+      itemInstanceId: string;
+      updateData: Partial<ItemInstance>;
+    }
+  | {
+      type: 'DELETE';
+      itemInstanceId: string;
+      itemName: string;
+    };
+
 export interface QueueCraft {
   id: string;
   recipeId: string;

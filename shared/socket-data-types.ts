@@ -1,8 +1,10 @@
+import type { itemInstanceService } from '../server/services/item-instance-service';
 import type {
   BuildingType,
   GameSysMessageType,
   Hero,
   HeroSidebarItem,
+  ItemSyncEvent,
   MapHero,
   QueueCraftStatusType,
   SkillInstance,
@@ -96,7 +98,14 @@ export type RemoveBuffData = {
 };
 export type FinishGatheringData = {
   type: 'FINISH_GATHERING';
-  payload: { heroId: string; backpack?: TItemContainer; itemName?: string; quantity?: number; message: string };
+  payload: {
+    heroId: string;
+    backpack?: TItemContainer;
+    itemName?: string;
+    quantity?: number;
+    message: string;
+    itemEquipSyncData: ItemSyncEvent | undefined;
+  };
 };
 export type SkillUpData = {
   type: 'SKILL_UP';

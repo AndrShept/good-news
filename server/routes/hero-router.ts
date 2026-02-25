@@ -943,7 +943,7 @@ export const heroRouter = new Hono<Context>()
         });
       }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-      // gatheringService.canStartGathering(hero.id, gatherSkill);
+      gatheringService.canStartGathering(hero.id, gatherSkill);
       gatheringService.setGatherTileOnMap(hero.id, gatherSkill);
       const state = getHeroStateWithGatherSkillKey(gatherSkill);
       const gatheringTime = Date.now() + BASE_GATHERING_TIME;
