@@ -1,0 +1,17 @@
+import { client } from '@/lib/utils';
+import { ErrorResponse } from '@/shared/types';
+
+export const itemEquip = async ({ heroId, itemInstanceId }: { heroId: string; itemInstanceId: string; }) => {
+  const res = await client.hero[':id'].equipment[':itemInstanceId'].$post({
+    param: {
+      id: heroId,
+      itemInstanceId,
+    },
+  });
+  if (!res.ok) {
+    const err = (await res.json()) as unknown as ErrorResponse;
+    throw new Error(err.message, { cause: { canShow: err.canShow } });
+  }
+
+  return await res.json();
+};

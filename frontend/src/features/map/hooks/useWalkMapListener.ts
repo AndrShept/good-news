@@ -2,7 +2,7 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
-import { WalkMapCompleteData, WalkMapStartData, WalkMapUpdateData } from '@/shared/socket-data-types';
+import { WalkMapCompleteEvent, WalkMapStartEvent, WalkMapUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { useEffect } from 'react';
@@ -21,7 +21,7 @@ export const useWalkMapListener = () => {
   const { updateHero } = useHeroUpdate();
 
   useEffect(() => {
-    const listener = (data: WalkMapStartData | WalkMapUpdateData | WalkMapCompleteData) => {
+    const listener = (data: WalkMapStartEvent | WalkMapUpdateEvent | WalkMapCompleteEvent) => {
       switch (data.type) {
         case 'WALK_MAP_START': {
           updateHeroes(data.payload.heroId, { state: data.payload.state });

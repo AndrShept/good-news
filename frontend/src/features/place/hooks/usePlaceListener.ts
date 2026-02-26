@@ -2,7 +2,7 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
-import { HeroOfflineData, HeroOnlineData, HeroUpdateStateData, PlaceUpdateData } from '@/shared/socket-data-types';
+import { HeroOfflineEvent, HeroOnlineEvent, HeroUpdateStateEvent, PlaceUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useEffect } from 'react';
 
@@ -16,7 +16,7 @@ export const usePlaceListener = () => {
   const { addHeroes, removeHeroes, updateHeroes } = usePlaceHeroesUpdate(placeId);
 
   useEffect(() => {
-    const listener = (data: PlaceUpdateData | HeroOfflineData | HeroOnlineData | HeroUpdateStateData) => {
+    const listener = (data: PlaceUpdateEvent | HeroOfflineEvent | HeroOnlineEvent | HeroUpdateStateEvent) => {
       switch (data.type) {
         case 'REMOVE_HERO':
           removeHeroes(data.payload.heroId);

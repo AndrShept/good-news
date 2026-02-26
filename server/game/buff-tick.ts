@@ -1,4 +1,4 @@
-import type { RemoveBuffData } from '@/shared/socket-data-types';
+import type { RemoveBuffEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { buffTemplateMapIds } from '@/shared/templates/buff-template';
 
@@ -19,7 +19,7 @@ export const buffTick = (now: number) => {
         heroService.updateModifier(heroId);
         const hero = heroService.getHero(heroId);
         const buffTemplate = buffTemplateMapIds[buff.buffTemplateId];
-        const socketData: RemoveBuffData = {
+        const socketData: RemoveBuffEvent = {
           type: 'REMOVE_BUFF',
           payload: {
             buffInstanceId: buff.id,

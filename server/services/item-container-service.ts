@@ -135,11 +135,13 @@ export const itemContainerService = {
     const container = this.getContainer(itemContainerId);
     const itemInstance = itemInstanceService.getItemInstance(itemContainerId, itemInstanceId);
     const template = itemTemplateService.getAllItemsTemplateMapIds()[itemInstance.itemTemplateId];
-
+    const resultData: itemsInstanceDeltaEvent[] = [];
     // ❌ non-stackable
     if (!template.stackable) {
       itemContainerService.deleteItem(itemContainerId, itemInstanceId);
-      return;
+      resultData.push({ type: 'DELETE', itemContainerId, itemInstanceId, itemName: template.name });
+
+      return resultData;
     }
 
     // 🧪 USE MODE — тільки один стек
@@ -150,11 +152,14 @@ export const itemContainerService = {
 
       itemInstance.quantity -= quantity;
 
-      if (itemInstance.quantity === 0) {
+      if (itemInstance.quantity <= 0) {
         itemContainerService.deleteItem(itemContainerId, itemInstance.id);
+        resultData.push({ type: 'DELETE', itemContainerId, itemInstanceId, itemName: template.name });
+      } else {
+        resultData.push({ type: 'UPDATE', itemContainerId, itemInstanceId, updateData: { quantity: itemInstance.quantity } });
       }
 
-      return;
+      return resultData;
     }
 
     // 🏗 CRAFT MODE — можна брати з усіх стеків
@@ -165,8 +170,11 @@ export const itemContainerService = {
     itemInstance.quantity -= takeFirst;
     remaining -= takeFirst;
 
-    if (itemInstance.quantity === 0) {
+    if (itemInstance.quantity <= 0) {
       itemContainerService.deleteItem(itemContainerId, itemInstance.id);
+      resultData.push({ type: 'DELETE', itemContainerId, itemInstanceId, itemName: template.name });
+    } else {
+      resultData.push({ type: 'UPDATE', itemContainerId, itemInstanceId, updateData: { quantity: itemInstance.quantity } });
     }
 
     // 2️⃣ інші
@@ -179,13 +187,17 @@ export const itemContainerService = {
       inst.quantity -= take;
       remaining -= take;
 
-      if (inst.quantity === 0) {
+      if (inst.quantity <= 0) {
         itemContainerService.deleteItem(itemContainerId, inst.id);
+        resultData.push({ type: 'DELETE', itemContainerId, itemInstanceId: inst.id, itemName: '' });
+      } else {
+        resultData.push({ type: 'UPDATE', itemContainerId, itemInstanceId, updateData: { quantity: inst.quantity } });
       }
     }
 
     if (remaining > 0) {
       throw new Error('Not enough items');
     }
+    return resultData;
   },
 };

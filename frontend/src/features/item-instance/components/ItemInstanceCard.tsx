@@ -59,7 +59,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
             <CustomTooltip.Content>
               {!props.isSelect && !isDragging && !over?.id && <ItemInstanceCardHoverTooltip {...props} />}
             </CustomTooltip.Content>
-            <PopoverContent className="bg-secondary flex h-11 w-fit select-none items-center gap-2 rounded px-2">
+            <PopoverContent className="bg-secondary flex items-center h-full  select-none w-fit p-1   rounded ">
               <ItemInstanceCardDropdownMenu {...props} />
             </PopoverContent>
           </CustomTooltip>

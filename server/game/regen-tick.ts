@@ -1,4 +1,4 @@
-import type { SkillUpData } from '@/shared/socket-data-types';
+import type { SkillUpEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 
 import { io } from '..';

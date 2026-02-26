@@ -1,7 +1,8 @@
-import type { QueueCraftItemSocketData } from '@/shared/socket-data-types';
+import type { QueueCraftItemSocketEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
 import { type SkillKey, skillTemplateById, skillTemplateByKey } from '@/shared/templates/skill-template';
+import type { itemsInstanceDeltaEvent } from '@/shared/types';
 
 import { io } from '..';
 import { getDisplayName, rollChance } from '../lib/utils';
@@ -36,7 +37,7 @@ export const queueCraftTick = (now: number) => {
       }
 
       if (!result.success) {
-        const socketData: QueueCraftItemSocketData = {
+        const socketData: QueueCraftItemSocketEvent = {
           type: 'FAILED',
           payload: {
             message: result.message,
@@ -81,28 +82,31 @@ export const queueCraftTick = (now: number) => {
       const expResultLoreSkill = skillService.addExp(heroId, loreSkillKey, finalExpLoreSkill);
 
       const displayName = getDisplayName(recipe.itemTemplateId, queue.coreResourceId);
+      const itemsDelta: itemsInstanceDeltaEvent[] = [];
       if (successCraft) {
-        itemContainerService.createItem({
+        const newItemDelta = itemContainerService.createItem({
           itemContainerId: backpack.id,
           heroId,
           quantity: 1,
           itemTemplateId: template.id,
           coreResourceId: queue.coreResourceId,
         });
+        itemsDelta.push(...newItemDelta);
         result.message = 'Success complete craft item';
       } else {
         result.message = 'Crafting failed! The materials were lost in the process';
       }
 
-      queueCraftService.consumeAllItemsForCraft(queue.coreResourceId, backpack, recipe);
-      const socketData: QueueCraftItemSocketData = {
+      const consumeItemsDelta = queueCraftService.consumeAllItemsForCraft(queue.coreResourceId, backpack, recipe);
+      itemsDelta.push(...(consumeItemsDelta ?? []));
+      const socketData: QueueCraftItemSocketEvent = {
         type: 'COMPLETE',
         payload: {
           message: result.message,
           itemName: displayName ?? template.name,
           successCraft,
           queueItemCraftId: queue.id,
-          backpack,
+          itemsDelta,
         },
       };
       socketService.sendToClientExpResult({ expResult, heroId });

@@ -1,4 +1,4 @@
-import type { HeroOfflineData } from '@/shared/socket-data-types';
+import type { HeroOfflineEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 
 import { io } from '..';
@@ -8,7 +8,7 @@ import { heroService } from '../services/hero-service';
 export const heroOffline = async (heroId: string, userId: string) => {
   const hero = heroService.getHero(heroId);
 
-  const socketData: HeroOfflineData = {
+  const socketData: HeroOfflineEvent = {
     type: 'HERO_OFFLINE',
     payload: {
       heroId,

@@ -2,7 +2,7 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
 import { useItemContainerUpdate } from '@/features/item-container/hooks/useItemContainerUpdate';
-import { QueueCraftItemSocketData } from '@/shared/socket-data-types';
+import { QueueCraftItemSocketEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect } from 'react';
@@ -13,15 +13,31 @@ export const useQueueCraftListener = () => {
   const { socket } = useSocket();
   const heroId = useHeroId();
   const backpackId = useGetBackpackId();
-  const { updateItemContainer } = useItemContainerUpdate();
+  const { addItemInstance, removeItemInstance, updateItemInstance } = useItemContainerUpdate();
   const { updateQueueCraftItems, removeQueueCraftItems } = useQueueCraftItem();
   const setGameMessage = useSetGameMessage();
   useEffect(() => {
-    const listener = (data: QueueCraftItemSocketData) => {
+    const listener = (data: QueueCraftItemSocketEvent) => {
       switch (data.type) {
         case 'COMPLETE':
           removeQueueCraftItems(data.payload.queueItemCraftId);
-          updateItemContainer(backpackId, data.payload.backpack);
+
+          if (data.payload.itemsDelta) {
+            for (const i of data.payload.itemsDelta) {
+              switch (i.type) {
+                case 'UPDATE':
+                  updateItemInstance(i.itemContainerId ?? '', i.itemInstanceId, i.updateData);
+                  break;
+                case 'DELETE':
+                  removeItemInstance(i.itemContainerId ?? '', i.itemInstanceId);
+                  break;
+                case 'CREATE':
+                  addItemInstance(i.itemContainerId ?? '', i.item);
+                  break;
+              }
+            }
+          }
+
           setGameMessage({
             type: data.payload.successCraft ? 'SUCCESS' : 'ERROR',
             text: data.payload.message,
@@ -46,5 +62,15 @@ export const useQueueCraftListener = () => {
     return () => {
       socket.off(socketEvents.queueCraft(), listener);
     };
-  }, [backpackId, heroId, removeQueueCraftItems, setGameMessage, socket, updateItemContainer, updateQueueCraftItems]);
+  }, [
+    addItemInstance,
+    backpackId,
+    heroId,
+    removeItemInstance,
+    removeQueueCraftItems,
+    setGameMessage,
+    socket,
+    updateItemInstance,
+    updateQueueCraftItems,
+  ]);
 };

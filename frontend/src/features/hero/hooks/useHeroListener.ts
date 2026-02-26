@@ -2,7 +2,7 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
 import { useItemContainerUpdate } from '@/features/item-container/hooks/useItemContainerUpdate';
 import { useSkillUpdate } from '@/features/skill/hooks/useSkillUpdate';
-import { SelfHeroData } from '@/shared/socket-data-types';
+import { SelfHeroEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect } from 'react';
@@ -24,7 +24,7 @@ export const useHeroListener = () => {
   const heroId = useHeroId();
   const setGameMessage = useSetGameMessage();
   useEffect(() => {
-    const listener = async (data: SelfHeroData) => {
+    const listener = async (data: SelfHeroEvent) => {
       switch (data.type) {
         case 'REMOVE_BUFF':
           updateHero({ ...data.payload.hero });

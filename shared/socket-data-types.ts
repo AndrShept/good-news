@@ -20,7 +20,7 @@ export type SocketGroupResponse = {
   updateType: 'leave' | 'kick' | 'remove' | 'new-member';
 };
 
-export type MapUpdateData =
+export type MapUpdateEvent =
   | {
       type: 'REMOVE_HERO';
       payload: {
@@ -32,7 +32,7 @@ export type MapUpdateData =
       payload: { hero: MapHero; mapId: string };
     };
 
-export type PlaceUpdateData =
+export type PlaceUpdateEvent =
   | {
       type: 'ADD_HERO';
       payload: {
@@ -45,16 +45,16 @@ export type PlaceUpdateData =
       payload: { heroId: string };
     };
 
-export type HeroOfflineData = {
+export type HeroOfflineEvent = {
   type: 'HERO_OFFLINE';
   payload: { heroId: string; placeId?: string; mapId?: string };
 };
-export type HeroOnlineData = {
+export type HeroOnlineEvent = {
   type: 'HERO_ONLINE';
   payload: MapHero;
 };
 
-export type QueueCraftItemSocketData =
+export type QueueCraftItemSocketEvent =
   | {
       type: 'COMPLETE';
       payload: {
@@ -62,8 +62,7 @@ export type QueueCraftItemSocketData =
         itemName: string;
         message: string;
         successCraft: boolean;
-        backpack: TItemContainer;
-        // expResult: { message: string; amount: number; isLevelUp: boolean };
+        itemsDelta: itemsInstanceDeltaEvent[] | undefined;
       };
     }
   | {
@@ -79,9 +78,9 @@ export type QueueCraftItemSocketData =
       payload: { queueItemCraftId: string; status: QueueCraftStatusType; expiresAt: number };
     };
 
-export type SelfHeroData = RemoveBuffData | SkillUpData | HeroUpdateStateData | FinishGatheringEvent;
+export type SelfHeroEvent = RemoveBuffEvent | SkillUpEvent | HeroUpdateStateEvent | FinishGatheringEvent;
 
-export type HeroUpdateStateData = {
+export type HeroUpdateStateEvent = {
   type: 'UPDATE_STATE';
   payload: {
     state: StateType;
@@ -89,7 +88,7 @@ export type HeroUpdateStateData = {
   };
 };
 
-export type RemoveBuffData = {
+export type RemoveBuffEvent = {
   type: 'REMOVE_BUFF';
   payload: {
     buffInstanceId: string;
@@ -106,7 +105,7 @@ export type FinishGatheringEvent = {
     equipmentDeltas?: itemsInstanceDeltaEvent[];
   };
 };
-export type SkillUpData = {
+export type SkillUpEvent = {
   type: 'SKILL_UP';
   payload: {
     skill: SkillInstance;
@@ -115,14 +114,14 @@ export type SkillUpData = {
   };
 };
 
-export type WalkMapStartData = {
+export type WalkMapStartEvent = {
   type: 'WALK_MAP_START';
   payload: {
     state: StateType;
     heroId: string;
   };
 };
-export type WalkMapUpdateData = {
+export type WalkMapUpdateEvent = {
   type: 'WALK_MAP_UPDATE';
   payload: {
     x: number;
@@ -130,7 +129,7 @@ export type WalkMapUpdateData = {
     heroId: string;
   };
 };
-export type WalkMapCompleteData = {
+export type WalkMapCompleteEvent = {
   type: 'WALK_MAP_COMPLETE';
   payload: {
     state: StateType;

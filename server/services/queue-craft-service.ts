@@ -9,11 +9,11 @@ import { HTTPException } from 'hono/http-exception';
 import { io } from '..';
 import { serverState } from '../game/state/server-state';
 import { CORE_RESOURCE_TABLE } from '../lib/table/crafting-table';
+import { clamp } from '../lib/utils';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
 import { skillService } from './skill-service';
-import { clamp } from '../lib/utils';
 
 interface GetCraftChance {
   craftSkillLevel: number;
@@ -93,12 +93,13 @@ export const queueCraftService = {
         throw new Error('Not enough items');
       }
 
-      itemContainerService.consumeItem({
+      const itemsDelta = itemContainerService.consumeItem({
         quantity: regResource.amount,
         itemInstanceId: item.id,
         itemContainerId: backpack.id,
         mode: 'all',
       });
+      return itemsDelta;
     }
   },
   updateStatus(heroId: string, queueCraftId: string, status: QueueCraftStatusType) {

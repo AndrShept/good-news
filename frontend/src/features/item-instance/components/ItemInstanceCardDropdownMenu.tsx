@@ -1,7 +1,7 @@
 import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { useItemUseMutation } from '@/features/hero/hooks/useItemUseMutation';
+import { useItemConsumeMutation } from '@/features/hero/hooks/useItemConsumeMutation';
+import { useItemEquipMutation } from '@/features/hero/hooks/useItemEquipMutation';
 import { imageConfig } from '@/shared/config/image-config';
 import { ItemInstance, ItemTemplate, ItemTemplateType } from '@/shared/types';
 import { useModalStore } from '@/store/useModalStore';
@@ -12,21 +12,30 @@ import { ReactElement } from 'react';
 interface Props extends ItemInstance {
   itemTemplate: ItemTemplate;
 }
-const buttonIconVariants: Record<Exclude<ItemTemplateType, 'MISC' | 'RESOURCES' >, ReactElement> = {
-  WEAPON: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
-  TOOL: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
-  SHIELD: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
-  ACCESSORY: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
-  ARMOR: <GameIcon className="size-5.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.equip} />,
-  POTION: <GameIcon className="size-7 opacity-70 hover:opacity-100" image={imageConfig.icon.action.drink} />,
-  'SKILL_BOOK': <GameIcon className="size-7 opacity-70 hover:opacity-100" image={imageConfig.icon.action.read} />,
+const buttonIconVariants: Record<Exclude<ItemTemplateType, 'MISC' | 'RESOURCES'>, ReactElement> = {
+  WEAPON: <GameIcon className="size-5.5" image={imageConfig.icon.action.equip} />,
+  TOOL: <GameIcon className="size-5.5" image={imageConfig.icon.action.equip} />,
+  SHIELD: <GameIcon className="size-5.5" image={imageConfig.icon.action.equip} />,
+  ACCESSORY: <GameIcon className="size-5.5" image={imageConfig.icon.action.equip} />,
+  ARMOR: <GameIcon className="size-5.5" image={imageConfig.icon.action.equip} />,
+  POTION: <GameIcon className="size-6.5" image={imageConfig.icon.action.drink} />,
+  SKILL_BOOK: <GameIcon className="size-6" image={imageConfig.icon.action.read} />,
 };
 export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
-  const itemUseMutation = useItemUseMutation();
+  const itemConsumeMutation = useItemConsumeMutation();
+  const itemEquipMutation = useItemEquipMutation();
+  const isDisabled = itemConsumeMutation.isPending || itemEquipMutation.isPending;
   const setItemInstance = useSelectItemInstanceStore((state) => state.setItemInstance);
   const { setModalData } = useModalStore();
-  const onItemUse = () => {
-    itemUseMutation.mutate({
+  const onItemConsume = () => {
+    itemConsumeMutation.mutate({
+      itemInstanceId: props.id,
+      itemTemplateId: props.itemTemplateId,
+    });
+    setItemInstance(null);
+  };
+  const onItemEquip = () => {
+    itemEquipMutation.mutate({
       itemInstanceId: props.id,
       itemTemplateId: props.itemTemplateId,
     });
@@ -38,20 +47,45 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
   };
   return (
     <>
-      {props.location === 'BACKPACK' && icon && (
-        <Button variant="ghost" className="p-0 hover:bg-transparent" disabled={itemUseMutation.isPending} onClick={onItemUse}>
+      {props.location === 'BACKPACK' && !props.itemTemplate.equipInfo && icon && (
+        <Button
+          variant="ghost"
+          className="w-10 opacity-70 hover:bg-transparent hover:opacity-100"
+          disabled={isDisabled}
+          onClick={onItemConsume}
+        >
+          {icon}
+        </Button>
+      )}
+      {props.location === 'BACKPACK' && !!props.itemTemplate.equipInfo && icon && (
+        <Button
+          variant="ghost"
+          className="w-10 opacity-70 hover:bg-transparent hover:opacity-100"
+          disabled={isDisabled}
+          onClick={onItemEquip}
+        >
           {icon}
         </Button>
       )}
       {props.location === 'EQUIPMENT' && (
-        <Button className="p-0 hover:bg-transparent" variant="ghost" disabled={itemUseMutation.isPending} onClick={onItemUse}>
-          <GameIcon className="size-5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.unEquip} />
+        <Button
+          className="w-10 opacity-70 hover:bg-transparent hover:opacity-100"
+          variant="ghost"
+          disabled={isDisabled}
+          onClick={onItemEquip}
+        >
+          <GameIcon className="size-5" image={imageConfig.icon.action.unEquip} />
         </Button>
       )}
 
       {(props.location === 'BACKPACK' || props.location === 'BANK') && (
-        <Button className="p-0 hover:bg-transparent" variant="ghost" onClick={onDeleteInventoryItem} disabled={itemUseMutation.isPending}>
-          <GameIcon className="size-7.5 opacity-70 hover:opacity-100" image={imageConfig.icon.action.close} />
+        <Button
+          className="w-10 opacity-70 hover:bg-transparent hover:opacity-100"
+          variant="ghost"
+          onClick={onDeleteInventoryItem}
+          disabled={isDisabled}
+        >
+          <X className="size-8 text-red-500/40" />
         </Button>
       )}
     </>

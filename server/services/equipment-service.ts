@@ -1,6 +1,6 @@
 import { type GatheringCategorySkillKey, skillTemplateByKey } from '@/shared/templates/skill-template';
 import { toolsTemplate } from '@/shared/templates/tool-template';
-import type { EquipmentSlotType, itemsInstanceDeltaEvent } from '@/shared/types';
+import type { EquipmentSlotType, ItemInstance, ItemTemplate, itemsInstanceDeltaEvent } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { heroService } from './hero-service';
@@ -9,11 +9,51 @@ import { itemInstanceService } from './item-instance-service';
 import { itemTemplateService } from './item-template-service';
 
 export const equipmentService = {
-  findEquipItemBySlot(slot: EquipmentSlotType, heroId: string) {
+  getEquipSlotData(heroId: string, itemTemplate: ItemTemplate) {
     const hero = heroService.getHero(heroId);
-    const equipItem = hero.equipments.find((e) => e.slot === slot);
+    const rightHand = hero.equipments.find((e) => e.slot === 'RIGHT_HAND');
+    const leftHand = hero.equipments.find((e) => e.slot === 'LEFT_HAND');
+    const template = itemTemplateService.getAllItemsTemplateMapIds();
+    switch (itemTemplate.type) {
+      case 'TOOL':
+      case 'WEAPON': {
+        switch (itemTemplate.equipInfo?.weaponHand) {
+          case 'TWO_HANDED':
+            return {
+              equippedItems: hero.equipments.filter((e) => e.slot === 'RIGHT_HAND' || e.slot === 'LEFT_HAND'),
+              slot: 'RIGHT_HAND',
+            };
+          case 'ONE_HANDED': {
+            if (!rightHand && !leftHand) return { slot: 'RIGHT_HAND', equippedItems: [] };
+            if (rightHand && leftHand) return { slot: 'RIGHT_HAND', equippedItems: [rightHand] };
+            if (!rightHand && leftHand) return { slot: 'RIGHT_HAND', equippedItems: [] };
+            if (rightHand && template[rightHand.itemTemplateId].equipInfo?.weaponHand === 'TWO_HANDED' && !leftHand) {
+              return { slot: 'RIGHT_HAND', equippedItems: [rightHand] };
+            } else {
+              return { slot: 'LEFT_HAND', equippedItems: [] };
+            }
+          }
+        }
+        break;
+      }
+      case 'SHIELD': {
+        if (!leftHand && rightHand && template[rightHand.itemTemplateId].equipInfo?.weaponHand !== 'TWO_HANDED')
+          return { slot: 'LEFT_HAND', equippedItems: [] };
+        if (rightHand && template[rightHand.itemTemplateId].equipInfo?.weaponHand === 'TWO_HANDED') {
+          return { slot: 'LEFT_HAND', equippedItems: [rightHand] };
+        }
+        if (leftHand) return { slot: 'LEFT_HAND', equippedItems: [leftHand] };
+        break;
+      }
 
-    return equipItem;
+      case 'ARMOR':
+        return {
+          equippedItems: hero.equipments.filter((e) => e.slot === itemTemplate.equipInfo?.armorType),
+          slot: itemTemplate.equipInfo?.armorType as EquipmentSlotType,
+        };
+      default:
+        throw new HTTPException(400, { message: 'Invalid item type for equipping' });
+    }
   },
   findEquipTool(heroId: string, gatherSkill: GatheringCategorySkillKey) {
     if (gatherSkill === 'FORAGING') return;
@@ -38,24 +78,30 @@ export const equipmentService = {
     const template = itemTemplateService.getAllItemsTemplateMapIds()[itemInstance.itemTemplateId];
     let resultDeltas: itemsInstanceDeltaEvent[] = [];
 
-    const slot = this.getEquipSlot(heroId, itemInstanceId);
-    if (slot) {
-      const equipItem = this.findEquipItemBySlot(slot, hero.id);
-      if (equipItem) {
-        resultDeltas = this.unEquipItem(heroId, equipItem.id);
-      }
-      itemInstance.itemContainerId = null;
-      itemInstance.location = 'EQUIPMENT';
-      itemInstance.slot = slot;
-      hero.equipments.push(itemInstance);
-      itemContainerService.deleteItem(backpack.id, itemInstanceId);
-      heroService.updateModifier(hero.id);
-
- 
-
-      
+    const equipData = this.getEquipSlotData(hero.id, template);
+    if (!equipData || !equipData.slot) return [];
+    for (const equippedItem of equipData.equippedItems) {
+      const unEquipItem = this.unEquipItem(heroId, equippedItem.id);
+      resultDeltas.push(...unEquipItem);
     }
+
+    itemInstance.itemContainerId = null;
+    itemInstance.location = 'EQUIPMENT';
+    itemInstance.slot = equipData.slot as EquipmentSlotType;
+    hero.equipments.push(itemInstance);
+    itemContainerService.deleteItem(backpack.id, itemInstanceId);
+    heroService.updateModifier(hero.id);
+    resultDeltas.push({
+      type: 'DELETE',
+      itemContainerId: backpack.id,
+      itemInstanceId,
+      itemName: itemInstance.displayName ?? template.name,
+    });
+    resultDeltas.push({ type: 'CREATE', item: itemInstance });
+
+    return resultDeltas;
   },
+
   unEquipItem(heroId: string, itemInstanceId: string) {
     const hero = heroService.getHero(heroId);
     const backpack = itemContainerService.getBackpack(hero.id);
@@ -85,58 +131,19 @@ export const equipmentService = {
     if (index === -1) return;
     hero.equipments.splice(index, 1);
   },
-  getEquipSlot(heroId: string, itemInstanceId: string) {
-    const hero = heroService.getHero(heroId);
-    const backpack = itemContainerService.getBackpack(hero.id);
-    const findItemInstance = itemInstanceService.getItemInstance(backpack.id, itemInstanceId);
-    const itemTemplateById = itemTemplateService.getAllItemsTemplateMapIds();
-    const itemTemplate = itemTemplateById[findItemInstance.itemTemplateId];
+  // getEquipSlot(itemTemplate: ItemTemplate) {
+  //   switch (itemTemplate.type) {
+  //     case 'ARMOR':
+  //       return itemTemplate.equipInfo?.armorType;
+  //     case 'SHIELD':
+  //       return 'LEFT_HAND';
 
-    switch (itemTemplate.type) {
-      case 'ARMOR':
-        return itemTemplate.equipInfo?.armorType;
-      case 'SHIELD': {
-        const existRightSlot = this.findEquipItemBySlot('RIGHT_HAND', heroId);
-        if (existRightSlot && itemTemplateById[existRightSlot.itemTemplateId].equipInfo?.weaponHand === 'TWO_HANDED') {
-          this.unEquipItem(hero.id, existRightSlot.id);
-        }
+  //     case 'TOOL':
+  //     case 'WEAPON':
+  //       return 'RIGHT_HAND';
 
-        return 'LEFT_HAND';
-      }
-
-      case 'TOOL':
-      case 'WEAPON': {
-        const weaponHand = itemTemplate.equipInfo?.weaponHand;
-
-        const leftItem = this.findEquipItemBySlot('LEFT_HAND', heroId);
-        const rightItem = this.findEquipItemBySlot('RIGHT_HAND', heroId);
-
-        const rightIsTwoHanded = rightItem && itemTemplateById[rightItem.itemTemplateId].equipInfo?.weaponHand === 'TWO_HANDED';
-
-        // TWO HANDED
-        if (weaponHand === 'TWO_HANDED') {
-          if (leftItem) this.unEquipItem(hero.id, leftItem.id);
-          if (rightItem) this.unEquipItem(hero.id, rightItem.id);
-          return 'RIGHT_HAND';
-        }
-
-        // ONE HANDED
-        if (weaponHand === 'ONE_HANDED') {
-          if (rightIsTwoHanded) {
-            this.unEquipItem(hero.id, rightItem.id);
-            return 'RIGHT_HAND';
-          }
-
-          if (!rightItem) return 'RIGHT_HAND';
-          if (!leftItem) return 'LEFT_HAND';
-
-          return 'RIGHT_HAND';
-        }
-
-        break;
-      }
-      default:
-        throw new HTTPException(400, { message: 'Invalid item type for equipping' });
-    }
-  },
+  //     default:
+  //       throw new HTTPException(400, { message: 'Invalid item type for equipping' });
+  //   }
+  // },
 };

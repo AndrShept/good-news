@@ -2,7 +2,7 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
-import { HeroOfflineData, HeroOnlineData, HeroUpdateStateData, MapUpdateData } from '@/shared/socket-data-types';
+import { HeroOfflineEvent, HeroOnlineEvent, HeroUpdateStateEvent, MapUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useEffect } from 'react';
 
@@ -18,7 +18,7 @@ export const useMapListener = () => {
   const id = useHeroId();
 
   useEffect(() => {
-    const listener = (data: MapUpdateData | HeroOfflineData | HeroOnlineData | HeroUpdateStateData) => {
+    const listener = (data: MapUpdateEvent | HeroOfflineEvent | HeroOnlineEvent | HeroUpdateStateEvent) => {
       switch (data.type) {
         case 'REMOVE_HERO':
           deleteHeroes(data.payload.heroId);

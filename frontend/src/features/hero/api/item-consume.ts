@@ -1,8 +1,8 @@
 import { client } from '@/lib/utils';
 import { ErrorResponse } from '@/shared/types';
 
-export const itemUse = async ({ heroId, itemInstanceId }: { heroId: string; itemInstanceId: string; }) => {
-  const res = await client.hero[':id'].item[':itemInstanceId'].use.$post({
+export const itemConsume = async ({ heroId, itemInstanceId }: { heroId: string; itemInstanceId: string; }) => {
+  const res = await client.hero[':id'].item[':itemInstanceId'].consume.$post({
     param: {
       id: heroId,
       itemInstanceId,

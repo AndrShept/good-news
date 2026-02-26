@@ -1,4 +1,4 @@
-import type { WalkMapUpdateData } from '@/shared/socket-data-types';
+import type { WalkMapUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import type { PathNode } from '@/shared/types';
 
@@ -22,7 +22,7 @@ export const moveTick = (now: number) => {
       const step = paths.shift();
       if (!step) continue;
       lastStep = step;
-      const socketData: WalkMapUpdateData = { type: 'WALK_MAP_UPDATE', payload: { heroId, x: step.x, y: step.y } };
+      const socketData: WalkMapUpdateEvent = { type: 'WALK_MAP_UPDATE', payload: { heroId, x: step.x, y: step.y } };
 
       heroState.location.x = step.x;
       heroState.location.y = step.y;

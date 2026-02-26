@@ -7,7 +7,7 @@ import { itemContainerService } from './item-container-service';
 import { itemInstanceService } from './item-instance-service';
 import { itemTemplateService } from './item-template-service';
 
-export const itemUseService = {
+export const itemConsumeService = {
   drink(heroId: string, itemInstanceId: string) {
     const hero = heroService.getHero(heroId);
     const backpack = itemContainerService.getBackpack(hero.id);
@@ -43,13 +43,13 @@ export const itemUseService = {
       result.message = 'You success use item ';
       result.name = itemTemplate.name;
     }
-    itemContainerService.consumeItem({
+    const itemsDelta = itemContainerService.consumeItem({
       itemContainerId: backpack.id,
       itemInstanceId,
       quantity: 1,
       mode: 'use',
     });
-    return result;
+    return { message: result.message, name: result.name, itemsDelta };
   },
   readSkillBook(heroId: string, itemInstanceId: string) {
     const hero = heroService.getHero(heroId);
@@ -59,7 +59,7 @@ export const itemUseService = {
     const result = { name: '', message: '' };
     switch (itemTemplate.bookInfo?.kind) {
       case 'TRAIN_BUFF': {
-        if (!itemTemplate.bookInfo.buffTemplateId) return result;
+        if (!itemTemplate.bookInfo.buffTemplateId) return 
         const buffTemplate = buffTemplateMapIds[itemTemplate.bookInfo.buffTemplateId];
         buffInstanceService.createBuff(heroId, itemTemplate.bookInfo.buffTemplateId);
         result.message = 'You obtain new buff';
@@ -68,12 +68,12 @@ export const itemUseService = {
       }
     }
 
-    itemContainerService.consumeItem({
+    const itemsDelta = itemContainerService.consumeItem({
       itemContainerId: backpack.id,
       itemInstanceId,
       quantity: 1,
       mode: 'use',
     });
-    return result;
+    return { message: result.message, name: result.name, itemsDelta };
   },
 };

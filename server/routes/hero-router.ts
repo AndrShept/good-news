@@ -8,7 +8,7 @@ import {
   RESET_STATS_COST,
   WORLD_SEED,
 } from '@/shared/constants';
-import type { HeroUpdateStateData, WalkMapCompleteData, WalkMapStartData } from '@/shared/socket-data-types';
+import type { HeroUpdateStateEvent, WalkMapCompleteEvent, WalkMapStartEvent } from '@/shared/socket-data-types';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
@@ -49,6 +49,7 @@ import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
 import { io } from '..';
+import { HeroSidebarList } from '../../frontend/src/features/map/components/HeroSidebarList';
 import { socketEvents } from '../../shared/socket-events';
 import type { Context } from '../context';
 import { db } from '../db/db';
@@ -76,10 +77,10 @@ import { actionQueue } from '../queue/actionQueue';
 import { equipmentService } from '../services/equipment-service';
 import { gatheringService } from '../services/gathering-service';
 import { heroService } from '../services/hero-service';
+import { itemConsumeService } from '../services/item-consume-service';
 import { itemContainerService } from '../services/item-container-service';
 import { itemInstanceService } from '../services/item-instance-service';
 import { itemTemplateService } from '../services/item-template-service';
-import { itemUseService } from '../services/item-use-service';
 import { queueCraftService } from '../services/queue-craft-service';
 import { skillService } from '../services/skill-service';
 import { socketService } from '../services/socket-service';
@@ -482,7 +483,7 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post(
-    '/:id/item/:itemInstanceId/use',
+    '/:id/equipment/:itemInstanceId',
     loggedIn,
     zValidator(
       'param',
@@ -498,76 +499,94 @@ export const heroRouter = new Hono<Context>()
       const backpack = itemContainerService.getBackpack(hero.id);
       verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.heroId, heroId: hero.id });
 
-      if (hero.state === 'BATTLE') {
+      if (hero.state !== 'IDLE') {
+        throw new HTTPException(403, { message: 'You cannot use item during some action.', cause: { canShow: true } });
+      }
+      let message: null | string = null;
+      const equipItem = hero.equipments.find((e) => e.id === itemInstanceId);
+      let itemsDelta: itemsInstanceDeltaEvent[] = [];
+
+      if (equipItem) {
+        itemsDelta = equipmentService.unEquipItem(hero.id, itemInstanceId);
+      } else {
+        itemsDelta = equipmentService.equipItem(hero.id, itemInstanceId);
+        message = 'You have equipped the item';
+      }
+
+      const returnData = {
+        hero: {
+          currentHealth: hero.currentHealth,
+          currentMana: hero.currentMana,
+          maxHealth: hero.maxHealth,
+          maxMana: hero.maxMana,
+          stat: hero.stat,
+          regen: hero.regen,
+          modifier: hero.modifier,
+        },
+        itemsDelta,
+      };
+
+      return c.json<SuccessResponse<typeof returnData>>({
+        success: true,
+        message: message ?? 'OK',
+        data: returnData,
+      });
+    },
+  )
+  .post(
+    '/:id/item/:itemInstanceId/consume',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string().uuid(),
+        itemInstanceId: z.string().uuid(),
+      }),
+    ),
+    async (c) => {
+      const { id, itemInstanceId } = c.req.valid('param');
+      const userId = c.get('user')?.id as string;
+      const hero = heroService.getHero(id);
+      const backpack = itemContainerService.getBackpack(hero.id);
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.heroId, heroId: hero.id });
+
+      if (hero.state !== 'IDLE') {
         throw new HTTPException(403, { message: 'You cannot use item during some action.', cause: { canShow: true } });
       }
 
       const template = itemTemplateService.getAllItemsTemplateMapIds();
 
-      const result = {
-        equipItemName: '',
-        message: '',
-        isEquip: false,
-        isHero: true,
-      };
-      const equipItem = hero.equipments.find((e) => e.id === itemInstanceId);
-      let itemDeltas: itemsInstanceDeltaEvent[] = [];
+      let result: ReturnType<typeof itemConsumeService.drink> | undefined | null = null;
 
-      if (equipItem) {
-        itemDeltas = equipmentService.unEquipItem(hero.id, itemInstanceId);
-        result.message = 'You have unequipped the item';
-        result.equipItemName = equipItem.displayName ?? template[equipItem.itemTemplateId].name;
-        result.isEquip = true;
-      } else {
-        const itemInstance = itemInstanceService.getItemInstance(backpack.id, itemInstanceId);
-        switch (template[itemInstance.itemTemplateId].type) {
-          case 'POTION': {
-            const useResult = itemUseService.drink(hero.id, itemInstanceId);
-            result.message = useResult.message;
-            break;
-          }
-          case 'SKILL_BOOK':
-            const useResult = itemUseService.readSkillBook(hero.id, itemInstanceId);
-            result.message = useResult.message;
-            result.isHero = false;
-            break;
-          case 'ACCESSORY':
-          case 'ARMOR':
-          case 'WEAPON':
-          case 'TOOL':
-          case 'SHIELD': {
-            const equipResultDeltas = equipmentService.equipItem(hero.id, itemInstanceId);
-            result.message = 'You have equipped the item';
-            result.equipItemName = itemInstance.displayName ?? template[itemInstance.itemTemplateId].name;
-            result.isEquip = true;
-            itemDeltas.push(...(equipResultDeltas ?? []));
-            break;
-          }
-
-          default:
-            throw new HTTPException(400, { message: 'Invalid item type for equipping' });
+      const itemInstance = itemInstanceService.getItemInstance(backpack.id, itemInstanceId);
+      switch (template[itemInstance.itemTemplateId].type) {
+        case 'POTION': {
+          result = itemConsumeService.drink(hero.id, itemInstanceId);
+          break;
         }
+        case 'SKILL_BOOK':
+          result = itemConsumeService.readSkillBook(hero.id, itemInstanceId);
+          break;
+
+        default:
+          throw new HTTPException(400, { message: 'Invalid item type for equipping' });
       }
-      console.log(itemDeltas);
+
       const returnData = {
-        equipItemName: result.equipItemName,
-        backpack,
-        hero: result.isHero
-          ? {
-              currentHealth: hero.currentHealth,
-              currentMana: hero.currentMana,
-              maxHealth: hero.maxHealth,
-              maxMana: hero.maxMana,
-              stat: hero.stat,
-              regen: hero.regen,
-              modifier: hero.modifier,
-              equipments: result.isEquip ? hero.equipments : undefined,
-            }
-          : undefined,
+        ...result,
+        hero: {
+          currentHealth: hero.currentHealth,
+          currentMana: hero.currentMana,
+          maxHealth: hero.maxHealth,
+          maxMana: hero.maxMana,
+          stat: hero.stat,
+          regen: hero.regen,
+          modifier: hero.modifier,
+        },
       };
       return c.json<SuccessResponse<typeof returnData>>({
         success: true,
-        message: result.message,
+        message: 'success consume item',
         data: returnData,
       });
     },
@@ -712,7 +731,7 @@ export const heroRouter = new Hono<Context>()
       heroState.location.targetX = targetPos.x;
       heroState.location.targetY = targetPos.y;
 
-      const socketData: WalkMapStartData = {
+      const socketData: WalkMapStartEvent = {
         type: 'WALK_MAP_START',
         payload: {
           heroId: id,
@@ -744,7 +763,7 @@ export const heroRouter = new Hono<Context>()
       heroState.state = 'IDLE';
       heroState.location.targetX = null;
       heroState.location.targetY = null;
-      const socketData: WalkMapCompleteData = {
+      const socketData: WalkMapCompleteEvent = {
         type: 'WALK_MAP_COMPLETE',
         payload: {
           heroId: id,
@@ -957,7 +976,7 @@ export const heroRouter = new Hono<Context>()
       hero.gatheringFinishAt = gatheringTime;
 
       if (hero.location.mapId) {
-        const socketData: HeroUpdateStateData = {
+        const socketData: HeroUpdateStateEvent = {
           type: 'UPDATE_STATE',
           payload: { heroId: hero.id, state },
         };
@@ -1042,7 +1061,6 @@ export const heroRouter = new Hono<Context>()
       const queueCraft = queueCraftService.getQueueCraft(hero.id);
 
       const recipe = recipeTemplateById[recipeId];
-      const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[recipe.itemTemplateId];
       const last = queueCraft.at(-1);
       if (last && last.craftBuildingType !== recipe.requirement.building) {
         throw new HTTPException(400, {
