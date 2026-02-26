@@ -1,5 +1,5 @@
 import { resourceTemplateById } from '@/shared/templates/resource-template';
-import type { CoreResourceType, ItemInstance, ItemLocationType, ItemSyncEvent, OmitModifier, WeaponType } from '@/shared/types';
+import type { CoreResourceType, ItemInstance, ItemLocationType, itemsInstanceDeltaEvent, OmitModifier, WeaponType } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { itemDurabilityConfig } from '../lib/config/item-dutability-config';
@@ -83,7 +83,7 @@ export const itemInstanceService = {
     const itemInstance = equipmentService.findEquipItemByInstanceId(heroId, itemInstanceId);
     const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[itemInstance.itemTemplateId];
 
-    let result: ItemSyncEvent | undefined = undefined;
+    let result: itemsInstanceDeltaEvent | undefined = undefined;
     if (itemInstance.durability) {
       itemInstance.durability.current -= value;
       result = {

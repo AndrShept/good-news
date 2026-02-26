@@ -4,12 +4,12 @@ import type {
   GameSysMessageType,
   Hero,
   HeroSidebarItem,
-  ItemSyncEvent,
   MapHero,
   QueueCraftStatusType,
   SkillInstance,
   StateType,
   TItemContainer,
+  itemsInstanceDeltaEvent,
 } from './types';
 
 export type SocketGroupResponse = {
@@ -102,8 +102,8 @@ export type FinishGatheringEvent = {
     itemName?: string;
     quantity?: number;
     message: string;
-    inventoryDeltas?: ItemSyncEvent[];
-    equipmentDeltas?: ItemSyncEvent[];
+    inventoryDeltas?: itemsInstanceDeltaEvent[];
+    equipmentDeltas?: itemsInstanceDeltaEvent[];
   };
 };
 export type SkillUpData = {

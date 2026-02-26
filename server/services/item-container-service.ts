@@ -1,4 +1,4 @@
-import type { ItemInstance, ItemLocationType, ItemSyncEvent } from '@/shared/types';
+import type { ItemInstance, ItemLocationType, itemsInstanceDeltaEvent } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
@@ -39,11 +39,8 @@ export const itemContainerService = {
     const backpack = this.getContainer(backpackId);
     return backpack;
   },
-  addItem(itemContainerId: string, itemInstance: ItemInstance) {
-    const container = this.getContainer(itemContainerId);
-    container.itemsInstance.push(itemInstance);
-  },
-  removeItem(itemContainerId: string, itemInstanceId: string) {
+
+  deleteItem(itemContainerId: string, itemInstanceId: string) {
     const container = this.getContainer(itemContainerId);
 
     const findIndex = container.itemsInstance.findIndex((i) => i.id === itemInstanceId);
@@ -73,7 +70,7 @@ export const itemContainerService = {
     const templateById = itemTemplateService.getAllItemsTemplateMapIds();
     const template = templateById[itemTemplateId];
     const location = 'BACKPACK';
-    const result: ItemSyncEvent[] = [];
+    let result: itemsInstanceDeltaEvent[] = [];
     if (!template.stackable) {
       for (let i = 0; i < quantity; i++) {
         const newItem = itemInstanceService.createItem({ heroId, itemContainerId, itemTemplateId, quantity: 1, location, coreResourceId });
@@ -82,15 +79,14 @@ export const itemContainerService = {
 
       return result;
     }
-    const obtainsItemData = this.obtainStackableItem({ heroId, itemContainerId, itemTemplateId, location, quantity });
-    result.push(...(obtainsItemData ?? []));
+    result = this.obtainStackableItem({ heroId, itemContainerId, itemTemplateId, location, quantity });
     return result;
   },
   obtainStackableItem({ heroId, itemContainerId, itemTemplateId, location, quantity }: IObtainStackableItem) {
     const container = itemContainerService.getContainer(itemContainerId);
     const templateById = itemTemplateService.getAllItemsTemplateMapIds();
     const template = templateById[itemTemplateId];
-    const resultData: ItemSyncEvent[] = [];
+    const resultData: itemsInstanceDeltaEvent[] = [];
     let remaining = quantity;
 
     // 1️⃣ Заповнюємо існуючі стеки
@@ -142,7 +138,7 @@ export const itemContainerService = {
 
     // ❌ non-stackable
     if (!template.stackable) {
-      itemContainerService.removeItem(itemContainerId, itemInstanceId);
+      itemContainerService.deleteItem(itemContainerId, itemInstanceId);
       return;
     }
 
@@ -155,7 +151,7 @@ export const itemContainerService = {
       itemInstance.quantity -= quantity;
 
       if (itemInstance.quantity === 0) {
-        itemContainerService.removeItem(itemContainerId, itemInstance.id);
+        itemContainerService.deleteItem(itemContainerId, itemInstance.id);
       }
 
       return;
@@ -170,7 +166,7 @@ export const itemContainerService = {
     remaining -= takeFirst;
 
     if (itemInstance.quantity === 0) {
-      itemContainerService.removeItem(itemContainerId, itemInstance.id);
+      itemContainerService.deleteItem(itemContainerId, itemInstance.id);
     }
 
     // 2️⃣ інші
@@ -184,7 +180,7 @@ export const itemContainerService = {
       remaining -= take;
 
       if (inst.quantity === 0) {
-        itemContainerService.removeItem(itemContainerId, inst.id);
+        itemContainerService.deleteItem(itemContainerId, inst.id);
       }
     }
 

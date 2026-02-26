@@ -21,7 +21,6 @@ import {
   type ErrorResponse,
   type Hero,
   type ItemInstance,
-  type ItemSyncEvent,
   type PathNode,
   type QueueCraft,
   type StateType,
@@ -33,6 +32,7 @@ import {
   buyItemsSchema,
   craftBuildingValues,
   createHeroSchema,
+  type itemsInstanceDeltaEvent,
   statsSchema,
 } from '@/shared/types';
 import {
@@ -511,9 +511,10 @@ export const heroRouter = new Hono<Context>()
         isHero: true,
       };
       const equipItem = hero.equipments.find((e) => e.id === itemInstanceId);
+      let itemDeltas: itemsInstanceDeltaEvent[] = [];
 
       if (equipItem) {
-        equipmentService.unEquipItem(hero.id, itemInstanceId);
+        itemDeltas = equipmentService.unEquipItem(hero.id, itemInstanceId);
         result.message = 'You have unequipped the item';
         result.equipItemName = equipItem.displayName ?? template[equipItem.itemTemplateId].name;
         result.isEquip = true;
@@ -535,10 +536,11 @@ export const heroRouter = new Hono<Context>()
           case 'WEAPON':
           case 'TOOL':
           case 'SHIELD': {
-            equipmentService.equipItem(hero.id, itemInstanceId);
+            const equipResultDeltas = equipmentService.equipItem(hero.id, itemInstanceId);
             result.message = 'You have equipped the item';
             result.equipItemName = itemInstance.displayName ?? template[itemInstance.itemTemplateId].name;
             result.isEquip = true;
+            itemDeltas.push(...(equipResultDeltas ?? []));
             break;
           }
 
@@ -546,6 +548,7 @@ export const heroRouter = new Hono<Context>()
             throw new HTTPException(400, { message: 'Invalid item type for equipping' });
         }
       }
+      console.log(itemDeltas);
       const returnData = {
         equipItemName: result.equipItemName,
         backpack,
@@ -607,16 +610,16 @@ export const heroRouter = new Hono<Context>()
       itemContainerService.checkFreeContainerCapacity(toContainer.id);
 
       const existContainer = toContainer.itemsInstance.some((i) => i.itemTemplateId === itemTemplate.id);
-      let inventoryDeltas: ItemSyncEvent[] = [];
+      let inventoryDeltas: itemsInstanceDeltaEvent[] = [];
       if ((!existContainer && itemTemplate.stackable) || !itemTemplate.stackable) {
         itemInstance.itemContainerId = to;
         itemInstance.location = toContainer.type;
         itemInstance.ownerHeroId = hero.id;
-        itemContainerService.removeItem(from, itemInstanceId);
+        itemContainerService.deleteItem(from, itemInstanceId);
         toContainer.itemsInstance.push(itemInstance);
         inventoryDeltas.push({ type: 'CREATE', itemContainerId: toContainer.id, item: itemInstance });
       } else {
-        itemContainerService.removeItem(from, itemInstanceId);
+        itemContainerService.deleteItem(from, itemInstanceId);
         inventoryDeltas = itemContainerService.obtainStackableItem({
           heroId: hero.id,
           itemContainerId: toContainer.id,

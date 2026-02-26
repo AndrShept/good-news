@@ -1,7 +1,7 @@
 import { BASE_GATHERING_TIME } from '@/shared/constants';
 import type { FinishGatheringEvent, HeroUpdateStateData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import type { ItemSyncEvent } from '@/shared/types';
+import type { itemsInstanceDeltaEvent } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
@@ -70,7 +70,7 @@ export const gatherTick = (now: number) => {
         loreSkillLevel: lorSkillInstance?.level,
         maxQuantity: gatherResult.gatherItem.maxGatherQuantity,
       });
-      let inventoryDeltas: ItemSyncEvent[] = [];
+      let inventoryDeltas: itemsInstanceDeltaEvent[] = [];
       if (gatherResult.success) {
         tileState.charges -= quantity;
         inventoryDeltas = itemContainerService.createItem({
@@ -81,7 +81,6 @@ export const gatherTick = (now: number) => {
           quantity,
         });
       }
-      // console.log(itemEventData);
       const exp = progressionService.calculateGatherExp({
         gatherSkillLevel: gatherSkillInstance.level,
         requiredMinSkill: gatherResult.gatherItem.requiredMinSkill,

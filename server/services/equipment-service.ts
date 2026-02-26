@@ -1,6 +1,6 @@
 import { type GatheringCategorySkillKey, skillTemplateByKey } from '@/shared/templates/skill-template';
 import { toolsTemplate } from '@/shared/templates/tool-template';
-import type { EquipmentSlotType } from '@/shared/types';
+import type { EquipmentSlotType, itemsInstanceDeltaEvent } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { heroService } from './hero-service';
@@ -35,25 +35,33 @@ export const equipmentService = {
     const hero = heroService.getHero(heroId);
     const backpack = itemContainerService.getBackpack(hero.id);
     const itemInstance = itemInstanceService.getItemInstance(backpack.id, itemInstanceId);
+    const template = itemTemplateService.getAllItemsTemplateMapIds()[itemInstance.itemTemplateId];
+    let resultDeltas: itemsInstanceDeltaEvent[] = [];
 
     const slot = this.getEquipSlot(heroId, itemInstanceId);
     if (slot) {
       const equipItem = this.findEquipItemBySlot(slot, hero.id);
       if (equipItem) {
-        this.unEquipItem(heroId, equipItem.id);
+        resultDeltas = this.unEquipItem(heroId, equipItem.id);
       }
       itemInstance.itemContainerId = null;
       itemInstance.location = 'EQUIPMENT';
       itemInstance.slot = slot;
       hero.equipments.push(itemInstance);
-      itemContainerService.removeItem(backpack.id, itemInstanceId);
+      itemContainerService.deleteItem(backpack.id, itemInstanceId);
       heroService.updateModifier(hero.id);
+
+ 
+
+      
     }
   },
   unEquipItem(heroId: string, itemInstanceId: string) {
     const hero = heroService.getHero(heroId);
     const backpack = itemContainerService.getBackpack(hero.id);
     const equippedItem = this.findEquipItemByInstanceId(heroId, itemInstanceId);
+    const template = itemTemplateService.getAllItemsTemplateMapIds()[equippedItem.itemTemplateId];
+    const resultDeltas: itemsInstanceDeltaEvent[] = [];
     heroService.checkFreeBackpackCapacity(heroId);
     const findIndex = hero.equipments.findIndex((e) => e.id === itemInstanceId);
     if (findIndex === -1) throw new HTTPException(404, { message: 'unEquipItem findIndex not found' });
@@ -61,9 +69,15 @@ export const equipmentService = {
     equippedItem.itemContainerId = backpack.id;
     equippedItem.location = 'BACKPACK';
     equippedItem.slot = null;
+
     const [itemInstance] = hero.equipments.splice(findIndex, 1);
-    itemContainerService.addItem(backpack.id, itemInstance);
+    const container = itemContainerService.getContainer(backpack.id);
+    container.itemsInstance.push(itemInstance);
     heroService.updateModifier(hero.id);
+
+    resultDeltas.push({ type: 'DELETE', itemInstanceId, itemName: itemInstance.displayName ?? template.name });
+    resultDeltas.push({ type: 'CREATE', itemContainerId: backpack.id, item: itemInstance });
+    return resultDeltas;
   },
   removeEquipment(heroId: string, itemInstanceId: string) {
     const hero = heroService.getHero(heroId);

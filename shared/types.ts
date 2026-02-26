@@ -223,7 +223,7 @@ export type TPlace = {
   entrances: Entrance[];
 };
 
-export type ItemSyncEvent =
+export type itemsInstanceDeltaEvent =
   | {
       type: 'CREATE';
       item: ItemInstance;
