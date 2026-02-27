@@ -5,6 +5,7 @@ import { HTTPException } from 'hono/http-exception';
 import { serverState } from '../game/state/server-state';
 import { skillExpConfig } from '../lib/config/skill-exp-config';
 import { itemTemplateService } from './item-template-service';
+import { deltaEventsService } from './delta-events-service';
 
 export const skillService = {
   getSkillBySkillTemplateId(heroId: string, skillTemplateId: string) {
@@ -58,7 +59,12 @@ export const skillService = {
       result.message = `Your skill in ${skillTemplate.name} has increased by ${increment}. It is now ${skill.level.toFixed(1)}  🔥`;
       result.isLevelUp = true;
     }
-
+    deltaEventsService.skillInstance.update(skill.id , {
+      currentExperience: 
+      skill.currentExperience,
+      level: skill.level,
+      expToLvl: skill.expToLvl
+    })
     return result;
   },
 

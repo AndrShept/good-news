@@ -74,6 +74,7 @@ import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
 import { actionQueue } from '../queue/actionQueue';
+import { deltaEventsService } from '../services/delta-events-service';
 import { equipmentService } from '../services/equipment-service';
 import { gatheringService } from '../services/gathering-service';
 import { heroService } from '../services/hero-service';
@@ -420,6 +421,9 @@ export const heroRouter = new Hono<Context>()
       heroService.checkFreeBackpackCapacity(hero.id, needCapacity);
 
       heroService.assertHasEnoughGold(hero.id, sumPriceGold);
+
+      heroService.spendGold(hero.id, sumPriceGold);
+
       const returnData = {
         goldCoins: hero.goldCoins,
         itemContainer: backpack,
@@ -434,9 +438,9 @@ export const heroRouter = new Hono<Context>()
           itemTemplateId: template.id,
           quantity: item.quantity,
           coreResourceId: undefined,
+          isAddPendingEvents: true,
         });
       }
-      heroService.spendGold(hero.id, sumPriceGold);
 
       return c.json<SuccessResponse<typeof returnData>>({
         message: `You have successfully purchased the items.`,
@@ -472,6 +476,8 @@ export const heroRouter = new Hono<Context>()
       }
       const [deletedItem] = container.itemsInstance.splice(findIndex, 1);
       const mapIds = itemTemplateService.getAllItemsTemplateMapIds();
+      deltaEventsService.itemInstance.delete(itemInstanceId);
+
       return c.json<SuccessResponse<{ name: string; quantity: number }>>(
         {
           success: true,
@@ -637,8 +643,15 @@ export const heroRouter = new Hono<Context>()
         itemContainerService.deleteItem(from, itemInstanceId);
         toContainer.itemsInstance.push(itemInstance);
         inventoryDeltas.push({ type: 'CREATE', itemContainerId: toContainer.id, item: itemInstance });
+        deltaEventsService.itemInstance.update(itemInstanceId, {
+          itemContainerId: toContainer.id,
+          ownerHeroId: toContainer.heroId,
+          location: toContainer.type,
+        });
       } else {
         itemContainerService.deleteItem(from, itemInstanceId);
+        deltaEventsService.itemInstance.delete(itemInstanceId);
+
         inventoryDeltas = itemContainerService.obtainStackableItem({
           heroId: hero.id,
           itemContainerId: toContainer.id,

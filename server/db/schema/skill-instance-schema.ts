@@ -1,11 +1,11 @@
 import { relations } from 'drizzle-orm';
-import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { integer, jsonb, pgEnum, pgTable, real, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { heroTable } from './hero-schema';
 
 export const skillInstanceTable = pgTable('skill_instance', {
   id: uuid().primaryKey().defaultRandom().notNull(),
-  level: integer().notNull().default(1),
+  level: real().notNull().default(1),
   currentExperience: integer().notNull().default(0),
   expToLvl: integer().notNull(),
   expAcc: integer().notNull().default(0),

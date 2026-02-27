@@ -79,6 +79,7 @@ export const gatherTick = (now: number) => {
           itemContainerId: backpack.id,
           itemTemplateId: itemTemplate.id,
           quantity,
+          isAddPendingEvents: true,
         });
       }
       const exp = progressionService.calculateGatherExp({

@@ -4,6 +4,7 @@ import type {
   BuffTemplate,
   CraftBuildingType,
   Hero,
+  ItemInstance,
   OmitTileType,
   PathNode,
   QueueCraft,
@@ -11,6 +12,8 @@ import type {
   TItemContainer,
 } from '@/shared/types';
 import type { Socket } from 'socket.io';
+
+import type { itemInstanceTable, skillInstanceTable } from '../../db/schema';
 
 export type HeroRuntime = Hero & {
   paths?: PathNode[];
@@ -30,6 +33,27 @@ export type TileState = {
   y: number;
 };
 
+export type ItemInstancePendingDeltaEvents =
+  | {
+      type: 'CREATE';
+      item: typeof itemInstanceTable.$inferInsert;
+    }
+  | {
+      type: 'UPDATE';
+      itemInstanceId: string;
+      updateData: Partial<typeof itemInstanceTable.$inferInsert>;
+    }
+  | {
+      type: 'DELETE';
+      itemInstanceId: string;
+    };
+
+export type SkillInstancePendingDeltaEvents = {
+  type: 'UPDATE';
+  skillInstanceId: string;
+  updateData: Partial<typeof skillInstanceTable.$inferInsert>;
+};
+
 export const serverState = {
   hero: new Map<string, HeroRuntime>(),
   container: new Map<string, TItemContainer>(),
@@ -40,5 +64,7 @@ export const serverState = {
   queueCraft: new Map<string, QueueCraft[]>(),
   socket: new Map<string, Socket>(),
   worldResourceTiles: new Map<string, Map<string, TileState>>(),
+  itemInstancePendingDeltaEvents: new Set<ItemInstancePendingDeltaEvents>(),
+  skillInstancePendingDeltaEvents: new Set<SkillInstancePendingDeltaEvents>(),
 };
 console.log('SERVER STATE INIT', new Date().toLocaleTimeString());

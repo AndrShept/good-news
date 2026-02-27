@@ -7,7 +7,7 @@ import { queueCraftTick } from './quue-craft-tick';
 import { regenTick } from './regen-tick';
 import { resourceRespawnTick } from './resource-respawn-tick';
 
-const TICK_RATE = 1000; // ms
+const TICK_RATE = 500; // ms
 const MAX_CATCHUP_TICKS = 5;
 
 let lastTick = Date.now();
@@ -26,7 +26,7 @@ export const gameLoop = () => {
     buffTick(lastTick);
     queueCraftTick(lastTick);
     gatherTick(lastTick);
-    resourceRespawnTick(lastTick)
+    resourceRespawnTick(lastTick);
     // regenTick(lastTick, TICK_RATE)
 
     lastTick += TICK_RATE;
@@ -40,7 +40,7 @@ export const gameLoop = () => {
 
   const elapsed = performance.now() - start;
   if (elapsed > 50) {
-    console.warn(`[TICK SLOW] ${elapsed.toFixed(2)}ms | ticks=${ticks}`);
+    console.warn(`[TICK SLOW ${new Date().toLocaleTimeString()}] ${elapsed.toFixed(2)}ms | ticks=${ticks}`);
   }
 
   setImmediate(gameLoop);

@@ -6,7 +6,7 @@ import { getMapLayerNameAtHeroPos } from '@/shared/utils';
 import { HTTPException } from 'hono/http-exception';
 
 import { type TileState, serverState } from '../game/state/server-state';
-import { type GatheringTableItem, MINING_TABLE } from '../lib/table/core-resource-table';
+import {  MINING_TABLE, type GatheringItemTable } from '../lib/table/gathering-item-table';
 import { clamp, getRandomValue, hash } from '../lib/utils';
 import { equipmentService } from './equipment-service';
 import { heroService } from './hero-service';
@@ -153,7 +153,7 @@ export const gatheringService = {
     }
   },
   getGatherTableItem({ gatherSkill, tileType, x, y, heroId }: GetGatherReward) {
-    let table: GatheringTableItem[] | null = null;
+    let table: GatheringItemTable[] | null = null;
     const skillInstance = skillService.getSkillByKey(heroId, gatherSkill);
     switch (gatherSkill) {
       case 'MINING':

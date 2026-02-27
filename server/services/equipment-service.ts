@@ -3,6 +3,7 @@ import { toolsTemplate } from '@/shared/templates/tool-template';
 import type { EquipmentSlotType, ItemInstance, ItemTemplate, itemsInstanceDeltaEvent } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
+import { deltaEventsService } from './delta-events-service';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { itemInstanceService } from './item-instance-service';
@@ -98,6 +99,7 @@ export const equipmentService = {
       itemName: itemInstance.displayName ?? template.name,
     });
     resultDeltas.push({ type: 'CREATE', item: itemInstance });
+    deltaEventsService.itemInstance.update(itemInstanceId, { itemContainerId: null, location: 'EQUIPMENT', slot: equipData.slot as EquipmentSlotType });
 
     return resultDeltas;
   },
@@ -123,6 +125,9 @@ export const equipmentService = {
 
     resultDeltas.push({ type: 'DELETE', itemInstanceId, itemName: itemInstance.displayName ?? template.name });
     resultDeltas.push({ type: 'CREATE', itemContainerId: backpack.id, item: itemInstance });
+
+    deltaEventsService.itemInstance.update(itemInstanceId, { itemContainerId: backpack.id, location: 'BACKPACK', slot: null });
+
     return resultDeltas;
   },
   removeEquipment(heroId: string, itemInstanceId: string) {
@@ -131,19 +136,4 @@ export const equipmentService = {
     if (index === -1) return;
     hero.equipments.splice(index, 1);
   },
-  // getEquipSlot(itemTemplate: ItemTemplate) {
-  //   switch (itemTemplate.type) {
-  //     case 'ARMOR':
-  //       return itemTemplate.equipInfo?.armorType;
-  //     case 'SHIELD':
-  //       return 'LEFT_HAND';
-
-  //     case 'TOOL':
-  //     case 'WEAPON':
-  //       return 'RIGHT_HAND';
-
-  //     default:
-  //       throw new HTTPException(400, { message: 'Invalid item type for equipping' });
-  //   }
-  // },
 };

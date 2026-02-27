@@ -2,6 +2,7 @@ import type { ItemInstance, ItemLocationType, itemsInstanceDeltaEvent } from '@/
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
+import { deltaEventsService } from './delta-events-service';
 import { heroService } from './hero-service';
 import { itemInstanceService } from './item-instance-service';
 import { itemTemplateService } from './item-template-service';
@@ -12,6 +13,7 @@ interface ICreateItem {
   quantity: number;
   heroId: string;
   coreResourceId: string | undefined;
+  isAddPendingEvents: boolean;
 }
 
 interface IObtainStackableItem {
@@ -66,14 +68,22 @@ export const itemContainerService = {
     if (amount < quantity) throw new HTTPException(409, { message: `Not enough ${template.name}.`, cause: { canShow: true } });
   },
 
-  createItem({ itemContainerId, heroId, itemTemplateId, quantity, coreResourceId }: ICreateItem) {
+  createItem({ itemContainerId, heroId, itemTemplateId, quantity, coreResourceId, isAddPendingEvents }: ICreateItem) {
     const templateById = itemTemplateService.getAllItemsTemplateMapIds();
     const template = templateById[itemTemplateId];
     const location = 'BACKPACK';
     let result: itemsInstanceDeltaEvent[] = [];
     if (!template.stackable) {
       for (let i = 0; i < quantity; i++) {
-        const newItem = itemInstanceService.createItem({ heroId, itemContainerId, itemTemplateId, quantity: 1, location, coreResourceId });
+        const newItem = itemInstanceService.createItem({
+          heroId,
+          itemContainerId,
+          itemTemplateId,
+          quantity: 1,
+          location,
+          coreResourceId,
+          isAddPendingEvents,
+        });
         result.push({ type: 'CREATE', itemContainerId, item: newItem });
       }
 
@@ -99,6 +109,8 @@ export const itemContainerService = {
       const add = Math.min(space, remaining);
       inst.quantity += add;
       resultData.push({ type: 'UPDATE', itemContainerId, itemInstanceId: inst.id, updateData: { quantity: inst.quantity } });
+      deltaEventsService.itemInstance.update(inst.id, { quantity: inst.quantity });
+
       remaining -= add;
 
       if (remaining === 0) return resultData;
@@ -114,6 +126,7 @@ export const itemContainerService = {
         quantity: stackQty,
         location,
         coreResourceId: undefined,
+        isAddPendingEvents: true,
       });
       resultData.push({ type: 'CREATE', itemContainerId, item: newItem });
       remaining -= stackQty;
@@ -140,7 +153,7 @@ export const itemContainerService = {
     if (!template.stackable) {
       itemContainerService.deleteItem(itemContainerId, itemInstanceId);
       resultData.push({ type: 'DELETE', itemContainerId, itemInstanceId, itemName: template.name });
-
+      deltaEventsService.itemInstance.delete(itemInstanceId);
       return resultData;
     }
 
@@ -155,8 +168,10 @@ export const itemContainerService = {
       if (itemInstance.quantity <= 0) {
         itemContainerService.deleteItem(itemContainerId, itemInstance.id);
         resultData.push({ type: 'DELETE', itemContainerId, itemInstanceId, itemName: template.name });
+        deltaEventsService.itemInstance.delete(itemInstanceId);
       } else {
         resultData.push({ type: 'UPDATE', itemContainerId, itemInstanceId, updateData: { quantity: itemInstance.quantity } });
+        deltaEventsService.itemInstance.update(itemInstanceId, { quantity: itemInstance.quantity });
       }
 
       return resultData;
@@ -173,8 +188,10 @@ export const itemContainerService = {
     if (itemInstance.quantity <= 0) {
       itemContainerService.deleteItem(itemContainerId, itemInstance.id);
       resultData.push({ type: 'DELETE', itemContainerId, itemInstanceId, itemName: template.name });
+      deltaEventsService.itemInstance.delete(itemInstanceId);
     } else {
       resultData.push({ type: 'UPDATE', itemContainerId, itemInstanceId, updateData: { quantity: itemInstance.quantity } });
+      deltaEventsService.itemInstance.update(itemInstanceId, { quantity: itemInstance.quantity });
     }
 
     // 2️⃣ інші
@@ -190,8 +207,10 @@ export const itemContainerService = {
       if (inst.quantity <= 0) {
         itemContainerService.deleteItem(itemContainerId, inst.id);
         resultData.push({ type: 'DELETE', itemContainerId, itemInstanceId: inst.id, itemName: '' });
+        deltaEventsService.itemInstance.delete(inst.id);
       } else {
         resultData.push({ type: 'UPDATE', itemContainerId, itemInstanceId, updateData: { quantity: inst.quantity } });
+        deltaEventsService.itemInstance.update(itemInstanceId, { quantity: inst.quantity });
       }
     }
 

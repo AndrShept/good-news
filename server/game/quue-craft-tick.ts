@@ -90,6 +90,7 @@ export const queueCraftTick = (now: number) => {
           quantity: 1,
           itemTemplateId: template.id,
           coreResourceId: queue.coreResourceId,
+          isAddPendingEvents: true,
         });
         itemsDelta.push(...newItemDelta);
         result.message = 'Success complete craft item';

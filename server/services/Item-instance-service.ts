@@ -1,10 +1,12 @@
 import { resourceTemplateById } from '@/shared/templates/resource-template';
-import type { CoreResourceType, ItemInstance, ItemLocationType, itemsInstanceDeltaEvent, OmitModifier, WeaponType } from '@/shared/types';
+import type { CoreResourceType, ItemInstance, ItemLocationType, OmitModifier, WeaponType, itemsInstanceDeltaEvent } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
+import { serverState } from '../game/state/server-state';
 import { itemDurabilityConfig } from '../lib/config/item-dutability-config';
 import { materialModifierConfig } from '../lib/config/material-modifier-config';
 import { generateRandomUuid, getDisplayName, getModifierByResourceKey } from '../lib/utils';
+import { deltaEventsService } from './delta-events-service';
 import { equipmentService } from './equipment-service';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
@@ -17,6 +19,7 @@ interface ICreateItem {
   quantity: number;
   location: ItemLocationType;
   coreResourceId: string | undefined;
+  isAddPendingEvents: boolean;
 }
 
 export const itemInstanceService = {
@@ -28,7 +31,7 @@ export const itemInstanceService = {
     return findItemInstance;
   },
 
-  createItem({ heroId, itemContainerId, itemTemplateId, quantity, location, coreResourceId }: ICreateItem) {
+  createItem({ heroId, itemContainerId, itemTemplateId, quantity, location, coreResourceId, isAddPendingEvents }: ICreateItem) {
     heroService.checkFreeBackpackCapacity(heroId);
     let coreResource: null | CoreResourceType = null;
     let coreResourceModifier: null | Partial<OmitModifier> = null;
@@ -55,6 +58,12 @@ export const itemInstanceService = {
       durability: durability ? { current: durability, max: durability } : null,
       createdAt: new Date().toISOString(),
     };
+    if (isAddPendingEvents) {
+      serverState.itemInstancePendingDeltaEvents.add({
+        type: 'CREATE',
+        item: newItem,
+      });
+    }
     const container = itemContainerService.getContainer(itemContainerId);
     container.itemsInstance.push(newItem);
     return newItem;
@@ -91,10 +100,13 @@ export const itemInstanceService = {
         itemInstanceId: itemInstance.id,
         updateData: { durability: { current: itemInstance.durability.current, max: itemInstance.durability.max } },
       };
-
+      deltaEventsService.itemInstance.update(itemInstance.id, {
+        durability: { current: itemInstance.durability.current, max: itemInstance.durability.max },
+      });
       if (itemInstance.durability.current <= 0) {
         equipmentService.removeEquipment(heroId, itemInstance.id);
         result = { type: 'DELETE', itemInstanceId: itemInstance.id, itemName: itemInstance.displayName ?? itemTemplate.name };
+        deltaEventsService.itemInstance.delete(itemInstance.id);
       }
     }
     return result;

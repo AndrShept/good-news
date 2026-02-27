@@ -15,7 +15,8 @@ import { db } from './db/db';
 import { heroTable } from './db/schema';
 import { locationTable } from './db/schema/location-schema';
 import { gameLoop } from './game/gameLoop';
-import { saveDb } from './game/save-db';
+import {  saveItemsDb } from './game/save-items-db';
+import { saveSkillsDb } from './game/save-skills-db';
 import { serverState } from './game/state/server-state';
 import { heroOffline } from './lib/heroOffline';
 import { inviteGroup } from './lib/inviteGroup';
@@ -151,5 +152,7 @@ io.on('connection', async (socket) => {
   });
 });
 gameLoop();
+saveItemsDb();
+saveSkillsDb();
 
 console.info('Server Running on port 🚀', process.env['PORT'] || 3000);

@@ -1,7 +1,7 @@
 
 import type { FishingTileTpe, MiningTileType, OreType, TileType } from '@/shared/types';
 
-export type GatheringTableItem = { itemKey: OreType | FishingTileTpe; chance: number; requiredMinSkill: number; maxGatherQuantity: number };
+export type GatheringItemTable = { itemKey: OreType | FishingTileTpe; chance: number; requiredMinSkill: number; maxGatherQuantity: number };
 
 export const MINING_TABLE = {
   STONE: [
@@ -44,4 +44,4 @@ export const MINING_TABLE = {
       maxGatherQuantity: 1,
     },
   ],
-} as const satisfies Record<MiningTileType, GatheringTableItem[]>;
+} as const satisfies Record<MiningTileType, GatheringItemTable[]>;
