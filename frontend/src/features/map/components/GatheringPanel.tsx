@@ -26,8 +26,7 @@ export const GatheringPanel = ({ heroState, gatheringFinishAt }: Props) => {
     };
   }, []);
   return (
-    // <section className="bg-secondary absolute left-1/2 z-50 flex h-fit w-fit -translate-x-1/2 flex-col items-center gap-1 rounded-b px-3 py-1.5 text-sm">
-    <section className="bg-secondary   flex h-fit w-fit  flex-col items-center gap-1 rounded-b  text-sm">
+    <section className="bg-accent/90 top-13 absolute left-1/2 z-50 flex h-fit -translate-x-1/2 items-center gap-2 rounded-b px-4 py-2 text-sm backdrop-blur-sm">
       <AnimatedShinyText className="flex items-center gap-2">
         <GameIcon className="size-5" image={imageConfig.icon.state[heroState]} />
         <span>{heroState.toLowerCase()}...</span>

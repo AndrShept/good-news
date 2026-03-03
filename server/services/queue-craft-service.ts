@@ -140,12 +140,12 @@ export const queueCraftService = {
 
     const diff = craftSkillLevel - effectiveMin;
 
-    if (diff < 0) return 0; // не дозволяємо крафт нижче мін
+
 
     const loreBonus = loreSkillLevel * loreScale;
 
     const chance = baseChance + diff * gainPerLevel + loreBonus;
-
-    return clamp(chance, 5, 97); // ніколи не 100%
+    console.log( 'CRAFT-CHANGE' ,chance )
+    return clamp(chance, 3, 97); // ніколи не 100%
   },
 };

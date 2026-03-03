@@ -1,7 +1,7 @@
 import { RefObject, useEffect, useState } from 'react';
 
 export const useScaleMap = (containerRef: RefObject<HTMLDivElement | null>) => {
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState(1.5);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -9,7 +9,7 @@ export const useScaleMap = (containerRef: RefObject<HTMLDivElement | null>) => {
 
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault(); // блок скролу
-      const delta = event.deltaY > 0 ? -0.1 : 0.1;
+      const delta = event.deltaY > 0 ? -0.1 : 0.1; 
       setScale((prev) => Math.max(1, Math.min(2, prev + delta)));
     };
 

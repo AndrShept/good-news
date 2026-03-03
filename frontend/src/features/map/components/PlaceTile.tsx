@@ -12,14 +12,13 @@ export const PlaceTile = memo(({ TILE_SIZE, image, x, y }: Props) => {
     <div
       style={{
         position: 'absolute',
-        left: x * TILE_SIZE,
-        top: y * TILE_SIZE,
+        transform: `translate(${x * TILE_SIZE}px, ${y * TILE_SIZE}px)`,
+        backgroundSize: 'cover',
+        backgroundImage: `url(${image})`,
         width: TILE_SIZE,
         height: TILE_SIZE,
       }}
-      className='drop-shadow-outline-sm'
-    >
-      <TileImg image={image} />
-    </div>
+      className="drop-shadow-outline-sm"
+    />
   );
 });

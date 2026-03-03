@@ -1,13 +1,14 @@
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useHeroActions } from '@/features/hero/hooks/useHeroActions';
 import { GatheringCategorySkillKey } from '@/shared/templates/skill-template';
 import { StateType, TMap } from '@/shared/types';
+import { BracketsIcon } from 'lucide-react';
 import { memo } from 'react';
 
 import { GatherSkillButton } from './GatherSkillButton';
-import { TravelButton } from './TravelButton';
 import { GatheringPanel } from './GatheringPanel';
-
+import { TravelButton } from './TravelButton';
 
 interface Props {
   map: TMap | undefined;
@@ -15,11 +16,12 @@ interface Props {
   heroPosY: number;
   state: StateType;
   gatheringFinishAt: number | null;
+  onCenter: () => void;
 }
 
 const gatherSkills: GatheringCategorySkillKey[] = ['FISHING', 'FORAGING', 'LUMBERJACKING', 'MINING', 'SKINNING'];
 
-export const HeroActionsBar = memo(({ heroPosX, heroPosY, map, state, gatheringFinishAt }: Props) => {
+export const HeroActionsBar = memo(({ heroPosX, heroPosY, map, state, gatheringFinishAt, onCenter }: Props) => {
   const { entranceTile, placeTile } = useHeroActions({
     heroPosX,
     heroPosY,
@@ -30,6 +32,9 @@ export const HeroActionsBar = memo(({ heroPosX, heroPosY, map, state, gatheringF
   const image = entranceTile ? entranceTile.image : placeTile?.image;
   return (
     <div className="flex w-full flex-row flex-wrap gap-1 sm:flex-col">
+      <Button onClick={() => onCenter()} variant="outline" size="icon">
+        <BracketsIcon />
+      </Button>
       {(entranceTile || placeTile) && (
         <TravelButton image={image ?? ''} placeId={placeId} entranceId={entranceId} disabled={state !== 'IDLE'} />
       )}
@@ -38,7 +43,6 @@ export const HeroActionsBar = memo(({ heroPosX, heroPosY, map, state, gatheringF
         <GatherSkillButton key={gatherSkill} gatherSkill={gatherSkill} disabled={state !== 'IDLE'} />
       ))}
 
-      {state !== 'IDLE' && !!gatheringFinishAt && <GatheringPanel heroState={state} gatheringFinishAt={gatheringFinishAt} />}
       {(entranceTile || placeTile) && <Separator className="hidden sm:block" />}
     </div>
   );

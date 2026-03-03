@@ -80,7 +80,7 @@ export const imageConfig = {
       LUMBERJACKING: '/sprites/icons/skills/lumberjacking.png',
       FISHING: '/sprites/icons/skills/fishing.png',
       SKINNING: '/sprites/icons/skills/skinning.png',
-      HERBALISM: '/sprites/icons/skills/herbalism.png',
+      FORAGING: '/sprites/icons/skills/herbalism.png',
       INGOT_LORE: '/sprites/icons/skills/ingot-lore.png',
       LEATHER_LORE: '/sprites/icons/skills/leather-lore.png',
       CLOTH_LORE: '/sprites/icons/skills/cloth-lore.png',

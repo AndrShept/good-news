@@ -2,13 +2,14 @@ import { Layer } from '@/shared/json-types';
 import { Entrance, MapHero, StateType, TPlace } from '@/shared/types';
 import { buildPathWithObstacles } from '@/shared/utils';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
-import { memo, useEffect, useRef, useState } from 'react';
+import { RefObject, memo, useEffect, useRef, useState } from 'react';
 
 import { useDragOnMap } from '../hooks/useDragOnMap';
 import { useScaleMap } from '../hooks/useScaleMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
 import { EntranceTile } from './EntranceTile';
 import { HeroTile } from './HeroTile';
+import { MapTile } from './MapTile';
 import { MovablePathTile } from './MovablePathTile';
 import { PlaceTile } from './PlaceTile';
 
@@ -27,6 +28,8 @@ interface Props {
   image: string;
   isLoading: boolean;
   layers: Layer[];
+  containerRef: RefObject<HTMLDivElement | null>;
+  scale: number;
 }
 
 export const GameMap = memo(
@@ -45,14 +48,13 @@ export const GameMap = memo(
     layers,
     heroTargetX,
     heroTargetY,
+    containerRef,
+    scale,
   }: Props) => {
     const TILE_SIZE = tileWidth;
     const MAP_HEIGHT = height;
     const MAP_WIDTH = width;
 
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    const { scale } = useScaleMap(containerRef);
     const [isDragging, setIsDragging] = useState(false);
 
     const { handleMouseMove, hoverIndex, setStart, handleMouseLeave, handleTap } = useSetHoverIndex({
@@ -73,7 +75,7 @@ export const GameMap = memo(
       setStart,
     });
     const { setMovementPathTiles, movementPathTiles } = useMovementPathTileStore();
-
+    const groundLayer = layers?.find((l) => l.name === 'GROUND');
     useEffect(() => {
       if (heroTargetY && layers.length) {
         const path = buildPathWithObstacles(
@@ -87,7 +89,7 @@ export const GameMap = memo(
       }
     }, [layers]);
 
-    if (isLoading) return 'Loading Map...';
+    // if (isLoading) return 'Loading Map...';
     return (
       <div
         ref={containerRef}
@@ -111,10 +113,29 @@ export const GameMap = memo(
             imageRendering: 'pixelated',
             width: MAP_WIDTH * TILE_SIZE,
             height: MAP_HEIGHT * TILE_SIZE,
-            backgroundImage: `url(${image})`,
+            // backgroundImage: `url(${image})`,
             transform: `scale(${scale})`,
           }}
         >
+          {groundLayer?.data.map((n, idx) => {
+            const x = idx % MAP_WIDTH;
+            const y = Math.floor(idx / MAP_WIDTH);
+            const dx = x - heroPosX;
+            const dy = y - heroPosY;
+            const radius = 8;
+            const isNear = dx * dx + dy * dy <= radius * radius;
+            if (!isNear) return;
+            return (
+              <MapTile
+                key={`${n}:${idx}`}
+                image={`/sprites/map/ground-pack/${(n - 1).toString().padStart(3, '0')}.png`}
+                TILE_SIZE={TILE_SIZE}
+                x={x}
+                y={y}
+                isNear={isNear}
+              />
+            );
+          })}
           {places?.map((place) => <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} />)}
           {entrances?.map((entrance) => (
             <EntranceTile key={entrance.id} x={entrance.x} y={entrance.y} image={entrance.image} TILE_SIZE={TILE_SIZE} />

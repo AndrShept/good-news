@@ -1,13 +1,15 @@
+import { Button } from '@/components/ui/button';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 
 import { getMapHeroesLocationOptions } from '../api/get-map-heroes';
+import { useCenter } from '../hooks/useCenter';
 import { useGameMap } from '../hooks/useGameMap';
+import { useScaleMap } from '../hooks/useScaleMap';
 import { GameMap } from './GameMap';
 import { HeroActionsBar } from './HeroActionsBar';
 import { HeroSidebarList } from './HeroSidebarList';
-import { MovingPanel } from './MovingPanel';
 
 export const GameMapLayout = () => {
   const hero = useHero((data) => ({
@@ -24,34 +26,55 @@ export const GameMapLayout = () => {
   const map = useGameMap({ mapId: hero.mapId });
 
   const heroesAtPosition = useMemo(() => mapHeroes?.filter((p) => p.x === hero.x && p.y === hero.y), [hero.x, hero.y, mapHeroes]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scale } = useScaleMap(containerRef);
+  const { onCenter } = useCenter({
+    TILE_SIZE: map.data?.tileWidth,
+    containerRef,
+    heroPosX: hero.x,
+    heroPosY: hero.y,
+    scale,
+  });
+  useEffect(() => {
+    if (!containerRef.current) return;
+    onCenter();
+  }, [map.data?.layers]);
 
   return (
-    <section className="flex w-full flex-col gap-2 p-1 sm:flex-row">
-      <aside className="flex w-full sm:max-w-[150px] gap-2 sm:flex-col">
-        <HeroActionsBar heroPosX={hero.x} heroPosY={hero.y} map={map.data} gatheringFinishAt={hero.gatheringFinishAt} state={hero.state} />
-        <HeroSidebarList heroes={heroesAtPosition} isLoading={isLoading} />
-      </aside>
-      <div className="relative aspect-video w-full overflow-hidden">
-        <MovingPanel heroState={hero.state} />
-        {/* {hero.state !== 'IDLE' && !!hero.gatheringFinishAt && (
-          <GatheringPanel heroState={hero.state} gatheringFinishAt={hero.gatheringFinishAt} />
-        )} */}
-        <GameMap
-          width={map.data?.width ?? 0}
-          height={map.data?.height ?? 0}
-          layers={map.data?.layers ?? []}
-          image={map.data?.image ?? ''}
-          tileWidth={map.data?.tileWidth ?? 32}
-          isLoading={map.isLoading}
+    <section className="flex w-full flex-col-reverse gap-2 p-1 sm:flex-row">
+      <aside className="flex w-full gap-2 sm:max-w-[150px] sm:flex-col">
+        <HeroActionsBar
+          onCenter={onCenter}
           heroPosX={hero.x}
           heroPosY={hero.y}
-          heroTargetX={hero.targetX}
-          heroTargetY={hero.targetY}
-          heroState={hero.state}
-          mapHeroes={mapHeroes}
-          places={map.data?.places}
-          entrances={map.data?.entrances}
+          map={map.data}
+          gatheringFinishAt={hero.gatheringFinishAt}
+          state={hero.state}
         />
+        <HeroSidebarList heroes={heroesAtPosition} isLoading={isLoading} />
+      </aside>
+
+      <div className="relative aspect-video w-full overflow-hidden">
+        <Suspense fallback={'LOADING MAP....'}>
+          <GameMap
+            scale={scale}
+            containerRef={containerRef}
+            width={map.data?.width ?? 0}
+            height={map.data?.height ?? 0}
+            layers={map.data?.layers ?? []}
+            image={map.data?.image ?? ''}
+            tileWidth={map.data?.tileWidth ?? 32}
+            isLoading={map.isLoading}
+            heroPosX={hero.x}
+            heroPosY={hero.y}
+            heroTargetX={hero.targetX}
+            heroTargetY={hero.targetY}
+            heroState={hero.state}
+            mapHeroes={mapHeroes}
+            places={map.data?.places}
+            entrances={map.data?.entrances}
+          />
+        </Suspense>
       </div>
     </section>
   );

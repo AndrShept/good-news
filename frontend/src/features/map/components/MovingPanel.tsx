@@ -6,8 +6,8 @@ import { useWalkMapMutation } from '@/features/hero/hooks/useWalkMapMutation';
 import { StateType } from '@/shared/types';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { memo, useEffect, useState } from 'react';
-import { useCancelWalkMutation } from '../hooks/useCancelWalkMutation';
 
+import { useCancelWalkMutation } from '../hooks/useCancelWalkMutation';
 
 type Props = {
   heroState: StateType;
@@ -42,20 +42,20 @@ export const MovingPanel = memo(function MovingPathInfo({ heroState }: Props) {
   }, [setMovementPathTiles]);
   if (!movementPathTiles.length) return;
   return (
-    <section className="bg-secondary absolute left-1/2 z-50 flex h-fit w-fit -translate-x-1/2 flex-col items-center gap-2 rounded-b px-4 py-3 text-sm">
-      <div className="flex gap-1">
+    <section className="bg-accent/90 top-13 absolute left-1/2 z-50 flex h-fit -translate-x-1/2 items-center gap-2 rounded-b px-4 py-2 text-sm backdrop-blur-sm">
+      
         <span className="text-muted-foreground">
           step: <span className="text-primary">{movementPathTiles.length}</span>
         </span>
         <span className="text-muted-foreground">
           time: <span className="text-primary">{resultTime ? `${resultTime.toFixed(0)}s` : '???'}</span>
         </span>
-      </div>
+      
 
       {heroState === 'IDLE' && (
-        <div className="space-x-1">
-          <CancelButton disabled={isPending} onClick={() => setMovementPathTiles([])} className="size-8" />
+        <div className="space-x-1 flex items-center">
           <AcceptButton disabled={isPending} onClick={onCLick} className="size-8 border" />
+          <CancelButton disabled={isPending} onClick={() => setMovementPathTiles([])} className="size-8" />
         </div>
       )}
       {heroState === 'WALK' && (
