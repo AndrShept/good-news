@@ -8,7 +8,7 @@ import {
   RESET_STATS_COST,
   WORLD_SEED,
 } from '@/shared/constants';
-import type { HeroUpdateStateEvent, WalkMapCompleteEvent, WalkMapStartEvent } from '@/shared/socket-data-types';
+import type { HeroUpdateStateEvent, WalkMapStartEvent } from '@/shared/socket-data-types';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
@@ -82,6 +82,7 @@ import { itemConsumeService } from '../services/item-consume-service';
 import { itemContainerService } from '../services/item-container-service';
 import { itemInstanceService } from '../services/item-instance-service';
 import { itemTemplateService } from '../services/item-template-service';
+import { mapService } from '../services/map-service';
 import { queueCraftService } from '../services/queue-craft-service';
 import { skillService } from '../services/skill-service';
 import { socketService } from '../services/socket-service';
@@ -776,14 +777,7 @@ export const heroRouter = new Hono<Context>()
       heroState.state = 'IDLE';
       heroState.location.targetX = null;
       heroState.location.targetY = null;
-      const socketData: WalkMapCompleteEvent = {
-        type: 'WALK_MAP_COMPLETE',
-        payload: {
-          heroId: id,
-          state: 'IDLE',
-        },
-      };
-      io.to(heroState.location.mapId!).emit(socketEvents.walkMap(), socketData);
+      socketService.sendMapChunkMoveFinish(heroState.id);
 
       return c.json<SuccessResponse>({
         message: 'walking cancel',
@@ -839,9 +833,9 @@ export const heroRouter = new Hono<Context>()
           .where(eq(locationTable.heroId, id));
 
         hero.location.mapId = null;
-        hero.location.placeId = place.id;
+        hero.location.placeId = place.id;  
 
-        socketService.sendMapRemoveHero(hero.id, place.mapId);
+        // socketService.sendMapRemoveHero(hero.id, place.mapId);
         socketService.sendPlaceAddHero(hero.id, place.id);
         socketService.sendToClientSysMessage(hero.id, { type: 'SUCCESS', text: `You have entered ${place.name}.` });
       }
@@ -865,7 +859,7 @@ export const heroRouter = new Hono<Context>()
           hero.location.x = entrance.targetX;
           hero.location.y = entrance.targetY;
           socketService.sendPlaceRemoveHero(hero.id, place.id);
-          socketService.sendMapAddHero(hero.id, entrance.targetMapId);
+          // socketService.sendMapAddHero(hero.id, entrance.targetMapId);
         } else {
           const map = mapTemplate.find((m) => m.id === hero.location.mapId);
           if (!map) {
@@ -895,7 +889,7 @@ export const heroRouter = new Hono<Context>()
             }
             hero.location.x = entrance.targetX ?? 0;
             hero.location.y = entrance.targetY ?? 0;
-            socketService.sendMapRemoveHero(hero.id, map.id);
+            // socketService.sendMapRemoveHero(hero.id, map.id);
             socketService.sendPlaceAddHero(hero.id, entrance.targetPlaceId);
             socketService.sendToClientSysMessage(hero.id, { type: 'SUCCESS', text: `You have entered ${place.name}.` });
           }
@@ -904,8 +898,8 @@ export const heroRouter = new Hono<Context>()
             hero.location.x = entrance.targetX ?? 0;
             hero.location.y = entrance.targetY ?? 0;
             hero.location.placeId = null;
-            socketService.sendMapRemoveHero(hero.id, map.id);
-            socketService.sendMapAddHero(hero.id, entrance.targetMapId);
+            // socketService.sendMapRemoveHero(hero.id, map.id);
+            // socketService.sendMapAddHero(hero.id, entrance.targetMapId);
           }
         }
       }
@@ -956,7 +950,7 @@ export const heroRouter = new Hono<Context>()
       hero.location.y = place.y;
 
       socketService.sendPlaceRemoveHero(hero.id, place.id);
-      socketService.sendMapAddHero(hero.id, place.mapId);
+      mapService.spawnMapEntitiesInChunk({ x: place.x, y: place.y, mapId: place.mapId, type: 'HERO',entityId: hero.id });
 
       return c.json<SuccessResponse>({
         message: 'leave place success ',

@@ -17,12 +17,12 @@ export const Game = () => {
     <>
       <DndInventoryProvider>
         <section className="mx-auto flex max-w-7xl flex-col">
-          <div className="relative">
-            <GameHeader />
+        
+          <GameHeader />
 
-            {state && <MovingPanel heroState={state} />}
-            {state && state !== 'IDLE' && !!gatheringFinishAt && <GatheringPanel heroState={state} gatheringFinishAt={gatheringFinishAt} />}
-          </div>
+          {state && <MovingPanel heroState={state} />}
+          {state && state !== 'IDLE' && !!gatheringFinishAt && <GatheringPanel heroState={state} gatheringFinishAt={gatheringFinishAt} />}
+       
 
           <div className="mx-auto flex min-h-[calc(100vh-315px)] w-full flex-1">
             <Outlet />

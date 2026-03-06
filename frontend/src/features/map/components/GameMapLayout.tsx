@@ -1,9 +1,9 @@
-import { Button } from '@/components/ui/button';
+
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useQuery } from '@tanstack/react-query';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 
-import { getMapHeroesLocationOptions } from '../api/get-map-heroes';
+import { getMapChunkEntitiesOptions } from '../api/get-map-heroes';
 import { useCenter } from '../hooks/useCenter';
 import { useGameMap } from '../hooks/useGameMap';
 import { useScaleMap } from '../hooks/useScaleMap';
@@ -21,11 +21,11 @@ export const GameMapLayout = () => {
     state: data?.state ?? 'IDLE',
     gatheringFinishAt: data?.gatheringFinishAt ?? 0,
   }));
-  const { data: mapHeroes, isLoading } = useQuery(getMapHeroesLocationOptions(hero.mapId));
+  const { data: mapEntities, isLoading } = useQuery(getMapChunkEntitiesOptions(hero.mapId));
 
   const map = useGameMap({ mapId: hero.mapId });
 
-  const heroesAtPosition = useMemo(() => mapHeroes?.filter((p) => p.x === hero.x && p.y === hero.y), [hero.x, hero.y, mapHeroes]);
+  const heroesAtPosition = useMemo(() => mapEntities?.heroes.filter((p) => p.x === hero.x && p.y === hero.y), [hero.x, hero.y, mapEntities?.heroes]);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scale } = useScaleMap(containerRef);
   const { onCenter } = useCenter({
@@ -70,7 +70,7 @@ export const GameMapLayout = () => {
             heroTargetX={hero.targetX}
             heroTargetY={hero.targetY}
             heroState={hero.state}
-            mapHeroes={mapHeroes}
+            mapHeroes={mapEntities?.heroes}
             places={map.data?.places}
             entrances={map.data?.entrances}
           />

@@ -2,29 +2,28 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
-import { WalkMapCompleteEvent, WalkMapStartEvent, WalkMapUpdateEvent } from '@/shared/socket-data-types';
+import { WalkMapFinishEvent, WalkMapStartEvent, WalkMapUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { useEffect } from 'react';
 
-import { useMapHeroesUpdate } from './useMapHeroesUpdate';
 
 export const useWalkMapListener = () => {
   const { mapId } = useHero((data) => ({
     mapId: data?.location?.mapId ?? '',
-
   }));
   const filterMovementPathTiles = useMovementPathTileStore((state) => state.filterMovementPathTiles);
   const heroId = useHeroId();
   const { socket } = useSocket();
-  const { updateHeroes } = useMapHeroesUpdate(mapId);
+  // const { updateHeroes } = useMapHeroesUpdate(mapId);
   const { updateHero } = useHeroUpdate();
 
   useEffect(() => {
-    const listener = (data: WalkMapStartEvent | WalkMapUpdateEvent | WalkMapCompleteEvent) => {
+    const listener = (data: WalkMapStartEvent | WalkMapUpdateEvent | WalkMapFinishEvent) => {
+      console.log(data);
       switch (data.type) {
         case 'WALK_MAP_START': {
-          updateHeroes(data.payload.heroId, { state: data.payload.state });
+          // updateHeroes(data.payload.heroId, { state: data.payload.state });
           if (heroId === data.payload.heroId) {
             updateHero({ state: data.payload.state });
           }
@@ -41,11 +40,11 @@ export const useWalkMapListener = () => {
 
             filterMovementPathTiles({ x: data.payload.x, y: data.payload.y });
           }
-          updateHeroes(data.payload.heroId, { x: data.payload.x, y: data.payload.y });
+          // updateHeroes(data.payload.heroId, { x: data.payload.x, y: data.payload.y });
           break;
         }
-        case 'WALK_MAP_COMPLETE': {
-          updateHeroes(data.payload.heroId, { state: data.payload.state });
+        case 'WALK_MAP_FINISH': {
+          // updateHeroes(data.payload.heroId, { state: data.payload.state });
           if (heroId === data.payload.heroId) {
             updateHero({ state: data.payload.state, location: { targetX: null, targetY: null } });
           }
@@ -58,5 +57,5 @@ export const useWalkMapListener = () => {
     return () => {
       socket.off(socketEvents.walkMap(), listener);
     };
-  }, [filterMovementPathTiles, heroId, socket, updateHero, updateHeroes]);
+  }, [filterMovementPathTiles, heroId, socket, updateHero]);
 };

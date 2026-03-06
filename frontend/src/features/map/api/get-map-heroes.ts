@@ -1,9 +1,9 @@
 import { client } from '@/lib/utils';
 import { queryOptions } from '@tanstack/react-query';
 
-export const getMapHeroesLocation = async (id: string) => {
+export const getMapChunkEntities = async (id: string) => {
   try {
-    const res = await client.map[':id'].heroes.$get({
+    const res = await client.map[':id'].entities.$get({
       param: {
         id,
       },
@@ -18,10 +18,10 @@ export const getMapHeroesLocation = async (id: string) => {
   }
 };
 
-export const getMapHeroesLocationOptions = (mapId: string) =>
+export const getMapChunkEntitiesOptions = (mapId: string) =>
   queryOptions({
-    queryKey: ['map', mapId, 'heroes'],
-    queryFn: () => getMapHeroesLocation(mapId),
+    queryKey: ['map', mapId, 'entities'],
+    queryFn: () => getMapChunkEntities(mapId),
     enabled: !!mapId,
     staleTime: 0,
   });

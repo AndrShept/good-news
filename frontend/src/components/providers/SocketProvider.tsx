@@ -1,6 +1,5 @@
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { getMapHeroesLocation } from '@/features/map/api/get-map-heroes';
 import { useQuery } from '@tanstack/react-query';
 import { PropsWithChildren, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { io } from 'socket.io-client';

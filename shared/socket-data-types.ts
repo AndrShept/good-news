@@ -4,6 +4,8 @@ import type {
   GameSysMessageType,
   Hero,
   HeroSidebarItem,
+  MapChunkEntitiesData,
+  MapChunkEntitiesType,
   MapHero,
   QueueCraftStatusType,
   SkillInstance,
@@ -20,17 +22,14 @@ export type SocketGroupResponse = {
   updateType: 'leave' | 'kick' | 'remove' | 'new-member';
 };
 
-export type MapUpdateEvent =
-  | {
-      type: 'REMOVE_HERO';
-      payload: {
-        heroId: string;
-      };
-    }
-  | {
-      type: 'ADD_HERO';
-      payload: { hero: MapHero; mapId: string };
-    };
+export type MapChunkSpawnEntityData = MapChunkEntitiesData;
+
+export type MapChunkDespawnEntityData = {
+  type: MapChunkEntitiesType;
+  payload: {
+    entityId: string;
+  };
+};
 
 export type PlaceUpdateEvent =
   | {
@@ -129,8 +128,8 @@ export type WalkMapUpdateEvent = {
     heroId: string;
   };
 };
-export type WalkMapCompleteEvent = {
-  type: 'WALK_MAP_COMPLETE';
+export type WalkMapFinishEvent = {
+  type: 'WALK_MAP_FINISH';
   payload: {
     state: StateType;
     heroId: string;

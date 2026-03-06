@@ -2,57 +2,40 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
-import { HeroOfflineEvent, HeroOnlineEvent, HeroUpdateStateEvent, MapUpdateEvent } from '@/shared/socket-data-types';
+import { MapChunkDespawnEntityData, MapChunkSpawnEntityData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useEffect } from 'react';
 
-import { useMapHeroesUpdate } from './useMapHeroesUpdate';
+import { useMapChunkEntitiesUpdate } from './useMapHeroesUpdate';
 
 export const useMapListener = () => {
   const { mapId } = useHero((data) => ({
     mapId: data?.location?.mapId ?? '',
   }));
   const { socket } = useSocket();
-  const { deleteHeroes, addHeroes ,updateHeroes} = useMapHeroesUpdate(mapId);
+  const { addChunkEntities, removeChunkEntities, updateChunkEntities } = useMapChunkEntitiesUpdate(mapId);
   const { updateHero } = useHeroUpdate();
   const id = useHeroId();
 
   useEffect(() => {
-    const listener = (data: MapUpdateEvent | HeroOfflineEvent | HeroOnlineEvent | HeroUpdateStateEvent) => {
-      switch (data.type) {
-        case 'REMOVE_HERO':
-          deleteHeroes(data.payload.heroId);
-          break;
-        case 'ADD_HERO':
-          if (id === data.payload.hero.id) {
-            updateHero({
-              state: 'IDLE',
-              location: { placeId: null, mapId: data.payload.mapId, x: data.payload.hero.x, y: data.payload.hero.y },
-            });
-          }
-          addHeroes(data.payload.hero);
-          break;
-
-        case 'HERO_OFFLINE':
-          deleteHeroes(data.payload.heroId);
-          break;
-        case 'HERO_ONLINE': {
-          addHeroes(data.payload);
-
-          break;
-        }
-        case 'UPDATE_STATE':
-          if (data.payload.heroId === id) {
-            updateHero({ state: data.payload.state });
-          }
-          updateHeroes(data.payload.heroId, { state: data.payload.state });
-          break;
-      }
+    const spawnListener = (data: MapChunkSpawnEntityData) => {
+      addChunkEntities({ ...data });
     };
-    socket.on(socketEvents.mapUpdate(), listener);
+    const despawnListener = (data: MapChunkDespawnEntityData) => {
+      removeChunkEntities(data.payload.entityId, data.type);
+    };
+    const updateListener = () => {
+      
+    };
+
+    socket.on(socketEvents.entitySpawn(), spawnListener);
+    socket.on(socketEvents.entityDespawn(), despawnListener);
+    socket.on(socketEvents.entityUpdate(), updateListener);
 
     return () => {
-      socket.off(socketEvents.mapUpdate(), listener);
+      socket.off(socketEvents.entitySpawn(), spawnListener);
+      socket.off(socketEvents.entityDespawn(), despawnListener);
+      socket.off(socketEvents.entityUpdate(), updateListener);
     };
-  }, [addHeroes, deleteHeroes, id, socket, updateHero]);
+  }, [addChunkEntities, id, removeChunkEntities, socket, updateHero]);
 };

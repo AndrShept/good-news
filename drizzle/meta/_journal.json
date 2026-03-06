@@ -43,6 +43,13 @@
       "when": 1772231829611,
       "tag": "0005_wandering_stardust",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1772703863194,
+      "tag": "0006_condemned_lady_deathstrike",
+      "breakpoints": true
     }
   ]
 }

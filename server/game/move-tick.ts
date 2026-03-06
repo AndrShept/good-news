@@ -1,13 +1,11 @@
-import type { WalkMapUpdateEvent } from '@/shared/socket-data-types';
-import { socketEvents } from '@/shared/socket-events';
+
 import type { PathNode } from '@/shared/types';
 
-import { io } from '..';
-import { serverState } from './state/server-state';
 import { heroOffline } from '../lib/heroOffline';
+import { socketService } from '../services/socket-service';
+import { serverState } from './state/server-state';
 
 export const moveTick = (now: number) => {
-
   for (const [heroId, { paths, offlineTimer, userId }] of serverState.hero.entries()) {
     const heroState = serverState.hero.get(heroId);
     if (!heroState) continue;
@@ -22,18 +20,13 @@ export const moveTick = (now: number) => {
       const step = paths.shift();
       if (!step) continue;
       lastStep = step;
-      const socketData: WalkMapUpdateEvent = { type: 'WALK_MAP_UPDATE', payload: { heroId, x: step.x, y: step.y } };
 
       heroState.location.x = step.x;
       heroState.location.y = step.y;
-      io.to(step.mapId).emit(socketEvents.walkMap(), socketData);
+      socketService.sendMapMoveHero(heroId);
     }
 
     if (!paths.length && lastStep) {
-      io.to(lastStep.mapId).emit(socketEvents.walkMap(), {
-        type: 'WALK_MAP_COMPLETE',
-        payload: { heroId: heroId, state: 'IDLE' },
-      });
       serverState.pathPersistQueue.set(heroId, {
         x: lastStep.x,
         y: lastStep.y,
@@ -42,7 +35,7 @@ export const moveTick = (now: number) => {
       if (heroState) {
         heroState.state = 'IDLE';
       }
+      socketService.sendMapChunkMoveFinish(heroId);
     }
   }
-
 };

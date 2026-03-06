@@ -1,6 +1,6 @@
 import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
 import { buffTemplateMapIds } from '@/shared/templates/buff-template';
-import type { Hero, OmitModifier } from '@/shared/types';
+import type { Hero, MapHero, OmitModifier } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
@@ -14,6 +14,20 @@ export const heroService = {
     const hero = serverState.hero.get(heroId);
     if (!hero) throw new HTTPException(404, { message: 'hero not found' });
     return hero;
+  },
+
+  getHeroMapData(heroId: string): MapHero {
+    const hero = this.getHero(heroId);
+    return {
+      id: hero.id,
+      avatarImage: hero.avatarImage,
+      characterImage: hero.characterImage,
+      level: hero.level,
+      name: hero.name,
+      state: hero.state,
+      x: hero.location.x,
+      y: hero.location.y,
+    };
   },
 
   checkFreeBackpackCapacity(heroId: string, value?: number) {

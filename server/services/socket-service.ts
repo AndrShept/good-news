@@ -1,19 +1,38 @@
-
+import type {
+  HeroUpdateStateEvent,
+  MapChunkDespawnEntityData,
+  MapChunkSpawnEntityData,
+  PlaceUpdateEvent,
+  SkillUpEvent,
+  WalkMapFinishEvent,
+  WalkMapUpdateEvent,
+} from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import type { GameSysMessage, StateType } from '@/shared/types';
+import type { GameSysMessage, MapChunkEntitiesData, MapChunkEntitiesType, StateType } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
 import { serverState } from '../game/state/server-state';
 import { heroService } from './hero-service';
+import { mapService } from './map-service';
 import { skillService } from './skill-service';
-import type { HeroUpdateStateEvent, MapUpdateEvent, PlaceUpdateEvent, SkillUpEvent } from '@/shared/socket-data-types';
 
 interface SendToClientExpResult {
   heroId: string;
   expResult: ReturnType<typeof skillService.addExp>;
   onlyLevelUp?: boolean;
 }
+
+type SendMapChunkSpawnEntities = {
+  chunkId: string;
+  type: MapChunkEntitiesType;
+  entityId: string;
+};
+type SendMapChunkDespawnEntities = {
+  chunkId: string;
+  type: MapChunkEntitiesType;
+  entityId: string;
+};
 
 export const socketService = {
   getSocket(heroId: string) {
@@ -35,41 +54,59 @@ export const socketService = {
     };
     io.to(placeId).emit(socketEvents.placeUpdate(), socketData);
   },
-  sendMapAddHero(heroId: string, mapId: string) {
-    const socket = this.getSocket(heroId);
-
+  sendMapMoveHero(heroId: string) {
     const hero = heroService.getHero(heroId);
-    const data: MapUpdateEvent = {
-      type: 'ADD_HERO',
-      payload: {
-        mapId,
-        hero: {
-          id: hero.id,
-          name: hero.name,
-          avatarImage: hero.avatarImage,
-          characterImage: hero.characterImage,
-          level: hero.level,
-          state: hero.state,
-          x: hero.location.x,
-          y: hero.location.y,
-        },
-      },
-    };
-    socket.join(mapId);
-    io.to(mapId).emit(socketEvents.mapUpdate(), data);
+    const heroesAroundRadius = mapService.getNearHeroes(heroId);
+    for (const aroundHero of heroesAroundRadius) {
+      const socketData: WalkMapUpdateEvent = {
+        type: 'WALK_MAP_UPDATE',
+        payload: { heroId, x: hero.location.x, y: hero.location.y },
+      };
+      io.to(aroundHero.id).emit(socketEvents.walkMap(), socketData);
+    }
   },
-  sendMapRemoveHero(heroId: string, mapId: string) {
-    const socket = this.getSocket(heroId);
+  sendMapChunkMoveFinish(heroId: string) {
+    const heroesAroundRadius = mapService.getNearHeroes(heroId);
+    for (const aroundHero of heroesAroundRadius) {
+      const socketData: WalkMapFinishEvent = {
+        type: 'WALK_MAP_FINISH',
+        payload: { heroId: heroId, state: 'IDLE' },
+      };
+      io.to(aroundHero.id).emit(socketEvents.walkMap(), socketData);
+    }
+  },
+  sendMapChunkSpawnEntities({ chunkId, type, entityId }: SendMapChunkSpawnEntities) {
+    let data: MapChunkEntitiesData | undefined = undefined;
+    switch (type) {
+      case 'HERO':
+        const socket = socketService.getSocket(entityId);
+        socket.join(chunkId);
+        data = { type, payload: heroService.getHeroMapData(entityId) };
+        break;
+      case 'CREATURE': {
+        const payload = serverState.creature.get(entityId);
+        if (!payload) break;
+        data = { type, payload };
+        break;
+      }
 
-    const hero = heroService.getHero(heroId);
-    const data: MapUpdateEvent = {
-      type: 'REMOVE_HERO',
-      payload: {
-        heroId: hero.id,
-      },
+      case 'CORPSE':
+        const payload = serverState.corpse.get(entityId);
+        if (!payload) break;
+        data = { type, payload };
+        break;
+    }
+    if (!data) return;
+
+    io.to(chunkId).emit(socketEvents.entitySpawn(), data);
+  },
+  sendMapChunkDespawnEntities({ chunkId, type, entityId }: SendMapChunkDespawnEntities) {
+    const data: MapChunkDespawnEntityData = {
+      type,
+      payload: { entityId },
     };
-    socket.leave(mapId);
-    io.to(mapId).emit(socketEvents.mapUpdate(), data);
+
+    io.to(chunkId).emit(socketEvents.entityDespawn(), data);
   },
   sendPlaceRemoveHero(heroId: string, placeId: string) {
     const socket = this.getSocket(heroId);

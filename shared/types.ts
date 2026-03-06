@@ -40,6 +40,7 @@ import type { locationTable } from '../server/db/schema/location-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { queueCraftItemTable, queueCraftStatusEnum } from '../server/db/schema/queue-craft-item-schema';
 import type { skillInstanceTable } from '../server/db/schema/skill-instance-schema';
+import type { HeroRuntime } from '../server/game/state/server-state';
 import type { Layer } from './json-types';
 import type { SkillKey, skillCategoryValues } from './templates/skill-template';
 
@@ -386,6 +387,31 @@ export type Hero = InferSelectModel<typeof heroTable> & {
   itemContainers: { id: string; type: ItemContainerType; name: string }[];
 };
 
+export type MapChunkEntitiesType = 'HERO' | 'CORPSE' | 'CREATURE';
+export type MapChunkEntitiesData =
+  | {
+      type: 'HERO';
+      payload: MapHero;
+    }
+  | {
+      type: 'CORPSE';
+      payload: Corpse;
+    }
+  | {
+      type: 'CREATURE';
+      payload: Creature;
+    };
+
+export type Corpse = {
+  id: string;
+  name: string;
+};
+
+export type Creature = {
+  id: string;
+  name: string;
+};
+
 export type HeroSidebarItem = {
   id: string;
   name: string;
@@ -439,7 +465,7 @@ export interface GameSysMessage {
 //API RESPONSE
 export type ApiGetHeroResponse = InferResponseType<(typeof client.hero)['$get']>['data'];
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];
-export type ApiGetMapHeroes = InferResponseType<(typeof client.map)[':id']['heroes']['$get']>['data'];
+export type ApiGeChunkMapEntities = InferResponseType<(typeof client.map)[':id']['entities']['$get']>['data'];
 export type ApiGetPlaceHeroes = InferResponseType<(typeof client.place)[':id']['heroes']['$get']>['data'];
 export type ApiGroupMembersResponse = InferResponseType<(typeof client.group)[':id']['heroes']['$get']>;
 export type ApiGetCraftItemsResponse = InferResponseType<(typeof client.craft.items)[':buildingType']['$get']>['data'];

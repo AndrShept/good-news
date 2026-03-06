@@ -11,4 +11,7 @@ export const socketEvents = {
   walkMap: () => `walk:map`,
   placeUpdate: () => `update:place`,
   queueCraft: () => 'queue:craft',
+  entitySpawn: () => 'ENTITY:SPAWN',
+  entityDespawn: () => 'ENTITY:DESPAWN',
+  entityUpdate: () => 'ENTITY:UPDATE',
 };

@@ -8,6 +8,7 @@ export const locationTable = pgTable('location', {
 
   placeId: uuid(),
   mapId: uuid(),
+  chunkId: text(),
   heroId: uuid()
     .references(() => heroTable.id, {
       onDelete: 'cascade',
@@ -15,6 +16,7 @@ export const locationTable = pgTable('location', {
     .notNull(),
   x: integer().default(0).notNull(),
   y: integer().default(0).notNull(),
+
   targetX: integer(),
   targetY: integer(),
   createdAt: timestamp({

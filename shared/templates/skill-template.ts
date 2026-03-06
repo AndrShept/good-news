@@ -103,7 +103,7 @@ export const skillsTemplate = [
   {
     id: 'a6ed4a4a-4ae9-4245-9b3a-cc0c37428493',
     name: 'FORAGING',
-    image: imageConfig.icon.skill['HERBALISM'],
+    image: imageConfig.icon.skill['FORAGING'],
     category: 'GATHERING',
     key: 'FORAGING',
   },
