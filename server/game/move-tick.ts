@@ -7,12 +7,14 @@ import { serverState } from './state/server-state';
 
 export const moveTick = (now: number) => {
   for (const [heroId, { paths, offlineTimer, userId }] of serverState.hero.entries()) {
-    const heroState = serverState.hero.get(heroId);
-    if (!heroState) continue;
+    const hero = serverState.hero.get(heroId);
+    if (!hero) continue;
     if (offlineTimer && offlineTimer <= now) {
       heroOffline(heroId, userId);
-      console.log(' heroOffline', heroState.isOnline);
+      console.log(' heroOffline', hero.isOnline);
     }
+
+
     if (!paths?.length) continue;
     const nextPath = paths[0];
     let lastStep: PathNode | null = null;
@@ -21,9 +23,9 @@ export const moveTick = (now: number) => {
       if (!step) continue;
       lastStep = step;
 
-      heroState.location.x = step.x;
-      heroState.location.y = step.y;
-      socketService.sendMapMoveHero(heroId);
+      hero.location.x = step.x;
+      hero.location.y = step.y;
+      socketService.sendMapMoveHero(heroId, hero.location.chunkId! );
     }
 
     if (!paths.length && lastStep) {
@@ -31,11 +33,11 @@ export const moveTick = (now: number) => {
         x: lastStep.x,
         y: lastStep.y,
       });
-      const heroState = serverState.hero.get(heroId);
-      if (heroState) {
-        heroState.state = 'IDLE';
-      }
-      socketService.sendMapChunkMoveFinish(heroId);
+      // const hero = serverState.hero.get(heroId);
+     
+        hero.state = 'IDLE';
+     
+      socketService.sendMapChunkMoveFinish(heroId,hero.location.chunkId!);
     }
   }
 };

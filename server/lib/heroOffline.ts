@@ -4,6 +4,7 @@ import { socketEvents } from '@/shared/socket-events';
 import { io } from '..';
 import { serverState } from '../game/state/server-state';
 import { heroService } from '../services/hero-service';
+import { mapService } from '../services/map-service';
 
 export const heroOffline = async (heroId: string, userId: string) => {
   const hero = heroService.getHero(heroId);
@@ -16,8 +17,14 @@ export const heroOffline = async (heroId: string, userId: string) => {
       placeId: hero.location.placeId ?? '',
     },
   };
-  if (hero.location.mapId) {
-    io.to(hero.location.mapId).emit(socketEvents.mapUpdate(), socketData);
+  if (hero.location.chunkId && hero.location.mapId) {
+    mapService.despawnMapEntitiesInChunk({
+      type: 'HERO',
+      entityId: hero.id,
+      mapId: hero.location.mapId,
+      x: hero.location.x,
+      y: hero.location.y,
+    });
   }
   if (hero.location.placeId) {
     io.to(hero.location.placeId).emit(socketEvents.placeUpdate(), socketData);

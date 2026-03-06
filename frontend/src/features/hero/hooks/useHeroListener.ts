@@ -45,7 +45,6 @@ export const useHeroListener = () => {
             text: data.payload.message,
             data: data.payload.itemName ? [{ name: data.payload.itemName, quantity: data.payload.quantity }] : undefined,
           });
-          console.log(data.payload);
           if (data.payload.inventoryDeltas && data.payload.itemName) {
             for (const i of data.payload.inventoryDeltas) {
               switch (i.type) {

@@ -2,10 +2,10 @@ import type {
   HeroUpdateStateEvent,
   MapChunkDespawnEntityData,
   MapChunkSpawnEntityData,
+  MapChunkUpdateEntitiesData,
   PlaceUpdateEvent,
   SkillUpEvent,
-  WalkMapFinishEvent,
-  WalkMapUpdateEvent,
+
 } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import type { GameSysMessage, MapChunkEntitiesData, MapChunkEntitiesType, StateType } from '@/shared/types';
@@ -54,33 +54,31 @@ export const socketService = {
     };
     io.to(placeId).emit(socketEvents.placeUpdate(), socketData);
   },
-  sendMapMoveHero(heroId: string) {
+  sendMapMoveHero(heroId: string, chunkId: string) {
     const hero = heroService.getHero(heroId);
-    const heroesAroundRadius = mapService.getNearHeroes(heroId);
-    for (const aroundHero of heroesAroundRadius) {
-      const socketData: WalkMapUpdateEvent = {
-        type: 'WALK_MAP_UPDATE',
-        payload: { heroId, x: hero.location.x, y: hero.location.y },
-      };
-      io.to(aroundHero.id).emit(socketEvents.walkMap(), socketData);
-    }
+
+    const socketData: MapChunkUpdateEntitiesData = {
+      entityId: heroId,
+      data: { type: 'HERO', payload: { x: hero.location.x, y: hero.location.y } },
+    };
+
+    io.to(chunkId).emit(socketEvents.entityUpdate(), socketData);
   },
-  sendMapChunkMoveFinish(heroId: string) {
-    const heroesAroundRadius = mapService.getNearHeroes(heroId);
-    for (const aroundHero of heroesAroundRadius) {
-      const socketData: WalkMapFinishEvent = {
-        type: 'WALK_MAP_FINISH',
-        payload: { heroId: heroId, state: 'IDLE' },
-      };
-      io.to(aroundHero.id).emit(socketEvents.walkMap(), socketData);
-    }
+  sendMapChunkMoveFinish(heroId: string, chunkId: string) {
+    const hero = heroService.getHero(heroId);
+
+    const socketData: MapChunkUpdateEntitiesData = {
+       entityId: heroId,
+       isFinishMove: true,
+      data: {type: 'HERO', payload: { x: hero.location.x, y: hero.location.y , state: 'IDLE'} },
+    };
+
+    io.to(chunkId).emit(socketEvents.entityUpdate(), socketData);
   },
   sendMapChunkSpawnEntities({ chunkId, type, entityId }: SendMapChunkSpawnEntities) {
     let data: MapChunkEntitiesData | undefined = undefined;
     switch (type) {
       case 'HERO':
-        const socket = socketService.getSocket(entityId);
-        socket.join(chunkId);
         data = { type, payload: heroService.getHeroMapData(entityId) };
         break;
       case 'CREATURE': {

@@ -387,20 +387,18 @@ export type Hero = InferSelectModel<typeof heroTable> & {
   itemContainers: { id: string; type: ItemContainerType; name: string }[];
 };
 
-export type MapChunkEntitiesType = 'HERO' | 'CORPSE' | 'CREATURE';
-export type MapChunkEntitiesData =
-  | {
-      type: 'HERO';
-      payload: MapHero;
-    }
-  | {
-      type: 'CORPSE';
-      payload: Corpse;
-    }
-  | {
-      type: 'CREATURE';
-      payload: Creature;
-    };
+export type EntityPayloadMap = {
+  HERO: MapHero;
+  CORPSE: Corpse;
+  CREATURE: Creature;
+};
+export type MapChunkEntitiesType = keyof EntityPayloadMap;
+export type MapChunkEntitiesData = {
+  [K in keyof EntityPayloadMap]: {
+    type: K;
+    payload: EntityPayloadMap[K];
+  };
+}[keyof EntityPayloadMap];
 
 export type Corpse = {
   id: string;

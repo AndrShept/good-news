@@ -2,11 +2,12 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
-import { MapChunkDespawnEntityData, MapChunkSpawnEntityData } from '@/shared/socket-data-types';
+import { MapChunkDespawnEntityData, MapChunkSpawnEntityData, MapChunkUpdateEntitiesData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
+import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { useEffect } from 'react';
 
-import { useMapChunkEntitiesUpdate } from './useMapHeroesUpdate';
+import { useMapChunkEntitiesUpdate } from './useMapChunkEntitiesUpdate';
 
 export const useMapListener = () => {
   const { mapId } = useHero((data) => ({
@@ -14,8 +15,9 @@ export const useMapListener = () => {
   }));
   const { socket } = useSocket();
   const { addChunkEntities, removeChunkEntities, updateChunkEntities } = useMapChunkEntitiesUpdate(mapId);
+  const filterMovementPathTiles = useMovementPathTileStore((state) => state.filterMovementPathTiles);
   const { updateHero } = useHeroUpdate();
-  const id = useHeroId();
+  const heroId = useHeroId();
 
   useEffect(() => {
     const spawnListener = (data: MapChunkSpawnEntityData) => {
@@ -24,8 +26,23 @@ export const useMapListener = () => {
     const despawnListener = (data: MapChunkDespawnEntityData) => {
       removeChunkEntities(data.payload.entityId, data.type);
     };
-    const updateListener = () => {
-      
+    const updateListener = (data: MapChunkUpdateEntitiesData) => {
+
+      if (data.data.type === 'HERO' && heroId === data.entityId && !data.isFinishMove) {
+        updateHero({
+          location: {
+            x: data.data.payload.x,
+            y: data.data.payload.y,
+          },
+        });
+
+        filterMovementPathTiles({ x: data.data.payload.x!, y: data.data.payload.y! });
+      }
+      if (data.data.type === 'HERO' && heroId === data.entityId && data.isFinishMove) {
+
+        updateHero({ state: data.data.payload.state, location: { targetX: null, targetY: null } });
+      }
+      updateChunkEntities({ ...data });
     };
 
     socket.on(socketEvents.entitySpawn(), spawnListener);
@@ -37,5 +54,5 @@ export const useMapListener = () => {
       socket.off(socketEvents.entityDespawn(), despawnListener);
       socket.off(socketEvents.entityUpdate(), updateListener);
     };
-  }, [addChunkEntities, id, removeChunkEntities, socket, updateHero]);
+  }, [addChunkEntities, filterMovementPathTiles, heroId, removeChunkEntities, socket, updateChunkEntities, updateHero]);
 };

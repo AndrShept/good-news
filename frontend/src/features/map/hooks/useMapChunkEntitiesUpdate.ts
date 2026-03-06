@@ -1,27 +1,25 @@
+import { MapChunkUpdateEntitiesData } from '@/shared/socket-data-types';
 import { ApiGeChunkMapEntities, MapChunkEntitiesData, MapChunkEntitiesType } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 import { getMapChunkEntitiesOptions } from '../api/get-map-heroes';
 
-type MapChunkEntitiesDataOmit = Omit<MapChunkEntitiesData, 'payload'> & {
-  payload: Partial<MapChunkEntitiesData['payload']>;
-};
-
 export const useMapChunkEntitiesUpdate = (mapId: string) => {
   const queryClient = useQueryClient();
 
   const updateChunkEntities = useCallback(
-    (entityId: string, data: MapChunkEntitiesDataOmit) => {
+    ({ entityId, data }: MapChunkUpdateEntitiesData) => {
       queryClient.setQueriesData<ApiGeChunkMapEntities>({ queryKey: getMapChunkEntitiesOptions(mapId).queryKey }, (oldData) => {
+    
         if (!oldData) return;
         switch (data.type) {
           case 'HERO':
-            return { ...oldData, heroes: oldData.heroes.map((e) => (entityId === e.id ? { ...e, ...data } : e)) };
+            return { ...oldData, heroes: oldData.heroes.map((e) => (entityId === e.id ? { ...e, ...data.payload } : e)) };
           case 'CORPSE':
-            return { ...oldData, corpses: oldData.corpses.map((e) => (entityId === e.id ? { ...e, ...data } : e)) };
+            return { ...oldData, corpses: oldData.corpses.map((e) => (entityId === e.id ? { ...e, ...data.payload } : e)) };
           case 'CREATURE':
-            return { ...oldData, creatures: oldData.creatures.map((e) => (entityId === e.id ? { ...e, ...data } : e)) };
+            return { ...oldData, creatures: oldData.creatures.map((e) => (entityId === e.id ? { ...e, ...data.payload } : e)) };
         }
       });
     },

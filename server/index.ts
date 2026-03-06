@@ -137,6 +137,9 @@ io.on('connection', async (socket) => {
     if (hero.location.mapId) {
       socket.join(hero.location.mapId);
     }
+    if (hero.location.chunkId) {
+      socket.join(hero.location.chunkId);
+    }
   }
   // inviteGroup(socket);
   // joinRoom(socket);

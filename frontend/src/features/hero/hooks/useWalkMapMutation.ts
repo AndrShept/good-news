@@ -22,7 +22,7 @@ export const useWalkMapMutation = (setFinishTime: (num: number) => void) => {
       return data;
     },
     onSuccess: async (res, { x, y }) => {
-      updateHero({ location: { targetX: x, targetY: y } });
+      updateHero({ location: { targetX: x, targetY: y }, state: 'WALK' });
       setFinishTime(res.data?.finishWalkTime ?? 0);
     },
   });

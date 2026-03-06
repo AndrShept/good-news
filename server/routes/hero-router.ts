@@ -8,7 +8,7 @@ import {
   RESET_STATS_COST,
   WORLD_SEED,
 } from '@/shared/constants';
-import type { HeroUpdateStateEvent, WalkMapStartEvent } from '@/shared/socket-data-types';
+import type { HeroUpdateStateEvent, MapChunkUpdateEntitiesData } from '@/shared/socket-data-types';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
@@ -745,14 +745,14 @@ export const heroRouter = new Hono<Context>()
       heroState.location.targetX = targetPos.x;
       heroState.location.targetY = targetPos.y;
 
-      const socketData: WalkMapStartEvent = {
-        type: 'WALK_MAP_START',
-        payload: {
-          heroId: id,
-          state: 'WALK',
+      const socketData: MapChunkUpdateEntitiesData = {
+        entityId: heroState.id,
+        data: {
+          type: 'HERO',
+          payload: { state: 'WALK' },
         },
       };
-      io.to(heroState.location.mapId!).emit(socketEvents.walkMap(), socketData);
+      io.to(heroState.location.chunkId!).emit(socketEvents.entityUpdate(), socketData);
       const lastItem = walkPathWithTime.at(-1);
       return c.json<SuccessResponse<{ finishWalkTime: number | undefined }>>({
         message: 'walking start',
@@ -833,9 +833,10 @@ export const heroRouter = new Hono<Context>()
           .where(eq(locationTable.heroId, id));
 
         hero.location.mapId = null;
-        hero.location.placeId = place.id;  
+        hero.location.chunkId = null;
+        hero.location.placeId = place.id;
 
-        // socketService.sendMapRemoveHero(hero.id, place.mapId);
+        mapService.despawnMapEntitiesInChunk({ entityId: hero.id, type: 'HERO', mapId: place.mapId, x: place.x, y: place.y });
         socketService.sendPlaceAddHero(hero.id, place.id);
         socketService.sendToClientSysMessage(hero.id, { type: 'SUCCESS', text: `You have entered ${place.name}.` });
       }
@@ -934,27 +935,39 @@ export const heroRouter = new Hono<Context>()
           message: 'place not found',
         });
       }
-
+      const chunkId = mapService.getChunkId({
+        x: place.x,
+        y: place.y,
+        mapId: place.mapId,
+      });
       await db
         .update(locationTable)
         .set({
           mapId: place.mapId,
+          chunkId,
           x: place.x,
           y: place.y,
           placeId: null,
         })
         .where(eq(locationTable.heroId, id));
+
+      hero.location.chunkId = chunkId;
       hero.location.mapId = place.mapId;
       hero.location.placeId = null;
       hero.location.x = place.x;
       hero.location.y = place.y;
 
       socketService.sendPlaceRemoveHero(hero.id, place.id);
-      mapService.spawnMapEntitiesInChunk({ x: place.x, y: place.y, mapId: place.mapId, type: 'HERO',entityId: hero.id });
 
-      return c.json<SuccessResponse>({
+      mapService.spawnMapEntitiesInChunk({ type: 'HERO', entityId: hero.id, chunkId });
+      socketService.sendMapChunkSpawnEntities({ chunkId, entityId: hero.id, type: 'HERO' });
+
+      const returnData = hero.location;
+
+      return c.json<SuccessResponse<typeof returnData>>({
         message: 'leave place success ',
         success: true,
+        data: returnData,
       });
     },
   )

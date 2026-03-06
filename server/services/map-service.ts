@@ -13,11 +13,9 @@ interface GetChunkId {
 }
 
 interface SpawnMapEntitiesInChunk {
-  x: number;
-  y: number;
-  mapId: string;
   type: MapChunkEntitiesType;
   entityId: string;
+  chunkId: string;
 }
 interface DespawnMapEntitiesInChunk {
   x: number;
@@ -46,30 +44,27 @@ export const mapService = {
     const dy = Math.floor(y / MAP_CHUNK_SIZE);
     return `${mapId}:${dy}:${dx}`;
   },
-  spawnMapEntitiesInChunk({ x, y, mapId, entityId, type }: SpawnMapEntitiesInChunk) {
-    const chunkId = this.getChunkId({
-      mapId,
-      x,
-      y,
-    });
-    const chunk = serverState.mapChunks.get(chunkId);
+  spawnMapEntitiesInChunk({ entityId, type, chunkId }: SpawnMapEntitiesInChunk) {
+    let chunk = serverState.mapChunks.get(chunkId);
     if (!chunk) {
-      serverState.mapChunks.set(chunkId, { corpses: new Set(), creatures: new Set(), heroes: new Set() });
+      chunk = { corpses: new Set(), creatures: new Set(), heroes: new Set() };
+      serverState.mapChunks.set(chunkId, chunk);
     }
 
     switch (type) {
       case 'HERO':
-        chunk?.heroes.add(entityId);
+        chunk.heroes.add(entityId);
+
         break;
       case 'CREATURE':
-        chunk?.creatures.add(entityId);
+        chunk.creatures.add(entityId);
         break;
       case 'CORPSE':
-        chunk?.corpses.add(entityId);
+        chunk.corpses.add(entityId);
         break;
     }
 
-    socketService.sendMapChunkSpawnEntities({ chunkId, entityId, type });
+    
   },
   despawnMapEntitiesInChunk({ x, y, mapId, entityId, type }: DespawnMapEntitiesInChunk) {
     const chunkId = this.getChunkId({

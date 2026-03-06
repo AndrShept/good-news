@@ -88,6 +88,10 @@ export const GameMap = memo(
         setMovementPathTiles(path);
       }
     }, [layers]);
+    const CHUNK_SIZE = 8;
+
+    const heroChunkX = Math.floor(heroPosX / CHUNK_SIZE);
+    const heroChunkY = Math.floor(heroPosY / CHUNK_SIZE);
 
     // if (isLoading) return 'Loading Map...';
     return (
@@ -120,10 +124,19 @@ export const GameMap = memo(
           {groundLayer?.data.map((n, idx) => {
             const x = idx % MAP_WIDTH;
             const y = Math.floor(idx / MAP_WIDTH);
+
             const dx = x - heroPosX;
             const dy = y - heroPosY;
-            const radius = 8;
+            const radius = 40;
+
             const isNear = dx * dx + dy * dy <= radius * radius;
+
+            const tileChunkX = Math.floor(x / CHUNK_SIZE);
+            const tileChunkY = Math.floor(y / CHUNK_SIZE);
+
+            const isChunk = tileChunkX === heroChunkX && tileChunkY === heroChunkY;
+            const chunkColor = (tileChunkX + tileChunkY) % 2 === 0;
+            const isChunkBorder = x % CHUNK_SIZE === 0 || y % CHUNK_SIZE === 0;
             if (!isNear) return;
             return (
               <MapTile
@@ -132,7 +145,9 @@ export const GameMap = memo(
                 TILE_SIZE={TILE_SIZE}
                 x={x}
                 y={y}
-                isNear={isNear}
+                isChunkBorder={isChunkBorder}
+                // isChunk={isChunk}
+                // chunkColor={chunkColor}
               />
             );
           })}

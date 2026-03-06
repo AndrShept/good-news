@@ -4,26 +4,27 @@ import { socketEvents } from '@/shared/socket-events';
 import { io } from '..';
 import { heroService } from '../services/hero-service';
 import { mapService } from '../services/map-service';
+import { socketService } from '../services/socket-service';
 
 export const heroOnline = async (heroId: string) => {
-  const heroState = heroService.getHero(heroId);
-  heroState.offlineTimer = undefined;
+  const hero = heroService.getHero(heroId);
+  hero.offlineTimer = undefined;
   const mapHeroData = heroService.getHeroMapData(heroId);
   const socketData: HeroOnlineEvent = {
     type: 'HERO_ONLINE',
     payload: mapHeroData,
   };
 
-  if (heroState.location.mapId) {
-    mapService.spawnMapEntitiesInChunk({
-      x: heroState.location.x,
-      y: heroState.location.y,
-      mapId: heroState.location.mapId,
-      type: 'HERO',
-      entityId: heroId,
+  if (hero.location.chunkId && hero.location.mapId) {
+    const chunkId = mapService.getChunkId({
+      x: hero.location.x,
+      y: hero.location.y,
+      mapId: hero.location.mapId,
     });
+    mapService.spawnMapEntitiesInChunk({ type: 'HERO', entityId: hero.id, chunkId });
+    socketService.sendMapChunkSpawnEntities({ chunkId, entityId: hero.id, type: 'HERO' });
   }
-  if (heroState.location.placeId) {
-    io.to(heroState.location.placeId).emit(socketEvents.placeUpdate(), socketData);
+  if (hero.location.placeId) {
+    io.to(hero.location.placeId).emit(socketEvents.placeUpdate(), socketData);
   }
 };

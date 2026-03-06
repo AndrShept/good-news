@@ -1,6 +1,7 @@
 import type { itemInstanceService } from '../server/services/item-instance-service';
 import type {
   BuildingType,
+  EntityPayloadMap,
   GameSysMessageType,
   Hero,
   HeroSidebarItem,
@@ -22,6 +23,13 @@ export type SocketGroupResponse = {
   updateType: 'leave' | 'kick' | 'remove' | 'new-member';
 };
 
+type MapChunkEntitiesDataPartial = {
+  [K in keyof EntityPayloadMap]: {
+    type: K;
+    payload: Partial<EntityPayloadMap[K]>;
+  };
+}[keyof EntityPayloadMap];
+
 export type MapChunkSpawnEntityData = MapChunkEntitiesData;
 
 export type MapChunkDespawnEntityData = {
@@ -29,6 +37,12 @@ export type MapChunkDespawnEntityData = {
   payload: {
     entityId: string;
   };
+};
+
+export type MapChunkUpdateEntitiesData = {
+  entityId: string;
+  isFinishMove?: boolean;
+  data: MapChunkEntitiesDataPartial;
 };
 
 export type PlaceUpdateEvent =
@@ -113,25 +127,3 @@ export type SkillUpEvent = {
   };
 };
 
-export type WalkMapStartEvent = {
-  type: 'WALK_MAP_START';
-  payload: {
-    state: StateType;
-    heroId: string;
-  };
-};
-export type WalkMapUpdateEvent = {
-  type: 'WALK_MAP_UPDATE';
-  payload: {
-    x: number;
-    y: number;
-    heroId: string;
-  };
-};
-export type WalkMapFinishEvent = {
-  type: 'WALK_MAP_FINISH';
-  payload: {
-    state: StateType;
-    heroId: string;
-  };
-};

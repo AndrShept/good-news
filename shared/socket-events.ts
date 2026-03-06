@@ -14,4 +14,5 @@ export const socketEvents = {
   entitySpawn: () => 'ENTITY:SPAWN',
   entityDespawn: () => 'ENTITY:DESPAWN',
   entityUpdate: () => 'ENTITY:UPDATE',
+  finishMove: () => 'FINISH:MOVE',
 };
