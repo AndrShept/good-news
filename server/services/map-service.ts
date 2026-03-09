@@ -1,5 +1,5 @@
 import { MAP_CHUNK_SIZE } from '@/shared/constants';
-import type { Corpse, Creature, MapChunkEntitiesData, MapChunkEntitiesType } from '@/shared/types';
+import type { Corpse, Creature, MapChunkEntitiesData, MapChunkEntitiesType, MapHero } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { type HeroRuntime, serverState } from '../game/state/server-state';
@@ -12,10 +12,18 @@ interface GetChunkId {
   mapId: string;
 }
 
+interface GetChunkIds {
+  x: number;
+  y: number;
+  mapId: string;
+}
+
 interface SpawnMapEntitiesInChunk {
   type: MapChunkEntitiesType;
   entityId: string;
-  chunkId: string;
+  x: number;
+  y: number;
+  mapId: string;
 }
 interface DespawnMapEntitiesInChunk {
   x: number;
@@ -44,7 +52,8 @@ export const mapService = {
     const dy = Math.floor(y / MAP_CHUNK_SIZE);
     return `${mapId}:${dy}:${dx}`;
   },
-  spawnMapEntitiesInChunk({ entityId, type, chunkId }: SpawnMapEntitiesInChunk) {
+  spawnMapEntitiesInChunk({ entityId, type, x, y, mapId }: SpawnMapEntitiesInChunk) {
+    const chunkId = mapService.getChunkId({ mapId, x, y });
     let chunk = serverState.mapChunks.get(chunkId);
     if (!chunk) {
       chunk = { corpses: new Set(), creatures: new Set(), heroes: new Set() };
@@ -63,8 +72,6 @@ export const mapService = {
         chunk.corpses.add(entityId);
         break;
     }
-
-    
   },
   despawnMapEntitiesInChunk({ x, y, mapId, entityId, type }: DespawnMapEntitiesInChunk) {
     const chunkId = this.getChunkId({
@@ -93,5 +100,39 @@ export const mapService = {
     }
 
     socketService.sendMapChunkDespawnEntities({ chunkId, entityId, type });
+  },
+  getAroundChunkIds({ mapId, x, y }: GetChunkIds) {
+    const chunkX = Math.floor(x / MAP_CHUNK_SIZE);
+    const chunkY = Math.floor(y / MAP_CHUNK_SIZE);
+
+    const chunkIds: string[] = [];
+
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        chunkIds.push(`${mapId}:${chunkY + dy}:${chunkX + dx}`);
+      }
+    }
+
+    return chunkIds;
+  },
+
+  getMapEntitiesByChunkIds(chunkIds: string[]) {
+    const entity = {
+      corpses: [] as Corpse[],
+      creatures: [] as Creature[],
+      heroes: [] as MapHero[],
+    };
+    for (const chunkId of chunkIds) {
+      const chunk = serverState.mapChunks.get(chunkId);
+      const heroes = [...(chunk?.heroes ?? [])].map((id) => heroService.getHeroMapData(id));
+      const creatures = [...(chunk?.creatures ?? [])].map((id) => serverState.creature.get(id)).filter((i) => !!i);
+      const corpses = [...(chunk?.corpses ?? [])].map((id) => serverState.corpse.get(id)).filter((i) => !!i);
+
+      entity.corpses.push(...corpses);
+      entity.creatures.push(...creatures);
+      entity.heroes.push(...heroes);
+    }
+
+    return entity;
   },
 };

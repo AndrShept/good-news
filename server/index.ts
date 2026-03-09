@@ -15,7 +15,7 @@ import { db } from './db/db';
 import { heroTable } from './db/schema';
 import { locationTable } from './db/schema/location-schema';
 import { gameLoop } from './game/gameLoop';
-import {  saveItemsDb } from './game/save-items-db';
+import { saveItemsDb } from './game/save-items-db';
 import { saveSkillsDb } from './game/save-skills-db';
 import { serverState } from './game/state/server-state';
 import { heroOffline } from './lib/heroOffline';
@@ -33,6 +33,7 @@ import { mapRouter } from './routes/map-router';
 import { placeRouter } from './routes/place-router';
 import { postRouter } from './routes/post-router';
 import { shopRouter } from './routes/shop-router';
+import { mapService } from './services/map-service';
 
 const app = new Hono<Context>();
 export let isMaintance = false;
@@ -138,7 +139,10 @@ io.on('connection', async (socket) => {
       socket.join(hero.location.mapId);
     }
     if (hero.location.chunkId) {
-      socket.join(hero.location.chunkId);
+      const chunkIds = mapService.getAroundChunkIds({ x: hero.location.x, y: hero.location.y, mapId: hero.location.mapId! });
+      for (const id of chunkIds) {
+        socket.join(id);
+      }
     }
   }
   // inviteGroup(socket);

@@ -1,5 +1,5 @@
 import { mapTemplate } from '@/shared/templates/map-template';
-import type { MapHero, SuccessResponse, TMap } from '@/shared/types';
+import type { Corpse, Creature, MapHero, SuccessResponse, TMap } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -65,17 +65,10 @@ export const mapRouter = new Hono<Context>()
         });
       }
 
+      const chunkIds = mapService.getAroundChunkIds({ mapId: map.id, x: hero.location.x, y: hero.location.y });
+      const returnData = mapService.getMapEntitiesByChunkIds(chunkIds)
+  
 
-      const chunkId = mapService.getChunkId({ mapId: map.id, x: hero.location.x, y: hero.location.y });
-      const chunk = serverState.mapChunks.get(chunkId);
-      const heroes = [...(chunk?.heroes ?? [])].map((id) => heroService.getHeroMapData(id));
-      const creatures = [...(chunk?.creatures ?? [])].map((id) => serverState.creature.get(id)).filter((i) => !!i);
-      const corpses = [...(chunk?.corpses ?? [])].map((id) => serverState.corpse.get(id)).filter((i) => !!i);
-      const returnData = {
-        heroes,
-        creatures,
-        corpses,
-      };
       return c.json<SuccessResponse<typeof returnData>>({
         message: 'map  entities fetched!',
         success: true,

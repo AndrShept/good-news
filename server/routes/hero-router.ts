@@ -735,10 +735,10 @@ export const heroRouter = new Hono<Context>()
         mapId: heroState.location.mapId!,
       }));
 
-      const savePosQueue = serverState.pathPersistQueue.get(id);
-      if (savePosQueue) {
-        serverState.pathPersistQueue.delete(id);
-      }
+      // const savePosQueue = serverState.pathPersistQueue.get(id);
+      // if (savePosQueue) {
+      //   serverState.pathPersistQueue.delete(id);
+      // }
 
       heroState.paths = walkPathWithTime;
       heroState.state = 'WALK';
@@ -769,15 +769,16 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
-      const heroState = heroService.getHero(id);
-      verifyHeroOwnership({ heroUserId: heroState.userId, userId: user?.id });
+      const hero = heroService.getHero(id);
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      serverState.pathPersistQueue.set(id, { x: heroState.location.x, y: heroState.location.y });
-      heroState.paths = [];
-      heroState.state = 'IDLE';
-      heroState.location.targetX = null;
-      heroState.location.targetY = null;
-      socketService.sendMapChunkMoveFinish(heroState.id);
+      // serverState.pathPersistQueue.set(id, { x: hero.location.x, y: hero.location.y });
+      hero.paths = [];
+      hero.state = 'IDLE';
+      hero.location.targetX = null;
+      hero.location.targetY = null;
+      const chunkId = mapService.getChunkId({ x: hero.location.x, y: hero.location.y, mapId: hero.location.mapId! });
+      socketService.sendMapChunkMoveFinish(hero.id, chunkId);
 
       return c.json<SuccessResponse>({
         message: 'walking cancel',
@@ -959,7 +960,13 @@ export const heroRouter = new Hono<Context>()
 
       socketService.sendPlaceRemoveHero(hero.id, place.id);
 
-      mapService.spawnMapEntitiesInChunk({ type: 'HERO', entityId: hero.id, chunkId });
+      mapService.spawnMapEntitiesInChunk({
+        type: 'HERO',
+        entityId: hero.id,
+        x: hero.location.x,
+        y: hero.location.y,
+        mapId: hero.location.mapId,
+      });
       socketService.sendMapChunkSpawnEntities({ chunkId, entityId: hero.id, type: 'HERO' });
 
       const returnData = hero.location;
