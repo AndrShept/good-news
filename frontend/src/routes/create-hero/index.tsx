@@ -48,7 +48,6 @@ function RouteComponent() {
   // const isLoading = form.formState.isSubmitting;
 
   const onSubmit = (values: z.infer<typeof heroNameSchema>) => {
-    console.log(stats);
     mutation.mutate(
       {
         avatarImage: avatarImage,

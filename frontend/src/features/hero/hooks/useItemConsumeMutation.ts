@@ -23,7 +23,6 @@ export const useItemConsumeMutation = () => {
 
     async onSuccess(data, { itemTemplateId }) {
       const template = itemsTemplateById[itemTemplateId];
-      console.log(data)
       updateHero({
         ...data.data?.hero,
       });

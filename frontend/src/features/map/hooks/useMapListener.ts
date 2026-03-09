@@ -27,8 +27,7 @@ export const useMapListener = () => {
       removeChunkEntities(data.payload.entityId, data.type);
     };
     const updateListener = (data: MapChunkUpdateEntitiesData) => {
-
-      if (data.data.type === 'HERO' && heroId === data.entityId && !data.isFinishMove) {
+      if (data.data.type === 'HERO' && heroId === data.entityId && !data.isFinishMove && data.data.payload.x && data.data.payload.y) {
         updateHero({
           location: {
             x: data.data.payload.x,
@@ -36,10 +35,9 @@ export const useMapListener = () => {
           },
         });
 
-        filterMovementPathTiles({ x: data.data.payload.x!, y: data.data.payload.y! });
+        filterMovementPathTiles({ x: data.data.payload.x, y: data.data.payload.y });
       }
       if (data.data.type === 'HERO' && heroId === data.entityId && data.isFinishMove) {
-
         updateHero({ state: data.data.payload.state, location: { targetX: null, targetY: null } });
       }
       updateChunkEntities({ ...data });

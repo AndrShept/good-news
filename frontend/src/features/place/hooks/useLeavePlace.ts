@@ -1,7 +1,7 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
 import { client } from '@/lib/utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 export const useLeavePlace = () => {
   const id = useHeroId();

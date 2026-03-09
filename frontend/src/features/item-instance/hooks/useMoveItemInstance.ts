@@ -17,7 +17,6 @@ export const useMoveItemInstance = () => {
     mutationFn: ({ itemInstanceId, from, to }: IUseMoveItemInstance) => moveItemInstance({ id: heroId, itemInstanceId, from, to }),
 
     async onSuccess({ data }, { from, to, itemInstanceId }) {
-      console.log(data);
       removeItemInstance(from, itemInstanceId);
       if (data?.inventoryDeltas) {
         for (const i of data.inventoryDeltas) {

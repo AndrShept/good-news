@@ -1,6 +1,8 @@
+import type { LoadMapChunkEntityEvent, RemoveMapChunkEntityEvent } from '@/shared/socket-data-types';
+import { socketEvents } from '@/shared/socket-events';
 import type { PathNode } from '@/shared/types';
-import { or } from 'drizzle-orm';
 
+import { io } from '..';
 import { heroOffline } from '../lib/heroOffline';
 import { mapService } from '../services/map-service';
 import { socketService } from '../services/socket-service';
@@ -33,10 +35,10 @@ export const moveTick = (now: number) => {
         const newChunks = mapService.getAroundChunkIds({ x: step.x, y: step.y, mapId: hero.location.mapId });
         const diffOld = oldChunks.filter((c) => !newChunks.includes(c));
         const diffNew = newChunks.filter((c) => !oldChunks.includes(c));
-        console.log('oldChunks', oldChunks);
-        console.log('newChunks', newChunks);
-        console.log('diffOld', diffOld);
-        console.log('diffNew', diffNew);
+        // console.log('oldChunks', oldChunks);
+        // console.log('newChunks', newChunks);
+        // console.log('diffOld', diffOld);
+        // console.log('diffNew', diffNew);
         for (const old of diffOld) {
           socket.leave(old);
         }
@@ -52,6 +54,20 @@ export const moveTick = (now: number) => {
         });
         mapService.spawnMapEntitiesInChunk({ entityId: heroId, type: 'HERO', x: step.x, y: step.y, mapId: hero.location.mapId });
         socketService.sendMapChunkSpawnEntities({ chunkId, entityId: heroId, type: 'HERO' });
+
+        const newEntity = mapService.getMapEntitiesByChunkIds(diffNew);
+        const oldEntity = mapService.getMapEntitiesByChunkIds(diffOld);
+        // console.log(newEntity);
+        const socketLoadData: LoadMapChunkEntityEvent = {
+          type: 'LOAD_MORE_ENTITY',
+          payload: newEntity,
+        };
+        const socketRemoveData: RemoveMapChunkEntityEvent = {
+          type: 'REMOVE_OLD_ENTITY',
+          payload: oldEntity,
+        };
+        io.to(heroId).emit(socketEvents.selfData(), socketRemoveData);
+        io.to(heroId).emit(socketEvents.selfData(), socketLoadData);
       }
       hero.location.x = step.x;
       hero.location.y = step.y;

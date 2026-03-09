@@ -15,6 +15,6 @@ export const resourceRespawnTick = (now: number) => {
     }
   }
   if (i > 0) {
-    console.log(`[${new Date().toLocaleTimeString()}]:`, `TILE RESTOCK - ${i}`);
+    console.info(`[${new Date().toLocaleTimeString()}]:`, `TILE RESTOCK - ${i}`);
   }
 };

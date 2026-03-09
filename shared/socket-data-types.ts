@@ -1,6 +1,8 @@
 import type { itemInstanceService } from '../server/services/item-instance-service';
 import type {
   BuildingType,
+  Corpse,
+  Creature,
   EntityPayloadMap,
   GameSysMessageType,
   Hero,
@@ -91,7 +93,30 @@ export type QueueCraftItemSocketEvent =
       payload: { queueItemCraftId: string; status: QueueCraftStatusType; expiresAt: number };
     };
 
-export type SelfHeroEvent = RemoveBuffEvent | SkillUpEvent | HeroUpdateStateEvent | FinishGatheringEvent;
+export type SelfHeroEvent =
+  | RemoveBuffEvent
+  | SkillUpEvent
+  | HeroUpdateStateEvent
+  | FinishGatheringEvent
+  | LoadMapChunkEntityEvent
+  | RemoveMapChunkEntityEvent;
+
+export type LoadMapChunkEntityEvent = {
+  type: 'LOAD_MORE_ENTITY';
+  payload: {
+    corpses: Corpse[];
+    creatures: Creature[];
+    heroes: MapHero[];
+  };
+};
+export type RemoveMapChunkEntityEvent = {
+  type: 'REMOVE_OLD_ENTITY';
+  payload: {
+    corpses: Corpse[];
+    creatures: Creature[];
+    heroes: MapHero[];
+  };
+};
 
 export type HeroUpdateStateEvent = {
   type: 'UPDATE_STATE';
@@ -126,4 +151,3 @@ export type SkillUpEvent = {
     expAmount: number;
   };
 };
-

@@ -70,7 +70,7 @@ export const socketService = {
     const socketData: MapChunkUpdateEntitiesData = {
        entityId: heroId,
        isFinishMove: true,
-      data: {type: 'HERO', payload: { x: hero.location.x, y: hero.location.y , state: 'IDLE'} },
+      data: {type: 'HERO', payload: {  state: 'IDLE'} },
     };
 
     io.to(chunkId).emit(socketEvents.entityUpdate(), socketData);

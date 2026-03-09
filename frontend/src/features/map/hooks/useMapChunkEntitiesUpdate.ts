@@ -1,3 +1,4 @@
+import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { MapChunkUpdateEntitiesData } from '@/shared/socket-data-types';
 import { ApiGeChunkMapEntities, MapChunkEntitiesData, MapChunkEntitiesType } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
@@ -7,11 +8,10 @@ import { getMapChunkEntitiesOptions } from '../api/get-map-heroes';
 
 export const useMapChunkEntitiesUpdate = (mapId: string) => {
   const queryClient = useQueryClient();
-
+  const heroId = useHeroId();
   const updateChunkEntities = useCallback(
     ({ entityId, data }: MapChunkUpdateEntitiesData) => {
       queryClient.setQueriesData<ApiGeChunkMapEntities>({ queryKey: getMapChunkEntitiesOptions(mapId).queryKey }, (oldData) => {
-    
         if (!oldData) return;
         switch (data.type) {
           case 'HERO':
@@ -29,6 +29,7 @@ export const useMapChunkEntitiesUpdate = (mapId: string) => {
     (entityId: string, type: MapChunkEntitiesType) => {
       queryClient.setQueriesData<ApiGeChunkMapEntities>({ queryKey: getMapChunkEntitiesOptions(mapId).queryKey }, (oldData) => {
         if (!oldData) return;
+        if (heroId === entityId) return;
 
         switch (type) {
           case 'HERO':

@@ -745,6 +745,8 @@ export const heroRouter = new Hono<Context>()
       heroState.location.targetX = targetPos.x;
       heroState.location.targetY = targetPos.y;
 
+
+      
       const socketData: MapChunkUpdateEntitiesData = {
         entityId: heroState.id,
         data: {
@@ -832,6 +834,12 @@ export const heroRouter = new Hono<Context>()
             placeId: place.id,
           })
           .where(eq(locationTable.heroId, id));
+
+        const socket = socketService.getSocket(hero.id);
+        const chunksIds = mapService.getAroundChunkIds({ x: hero.location.x, y: hero.location.y, mapId: hero.location.mapId });
+        for (const chunkId of chunksIds) {
+          socket.leave(chunkId);
+        }
 
         hero.location.mapId = null;
         hero.location.chunkId = null;
@@ -959,6 +967,11 @@ export const heroRouter = new Hono<Context>()
       hero.location.y = place.y;
 
       socketService.sendPlaceRemoveHero(hero.id, place.id);
+      const socket = socketService.getSocket(hero.id);
+      const chunksIds = mapService.getAroundChunkIds({ x: hero.location.x, y: hero.location.y, mapId: hero.location.mapId });
+      for (const chunkId of chunksIds) {
+        socket.join(chunkId);
+      }
 
       mapService.spawnMapEntitiesInChunk({
         type: 'HERO',

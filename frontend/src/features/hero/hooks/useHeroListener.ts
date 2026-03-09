@@ -1,15 +1,18 @@
 import { useSocket } from '@/components/providers/SocketProvider';
 import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
 import { useItemContainerUpdate } from '@/features/item-container/hooks/useItemContainerUpdate';
+import { useMapChunkEntitiesUpdate } from '@/features/map/hooks/useMapChunkEntitiesUpdate';
 import { useSkillUpdate } from '@/features/skill/hooks/useSkillUpdate';
 import { SelfHeroEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
+import { Corpse, Creature, MapChunkEntitiesData, MapChunkEntitiesType, MapHero } from '@/shared/types';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect } from 'react';
 
 import { useBuff } from './useBuff';
 import { useEquipmentsUpdate } from './useEquipmentsUpdate';
 import { useGameData } from './useGameData';
+import { useHero } from './useHero';
 import { useHeroId } from './useHeroId';
 import { useHeroUpdate } from './useHeroUpdate';
 
@@ -20,6 +23,8 @@ export const useHeroListener = () => {
   const { updateSkill } = useSkillUpdate();
   const { addItemInstance, updateItemInstance } = useItemContainerUpdate();
   const { updateEquip, removeEquip } = useEquipmentsUpdate();
+  const mapId = useHero((data) => data?.location.mapId ?? '');
+  const { removeChunkEntities, addChunkEntities } = useMapChunkEntitiesUpdate(mapId);
   const backpackId = useGetBackpackId();
   const heroId = useHeroId();
   const setGameMessage = useSetGameMessage();
@@ -75,6 +80,30 @@ export const useHeroListener = () => {
           }
 
           break;
+        case 'REMOVE_OLD_ENTITY':
+        case 'LOAD_MORE_ENTITY': {
+          const corpses = data.payload.corpses.map<MapChunkEntitiesData>((c) => ({
+            type: 'CORPSE',
+            payload: c,
+          }));
+          const creatures = data.payload.creatures.map<MapChunkEntitiesData>((c) => ({
+            type: 'CREATURE',
+            payload: c,
+          }));
+          const heroes = data.payload.heroes.map<MapChunkEntitiesData>((h) => ({ type: 'HERO', payload: h }));
+          if (data.type === 'LOAD_MORE_ENTITY') {
+            for (const entity of corpses) addChunkEntities(entity);
+            for (const entity of creatures) addChunkEntities(entity);
+            for (const entity of heroes) addChunkEntities(entity);
+          }
+          if (data.type === 'REMOVE_OLD_ENTITY') {
+            for (const entity of corpses) removeChunkEntities(entity.payload.id, entity.type);
+            for (const entity of creatures) removeChunkEntities(entity.payload.id, entity.type);
+            for (const entity of heroes) removeChunkEntities(entity.payload.id, entity.type);
+          }
+
+          break;
+        }
       }
     };
 
@@ -83,5 +112,5 @@ export const useHeroListener = () => {
     return () => {
       socket.off(socketEvents.selfData(), listener);
     };
-  }, [heroId, removeBuff, setGameMessage, socket, updateHero, updateSkill]);
+  }, [addChunkEntities, addItemInstance, heroId, removeBuff, removeChunkEntities, removeEquip, setGameMessage, socket, updateEquip, updateHero, updateItemInstance, updateSkill]);
 };

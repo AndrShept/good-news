@@ -73,4 +73,4 @@ export const serverState = {
   itemInstancePendingDeltaEvents: new Set<ItemInstancePendingDeltaEvents>(),
   skillInstancePendingDeltaEvents: new Set<SkillInstancePendingDeltaEvents>(),
 };
-console.log('SERVER STATE INIT', new Date().toLocaleTimeString());
+console.info('SERVER STATE INIT', new Date().toLocaleTimeString());
