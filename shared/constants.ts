@@ -10,7 +10,7 @@ export const BASE_STATS: IHeroStat = {
 };
 
 export const SAVE_DB_INTERVAL = 30_000;
-export const MAP_CHUNK_SIZE = 8
+export const MAP_CHUNK_SIZE = 10
 export const BASE_FREE_POINTS = 10;
 export const RESET_STATS_COST = 100;
 

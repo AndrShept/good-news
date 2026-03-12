@@ -1,5 +1,5 @@
 import type {
-  HeroUpdateStateEvent,
+  HeroUpdateEvent,
   MapChunkDespawnEntityData,
   MapChunkSpawnEntityData,
   MapChunkUpdateEntitiesData,
@@ -45,10 +45,10 @@ export const socketService = {
 
   sendToPlaceUpdateState(heroId: string, placeId: string | null, state: StateType) {
     if (!placeId) return;
-    const socketData: HeroUpdateStateEvent = {
-      type: 'UPDATE_STATE',
+    const socketData: HeroUpdateEvent = {
+      type: 'UPDATE_HERO',
+      heroId,
       payload: {
-        heroId,
         state,
       },
     };

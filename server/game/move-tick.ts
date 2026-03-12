@@ -1,4 +1,4 @@
-import type { LoadMapChunkEntityEvent, RemoveMapChunkEntityEvent } from '@/shared/socket-data-types';
+import type { HeroUpdateEvent, LoadMapChunkEntityEvent, RemoveMapChunkEntityEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import type { PathNode } from '@/shared/types';
 
@@ -66,8 +66,14 @@ export const moveTick = (now: number) => {
           type: 'REMOVE_OLD_ENTITY',
           payload: oldEntity,
         };
+        const updateHero: HeroUpdateEvent = {
+          type: 'UPDATE_HERO',
+          heroId,
+          payload: { location: { chunkId } },
+        };
         io.to(heroId).emit(socketEvents.selfData(), socketRemoveData);
         io.to(heroId).emit(socketEvents.selfData(), socketLoadData);
+        io.to(heroId).emit(socketEvents.selfData(), updateHero);
       }
       hero.location.x = step.x;
       hero.location.y = step.y;
@@ -79,7 +85,8 @@ export const moveTick = (now: number) => {
       //   x: lastStep.x,
       //   y: lastStep.y,
       // });
-
+      hero.location.targetX = null;
+      hero.location.targetY = null;
       hero.state = 'IDLE';
 
       socketService.sendMapChunkMoveFinish(heroId, hero.location.chunkId!);

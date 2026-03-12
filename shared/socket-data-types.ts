@@ -10,6 +10,7 @@ import type {
   MapChunkEntitiesData,
   MapChunkEntitiesType,
   MapHero,
+  OmitDeepHero,
   QueueCraftStatusType,
   SkillInstance,
   StateType,
@@ -96,7 +97,7 @@ export type QueueCraftItemSocketEvent =
 export type SelfHeroEvent =
   | RemoveBuffEvent
   | SkillUpEvent
-  | HeroUpdateStateEvent
+  | HeroUpdateEvent
   | FinishGatheringEvent
   | LoadMapChunkEntityEvent
   | RemoveMapChunkEntityEvent;
@@ -118,12 +119,11 @@ export type RemoveMapChunkEntityEvent = {
   };
 };
 
-export type HeroUpdateStateEvent = {
-  type: 'UPDATE_STATE';
-  payload: {
-    state: StateType;
-    heroId: string;
-  };
+
+export type HeroUpdateEvent = {
+  type: 'UPDATE_HERO';
+  heroId: string;
+  payload: Partial<OmitDeepHero>
 };
 
 export type RemoveBuffEvent = {

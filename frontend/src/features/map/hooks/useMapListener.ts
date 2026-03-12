@@ -15,7 +15,7 @@ export const useMapListener = () => {
   }));
   const { socket } = useSocket();
   const { addChunkEntities, removeChunkEntities, updateChunkEntities } = useMapChunkEntitiesUpdate(mapId);
-  const filterMovementPathTiles = useMovementPathTileStore((state) => state.filterMovementPathTiles);
+  const { clearMovementPathTiles, filterMovementPathTiles } = useMovementPathTileStore();
   const { updateHero } = useHeroUpdate();
   const heroId = useHeroId();
 
@@ -39,6 +39,7 @@ export const useMapListener = () => {
       }
       if (data.data.type === 'HERO' && heroId === data.entityId && data.isFinishMove) {
         updateHero({ state: data.data.payload.state, location: { targetX: null, targetY: null } });
+        clearMovementPathTiles();
       }
       updateChunkEntities({ ...data });
     };

@@ -10,9 +10,10 @@ interface Props {
   // isChunk: boolean;
   // chunkColor: boolean;
   isChunkBorder: boolean;
+
 }
 
-export const MapTile = memo(({ TILE_SIZE, image, x, y, isChunkBorder }: Props) => {
+export const MapTile = memo(({ TILE_SIZE, image, x, y, isChunkBorder}: Props) => {
   return (
     <div
       className={cn({
@@ -23,7 +24,7 @@ export const MapTile = memo(({ TILE_SIZE, image, x, y, isChunkBorder }: Props) =
 
         width: TILE_SIZE,
         height: TILE_SIZE,
-        transform: `translate(${x * TILE_SIZE}px, ${y * TILE_SIZE}px)`,
+        transform: `translate(${x * TILE_SIZE }px, ${y * TILE_SIZE }px)`,
         backgroundSize: 'cover',
         backgroundImage: `url(${image})`,
       }}

@@ -1,5 +1,5 @@
 import { BASE_GATHERING_TIME } from '@/shared/constants';
-import type { FinishGatheringEvent, HeroUpdateStateEvent } from '@/shared/socket-data-types';
+import type { FinishGatheringEvent, HeroUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import type { itemsInstanceDeltaEvent } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
@@ -34,10 +34,11 @@ export const gatherTick = (now: number) => {
 
       hero.state = 'IDLE';
       hero.gatheringFinishAt = null;
-      if (hero.location.mapId) {
-        const socketData: HeroUpdateStateEvent = {
-          type: 'UPDATE_STATE',
-          payload: { heroId: hero.id, state: hero.state },
+      if (hero.location.chunkId) {
+        const socketData: HeroUpdateEvent = {
+          type: 'UPDATE_HERO',
+          heroId: hero.id,
+          payload: { state: hero.state },
         };
         io.to(hero.location.mapId).emit(socketEvents.mapUpdate(), socketData);
       }

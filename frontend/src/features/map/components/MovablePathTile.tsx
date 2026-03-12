@@ -5,30 +5,24 @@ interface Props {
   TILE_SIZE: number;
   x: number;
   y: number;
+  offsetY: number;
+  offsetX: number;
 }
 
-export const MovablePathTile = memo(function MovablePathTile({ x, y, TILE_SIZE }: Props) {
+export const MovablePathTile = memo(function MovablePathTile({ x, y, TILE_SIZE, offsetX, offsetY }: Props) {
+  const localX = x - offsetX
+const localY = y - offsetY
   return (
     <>
       <div
-        className="absolute select-none inline-flex items-center justify-center text-red-500"
+        className="absolute inline-flex select-none items-center justify-center text-red-500"
         style={{
-          transform: `translate(${x * TILE_SIZE}px, ${y * TILE_SIZE}px)`,
+          transform: `translate(${localX * TILE_SIZE}px, ${localY * TILE_SIZE}px)`,
           width: TILE_SIZE,
           height: TILE_SIZE,
         }}
       >
-        <X
-          style={{
-            filter: `
-
-    drop-shadow(0.5px 0 0 rgba(0,0,0,1))
-      drop-shadow(-0.4px 0 0 rgba(0,0,0,1))
-      drop-shadow(0 0.5px 0 rgba(0,0,0,1))
-      drop-shadow(0 -0.3px 0 rgba(0,0,0,0.4))
-`,
-          }}
-        />
+        <X className="drop-shadow-outline stroke-amber-300" />
       </div>
     </>
   );

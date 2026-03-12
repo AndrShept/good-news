@@ -14,7 +14,7 @@ type Props = {
 };
 
 export const MovingPanel = memo(function MovingPathInfo({ heroState }: Props) {
-  const { movementPathTiles, setMovementPathTiles } = useMovementPathTileStore();
+  const { movementPathTiles, clearMovementPathTiles } = useMovementPathTileStore();
   const targetPos = movementPathTiles.at(-1);
   const [now, setNow] = useState(0);
   const [finishTime, setFinishTime] = useState(0);
@@ -23,7 +23,7 @@ export const MovingPanel = memo(function MovingPathInfo({ heroState }: Props) {
   const resultTime = Math.max(Math.ceil((finishTime - now) / 1000), 0);
   const onCLick = () => {
     if (!targetPos) return;
-    mutate(targetPos);
+    mutate({ ...targetPos });
     setNow(Date.now());
   };
   useEffect(() => {
@@ -35,27 +35,21 @@ export const MovingPanel = memo(function MovingPathInfo({ heroState }: Props) {
       clearInterval(id);
     };
   }, [heroState]);
-  useEffect(() => {
-    return () => {
-      setMovementPathTiles([]);
-    };
-  }, [setMovementPathTiles]);
+
   if (!movementPathTiles.length) return;
   return (
     <section className="bg-accent/70 top-13 absolute left-1/2 z-50 flex h-fit -translate-x-1/2 items-center gap-2 rounded-b px-4 py-2 text-sm backdrop-blur-sm">
-      
-        <span className="text-muted-foreground">
-          step: <span className="text-primary">{movementPathTiles.length}</span>
-        </span>
-        <span className="text-muted-foreground">
-          time: <span className="text-primary">{resultTime ? `${resultTime.toFixed(0)}s` : '???'}</span>
-        </span>
-      
+      <span className="text-muted-foreground">
+        step: <span className="text-primary">{movementPathTiles.length}</span>
+      </span>
+      <span className="text-muted-foreground">
+        time: <span className="text-primary">{resultTime ? `${resultTime.toFixed(0)}s` : '???'}</span>
+      </span>
 
       {heroState === 'IDLE' && (
-        <div className="space-x-1 flex items-center">
+        <div className="flex items-center space-x-1">
           <AcceptButton disabled={isPending} onClick={onCLick} className="size-8 border" />
-          <CancelButton disabled={isPending} onClick={() => setMovementPathTiles([])} className="size-8" />
+          <CancelButton disabled={isPending} onClick={() => clearMovementPathTiles()} className="size-8" />
         </div>
       )}
       {heroState === 'WALK' && (

@@ -2,7 +2,7 @@ import { useSocket } from '@/components/providers/SocketProvider';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
-import { HeroOfflineEvent, HeroOnlineEvent, HeroUpdateStateEvent, PlaceUpdateEvent } from '@/shared/socket-data-types';
+import { HeroOfflineEvent, HeroOnlineEvent, HeroUpdateEvent, PlaceUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { useEffect } from 'react';
 
@@ -16,7 +16,7 @@ export const usePlaceListener = () => {
   const { addHeroes, removeHeroes, updateHeroes } = usePlaceHeroesUpdate(placeId);
 
   useEffect(() => {
-    const listener = (data: PlaceUpdateEvent | HeroOfflineEvent | HeroOnlineEvent | HeroUpdateStateEvent) => {
+    const listener = (data: PlaceUpdateEvent | HeroOfflineEvent | HeroOnlineEvent | HeroUpdateEvent) => {
       switch (data.type) {
         case 'REMOVE_HERO':
           removeHeroes(data.payload.heroId);
@@ -34,11 +34,11 @@ export const usePlaceListener = () => {
         case 'HERO_ONLINE':
           addHeroes(data.payload);
           break;
-        case 'UPDATE_STATE':
-          if (data.payload.heroId === id) {
-            updateHero({ state: data.payload.state });
+        case 'UPDATE_HERO':
+          if (data.heroId === id) {
+            updateHero({ ...data.payload });
           }
-          updateHeroes(data.payload.heroId, { state: data.payload.state });
+          updateHeroes(data.heroId, { state: data.payload.state });
           break;
       }
     };

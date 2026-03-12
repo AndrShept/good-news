@@ -146,6 +146,6 @@ export const queueCraftService = {
 
     const chance = baseChance + diff * gainPerLevel + loreBonus;
     console.log( 'CRAFT-CHANGE' ,chance )
-    return clamp(chance, 3, 97); // ніколи не 100%
+    return clamp(chance, 3, 99); // ніколи не 100%
   },
 };

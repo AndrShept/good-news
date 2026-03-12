@@ -9,20 +9,19 @@ import { GameMessage } from './GameMessage';
 import { DndInventoryProvider } from './providers/DndInventoryProvider';
 
 export const Game = () => {
-  const { gatheringFinishAt, state } = useHero((data) => ({
+  const { gatheringFinishAt, state, } = useHero((data) => ({
     state: data?.state,
     gatheringFinishAt: data?.gatheringFinishAt,
+
   }));
   return (
     <>
       <DndInventoryProvider>
         <section className="mx-auto flex max-w-7xl flex-col">
-        
           <GameHeader />
 
           {state && <MovingPanel heroState={state} />}
           {state && state !== 'IDLE' && !!gatheringFinishAt && <GatheringPanel heroState={state} gatheringFinishAt={gatheringFinishAt} />}
-       
 
           <div className="mx-auto flex min-h-[calc(100vh-315px)] w-full flex-1">
             <Outlet />

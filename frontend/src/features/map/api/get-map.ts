@@ -18,9 +18,9 @@ export const getMap = async (id: string) => {
   }
 };
 
-export const getMapOptions = (mapId: string) =>
+export const getMapOptions = (mapId: string,chunkId:string) =>
   queryOptions({
-    queryKey: ['map', mapId],
+    queryKey: ['map', mapId, chunkId],
     queryFn: () => getMap(mapId),
-    enabled: !!mapId,
+    enabled: !!mapId && !!chunkId,
   });

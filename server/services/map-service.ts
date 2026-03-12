@@ -33,19 +33,28 @@ interface DespawnMapEntitiesInChunk {
   entityId: string;
 }
 
+interface SliceChunksLayerData {
+  startY: number;
+  startX: number;
+  sliceHeight: number;
+  sliceWidth: number;
+  width: number;
+  data: number[];
+}
+
 export const mapService = {
-  getNearHeroes(heroId: string) {
-    const hero = heroService.getHero(heroId);
+  // getNearHeroes(heroId: string) {
+  //   const hero = heroService.getHero(heroId);
 
-    const radius = 5;
+  //   const radius = 5;
 
-    const heroes = Array.from(serverState.hero.values()).filter((h) => {
-      const dx = h.location.x - hero.location.x;
-      const dy = h.location.y - hero.location.y;
-      return dx * dx + dy * dy <= radius * radius && h.location.mapId === hero.location.mapId;
-    });
-    return heroes;
-  },
+  //   const heroes = Array.from(serverState.hero.values()).filter((h) => {
+  //     const dx = h.location.x - hero.location.x;
+  //     const dy = h.location.y - hero.location.y;
+  //     return dx * dx + dy * dy <= radius * radius && h.location.mapId === hero.location.mapId;
+  //   });
+  //   return heroes;
+  // },
 
   getChunkId({ mapId, x, y }: GetChunkId) {
     const dx = Math.floor(x / MAP_CHUNK_SIZE);
@@ -134,5 +143,18 @@ export const mapService = {
     }
 
     return entity;
+  },
+
+  sliceChunksLayerData({ data, sliceHeight, sliceWidth, startX, startY, width }: SliceChunksLayerData) {
+    const result: number[] = [];
+
+    for (let y = 0; y < sliceHeight; y++) {
+      const rowStart = (startY + y) * width + startX;
+      const rowEnd = rowStart + sliceWidth;
+
+      result.push(...data.slice(rowStart, rowEnd));
+    }
+
+    return result;
   },
 };

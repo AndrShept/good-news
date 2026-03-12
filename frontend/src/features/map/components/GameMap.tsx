@@ -14,8 +14,6 @@ import { MovablePathTile } from './MovablePathTile';
 import { PlaceTile } from './PlaceTile';
 
 interface Props {
-  heroPosX: number;
-  heroPosY: number;
   heroTargetX: number;
   heroTargetY: number;
   heroState: StateType;
@@ -30,6 +28,13 @@ interface Props {
   layers: Layer[];
   containerRef: RefObject<HTMLDivElement | null>;
   scale: number;
+  heroWorldX: number;
+  heroWorldY: number;
+
+  heroLocalX: number;
+  heroLocalY: number;
+  offsetX: number;
+  offsetY: number;
 }
 
 export const GameMap = memo(
@@ -39,8 +44,6 @@ export const GameMap = memo(
     height,
     tileWidth,
     width,
-    heroPosX,
-    heroPosY,
     mapHeroes,
     places,
     entrances,
@@ -50,6 +53,13 @@ export const GameMap = memo(
     heroTargetY,
     containerRef,
     scale,
+    heroWorldX,
+    heroWorldY,
+    offsetX,
+    offsetY,
+
+    heroLocalX,
+    heroLocalY,
   }: Props) => {
     const TILE_SIZE = tileWidth;
     const MAP_HEIGHT = height;
@@ -64,10 +74,15 @@ export const GameMap = memo(
       MAP_WIDTH,
       scale,
       TILE_SIZE,
-      heroPosX,
-      heroPosY,
+
+      heroWorldX,
+      heroWorldY,
+
       heroState,
       layers,
+
+      offsetX,
+      offsetY,
     });
 
     const { handleMouseDown, handleMouseUp } = useDragOnMap({
@@ -77,21 +92,21 @@ export const GameMap = memo(
     const { setMovementPathTiles, movementPathTiles } = useMovementPathTileStore();
     const groundLayer = layers?.find((l) => l.name === 'GROUND');
     useEffect(() => {
-      if (heroTargetY && layers.length) {
-        const path = buildPathWithObstacles(
-          { x: heroPosX, y: heroPosY },
-          { x: heroTargetX, y: heroTargetY },
+      if (heroTargetY && heroTargetX && !movementPathTiles.length) {
+        setMovementPathTiles({
+          heroTargetX: heroTargetX - offsetX,
+          heroTargetY: heroTargetY - offsetY,
+          heroWorldX,
+          heroWorldY,
           layers,
-          MAP_WIDTH,
           MAP_HEIGHT,
-        );
-        setMovementPathTiles(path);
+          MAP_WIDTH,
+          offsetX,
+          offsetY,
+        });
       }
-    }, [layers]);
-    const CHUNK_SIZE = 8;
-
-    const heroChunkX = Math.floor(heroPosX / CHUNK_SIZE);
-    const heroChunkY = Math.floor(heroPosY / CHUNK_SIZE);
+    }, [heroTargetX, heroTargetY, layers]);
+    const CHUNK_SIZE = 10;
 
     // if (isLoading) return 'Loading Map...';
     return (
@@ -117,7 +132,6 @@ export const GameMap = memo(
             imageRendering: 'pixelated',
             width: MAP_WIDTH * TILE_SIZE,
             height: MAP_HEIGHT * TILE_SIZE,
-            // backgroundImage: `url(${image})`,
             transform: `scale(${scale})`,
           }}
         >
@@ -125,17 +139,12 @@ export const GameMap = memo(
             const x = idx % MAP_WIDTH;
             const y = Math.floor(idx / MAP_WIDTH);
 
-            const dx = x - heroPosX;
-            const dy = y - heroPosY;
-            const radius = 40;
+            const dx = x - heroLocalX;
+            const dy = y - heroLocalY;
+            const radius = 60;
 
             const isNear = dx * dx + dy * dy <= radius * radius;
 
-            const tileChunkX = Math.floor(x / CHUNK_SIZE);
-            const tileChunkY = Math.floor(y / CHUNK_SIZE);
-
-            const isChunk = tileChunkX === heroChunkX && tileChunkY === heroChunkY;
-            const chunkColor = (tileChunkX + tileChunkY) % 2 === 0;
             const isChunkBorder = x % CHUNK_SIZE === 0 || y % CHUNK_SIZE === 0;
             if (!isNear) return;
             return (
@@ -146,24 +155,23 @@ export const GameMap = memo(
                 x={x}
                 y={y}
                 isChunkBorder={isChunkBorder}
-                // isChunk={isChunk}
-                // chunkColor={chunkColor}
               />
             );
           })}
-          {places?.map((place) => <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} />)}
+          {/* {places?.map((place) => <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} />)}
           {entrances?.map((entrance) => (
             <EntranceTile key={entrance.id} x={entrance.x} y={entrance.y} image={entrance.image} TILE_SIZE={TILE_SIZE} />
+          ))} */}
+          {mapHeroes?.map((hero) => <HeroTile key={hero.id} {...hero} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />)}
+          {movementPathTiles?.map((position) => (
+            <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
           ))}
-          {mapHeroes?.map((hero) => <HeroTile key={hero.id} {...hero} TILE_SIZE={TILE_SIZE} />)}
-          {movementPathTiles?.map((position) => <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} />)}
 
           {hoverIndex !== null && !isDragging && heroState === 'IDLE' && (
             <div
               style={{
                 position: 'absolute',
-                left: (hoverIndex % MAP_WIDTH) * TILE_SIZE,
-                top: Math.floor(hoverIndex / MAP_WIDTH) * TILE_SIZE,
+                transform: `translate(${(hoverIndex % MAP_WIDTH) * TILE_SIZE}px, ${Math.floor(hoverIndex / MAP_WIDTH) * TILE_SIZE}px)`,
                 width: TILE_SIZE,
                 height: TILE_SIZE,
                 backgroundColor: 'rgba(0, 255, 0, 0.3)',

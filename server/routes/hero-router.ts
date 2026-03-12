@@ -8,7 +8,7 @@ import {
   RESET_STATS_COST,
   WORLD_SEED,
 } from '@/shared/constants';
-import type { HeroUpdateStateEvent, MapChunkUpdateEntitiesData } from '@/shared/socket-data-types';
+import type { HeroUpdateEvent,  MapChunkUpdateEntitiesData } from '@/shared/socket-data-types';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
@@ -1015,12 +1015,13 @@ export const heroRouter = new Hono<Context>()
       hero.state = state;
       hero.gatheringFinishAt = gatheringTime;
 
-      if (hero.location.mapId) {
-        const socketData: HeroUpdateStateEvent = {
-          type: 'UPDATE_STATE',
-          payload: { heroId: hero.id, state },
+      if (hero.location.chunkId) {
+        const socketData: HeroUpdateEvent = {
+          type: 'UPDATE_HERO',
+          heroId: hero.id,
+          payload: { state },
         };
-        io.to(hero.location.mapId).emit(socketEvents.mapUpdate(), socketData);
+        io.to(hero.location.chunkId).emit(socketEvents.mapUpdate(), socketData);
       }
       const returnData = {
         state: hero.state,

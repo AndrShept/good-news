@@ -3,10 +3,11 @@ import { mapTemplate } from './templates/map-template';
 import type { GatheringCategorySkillKey } from './templates/skill-template';
 import type { CraftBuildingType, IHeroStat, IPosition, OmitTileType, StateType, TileType } from './types';
 
-function isBlocked(x: number, y: number, layers: Layer[]): boolean {
+function isBlocked(x: number, y: number, layers: Layer[], width: number): boolean {
   return layers.some((layer) => {
-    const index = y * layer.width + x;
+    const index = y * width + x;
 
+  
     if (layer.name === 'WATER' || layer.name === 'OBJECT') {
       return layer.data[index] !== 0;
     }
@@ -36,6 +37,7 @@ function heuristic(a: IPosition, b: IPosition) {
   return Math.max(dx, dy);
 }
 export function buildPathWithObstacles(from: IPosition, to: IPosition, layers: Layer[], width: number, height: number): IPosition[] {
+
   const open = new Set<string>();
   const cameFrom = new Map<string, string>();
   const gScore = new Map<string, number>();
@@ -83,7 +85,7 @@ export function buildPathWithObstacles(from: IPosition, to: IPosition, layers: L
       const ny = cy + dy;
 
       if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
-      if (isBlocked(nx, ny, layers)) continue;
+      if (isBlocked(nx, ny, layers, width)) continue;
 
       const neighborKey = `${nx},${ny}`;
       const cost = dx !== 0 && dy !== 0 ? 1.4 : 1;

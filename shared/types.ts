@@ -154,6 +154,12 @@ export type PaginatedResponse<T> = {
   data: T;
 } & Omit<SuccessResponse, 'data'>;
 
+export type OmitDeepHero = Omit<Partial<Hero>, 'location' | 'group' | 'regen'> & {
+  location?: Partial<Hero['location']>;
+  group?: Partial<Hero['group']>;
+  regen?: Partial<Hero['regen']>;
+};
+
 export type PathNode = { x: number; y: number; mapId: string; completedAt: number };
 
 export type GetPostsData = InferResponseType<typeof client.post.$get>;
@@ -205,6 +211,8 @@ export type TMap = {
   height: number;
   tileHeight: number;
   tileWidth: number;
+  offsetX: number
+  offsetY: number
   image: string;
   name: string;
   layers: Layer[];

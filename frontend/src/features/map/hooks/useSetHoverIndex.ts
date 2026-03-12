@@ -7,14 +7,21 @@ import { RefObject, useRef, useState } from 'react';
 interface IUseSetHoverIndex {
   isDragging: boolean;
   containerRef: RefObject<HTMLDivElement | null>;
+
   scale: number;
+
   MAP_HEIGHT: number;
-  TILE_SIZE: number;
   MAP_WIDTH: number;
-  heroPosX: number;
-  heroPosY: number;
+  TILE_SIZE: number;
+
+  heroWorldX: number;
+  heroWorldY: number;
+
   heroState: StateType;
   layers: Layer[];
+
+  offsetX: number;
+  offsetY: number;
 }
 
 export const useSetHoverIndex = ({
@@ -24,10 +31,12 @@ export const useSetHoverIndex = ({
   containerRef,
   isDragging,
   scale,
-  heroPosX,
-  heroPosY,
   heroState,
   layers,
+  offsetY,
+  offsetX,
+  heroWorldX,
+  heroWorldY,
 }: IUseSetHoverIndex) => {
   const [start, setStart] = useState<{ x: number; y: number } | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
@@ -41,13 +50,14 @@ export const useSetHoverIndex = ({
 
     // DRAG MAP
     if (isDragging && start) {
-      const dx = e.clientX - start.x;
-      const dy = e.clientY - start.y;
+      const dx = e.clientX - start.x; // / scale;
+      const dy = e.clientY - start.y; // / scale;
 
       containerRef.current.scrollLeft -= dx;
       containerRef.current.scrollTop -= dy;
 
-      setStart({ x: e.clientX, y: e.clientY });
+      start.x = e.clientX;
+      start.y = e.clientY;
       return;
     }
 
@@ -60,7 +70,7 @@ export const useSetHoverIndex = ({
     const y = Math.floor(relativeY / TILE_SIZE);
 
     if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
-      if(heroState !== 'IDLE') return
+      if (heroState !== 'IDLE') return;
       setHoverIndex(y * MAP_WIDTH + x);
     } else {
       setHoverIndex(null);
@@ -74,16 +84,27 @@ export const useSetHoverIndex = ({
 
   const handleTap = () => {
     const now = Date.now();
+
     if (heroState !== 'IDLE') return;
+
     if (now - lastTapRef.current < 300) {
       if (dragStartedRef.current) return;
       if (hoverIndex === null) return;
 
-      const x = hoverIndex % MAP_WIDTH;
-      const y = Math.floor(hoverIndex / MAP_WIDTH);
+      const localX = hoverIndex % MAP_WIDTH;
+      const localY = Math.floor(hoverIndex / MAP_WIDTH);
 
-      const path = buildPathWithObstacles({ x: heroPosX, y: heroPosY }, { x, y }, layers, MAP_WIDTH, MAP_HEIGHT);
-      setMovementPathTiles(path);
+      setMovementPathTiles({
+        heroTargetX: localX,
+        heroTargetY: localY,
+        heroWorldX,
+        heroWorldY,
+        layers,
+        MAP_HEIGHT,
+        MAP_WIDTH,
+        offsetX,
+        offsetY,
+      });
     }
 
     lastTapRef.current = now;

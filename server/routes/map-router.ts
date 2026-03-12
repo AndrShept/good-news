@@ -1,3 +1,4 @@
+import { MAP_CHUNK_SIZE } from '@/shared/constants';
 import { mapTemplate } from '@/shared/templates/map-template';
 import type { Corpse, Creature, MapHero, SuccessResponse, TMap } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
@@ -28,18 +29,50 @@ export const mapRouter = new Hono<Context>()
 
     async (c) => {
       const { id } = c.req.valid('param');
-
+      const userId = c.get('user')?.id;
+      const heroId = serverState.user.get(userId ?? '');
+      if (!heroId) throw new HTTPException(400, { message: 'hero id not found' });
+      const hero = heroService.getHero(heroId);
       const map = mapTemplate.find((m) => m.id === id);
       if (!map) {
         throw new HTTPException(404, {
           message: 'map not found',
         });
       }
+      const chunkX = Math.floor(hero.location.x / MAP_CHUNK_SIZE);
+      const chunkY = Math.floor(hero.location.y / MAP_CHUNK_SIZE);
+
+      const startX = Math.max((chunkX - 1) * MAP_CHUNK_SIZE, 0);
+      const startY = Math.max((chunkY - 1) * MAP_CHUNK_SIZE, 0);
+
+      const endX = Math.min((chunkX + 2) * MAP_CHUNK_SIZE, map.width);
+      const endY = Math.min((chunkY + 2) * MAP_CHUNK_SIZE, map.height);
+
+      const sliceWidth = endX - startX;
+      const sliceHeight = endY - startY;
+
+      const copyMap = { ...map };
+      copyMap.layers = copyMap.layers.map((l) => ({
+        ...l,
+        data: mapService.sliceChunksLayerData({
+          data: l.data,
+          sliceHeight,
+          sliceWidth,
+          startX,
+          startY,
+          width: map.width,
+        }),
+      }));
+
+      copyMap.width = sliceWidth;
+      copyMap.height = sliceHeight;
+      copyMap.offsetX = startX;
+      copyMap.offsetY = startY;
 
       return c.json<SuccessResponse<TMap>>({
         message: 'map fetched!',
         success: true,
-        data: map,
+        data: copyMap,
       });
     },
   )
@@ -57,8 +90,8 @@ export const mapRouter = new Hono<Context>()
       const userId = c.get('user')?.id;
       const heroId = serverState.user.get(userId ?? '');
       if (!heroId) throw new HTTPException(400, { message: 'hero id not found' });
-      const map = mapTemplate.find((m) => m.id === id);
       const hero = heroService.getHero(heroId);
+      const map = mapTemplate.find((m) => m.id === id);
       if (!map) {
         throw new HTTPException(404, {
           message: 'map not found',
@@ -66,8 +99,7 @@ export const mapRouter = new Hono<Context>()
       }
 
       const chunkIds = mapService.getAroundChunkIds({ mapId: map.id, x: hero.location.x, y: hero.location.y });
-      const returnData = mapService.getMapEntitiesByChunkIds(chunkIds)
-  
+      const returnData = mapService.getMapEntitiesByChunkIds(chunkIds);
 
       return c.json<SuccessResponse<typeof returnData>>({
         message: 'map  entities fetched!',

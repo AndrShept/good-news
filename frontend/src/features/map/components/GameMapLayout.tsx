@@ -1,5 +1,5 @@
-
 import { useHero } from '@/features/hero/hooks/useHero';
+import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { useQuery } from '@tanstack/react-query';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 
@@ -18,26 +18,40 @@ export const GameMapLayout = () => {
     targetX: data?.location?.targetX ?? 0,
     targetY: data?.location?.targetY ?? 0,
     mapId: data?.location?.mapId ?? '',
+    chunkId: data?.location?.chunkId ?? '',
     state: data?.state ?? 'IDLE',
     gatheringFinishAt: data?.gatheringFinishAt ?? 0,
   }));
   const { data: mapEntities, isLoading } = useQuery(getMapChunkEntitiesOptions(hero.mapId));
 
-  const map = useGameMap({ mapId: hero.mapId });
+  const map = useGameMap({ mapId: hero.mapId, chunkId: hero.chunkId });
 
-  const heroesAtPosition = useMemo(() => mapEntities?.heroes.filter((p) => p.x === hero.x && p.y === hero.y), [hero.x, hero.y, mapEntities?.heroes]);
+  const heroWorldX = hero.x;
+  const heroWorldY = hero.y;
+
+  const offsetX = map.data?.offsetX ?? 0;
+  const offsetY = map.data?.offsetY ?? 0;
+
+  const heroLocalX = heroWorldX - offsetX;
+  const heroLocalY = heroWorldY - offsetY;
+  const heroesAtPosition = useMemo(
+    () => mapEntities?.heroes.filter((h) => h.x === heroWorldX && h.y === heroWorldY),
+    [heroWorldX, heroWorldY, mapEntities?.heroes],
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   const { scale } = useScaleMap(containerRef);
+
   const { onCenter } = useCenter({
     TILE_SIZE: map.data?.tileWidth,
     containerRef,
-    heroPosX: hero.x,
-    heroPosY: hero.y,
+    heroPosX: heroLocalX,
+    heroPosY: heroLocalY,
     scale,
   });
   useEffect(() => {
     if (!containerRef.current) return;
     onCenter();
+
   }, [map.data?.layers]);
 
   return (
@@ -65,14 +79,18 @@ export const GameMapLayout = () => {
             image={map.data?.image ?? ''}
             tileWidth={map.data?.tileWidth ?? 32}
             isLoading={map.isLoading}
-            heroPosX={hero.x}
-            heroPosY={hero.y}
+            heroWorldX={heroWorldX}
+            heroWorldY={heroWorldY}
+            heroLocalX={heroLocalX}
+            heroLocalY={heroLocalY}
             heroTargetX={hero.targetX}
             heroTargetY={hero.targetY}
             heroState={hero.state}
             mapHeroes={mapEntities?.heroes}
             places={map.data?.places}
             entrances={map.data?.entrances}
+            offsetX={offsetX}
+            offsetY={offsetY}
           />
         </Suspense>
       </div>

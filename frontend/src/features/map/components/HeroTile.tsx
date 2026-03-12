@@ -7,9 +7,14 @@ import { TileImg } from './TileImg';
 
 interface Props extends MapHero {
   TILE_SIZE: number;
+  offsetY: number;
+  offsetX: number;
 }
 
-export const HeroTile = memo(function HeroTile({ x, y, id, characterImage, name, state, TILE_SIZE }: Props) {
+export const HeroTile = memo(function HeroTile({ x, y, id, characterImage, name, state, TILE_SIZE, offsetX, offsetY }: Props) {
+
+  const localX = x - offsetX
+const localY = y - offsetY
   return (
     <div
       className="drop-shadow-outline-sm relative"
@@ -18,7 +23,7 @@ export const HeroTile = memo(function HeroTile({ x, y, id, characterImage, name,
         width: TILE_SIZE,
         height: TILE_SIZE,
         // willChange: 'transform',
-        transform: `translate(${x * TILE_SIZE}px, ${y * TILE_SIZE}px)`,
+        transform: `translate(${localX * TILE_SIZE}px, ${localY * TILE_SIZE}px)`,
         backgroundSize: 'cover',
         backgroundImage: `url(${characterImage})`,
       }}

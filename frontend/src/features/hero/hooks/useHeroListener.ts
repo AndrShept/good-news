@@ -39,8 +39,8 @@ export const useHeroListener = () => {
           updateSkill(data.payload.skill.id, data.payload.skill);
           setGameMessage({ type: 'SKILL_EXP', text: data.payload.message, expAmount: data.payload.expAmount });
           break;
-        case 'UPDATE_STATE':
-          updateHero({ state: data.payload.state });
+        case 'UPDATE_HERO':
+          updateHero({ ...data.payload });
           break;
 
         case 'FINISH_GATHERING':
