@@ -8,22 +8,24 @@ interface Props {
   x: number;
   y: number;
   image: string;
+  offsetX: number;
+  offsetY: number;
 }
 
-export const EntranceTile = memo(function HeroTile({ x, y, image, TILE_SIZE }: Props) {
+export const EntranceTile = memo(function HeroTile({ x, y, image, TILE_SIZE, offsetX, offsetY }: Props) {
+  const localX = x - offsetX;
+  const localY = y - offsetY;
   return (
     <div
-      className="relative drop-shadow-outline"
       style={{
         position: 'absolute',
-        left: x * TILE_SIZE,
-        top: y * TILE_SIZE,
+        transform: `translate(${localX * TILE_SIZE}px, ${localY * TILE_SIZE}px)`,
+        backgroundSize: 'cover',
+        backgroundImage: `url(${image})`,
         width: TILE_SIZE,
         height: TILE_SIZE,
-
       }}
-    >
-      <TileImg image={image} />
-    </div>
+      className="drop-shadow-outline-sm"
+    />
   );
 });

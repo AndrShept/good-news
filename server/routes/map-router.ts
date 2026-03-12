@@ -1,13 +1,14 @@
 import { MAP_CHUNK_SIZE } from '@/shared/constants';
 import { mapTemplate } from '@/shared/templates/map-template';
-import type { Corpse, Creature, MapHero, SuccessResponse, TMap } from '@/shared/types';
+import { placeTemplate } from '@/shared/templates/place-template';
+import type { Corpse, Creature, MapHero, SuccessResponse, TMap, TPlace } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
-import { getHero } from '../../frontend/src/features/hero/api/get-hero';
+
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { heroTable, locationTable } from '../db/schema';
@@ -51,7 +52,18 @@ export const mapRouter = new Hono<Context>()
       const sliceWidth = endX - startX;
       const sliceHeight = endY - startY;
 
+      const placesByChunkId = placeTemplate.map((p) => {
+        const chunkId = mapService.getChunkId({ x: p.x, y: p.y, mapId: p.mapId });
+        return {
+          ...p,
+          chunkId,
+        };
+      });
+
+      const chunkAroundHero = mapService.getAroundChunkIds({ x: hero.location.x, y: hero.location.y, mapId: hero.location.mapId! });
+
       const copyMap = { ...map };
+      copyMap.places = placesByChunkId.filter(p =>chunkAroundHero.includes(p.chunkId) )
       copyMap.layers = copyMap.layers.map((l) => ({
         ...l,
         data: mapService.sliceChunksLayerData({

@@ -12,9 +12,8 @@ interface Props extends MapHero {
 }
 
 export const HeroTile = memo(function HeroTile({ x, y, id, characterImage, name, state, TILE_SIZE, offsetX, offsetY }: Props) {
-
-  const localX = x - offsetX
-const localY = y - offsetY
+  const localX = x - offsetX;
+  const localY = y - offsetY;
   return (
     <div
       className="drop-shadow-outline-sm relative"

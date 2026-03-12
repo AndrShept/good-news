@@ -1,6 +1,5 @@
 import { Layer } from '@/shared/json-types';
 import { StateType } from '@/shared/types';
-import { buildPathWithObstacles } from '@/shared/utils';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { RefObject, useRef, useState } from 'react';
 
@@ -22,6 +21,7 @@ interface IUseSetHoverIndex {
 
   offsetX: number;
   offsetY: number;
+  hoverRef: RefObject<HTMLDivElement | null>;
 }
 
 export const useSetHoverIndex = ({
@@ -37,9 +37,10 @@ export const useSetHoverIndex = ({
   offsetX,
   heroWorldX,
   heroWorldY,
+  hoverRef,
 }: IUseSetHoverIndex) => {
   const [start, setStart] = useState<{ x: number; y: number } | null>(null);
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const hoverIndexRef = useRef<number | null>(null);
   const dragStartedRef = useRef(false);
   const lastTapRef = useRef(0);
 
@@ -48,10 +49,10 @@ export const useSetHoverIndex = ({
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
 
-    // DRAG MAP
+    // DRAG
     if (isDragging && start) {
-      const dx = e.clientX - start.x; // / scale;
-      const dy = e.clientY - start.y; // / scale;
+      const dx = e.clientX - start.x;
+      const dy = e.clientY - start.y;
 
       containerRef.current.scrollLeft -= dx;
       containerRef.current.scrollTop -= dy;
@@ -70,15 +71,29 @@ export const useSetHoverIndex = ({
     const y = Math.floor(relativeY / TILE_SIZE);
 
     if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
-      if (heroState !== 'IDLE') return;
-      setHoverIndex(y * MAP_WIDTH + x);
+      const index = y * MAP_WIDTH + x;
+
+      hoverIndexRef.current = index;
+
+      if (hoverRef.current) {
+        hoverRef.current.style.display = 'block';
+        hoverRef.current.style.transform = `translate(${x * TILE_SIZE}px, ${y * TILE_SIZE}px)`;
+      }
     } else {
-      setHoverIndex(null);
+      hoverIndexRef.current = null;
+
+      if (hoverRef.current) {
+        hoverRef.current.style.display = 'none';
+      }
     }
   };
 
   const handleMouseLeave = () => {
-    setHoverIndex(null);
+    hoverIndexRef.current = null;
+    if(hoverRef?.current){
+
+      hoverRef.current.style.display = 'none';
+    }
     setStart(null);
   };
 
@@ -89,6 +104,9 @@ export const useSetHoverIndex = ({
 
     if (now - lastTapRef.current < 300) {
       if (dragStartedRef.current) return;
+
+      const hoverIndex = hoverIndexRef.current;
+
       if (hoverIndex === null) return;
 
       const localX = hoverIndex % MAP_WIDTH;
@@ -111,7 +129,7 @@ export const useSetHoverIndex = ({
   };
 
   return {
-    hoverIndex,
+    hoverIndexRef,
     handleMouseMove,
     handleMouseLeave,
     setStart,

@@ -1,11 +1,9 @@
 import { Layer } from '@/shared/json-types';
 import { Entrance, MapHero, StateType, TPlace } from '@/shared/types';
-import { buildPathWithObstacles } from '@/shared/utils';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { RefObject, memo, useEffect, useRef, useState } from 'react';
 
 import { useDragOnMap } from '../hooks/useDragOnMap';
-import { useScaleMap } from '../hooks/useScaleMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
 import { EntranceTile } from './EntranceTile';
 import { HeroTile } from './HeroTile';
@@ -39,7 +37,6 @@ interface Props {
 
 export const GameMap = memo(
   ({
-    image,
     heroState,
     height,
     tileWidth,
@@ -66,15 +63,16 @@ export const GameMap = memo(
     const MAP_WIDTH = width;
 
     const [isDragging, setIsDragging] = useState(false);
+    const hoverRef = useRef<HTMLDivElement | null>(null);
 
-    const { handleMouseMove, hoverIndex, setStart, handleMouseLeave, handleTap } = useSetHoverIndex({
+    const { handleMouseMove, hoverIndexRef, setStart, handleMouseLeave, handleTap } = useSetHoverIndex({
       containerRef,
       isDragging,
       MAP_HEIGHT,
       MAP_WIDTH,
       scale,
       TILE_SIZE,
-
+      hoverRef,
       heroWorldX,
       heroWorldY,
 
@@ -139,14 +137,14 @@ export const GameMap = memo(
             const x = idx % MAP_WIDTH;
             const y = Math.floor(idx / MAP_WIDTH);
 
-            const dx = x - heroLocalX;
-            const dy = y - heroLocalY;
-            const radius = 60;
+            // const dx = x - heroLocalX;
+            // const dy = y - heroLocalY;
+            // const radius = 60;
 
-            const isNear = dx * dx + dy * dy <= radius * radius;
+            // const isNear = dx * dx + dy * dy <= radius * radius;
 
             const isChunkBorder = x % CHUNK_SIZE === 0 || y % CHUNK_SIZE === 0;
-            if (!isNear) return;
+            // if (!isNear) return;
             return (
               <MapTile
                 key={`${n}:${idx}`}
@@ -158,24 +156,33 @@ export const GameMap = memo(
               />
             );
           })}
-          {/* {places?.map((place) => <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} />)}
+          {places?.map((place) => <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />)}
           {entrances?.map((entrance) => (
-            <EntranceTile key={entrance.id} x={entrance.x} y={entrance.y} image={entrance.image} TILE_SIZE={TILE_SIZE} />
-          ))} */}
+            <EntranceTile
+              key={entrance.id}
+              x={entrance.x}
+              y={entrance.y}
+              image={entrance.image}
+              TILE_SIZE={TILE_SIZE}
+              offsetX={offsetX}
+              offsetY={offsetY}
+            />
+          ))}
           {mapHeroes?.map((hero) => <HeroTile key={hero.id} {...hero} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />)}
           {movementPathTiles?.map((position) => (
             <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
           ))}
 
-          {hoverIndex !== null && !isDragging && heroState === 'IDLE' && (
+          {hoverIndexRef  && !isDragging && heroState === 'IDLE' && (
             <div
+              ref={hoverRef}
               style={{
                 position: 'absolute',
-                transform: `translate(${(hoverIndex % MAP_WIDTH) * TILE_SIZE}px, ${Math.floor(hoverIndex / MAP_WIDTH) * TILE_SIZE}px)`,
                 width: TILE_SIZE,
                 height: TILE_SIZE,
-                backgroundColor: 'rgba(0, 255, 0, 0.3)',
+                backgroundColor: 'rgba(0,255,0,0.3)',
                 pointerEvents: 'none',
+                display: 'none',
               }}
             />
           )}

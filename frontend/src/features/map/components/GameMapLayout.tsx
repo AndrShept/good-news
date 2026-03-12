@@ -1,5 +1,4 @@
 import { useHero } from '@/features/hero/hooks/useHero';
-import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { useQuery } from '@tanstack/react-query';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 
@@ -55,7 +54,7 @@ export const GameMapLayout = () => {
   }, [map.data?.layers]);
 
   return (
-    <section className="flex w-full flex-col-reverse gap-2 p-1 sm:flex-row">
+    <section className="flex w-full flex-col gap-2 p-1 sm:flex-row">
       <aside className="flex w-full gap-2 sm:max-w-[150px] sm:flex-col">
         <HeroActionsBar
           onCenter={onCenter}

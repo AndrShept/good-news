@@ -38,7 +38,7 @@ export const MovingPanel = memo(function MovingPathInfo({ heroState }: Props) {
 
   if (!movementPathTiles.length) return;
   return (
-    <section className="bg-accent/70 top-13 absolute left-1/2 z-50 flex h-fit -translate-x-1/2 items-center gap-2 rounded-b px-4 py-2 text-sm backdrop-blur-sm">
+    <section className="bg-accent/70 sm:top-11 border top-27 absolute left-1/2 z-50 flex h-fit -translate-x-1/2 items-center gap-2 rounded-b px-4 py-2 text-sm backdrop-blur-sm">
       <span className="text-muted-foreground">
         step: <span className="text-primary">{movementPathTiles.length}</span>
       </span>

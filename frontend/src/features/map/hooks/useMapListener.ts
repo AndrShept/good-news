@@ -53,5 +53,5 @@ export const useMapListener = () => {
       socket.off(socketEvents.entityDespawn(), despawnListener);
       socket.off(socketEvents.entityUpdate(), updateListener);
     };
-  }, [addChunkEntities, filterMovementPathTiles, heroId, removeChunkEntities, socket, updateChunkEntities, updateHero]);
+  }, [addChunkEntities, clearMovementPathTiles, filterMovementPathTiles, heroId, removeChunkEntities, socket, updateChunkEntities, updateHero]);
 };
