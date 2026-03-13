@@ -13,7 +13,7 @@ interface Props {
 
 export const HeroSidebarList = memo(({ heroes, isLoading }: Props) => {
   return (
-    <ul className="hidden w-full max-w-[200px] flex-col gap-1 p-1.5 sm:flex">
+    <ul className="hidden w-full select-text max-w-[200px] flex-col gap-1 p-1.5 sm:flex">
       {!isLoading ? (
         heroes?.map((hero) => (
           <li key={hero.id} className="hover:bg-secondary flex items-center gap-1.5 rounded px-2 py-1 duration-75">

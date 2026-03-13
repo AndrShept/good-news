@@ -1,15 +1,23 @@
-import { RefObject, useEffect, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
-export const useScaleMap = (containerRef: RefObject<HTMLDivElement | null>) => {
+export const useScaleMap = () => {
   const [scale, setScale] = useState(1.5);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const lastWheelRef = useRef(0);
 
-  useEffect(() => {
-    const el = containerRef.current;
+  const callbackRef = useCallback((el: HTMLDivElement | null) => {
+    containerRef.current = el;
+
     if (!el) return;
 
     const handleWheel = (event: WheelEvent) => {
-      event.preventDefault(); // блок скролу
-      const delta = event.deltaY > 0 ? -0.1 : 0.1; 
+      event.preventDefault();
+
+      const now = Date.now();
+      if (now - lastWheelRef.current < 10) return; // throttle 50ms
+      lastWheelRef.current = now;
+
+      const delta = event.deltaY > 0 ? -0.1 : 0.1;
       setScale((prev) => Math.max(1, Math.min(2, prev + delta)));
     };
 
@@ -18,7 +26,7 @@ export const useScaleMap = (containerRef: RefObject<HTMLDivElement | null>) => {
     return () => {
       el.removeEventListener('wheel', handleWheel);
     };
-  }, [containerRef.current]); 
+  }, []);
 
-  return { scale };
+  return { scale, containerRef, callbackRef };
 };

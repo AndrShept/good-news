@@ -10,10 +10,12 @@ export const mapTemplate: TMap[] = [
     id: '019a350c-5552-76dd-b6d5-181b473d3128',
     name: 'Solmere Valley',
     height: solverValley.height,
+    offsetX: 0,
+    offsetY: 0,
     width: solverValley.width,
     tileHeight: solverValley.tileheight,
     tileWidth: solverValley.tilewidth,
-    image: imageConfig.bg.map.SolmereValley,
+    image: '/sprites/map/ground-tileset.png',
     layers: solverValley.layers,
     places: [placeTemplateByName['Solmer Town'], placeTemplateByName['Solmer Mine']],
     entrances: [],
@@ -27,6 +29,8 @@ export const mapTemplate: TMap[] = [
     tileWidth: solverMine.tilewidth,
     image: imageConfig.bg.map.solmerMine,
     layers: solverMine.layers,
+    offsetX: 0,
+    offsetY: 0,
     places: [],
     entrances: [
       {

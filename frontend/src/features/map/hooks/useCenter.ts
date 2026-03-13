@@ -9,21 +9,25 @@ interface UseCenter {
 }
 
 export const useCenter = ({ heroPosX, heroPosY, containerRef, TILE_SIZE, scale }: UseCenter) => {
-  const onCenter = useCallback(() => {
-    const container = containerRef.current;
-    if (!container) return;
+  const onCenter = useCallback(
+    (options?: ScrollOptions) => {
+      const container = containerRef.current;
+      if (!container) return;
 
-    const tileSize = TILE_SIZE ?? 32;
+      const tileSize = TILE_SIZE ?? 32;
 
-    const heroPixelX = heroPosX * tileSize + tileSize / 2;
-    const heroPixelY = heroPosY * tileSize + tileSize / 2;
+      const heroPixelX = heroPosX * tileSize + tileSize / 2;
+      const heroPixelY = heroPosY * tileSize + tileSize / 2;
 
-    const centerX = heroPixelX * scale - container.clientWidth / 2;
-    const centerY = heroPixelY * scale - container.clientHeight / 2;
+      const centerX = heroPixelX * scale - container.clientWidth / 2;
+      const centerY = heroPixelY * scale - container.clientHeight / 2;
 
-    container.scrollLeft = centerX;
-    container.scrollTop = centerY;
-  }, [TILE_SIZE, containerRef, heroPosX, heroPosY, scale]);
+      // container.scrollLeft = centerX;
+      // container.scrollTop = centerY;
+      container.scroll({ left: centerX, top: centerY, ...options });
+    },
+    [TILE_SIZE, containerRef, heroPosX, heroPosY, scale],
+  );
 
   return { onCenter };
 };

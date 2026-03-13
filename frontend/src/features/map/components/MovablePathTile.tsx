@@ -15,7 +15,7 @@ const localY = y - offsetY
   return (
     <>
       <div
-        className="absolute inline-flex select-none items-center justify-center text-red-500"
+        className="absolute  inline-flex select-none items-center justify-center text-red-500"
         style={{
           transform: `translate(${localX * TILE_SIZE}px, ${localY * TILE_SIZE}px)`,
           width: TILE_SIZE,

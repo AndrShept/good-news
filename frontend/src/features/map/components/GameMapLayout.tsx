@@ -37,8 +37,8 @@ export const GameMapLayout = () => {
     () => mapEntities?.heroes.filter((h) => h.x === heroWorldX && h.y === heroWorldY),
     [heroWorldX, heroWorldY, mapEntities?.heroes],
   );
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scale } = useScaleMap(containerRef);
+
+  const { scale, callbackRef, containerRef } = useScaleMap();
 
   const { onCenter } = useCenter({
     TILE_SIZE: map.data?.tileWidth,
@@ -47,17 +47,20 @@ export const GameMapLayout = () => {
     heroPosY: heroLocalY,
     scale,
   });
+
   useEffect(() => {
-    if (!containerRef.current) return;
-    onCenter();
+    onCenter({ behavior: 'instant' });
+  }, [hero.mapId]);
+  useEffect(() => {
+    // if (!containerRef.current) return;
 
+    onCenter({ behavior: 'smooth' });
   }, [map.data?.layers]);
-
   return (
     <section className="flex w-full flex-col gap-2 p-1 sm:flex-row">
       <aside className="flex w-full gap-2 sm:max-w-[150px] sm:flex-col">
         <HeroActionsBar
-          onCenter={onCenter}
+          onCenter={() => onCenter({ behavior: 'smooth' })}
           heroPosX={hero.x}
           heroPosY={hero.y}
           map={map.data}
@@ -67,32 +70,29 @@ export const GameMapLayout = () => {
         <HeroSidebarList heroes={heroesAtPosition} isLoading={isLoading} />
       </aside>
 
-      <div className="relative aspect-video w-full overflow-hidden">
-        <Suspense fallback={'LOADING MAP....'}>
-          <GameMap
-            scale={scale}
-            containerRef={containerRef}
-            width={map.data?.width ?? 0}
-            height={map.data?.height ?? 0}
-            layers={map.data?.layers ?? []}
-            image={map.data?.image ?? ''}
-            tileWidth={map.data?.tileWidth ?? 32}
-            isLoading={map.isLoading}
-            heroWorldX={heroWorldX}
-            heroWorldY={heroWorldY}
-            heroLocalX={heroLocalX}
-            heroLocalY={heroLocalY}
-            heroTargetX={hero.targetX}
-            heroTargetY={hero.targetY}
-            heroState={hero.state}
-            mapHeroes={mapEntities?.heroes}
-            places={map.data?.places}
-            entrances={map.data?.entrances}
-            offsetX={offsetX}
-            offsetY={offsetY}
-          />
-        </Suspense>
-      </div>
+      <GameMap
+        scale={scale}
+        containerRef={containerRef}
+        callbackRef={callbackRef}
+        width={map.data?.width ?? 0}
+        height={map.data?.height ?? 0}
+        layers={map.data?.layers ?? []}
+        image={map.data?.image ?? ''}
+        tileWidth={map.data?.tileWidth ?? 32}
+        isLoading={map.isLoading}
+        heroWorldX={heroWorldX}
+        heroWorldY={heroWorldY}
+        heroLocalX={heroLocalX}
+        heroLocalY={heroLocalY}
+        heroTargetX={hero.targetX}
+        heroTargetY={hero.targetY}
+        heroState={hero.state}
+        mapHeroes={mapEntities?.heroes}
+        places={map.data?.places}
+        entrances={map.data?.entrances}
+        offsetX={offsetX}
+        offsetY={offsetY}
+      />
     </section>
   );
 };

@@ -5,6 +5,7 @@ import { RefObject, memo, useEffect, useRef, useState } from 'react';
 
 import { useDragOnMap } from '../hooks/useDragOnMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
+import { Canvas } from './Canvas';
 import { EntranceTile } from './EntranceTile';
 import { HeroTile } from './HeroTile';
 import { MapTile } from './MapTile';
@@ -25,10 +26,10 @@ interface Props {
   isLoading: boolean;
   layers: Layer[];
   containerRef: RefObject<HTMLDivElement | null>;
+  callbackRef: (el: HTMLDivElement | null) => void;
   scale: number;
   heroWorldX: number;
   heroWorldY: number;
-
   heroLocalX: number;
   heroLocalY: number;
   offsetX: number;
@@ -37,6 +38,7 @@ interface Props {
 
 export const GameMap = memo(
   ({
+    image,
     heroState,
     height,
     tileWidth,
@@ -49,25 +51,24 @@ export const GameMap = memo(
     heroTargetX,
     heroTargetY,
     containerRef,
+    callbackRef,
     scale,
     heroWorldX,
     heroWorldY,
     offsetX,
     offsetY,
-
-    heroLocalX,
-    heroLocalY,
   }: Props) => {
     const TILE_SIZE = tileWidth;
     const MAP_HEIGHT = height;
     const MAP_WIDTH = width;
 
-    const [isDragging, setIsDragging] = useState(false);
+    const isDraggingRef = useRef<boolean>(false);
+    const [isDragging, setIsDragging] = useState(false); // тільки для cursor стилю
     const hoverRef = useRef<HTMLDivElement | null>(null);
 
     const { handleMouseMove, hoverIndexRef, setStart, handleMouseLeave, handleTap } = useSetHoverIndex({
       containerRef,
-      isDragging,
+      isDraggingRef,
       MAP_HEIGHT,
       MAP_WIDTH,
       scale,
@@ -75,20 +76,21 @@ export const GameMap = memo(
       hoverRef,
       heroWorldX,
       heroWorldY,
-
       heroState,
       layers,
-
       offsetX,
       offsetY,
     });
 
     const { handleMouseDown, handleMouseUp } = useDragOnMap({
+      isDraggingRef,
       setIsDragging,
       setStart,
     });
+
     const { setMovementPathTiles, movementPathTiles } = useMovementPathTileStore();
     const groundLayer = layers?.find((l) => l.name === 'GROUND');
+
     useEffect(() => {
       if (heroTargetY && heroTargetX && !movementPathTiles.length) {
         setMovementPathTiles({
@@ -104,12 +106,17 @@ export const GameMap = memo(
         });
       }
     }, [heroTargetX, heroTargetY, layers]);
+
     const CHUNK_SIZE = 10;
 
-    // if (isLoading) return 'Loading Map...';
+    if (isLoading) return 'Loading Map...';
+
     return (
       <div
-        ref={containerRef}
+        ref={(el) => {
+          callbackRef(el);
+          containerRef.current = el;
+        }}
         className="relative mx-auto aspect-video w-full max-w-[700px] overflow-hidden rounded border"
         style={{
           cursor: isDragging ? 'grabbing' : 'default',
@@ -124,7 +131,7 @@ export const GameMap = memo(
         onPointerCancel={handleMouseUp}
         onClick={handleTap}
       >
-        <ul
+        <div
           className="relative origin-top-left"
           style={{
             imageRendering: 'pixelated',
@@ -133,18 +140,19 @@ export const GameMap = memo(
             transform: `scale(${scale})`,
           }}
         >
-          {groundLayer?.data.map((n, idx) => {
+          <Canvas
+            grounds={groundLayer?.data ?? []}
+            className="-z-1 absolute left-0 top-0 border border-red-400"
+            width={MAP_WIDTH * TILE_SIZE}
+            height={MAP_HEIGHT * TILE_SIZE}
+            MAP_WIDTH={MAP_WIDTH}
+            TILE_SIZE={TILE_SIZE}
+            tileImage={image}
+          />
+          {/* {groundLayer?.data.map((n, idx) => {
             const x = idx % MAP_WIDTH;
             const y = Math.floor(idx / MAP_WIDTH);
-
-            // const dx = x - heroLocalX;
-            // const dy = y - heroLocalY;
-            // const radius = 60;
-
-            // const isNear = dx * dx + dy * dy <= radius * radius;
-
             const isChunkBorder = x % CHUNK_SIZE === 0 || y % CHUNK_SIZE === 0;
-            // if (!isNear) return;
             return (
               <MapTile
                 key={`${n}:${idx}`}
@@ -155,7 +163,7 @@ export const GameMap = memo(
                 isChunkBorder={isChunkBorder}
               />
             );
-          })}
+          })} */}
           {places?.map((place) => <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />)}
           {entrances?.map((entrance) => (
             <EntranceTile
@@ -173,7 +181,7 @@ export const GameMap = memo(
             <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
           ))}
 
-          {hoverIndexRef  && !isDragging && heroState === 'IDLE' && (
+          {hoverIndexRef.current !== null && !isDragging && heroState === 'IDLE' && (
             <div
               ref={hoverRef}
               style={{
@@ -186,7 +194,7 @@ export const GameMap = memo(
               }}
             />
           )}
-        </ul>
+        </div>
       </div>
     );
   },

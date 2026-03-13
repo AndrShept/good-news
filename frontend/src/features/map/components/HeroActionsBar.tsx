@@ -31,8 +31,8 @@ export const HeroActionsBar = memo(({ heroPosX, heroPosY, map, state, gatheringF
   const placeId = placeTile?.id;
   const image = entranceTile ? entranceTile.image : placeTile?.image;
   return (
-    <div className="flex w-full flex-row flex-wrap gap-1 sm:flex-col">
-      <Button onClick={() => onCenter()} variant="outline" size="icon">
+    <div className="flex w-full flex-row flex-wrap gap-1 sm:flex-col select-none">
+      <Button onClick={onCenter} variant="outline" size="icon">
         <BracketsIcon />
       </Button>
       {(entranceTile || placeTile) && (

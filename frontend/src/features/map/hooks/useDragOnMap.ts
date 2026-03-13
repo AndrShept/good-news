@@ -1,23 +1,24 @@
-import { IPosition } from '@/shared/types';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { RefObject } from 'react';
 
 interface IUseDragOnMap {
-  setStart: (data: IPosition | null) => void;
-  setIsDragging: Dispatch<SetStateAction<boolean>>;
+  isDraggingRef: RefObject<boolean>;
+  setIsDragging: (val: boolean) => void;
+  setStart: (data: { x: number; y: number } | null) => void;
 }
 
-export const useDragOnMap = ({ setIsDragging, setStart }: IUseDragOnMap) => {
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+export const useDragOnMap = ({ isDraggingRef, setIsDragging, setStart }: IUseDragOnMap) => {
+  const handleMouseDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    isDraggingRef.current = true;
     setIsDragging(true);
     setStart({ x: e.clientX, y: e.clientY });
   };
 
   const handleMouseUp = () => {
+    isDraggingRef.current = false;
     setIsDragging(false);
     setStart(null);
   };
-
-  
 
   return {
     handleMouseDown,

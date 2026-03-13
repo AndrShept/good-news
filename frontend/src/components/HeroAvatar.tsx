@@ -28,7 +28,7 @@ export const HeroAvatar = memo(({ src, isSelected = false, setAvatar, className,
   return (
     <article
       onClick={() => setAvatar?.(src)}
-      className={cn('shrink-0', avatarVariants({ className, size }), {
+      className={cn('shrink-0 select-none', avatarVariants({ className, size }), {
         'border-primary opacity-100 ring-1 hover:opacity-100': isSelected,
       })}
     >
