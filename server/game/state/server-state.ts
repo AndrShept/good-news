@@ -12,6 +12,7 @@ import type {
   PathNode,
   QueueCraft,
   SkillInstance,
+  SpawnPoint,
   TItemContainer,
 } from '@/shared/types';
 import type { Socket } from 'socket.io';
@@ -65,6 +66,7 @@ export const serverState = {
   user: new Map<string, string>(),
   // pathPersistQueue: new Map<string, { x: number; y: number }>(),
   mapChunks: new Map<string, { heroes: Set<string>; corpses: Set<string>; creatures: Set<string> }>(),
+  spawnPoints: new Map<string, SpawnPoint>(),
   corpse: new Map<string, Corpse>(),
   creature: new Map<string, Creature>(),
   queueCraft: new Map<string, QueueCraft[]>(),

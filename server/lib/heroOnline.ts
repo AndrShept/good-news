@@ -18,7 +18,7 @@ export const heroOnline = async (heroId: string) => {
   if (hero.location.chunkId && hero.location.mapId) {
    
     mapService.spawnMapEntitiesInChunk({ type: 'HERO', entityId: hero.id, x: hero.location.x, y: hero.location.y , mapId: hero.location.mapId });
-    socketService.sendMapChunkSpawnEntities({ chunkId: hero.location.chunkId, entityId: hero.id, type: 'HERO' });
+    socketService.sendMapChunkSpawnEntities({ chunkId: hero.location.chunkId, entityIds: [hero.id], type: 'HERO' });
   }
   if (hero.location.placeId) {
     io.to(hero.location.placeId).emit(socketEvents.placeUpdate(), socketData);

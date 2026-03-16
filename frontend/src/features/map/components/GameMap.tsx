@@ -65,7 +65,7 @@ export const GameMap = memo(
     const MAP_WIDTH = width;
 
     const isDraggingRef = useRef<boolean>(false);
-    const [isDragging, setIsDragging] = useState(false); // тільки для cursor стилю
+    const [isDragging, setIsDragging] = useState(false); 
     const hoverRef = useRef<HTMLDivElement | null>(null);
 
     const { handleMouseMove, hoverIndexRef, setStart, handleMouseLeave, handleTap } = useSetHoverIndex({

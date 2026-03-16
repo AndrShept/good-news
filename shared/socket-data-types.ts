@@ -38,7 +38,7 @@ export type MapChunkSpawnEntityData = MapChunkEntitiesData;
 export type MapChunkDespawnEntityData = {
   type: MapChunkEntitiesType;
   payload: {
-    entityId: string;
+    entityIds: string[];
   };
 };
 
@@ -113,17 +113,16 @@ export type LoadMapChunkEntityEvent = {
 export type RemoveMapChunkEntityEvent = {
   type: 'REMOVE_OLD_ENTITY';
   payload: {
-    corpses: Corpse[];
-    creatures: Creature[];
-    heroes: MapHero[];
+    corpses: string[];
+    creatures: string[];
+    heroes: string[];
   };
 };
-
 
 export type HeroUpdateEvent = {
   type: 'UPDATE_HERO';
   heroId: string;
-  payload: Partial<OmitDeepHero>
+  payload: Partial<OmitDeepHero>;
 };
 
 export type RemoveBuffEvent = {

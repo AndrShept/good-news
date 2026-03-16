@@ -26,18 +26,18 @@ export const useMapChunkEntitiesUpdate = (mapId: string) => {
     [mapId],
   );
   const removeChunkEntities = useCallback(
-    (entityId: string, type: MapChunkEntitiesType) => {
+    (entityIds: string[], type: MapChunkEntitiesType) => {
       queryClient.setQueriesData<ApiGeChunkMapEntities>({ queryKey: getMapChunkEntitiesOptions(mapId).queryKey }, (oldData) => {
         if (!oldData) return;
-        if (heroId === entityId) return;
-
+        // if (heroId === entityId) return;
+        // const removeIds = new Set(entityIds);
         switch (type) {
           case 'HERO':
-            return { ...oldData, heroes: oldData.heroes.filter((e) => entityId !== e.id) };
+            return { ...oldData, heroes: oldData.heroes.filter((e) => !entityIds.includes(e.id)) };
           case 'CORPSE':
-            return { ...oldData, corpses: oldData.corpses.filter((e) => entityId !== e.id) };
+            return { ...oldData, corpses: oldData.corpses.filter((e) => !entityIds.includes(e.id)) };
           case 'CREATURE':
-            return { ...oldData, creatures: oldData.creatures.filter((e) => entityId !== e.id) };
+            return { ...oldData, creatures: oldData.creatures.filter((e) => !entityIds.includes(e.id)) };
         }
       });
     },
@@ -51,14 +51,11 @@ export const useMapChunkEntitiesUpdate = (mapId: string) => {
 
         switch (data.type) {
           case 'HERO':
-            if (oldData.heroes.some((e) => e.id === data.payload.id)) return;
-            return { ...oldData, heroes: [...oldData.heroes, data.payload] };
+            return { ...oldData, heroes: [...oldData.heroes, ...data.payload] };
           case 'CORPSE':
-            if (oldData.corpses.some((e) => e.id === data.payload.id)) return;
-            return { ...oldData, corpses: [...oldData.corpses, data.payload] };
+            return { ...oldData, corpses: [...oldData.corpses, ...data.payload] };
           case 'CREATURE':
-            if (oldData.creatures.some((e) => e.id === data.payload.id)) return;
-            return { ...oldData, creatures: [...oldData.creatures, data.payload] };
+            return { ...oldData, creatures: [...oldData.creatures, ...data.payload] };
         }
       });
     },

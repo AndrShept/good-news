@@ -211,8 +211,8 @@ export type TMap = {
   height: number;
   tileHeight: number;
   tileWidth: number;
-  offsetX: number
-  offsetY: number
+  offsetX: number;
+  offsetY: number;
   image: string;
   name: string;
   layers: Layer[];
@@ -404,7 +404,7 @@ export type MapChunkEntitiesType = keyof EntityPayloadMap;
 export type MapChunkEntitiesData = {
   [K in keyof EntityPayloadMap]: {
     type: K;
-    payload: EntityPayloadMap[K];
+    payload: EntityPayloadMap[K][];
   };
 }[keyof EntityPayloadMap];
 
@@ -412,10 +412,51 @@ export type Corpse = {
   id: string;
   name: string;
 };
+export type CreatureType =
+  | 'HUMANOID'
+  | 'ANIMAL'
+  | 'BEAST'
+  | 'UNDEAD'
+  | 'DEMON'
+  | 'ELEMENTAL'
+  | 'CONSTRUCT'
+  | 'DRAGON'
+  | 'GIANT'
+  | 'SPIRIT'
+  | 'PLANT'
+  | 'ABERRATION';
 
-export type Creature = {
+export type CreatureTemplate = {
   id: string;
   name: string;
+  image: string;
+  type: CreatureType;
+  currentHealth: number;
+  maxHealth: number;
+  currentMana: number;
+  maxMana: number;
+
+  baseModifier: Partial<OmitModifier>;
+};
+export type Creature = {
+  id: string;
+  x: number;
+  y: number;
+  mapId: string;
+  creatureTemplateId: string;
+  displayName?: string;
+  modifier?: OmitModifier;
+};
+
+export type SpawnPoint = {
+  id: string;
+  x: number;
+  y: number;
+  creatureTemplateId: string;
+  maxCreatures: number;
+  radius: number;
+  respawnTime: number;
+  respawnAt: number | null;
 };
 
 export type HeroSidebarItem = {

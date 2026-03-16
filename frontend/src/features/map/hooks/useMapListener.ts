@@ -24,7 +24,7 @@ export const useMapListener = () => {
       addChunkEntities({ ...data });
     };
     const despawnListener = (data: MapChunkDespawnEntityData) => {
-      removeChunkEntities(data.payload.entityId, data.type);
+      removeChunkEntities(data.payload.entityIds, data.type);
     };
     const updateListener = (data: MapChunkUpdateEntitiesData) => {
       if (data.data.type === 'HERO' && heroId === data.entityId && !data.isFinishMove && data.data.payload.x && data.data.payload.y) {
@@ -53,5 +53,14 @@ export const useMapListener = () => {
       socket.off(socketEvents.entityDespawn(), despawnListener);
       socket.off(socketEvents.entityUpdate(), updateListener);
     };
-  }, [addChunkEntities, clearMovementPathTiles, filterMovementPathTiles, heroId, removeChunkEntities, socket, updateChunkEntities, updateHero]);
+  }, [
+    addChunkEntities,
+    clearMovementPathTiles,
+    filterMovementPathTiles,
+    heroId,
+    removeChunkEntities,
+    socket,
+    updateChunkEntities,
+    updateHero,
+  ]);
 };

@@ -980,7 +980,7 @@ export const heroRouter = new Hono<Context>()
         y: hero.location.y,
         mapId: hero.location.mapId,
       });
-      socketService.sendMapChunkSpawnEntities({ chunkId, entityId: hero.id, type: 'HERO' });
+      socketService.sendMapChunkSpawnEntities({ chunkId, entityIds: [hero.id], type: 'HERO' });
 
       const returnData = hero.location;
 

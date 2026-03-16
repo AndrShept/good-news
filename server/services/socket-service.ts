@@ -5,7 +5,6 @@ import type {
   MapChunkUpdateEntitiesData,
   PlaceUpdateEvent,
   SkillUpEvent,
-
 } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import type { GameSysMessage, MapChunkEntitiesData, MapChunkEntitiesType, StateType } from '@/shared/types';
@@ -26,12 +25,12 @@ interface SendToClientExpResult {
 type SendMapChunkSpawnEntities = {
   chunkId: string;
   type: MapChunkEntitiesType;
-  entityId: string;
+  entityIds: string[];
 };
 type SendMapChunkDespawnEntities = {
   chunkId: string;
   type: MapChunkEntitiesType;
-  entityId: string;
+  entityIds: string[];
 };
 
 export const socketService = {
@@ -68,28 +67,28 @@ export const socketService = {
     const hero = heroService.getHero(heroId);
 
     const socketData: MapChunkUpdateEntitiesData = {
-       entityId: heroId,
-       isFinishMove: true,
-      data: {type: 'HERO', payload: {  state: 'IDLE'} },
+      entityId: heroId,
+      isFinishMove: true,
+      data: { type: 'HERO', payload: { state: 'IDLE' } },
     };
 
     io.to(chunkId).emit(socketEvents.entityUpdate(), socketData);
   },
-  sendMapChunkSpawnEntities({ chunkId, type, entityId }: SendMapChunkSpawnEntities) {
+  sendMapChunkSpawnEntities({ chunkId, type, entityIds }: SendMapChunkSpawnEntities) {
     let data: MapChunkEntitiesData | undefined = undefined;
     switch (type) {
       case 'HERO':
-        data = { type, payload: heroService.getHeroMapData(entityId) };
+        data = { type, payload: entityIds.map((i) => heroService.getHeroMapData(i)) };
         break;
       case 'CREATURE': {
-        const payload = serverState.creature.get(entityId);
+        const payload = entityIds.map((i) => serverState.creature.get(i)).filter((i) => !!i);
         if (!payload) break;
         data = { type, payload };
         break;
       }
 
       case 'CORPSE':
-        const payload = serverState.corpse.get(entityId);
+        const payload = entityIds.map((i) => serverState.corpse.get(i)).filter((i) => !!i);
         if (!payload) break;
         data = { type, payload };
         break;
@@ -98,10 +97,10 @@ export const socketService = {
 
     io.to(chunkId).emit(socketEvents.entitySpawn(), data);
   },
-  sendMapChunkDespawnEntities({ chunkId, type, entityId }: SendMapChunkDespawnEntities) {
+  sendMapChunkDespawnEntities({ chunkId, type, entityIds }: SendMapChunkDespawnEntities) {
     const data: MapChunkDespawnEntityData = {
       type,
-      payload: { entityId },
+      payload: { entityIds },
     };
 
     io.to(chunkId).emit(socketEvents.entityDespawn(), data);

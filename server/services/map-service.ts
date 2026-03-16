@@ -108,7 +108,7 @@ export const mapService = {
         break;
     }
 
-    socketService.sendMapChunkDespawnEntities({ chunkId, entityId, type });
+    socketService.sendMapChunkDespawnEntities({ chunkId, entityIds: [entityId], type });
   },
   getAroundChunkIds({ mapId, x, y }: GetChunkIds) {
     const chunkX = Math.floor(x / MAP_CHUNK_SIZE);

@@ -175,7 +175,16 @@ export const imageConfig = {
       solmerMine: '/sprites/bg/map/solmer-mine.png',
     },
   },
-
+  creature: {
+    animal: {
+      pig: '/sprites/creatures/animals/pig.png',
+      sheep: '/sprites/creatures/animals/sheep.png',
+    },
+    beast: {
+      rat: '/sprites/creatures/beasts/rat.png',
+      bat: '/sprites/creatures/beasts/bat.png',
+    },
+  },
   equipments: {
     tools: {
       'blacksmith-hammer': '/sprites/equipments/tools/blacksmith-hammer.png',

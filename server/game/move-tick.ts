@@ -39,21 +39,22 @@ export const moveTick = (now: number) => {
         // console.log('newChunks', newChunks);
         // console.log('diffOld', diffOld);
         // console.log('diffNew', diffNew);
-        for (const old of diffOld) {
-          socket.leave(old);
-        }
-        for (const dNew of diffNew) {
-          socket.join(dNew);
-        }
-        mapService.despawnMapEntitiesInChunk({
+                mapService.despawnMapEntitiesInChunk({
           entityId: heroId,
           mapId: hero.location.mapId,
           type: 'HERO',
           x: hero.location.x,
           y: hero.location.y,
         });
+        for (const old of diffOld) {
+          socket.leave(old);
+        }
+        for (const dNew of diffNew) {
+          socket.join(dNew);
+        }
+
         mapService.spawnMapEntitiesInChunk({ entityId: heroId, type: 'HERO', x: step.x, y: step.y, mapId: hero.location.mapId });
-        socketService.sendMapChunkSpawnEntities({ chunkId, entityId: heroId, type: 'HERO' });
+        socketService.sendMapChunkSpawnEntities({ chunkId, entityIds: [heroId], type: 'HERO' });
 
         const newEntity = mapService.getMapEntitiesByChunkIds(diffNew);
         const oldEntity = mapService.getMapEntitiesByChunkIds(diffOld);
@@ -64,7 +65,12 @@ export const moveTick = (now: number) => {
         };
         const socketRemoveData: RemoveMapChunkEntityEvent = {
           type: 'REMOVE_OLD_ENTITY',
-          payload: oldEntity,
+          payload: {
+            ...oldEntity,
+            corpses: oldEntity.corpses.map((c) => c.id),
+            creatures: oldEntity.creatures.map((c) => c.id),
+            heroes: oldEntity.heroes.map((h) => h.id),
+          },
         };
         const updateHero: HeroUpdateEvent = {
           type: 'UPDATE_HERO',

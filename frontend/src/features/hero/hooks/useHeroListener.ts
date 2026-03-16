@@ -80,30 +80,37 @@ export const useHeroListener = () => {
           }
 
           break;
-        case 'REMOVE_OLD_ENTITY':
+
         case 'LOAD_MORE_ENTITY': {
-          const corpses = data.payload.corpses.map<MapChunkEntitiesData>((c) => ({
-            type: 'CORPSE',
-            payload: c,
-          }));
-          const creatures = data.payload.creatures.map<MapChunkEntitiesData>((c) => ({
-            type: 'CREATURE',
-            payload: c,
-          }));
-          const heroes = data.payload.heroes.map<MapChunkEntitiesData>((h) => ({ type: 'HERO', payload: h }));
-          if (data.type === 'LOAD_MORE_ENTITY') {
-            for (const entity of corpses) addChunkEntities(entity);
-            for (const entity of creatures) addChunkEntities(entity);
-            for (const entity of heroes) addChunkEntities(entity);
+          const corpses = { type: 'CORPSE', payload: data.payload.corpses } as MapChunkEntitiesData;
+          const creatures = { type: 'CREATURE', payload: data.payload.creatures } as MapChunkEntitiesData;
+          const heroes = { type: 'HERO', payload: data.payload.heroes } as MapChunkEntitiesData;
+
+          if (corpses.payload.length) {
+            addChunkEntities(corpses);
           }
-          if (data.type === 'REMOVE_OLD_ENTITY') {
-            for (const entity of corpses) removeChunkEntities(entity.payload.id, entity.type);
-            for (const entity of creatures) removeChunkEntities(entity.payload.id, entity.type);
-            for (const entity of heroes) removeChunkEntities(entity.payload.id, entity.type);
+          if (creatures.payload.length) {
+            addChunkEntities(creatures);
+          }
+          if (heroes.payload.length) {
+            addChunkEntities(heroes);
           }
 
           break;
         }
+        case 'REMOVE_OLD_ENTITY':
+      
+          if (data.payload.corpses.length) {
+            removeChunkEntities(data.payload.corpses, 'CORPSE');
+          }
+          if (data.payload.creatures.length ) {
+            removeChunkEntities(data.payload.creatures, 'CREATURE');
+          }
+          if (data.payload.heroes.length) {
+            removeChunkEntities(data.payload.heroes, 'HERO');
+          }
+
+          break;
       }
     };
 
@@ -112,5 +119,18 @@ export const useHeroListener = () => {
     return () => {
       socket.off(socketEvents.selfData(), listener);
     };
-  }, [addChunkEntities, addItemInstance, heroId, removeBuff, removeChunkEntities, removeEquip, setGameMessage, socket, updateEquip, updateHero, updateItemInstance, updateSkill]);
+  }, [
+    addChunkEntities,
+    addItemInstance,
+    heroId,
+    removeBuff,
+    removeChunkEntities,
+    removeEquip,
+    setGameMessage,
+    socket,
+    updateEquip,
+    updateHero,
+    updateItemInstance,
+    updateSkill,
+  ]);
 };
