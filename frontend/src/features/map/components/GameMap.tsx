@@ -1,6 +1,7 @@
 import { Layer } from '@/shared/json-types';
 import { Entrance, MapHero, StateType, TPlace } from '@/shared/types';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
+import { Application } from '@pixi/react';
 import { RefObject, memo, useEffect, useRef, useState } from 'react';
 
 import { useDragOnMap } from '../hooks/useDragOnMap';
@@ -9,6 +10,7 @@ import { Canvas } from './Canvas';
 import { EntranceTile } from './EntranceTile';
 import { HeroTile } from './HeroTile';
 import { MapTile } from './MapTile';
+import { MapTileList } from './MapTileList';
 import { MovablePathTile } from './MovablePathTile';
 import { PlaceTile } from './PlaceTile';
 
@@ -149,6 +151,13 @@ export const GameMap = memo(
             TILE_SIZE={TILE_SIZE}
             tileImage={image}
           />
+          {/* <Application
+            className="absolute left-0 top-0 "
+            width={MAP_WIDTH * TILE_SIZE}
+            height={MAP_HEIGHT * TILE_SIZE}
+          >
+            <MapTileList grounds={groundLayer?.data ?? []} MAP_WIDTH={MAP_WIDTH} TILE_SIZE={TILE_SIZE} tileImage={image} />
+          </Application> */}
           {/* {groundLayer?.data.map((n, idx) => {
             const x = idx % MAP_WIDTH;
             const y = Math.floor(idx / MAP_WIDTH);
