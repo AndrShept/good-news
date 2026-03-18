@@ -42,6 +42,7 @@ import type { queueCraftItemTable, queueCraftStatusEnum } from '../server/db/sch
 import type { skillInstanceTable } from '../server/db/schema/skill-instance-schema';
 import type { HeroRuntime } from '../server/game/state/server-state';
 import type { Layer } from './json-types';
+import type { CreatureKey } from './templates/creature-template';
 import type { SkillKey, skillCategoryValues } from './templates/skill-template';
 
 export interface SuccessResponse<T = undefined> {
@@ -429,6 +430,7 @@ export type CreatureType =
 export type CreatureTemplate = {
   id: string;
   name: string;
+  key: CreatureKey;
   image: string;
   type: CreatureType;
   currentHealth: number;
@@ -452,8 +454,12 @@ export type SpawnPoint = {
   id: string;
   x: number;
   y: number;
+  name: string;
+  mapId: string;
+  chunkId: string;
   creatureTemplateId: string;
   maxCreatures: number;
+  alive: number;
   radius: number;
   respawnTime: number;
   respawnAt: number | null;

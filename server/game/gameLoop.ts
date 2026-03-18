@@ -6,6 +6,7 @@ import { moveTick } from './move-tick';
 import { queueCraftTick } from './quue-craft-tick';
 import { regenTick } from './regen-tick';
 import { resourceRespawnTick } from './resource-respawn-tick';
+import { spawnCreatureTick } from './spawn-creature-tick';
 
 const TICK_RATE = 500; // ms
 const MAX_CATCHUP_TICKS = 5;
@@ -27,6 +28,7 @@ export const gameLoop = () => {
     queueCraftTick(lastTick);
     gatherTick(lastTick);
     resourceRespawnTick(lastTick);
+    spawnCreatureTick(lastTick)
     // regenTick(lastTick, TICK_RATE)
 
     lastTick += TICK_RATE;

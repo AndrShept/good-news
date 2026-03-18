@@ -4,6 +4,7 @@ import type { TMap } from '@/shared/types';
 import solverMine from '../../server/data/json/solmer-mine.json';
 import solverValley from '../../server/data/json/solmer-valley.json';
 import { placeTemplate, placeTemplateByName } from './place-template';
+import type { Layer } from '../json-types';
 
 export const mapTemplate: TMap[] = [
   {
@@ -16,7 +17,7 @@ export const mapTemplate: TMap[] = [
     tileHeight: solverValley.tileheight,
     tileWidth: solverValley.tilewidth,
     image: '/sprites/map/ground-tileset.png',
-    layers: solverValley.layers,
+    layers: solverValley.layers as Layer[],
     places: [placeTemplateByName['Solmer Town'], placeTemplateByName['Solmer Mine']],
     entrances: [],
   },

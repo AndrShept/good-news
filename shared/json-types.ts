@@ -1,5 +1,3 @@
-
-
 export interface IMapJson {
   compressionlevel: number;
   height: number;
@@ -24,6 +22,27 @@ export interface Layer {
   id: number;
   name: string;
   opacity: number;
+  type: string;
+  visible: boolean;
+  objects?: TiledObject[]
+  width: number;
+  x: number;
+  y: number;
+}
+
+export interface ObjectProperty {
+  name: string;
+  type: string;
+  value: string;
+}
+
+export interface TiledObject {
+  gid: number;
+  height: number;
+  id: number;
+  name: string;
+  properties: ObjectProperty[];
+  rotation: number;
   type: string;
   visible: boolean;
   width: number;

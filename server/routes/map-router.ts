@@ -8,7 +8,6 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
-
 import type { Context } from '../context';
 import { db } from '../db/db';
 import { heroTable, locationTable } from '../db/schema';
@@ -63,18 +62,24 @@ export const mapRouter = new Hono<Context>()
       const chunkAroundHero = mapService.getAroundChunkIds({ x: hero.location.x, y: hero.location.y, mapId: hero.location.mapId! });
 
       const copyMap = { ...map };
-      copyMap.places = placesByChunkId.filter(p =>chunkAroundHero.includes(p.chunkId) )
-      copyMap.layers = copyMap.layers.map((l) => ({
-        ...l,
-        data: mapService.sliceChunksLayerData({
-          data: l.data,
-          sliceHeight,
-          sliceWidth,
-          startX,
-          startY,
-          width: map.width,
-        }),
-      }));
+
+      copyMap.places = placesByChunkId.filter((p) => chunkAroundHero.includes(p.chunkId));
+
+      copyMap.layers = copyMap.layers.map((l) =>
+        l.data
+          ? {
+              ...l,
+              data: mapService.sliceChunksLayerData({
+                data: l.data,
+                sliceHeight,
+                sliceWidth,
+                startX,
+                startY,
+                width: map.width,
+              }),
+            }
+          : l,
+      );
 
       copyMap.width = sliceWidth;
       copyMap.height = sliceHeight;
@@ -112,6 +117,8 @@ export const mapRouter = new Hono<Context>()
 
       const chunkIds = mapService.getAroundChunkIds({ mapId: map.id, x: hero.location.x, y: hero.location.y });
       const returnData = mapService.getMapEntitiesByChunkIds(chunkIds);
+
+      console.log(returnData.creatures);
 
       return c.json<SuccessResponse<typeof returnData>>({
         message: 'map  entities fetched!',

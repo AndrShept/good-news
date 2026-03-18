@@ -223,9 +223,56 @@
          "width":100,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":15,
+         "name":"SPAWN",
+         "objects":[
+                {
+                 "gid":168,
+                 "height":32,
+                 "id":7,
+                 "name":"PIG",
+                 "properties":[
+                        {
+                         "name":"key",
+                         "type":"string",
+                         "value":"PIG"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":512,
+                 "y":224
+                }, 
+                {
+                 "gid":168,
+                 "height":32,
+                 "id":9,
+                 "name":"SHEEP",
+                 "properties":[
+                        {
+                         "name":"key",
+                         "type":"string",
+                         "value":"SHEEP"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":224,
+                 "y":256
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":11,
- "nextobjectid":1,
+ "nextlayerid":16,
+ "nextobjectid":15,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

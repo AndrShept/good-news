@@ -34,6 +34,7 @@ import { placeRouter } from './routes/place-router';
 import { postRouter } from './routes/post-router';
 import { shopRouter } from './routes/shop-router';
 import { mapService } from './services/map-service';
+import { spawnService } from './services/spawn-service';
 
 const app = new Hono<Context>();
 export let isMaintance = false;
@@ -48,6 +49,7 @@ app.get('/restart', async (c) => {
   return c.json({ isMaintance: isMaintance }, 200);
 });
 //APP ROUTES
+
 const routes = app
   .basePath('/api')
   .route('/auth', authRouter)
@@ -161,5 +163,6 @@ io.on('connection', async (socket) => {
 gameLoop();
 saveItemsDb();
 saveSkillsDb();
+spawnService.createSpawnPoints();
 
 console.info('Server Running on port 🚀', process.env['PORT'] || 3000);

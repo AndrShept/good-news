@@ -5,6 +5,8 @@ import { HTTPException } from 'hono/http-exception';
 import { type HeroRuntime, serverState } from '../game/state/server-state';
 import { heroService } from './hero-service';
 import { socketService } from './socket-service';
+import { spawnService } from './spawn-service';
+import { creatureTemplateById } from '@/shared/templates/creature-template';
 
 interface GetChunkId {
   x: number;
@@ -67,6 +69,7 @@ export const mapService = {
     if (!chunk) {
       chunk = { corpses: new Set(), creatures: new Set(), heroes: new Set() };
       serverState.mapChunks.set(chunkId, chunk);
+  
     }
 
     switch (type) {
@@ -75,7 +78,9 @@ export const mapService = {
 
         break;
       case 'CREATURE':
+    
         chunk.creatures.add(entityId);
+   
         break;
       case 'CORPSE':
         chunk.corpses.add(entityId);

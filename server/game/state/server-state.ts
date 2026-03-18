@@ -67,6 +67,7 @@ export const serverState = {
   // pathPersistQueue: new Map<string, { x: number; y: number }>(),
   mapChunks: new Map<string, { heroes: Set<string>; corpses: Set<string>; creatures: Set<string> }>(),
   spawnPoints: new Map<string, SpawnPoint>(),
+  chunkSpawns: new Map<string, Set<string>>(),
   corpse: new Map<string, Corpse>(),
   creature: new Map<string, Creature>(),
   queueCraft: new Map<string, QueueCraft[]>(),
