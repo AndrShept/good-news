@@ -17,14 +17,14 @@ export interface IMapJson {
 }
 
 export interface Layer {
-  data: number[];
+  data?: number[];
   height: number;
   id: number;
   name: string;
   opacity: number;
   type: string;
   visible: boolean;
-  objects?: TiledObject[]
+  objects?: TiledObject[];
   width: number;
   x: number;
   y: number;

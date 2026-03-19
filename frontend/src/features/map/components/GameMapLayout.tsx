@@ -87,9 +87,10 @@ export const GameMapLayout = () => {
         heroTargetX={hero.targetX}
         heroTargetY={hero.targetY}
         heroState={hero.state}
-        mapHeroes={mapEntities?.heroes}
-        places={map.data?.places}
-        entrances={map.data?.entrances}
+        mapHeroes={mapEntities?.heroes ?? []}
+        mapCreatures={mapEntities?.creatures ?? []}
+        places={map.data?.places ?? []}
+        entrances={map.data?.entrances ?? []}
         offsetX={offsetX}
         offsetY={offsetY}
       />

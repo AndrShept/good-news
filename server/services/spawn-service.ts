@@ -4,7 +4,7 @@ import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
 import { spawnConfig } from '../lib/config/spawn-config';
-import { generateRandomUuid } from '../lib/utils';
+import { generateRandomUuid, getTileExists } from '../lib/utils';
 import { mapService } from './map-service';
 
 export const spawnService = {
@@ -19,11 +19,22 @@ export const spawnService = {
     const spawn = this.getSpawnPoint(spawnId);
     const angle = Math.random() * Math.PI * 2;
     const r = Math.random() * spawn.radius;
-
-    return {
-      x: Math.floor(spawn.x + Math.cos(angle) * r),
-      y: Math.floor(spawn.y + Math.sin(angle) * r),
-    };
+    const x = Math.floor(spawn.x + Math.cos(angle) * r);
+    const y = Math.floor(spawn.y + Math.sin(angle) * r);
+    const map = mapTemplate.find((m) => m.id === spawn.mapId);
+    if (!map) return;
+    const index = y * map.width + x;
+    const groundTile = getTileExists(spawn.mapId, index, 'GROUND');
+    const waterTile = getTileExists(spawn.mapId, index, 'WATER');
+    const objectTile = getTileExists(spawn.mapId, index, 'OBJECT');
+    if (!groundTile || (groundTile && (objectTile || waterTile))) {
+      this.getSpawnPosition(spawnId);
+    } else {
+      return {
+        x,
+        y,
+      };
+    }
   },
   createSpawnPoints() {
     const maps = mapTemplate;

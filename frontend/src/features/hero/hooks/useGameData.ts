@@ -1,4 +1,4 @@
-import { BuffTemplate, ItemTemplate, RecipeTemplate, SkillTemplate } from '@/shared/types';
+import { BuffTemplate, CreatureTemplate, ItemTemplate, RecipeTemplate, SkillTemplate } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
@@ -53,11 +53,13 @@ export const useGameData = () => {
     [],
   );
 
+
   return {
     itemsTemplateById,
     skillsTemplateById,
     recipeTemplateById,
     buffTemplateById,
     itemsTemplate: data?.itemsTemplate,
+
   };
 };

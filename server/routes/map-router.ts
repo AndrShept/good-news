@@ -1,7 +1,7 @@
 import { MAP_CHUNK_SIZE } from '@/shared/constants';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
-import type { Corpse, Creature, MapHero, SuccessResponse, TMap, TPlace } from '@/shared/types';
+import type { Corpse, MapHero, SuccessResponse, TMap, TPlace } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -118,7 +118,6 @@ export const mapRouter = new Hono<Context>()
       const chunkIds = mapService.getAroundChunkIds({ mapId: map.id, x: hero.location.x, y: hero.location.y });
       const returnData = mapService.getMapEntitiesByChunkIds(chunkIds);
 
-      console.log(returnData.creatures);
 
       return c.json<SuccessResponse<typeof returnData>>({
         message: 'map  entities fetched!',

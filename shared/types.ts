@@ -399,7 +399,7 @@ export type Hero = InferSelectModel<typeof heroTable> & {
 export type EntityPayloadMap = {
   HERO: MapHero;
   CORPSE: Corpse;
-  CREATURE: Creature;
+  CREATURE: MapCreature;
 };
 export type MapChunkEntitiesType = keyof EntityPayloadMap;
 export type MapChunkEntitiesData = {
@@ -411,8 +411,17 @@ export type MapChunkEntitiesData = {
 
 export type Corpse = {
   id: string;
+  image: string;
   name: string;
+  x: number;
+  y: number;
+  mapId: string;
+  deadEntityId: string;
+  expiredAt: number;
 };
+
+export type MapCorpse = Pick<Corpse, 'image' | 'id' | 'name' | 'x' | 'y'>;
+
 export type CreatureType =
   | 'HUMANOID'
   | 'ANIMAL'
@@ -440,15 +449,14 @@ export type CreatureTemplate = {
 
   baseModifier: Partial<OmitModifier>;
 };
-export type Creature = {
+export type CreatureInstance = CreatureTemplate & {
   id: string;
   x: number;
   y: number;
   mapId: string;
   creatureTemplateId: string;
-  displayName?: string;
-  modifier?: OmitModifier;
 };
+export type MapCreature = Pick<CreatureInstance, 'image' | 'id' | 'name' | 'x' | 'y'>;
 
 export type SpawnPoint = {
   id: string;

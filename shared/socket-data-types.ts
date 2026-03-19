@@ -2,13 +2,15 @@ import type { itemInstanceService } from '../server/services/item-instance-servi
 import type {
   BuildingType,
   Corpse,
-  Creature,
+  
   EntityPayloadMap,
   GameSysMessageType,
   Hero,
   HeroSidebarItem,
   MapChunkEntitiesData,
   MapChunkEntitiesType,
+  MapCorpse,
+  MapCreature,
   MapHero,
   OmitDeepHero,
   QueueCraftStatusType,
@@ -105,8 +107,8 @@ export type SelfHeroEvent =
 export type LoadMapChunkEntityEvent = {
   type: 'LOAD_MORE_ENTITY';
   payload: {
-    corpses: Corpse[];
-    creatures: Creature[];
+    corpses: MapCorpse[];
+    creatures: MapCreature[];
     heroes: MapHero[];
   };
 };

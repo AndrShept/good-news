@@ -2,7 +2,7 @@ import type { CreatureTemplate } from '@/shared/types';
 
 import { imageConfig } from '../config/image-config';
 
-export const creatureKeyValues = ['PIG', 'SHEEP'] as const;
+export const creatureKeyValues = ['PIG', 'SHEEP', 'RAT'] as const;
 export type CreatureKey = (typeof creatureKeyValues)[number];
 
 export const creatureTemplate = [
@@ -36,6 +36,22 @@ export const creatureTemplate = [
       strength: 14,
       constitution: 7,
       dexterity: 7,
+    },
+  },
+  {
+    id: '019d062f-79e2-7054-b6e9-c823838415c9',
+    type: 'BEAST',
+    name: 'rat',
+    key: 'RAT',
+    image: imageConfig.creature.beast.rat,
+    currentHealth: 50,
+    currentMana: 0,
+    maxHealth: 50,
+    maxMana: 0,
+    baseModifier: {
+      strength: 14,
+      constitution: 5,
+      dexterity: 10,
     },
   },
 ] as const satisfies CreatureTemplate[];

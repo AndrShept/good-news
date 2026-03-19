@@ -5,13 +5,13 @@ import { useMapChunkEntitiesUpdate } from '@/features/map/hooks/useMapChunkEntit
 import { useSkillUpdate } from '@/features/skill/hooks/useSkillUpdate';
 import { SelfHeroEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import { Corpse, Creature, MapChunkEntitiesData, MapChunkEntitiesType, MapHero } from '@/shared/types';
+import { Corpse,  MapChunkEntitiesData, MapChunkEntitiesType, MapHero } from '@/shared/types';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect } from 'react';
 
 import { useBuff } from './useBuff';
 import { useEquipmentsUpdate } from './useEquipmentsUpdate';
-import { useGameData } from './useGameData';
+
 import { useHero } from './useHero';
 import { useHeroId } from './useHeroId';
 import { useHeroUpdate } from './useHeroUpdate';

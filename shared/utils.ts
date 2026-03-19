@@ -9,11 +9,11 @@ function isBlocked(x: number, y: number, layers: Layer[], width: number): boolea
 
   
     if (layer.name === 'WATER' || layer.name === 'OBJECT') {
-      return layer.data[index] !== 0;
+      return layer.data?.[index] !== 0;
     }
 
     if (layer.name === 'GROUND') {
-      return layer.data[index] === 0;
+      return layer.data?.[index] === 0;
     }
 
     return false;
@@ -152,7 +152,7 @@ export const getMapLayerNameAtHeroPos = ({ mapId, pos, radius, tilesType }: GetM
 
     for (const p of around) {
       const i = p.y * map.width + p.x;
-      if (layer.data[i] && tilesType.includes(layer.name as OmitTileType)) {
+      if (layer.data?.[i] && tilesType.includes(layer.name as OmitTileType)) {
         result.push({
           tileType: layer.name as OmitTileType,
           x: p.x,

@@ -1,5 +1,5 @@
 import { creatureTemplateById } from '@/shared/templates/creature-template';
-import type { Creature } from '@/shared/types';
+import type { CreatureInstance, MapCreature } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
@@ -20,17 +20,29 @@ export const creatureService = {
     }
     return creature;
   },
+  getCreatureMapData(creatureId: string): MapCreature {
+    const creature = this.getCreature(creatureId);
+
+    return {
+      id: creature.id,
+      image: creature.image,
+      name: creature.name,
+      x: creature.x,
+      y: creature.y,
+    };
+  },
   createCreature({ creatureTemplateId, mapId, x, y }: CreateCreature) {
-    const template = creatureTemplateById[creatureTemplateId];
-    const id = generateRandomUuid();
-    const newCreature: Creature = {
-      id,
+    const { id, ...template } = creatureTemplateById[creatureTemplateId];
+    const creatureInstanceId = generateRandomUuid();
+    const newCreature: CreatureInstance = {
+      id: creatureInstanceId,
       creatureTemplateId,
       mapId,
       x,
       y,
+      ...template,
     };
-    serverState.creature.set(id, newCreature);
+    serverState.creature.set(newCreature.id, newCreature);
 
     return newCreature;
   },

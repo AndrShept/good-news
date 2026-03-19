@@ -96,7 +96,7 @@ export const clamp = (value: number, min: number, max: number) => {
 export const getTileExists = (mapId: string, index: number, tileType: TileType) => {
   const map = mapTemplate.find((m) => m.id === mapId);
   const tiles = map?.layers.find((l) => l.name === tileType);
-  return tiles?.data[index];
+  return tiles?.data?.[index];
 };
 
 export const jobQueueId = {

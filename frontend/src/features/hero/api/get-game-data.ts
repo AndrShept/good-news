@@ -21,7 +21,7 @@ export const getGameData = () => {
     ...toolsTemplate,
   ];
 
-  return { itemsTemplate, skillsTemplate, recipeTemplate, buffTemplate };
+  return { itemsTemplate, skillsTemplate, recipeTemplate, buffTemplate  };
 };
 
 export const getGameDataOptions = () =>

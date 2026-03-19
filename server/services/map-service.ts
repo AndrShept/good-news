@@ -1,12 +1,14 @@
 import { MAP_CHUNK_SIZE } from '@/shared/constants';
-import type { Corpse, Creature, MapChunkEntitiesData, MapChunkEntitiesType, MapHero } from '@/shared/types';
+import { creatureTemplateById } from '@/shared/templates/creature-template';
+import type { Corpse, MapChunkEntitiesData, MapChunkEntitiesType, MapCorpse, MapCreature, MapHero } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { type HeroRuntime, serverState } from '../game/state/server-state';
+import { corpseService } from './corpese-service';
+import { creatureService } from './creature-service';
 import { heroService } from './hero-service';
 import { socketService } from './socket-service';
 import { spawnService } from './spawn-service';
-import { creatureTemplateById } from '@/shared/templates/creature-template';
 
 interface GetChunkId {
   x: number;
@@ -64,12 +66,11 @@ export const mapService = {
     return `${mapId}:${dy}:${dx}`;
   },
   spawnMapEntitiesInChunk({ entityId, type, x, y, mapId }: SpawnMapEntitiesInChunk) {
-    const chunkId = mapService.getChunkId({ mapId, x, y });
+    const chunkId = this.getChunkId({ mapId, x, y });
     let chunk = serverState.mapChunks.get(chunkId);
     if (!chunk) {
       chunk = { corpses: new Set(), creatures: new Set(), heroes: new Set() };
       serverState.mapChunks.set(chunkId, chunk);
-  
     }
 
     switch (type) {
@@ -78,9 +79,8 @@ export const mapService = {
 
         break;
       case 'CREATURE':
-    
         chunk.creatures.add(entityId);
-   
+
         break;
       case 'CORPSE':
         chunk.corpses.add(entityId);
@@ -132,15 +132,15 @@ export const mapService = {
 
   getMapEntitiesByChunkIds(chunkIds: string[]) {
     const entity = {
-      corpses: [] as Corpse[],
-      creatures: [] as Creature[],
+      corpses: [] as MapCorpse[],
+      creatures: [] as MapCreature[],
       heroes: [] as MapHero[],
     };
     for (const chunkId of chunkIds) {
       const chunk = serverState.mapChunks.get(chunkId);
       const heroes = [...(chunk?.heroes ?? [])].map((id) => heroService.getHeroMapData(id));
-      const creatures = [...(chunk?.creatures ?? [])].map((id) => serverState.creature.get(id)).filter((i) => !!i);
-      const corpses = [...(chunk?.corpses ?? [])].map((id) => serverState.corpse.get(id)).filter((i) => !!i);
+      const creatures = [...(chunk?.creatures ?? [])].map((id) => creatureService.getCreatureMapData(id));
+      const corpses = [...(chunk?.corpses ?? [])].map((id) => corpseService.getCorpseMapData(id));
 
       entity.corpses.push(...corpses);
       entity.creatures.push(...creatures);

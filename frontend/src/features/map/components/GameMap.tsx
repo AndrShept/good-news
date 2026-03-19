@@ -1,5 +1,6 @@
+import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { Layer } from '@/shared/json-types';
-import { Entrance, MapHero, StateType, TPlace } from '@/shared/types';
+import { Entrance, MapCreature, MapHero, StateType, TPlace } from '@/shared/types';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { Application } from '@pixi/react';
 import { RefObject, memo, useEffect, useRef, useState } from 'react';
@@ -7,6 +8,7 @@ import { RefObject, memo, useEffect, useRef, useState } from 'react';
 import { useDragOnMap } from '../hooks/useDragOnMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
 import { Canvas } from './Canvas';
+import { CreatureTile } from './CreatureTile';
 import { EntranceTile } from './EntranceTile';
 import { HeroTile } from './HeroTile';
 import { MapTile } from './MapTile';
@@ -18,9 +20,10 @@ interface Props {
   heroTargetX: number;
   heroTargetY: number;
   heroState: StateType;
-  mapHeroes: MapHero[] | undefined;
-  places: TPlace[] | undefined;
-  entrances: Entrance[] | undefined;
+  mapHeroes: MapHero[];
+  mapCreatures: MapCreature[];
+  places: TPlace[];
+  entrances: Entrance[];
   tileWidth: number;
   height: number;
   width: number;
@@ -46,6 +49,7 @@ export const GameMap = memo(
     tileWidth,
     width,
     mapHeroes,
+    mapCreatures,
     places,
     entrances,
     isLoading,
@@ -65,9 +69,9 @@ export const GameMap = memo(
     const MAP_WIDTH = width;
 
     const isDraggingRef = useRef<boolean>(false);
-    const [isDragging, setIsDragging] = useState(false); 
+    const [isDragging, setIsDragging] = useState(false);
     const hoverRef = useRef<HTMLDivElement | null>(null);
-
+    const heroId = useHeroId();
     const { handleMouseMove, hoverIndexRef, setStart, handleMouseLeave, handleTap } = useSetHoverIndex({
       containerRef,
       isDraggingRef,
@@ -83,7 +87,6 @@ export const GameMap = memo(
       offsetX,
       offsetY,
     });
-
     const { handleMouseDown, handleMouseUp } = useDragOnMap({
       isDraggingRef,
       setIsDragging,
@@ -173,8 +176,28 @@ export const GameMap = memo(
               />
             );
           })} */}
-          {places?.map((place) => <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />)}
-          {entrances?.map((entrance) => (
+
+          {mapCreatures.map((creature) => {
+            const firstCreature = mapCreatures[0];
+            if (firstCreature.id !== creature.id && firstCreature.x === creature.x && firstCreature.y === creature.y) return;
+            if (mapHeroes.some((h) => h.x === creature.x && h.y === creature.y)) return;
+            const creatureCountInTile = mapCreatures.filter((c) => c.x === creature.x && c.y === creature.y).length;
+
+            return (
+              <CreatureTile
+                key={creature.id}
+                {...creature}
+                creatureCountInTile={creatureCountInTile}
+                TILE_SIZE={TILE_SIZE}
+                offsetX={offsetX}
+                offsetY={offsetY}
+              />
+            );
+          })}
+          {places.map((place) => (
+            <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
+          ))}
+          {entrances.map((entrance) => (
             <EntranceTile
               key={entrance.id}
               x={entrance.x}
@@ -185,7 +208,21 @@ export const GameMap = memo(
               offsetY={offsetY}
             />
           ))}
-          {mapHeroes?.map((hero) => <HeroTile key={hero.id} {...hero} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />)}
+          {mapHeroes.map((hero) => {
+            if (hero.id !== heroId && hero.x === heroWorldX && hero.y === heroWorldY) return;
+            const heroCountInTile = mapHeroes.filter((h) => h.x === hero.x && h.y === hero.y).length;
+            const creatureCountInTile = mapCreatures.filter((c) => c.x === hero.x && c.y === hero.y).length;
+            return (
+              <HeroTile
+                key={hero.id}
+                {...hero}
+                heroCountInTile={heroCountInTile + creatureCountInTile}
+                TILE_SIZE={TILE_SIZE}
+                offsetX={offsetX}
+                offsetY={offsetY}
+              />
+            );
+          })}
           {movementPathTiles?.map((position) => (
             <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
           ))}
