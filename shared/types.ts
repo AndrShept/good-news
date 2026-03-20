@@ -473,13 +473,8 @@ export type SpawnPoint = {
   respawnAt: number | null;
 };
 
-export type HeroSidebarItem = {
-  id: string;
-  name: string;
-  level: number;
-  state: StateType;
-  avatarImage: string;
-};
+export type HeroSidebarItem = Pick<Hero, 'id' | 'name' | 'level' | 'state' | 'avatarImage'>;
+
 export type MapHero = HeroSidebarItem & {
   characterImage: string;
   x: number;

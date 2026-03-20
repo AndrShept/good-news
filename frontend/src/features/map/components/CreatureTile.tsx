@@ -29,7 +29,7 @@ export const CreatureTile = memo(function CreatureTile({ x, y, image, creatureCo
         <div className="absolute -top-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-0.5 text-xs">
           <p>{name}</p>
 
-          <p className="leading-3.5 size-3.5 rounded-full bg-red-800/70  text-center text-[8px] text-white">{creatureCountInTile}</p>
+          <p className="leading-3.5 size-3.5 rounded-full bg-teal-800   text-center text-[8px] text-white">{creatureCountInTile}</p>
         </div>
       )}
     </div>

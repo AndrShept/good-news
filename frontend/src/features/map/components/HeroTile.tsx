@@ -31,7 +31,7 @@ export const HeroTile = memo(function HeroTile({ x, y, heroCountInTile, characte
         <GameIcon className="size-3" image={imageConfig.icon.state[state]} />
         <p>{name}</p>
 
-        {heroCountInTile > 1 && <p className="size-3.5 rounded-full  bg-red-800/70 leading-3.5 text-center text-[8px] text-white">{heroCountInTile}</p>}
+        {heroCountInTile > 1 && <p className="size-3.5 rounded-full  bg-teal-800 leading-3.5 text-center text-[8px] text-white">{heroCountInTile}</p>}
       </div>
     </div>
   );

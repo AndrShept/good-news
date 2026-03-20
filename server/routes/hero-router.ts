@@ -49,7 +49,6 @@ import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
 import { io } from '..';
-import { HeroSidebarList } from '../../frontend/src/features/map/components/HeroSidebarList';
 import { socketEvents } from '../../shared/socket-events';
 import type { Context } from '../context';
 import { db } from '../db/db';

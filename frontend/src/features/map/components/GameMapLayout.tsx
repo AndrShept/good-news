@@ -1,14 +1,13 @@
 import { useHero } from '@/features/hero/hooks/useHero';
-import { useQuery } from '@tanstack/react-query';
-import { Suspense, useEffect, useMemo, useRef } from 'react';
+import { useEffect } from 'react';
 
-import { getMapChunkEntitiesOptions } from '../api/get-map-heroes';
 import { useCenter } from '../hooks/useCenter';
 import { useGameMap } from '../hooks/useGameMap';
+import { useMapEntities } from '../hooks/useMapEntities';
 import { useScaleMap } from '../hooks/useScaleMap';
+import { EntitySidebar } from './EntitySidebar';
 import { GameMap } from './GameMap';
 import { HeroActionsBar } from './HeroActionsBar';
-import { HeroSidebarList } from './HeroSidebarList';
 
 export const GameMapLayout = () => {
   const hero = useHero((data) => ({
@@ -21,8 +20,7 @@ export const GameMapLayout = () => {
     state: data?.state ?? 'IDLE',
     gatheringFinishAt: data?.gatheringFinishAt ?? 0,
   }));
-  const { data: mapEntities, isLoading } = useQuery(getMapChunkEntitiesOptions(hero.mapId));
-
+  const { mapEntities, isLoading, heroesAtPosition, corpsesAtPosition, creaturesAtPosition } = useMapEntities();
   const map = useGameMap({ mapId: hero.mapId, chunkId: hero.chunkId });
 
   const heroWorldX = hero.x;
@@ -33,10 +31,6 @@ export const GameMapLayout = () => {
 
   const heroLocalX = heroWorldX - offsetX;
   const heroLocalY = heroWorldY - offsetY;
-  const heroesAtPosition = useMemo(
-    () => mapEntities?.heroes.filter((h) => h.x === heroWorldX && h.y === heroWorldY),
-    [heroWorldX, heroWorldY, mapEntities?.heroes],
-  );
 
   const { scale, callbackRef, containerRef } = useScaleMap();
 
@@ -52,8 +46,6 @@ export const GameMapLayout = () => {
     onCenter({ behavior: 'instant' });
   }, [hero.mapId]);
   useEffect(() => {
-    // if (!containerRef.current) return;
-
     onCenter({ behavior: 'smooth' });
   }, [map.data?.layers]);
   return (
@@ -67,7 +59,13 @@ export const GameMapLayout = () => {
           gatheringFinishAt={hero.gatheringFinishAt}
           state={hero.state}
         />
-        <HeroSidebarList heroes={heroesAtPosition} isLoading={isLoading} />
+        <EntitySidebar
+          mode="MAP"
+          creatures={creaturesAtPosition}
+          corpses={corpsesAtPosition}
+          heroes={heroesAtPosition}
+          isLoading={isLoading}
+        />
       </aside>
 
       <GameMap

@@ -1,5 +1,5 @@
 import { useHero } from '@/features/hero/hooks/useHero';
-import { HeroSidebarList } from '@/features/map/components/HeroSidebarList';
+import { EntitySidebar } from '@/features/map/components/EntitySidebar';
 import { Entrance } from '@/shared/types';
 import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useShopItemStore } from '@/store/useShopItemStore';
@@ -31,7 +31,9 @@ export const Place = () => {
       <PlaceSidebar entrances={entrances} setEntrances={setEntrances} place={placeData.data} />
       {!!entrances?.length && <PlaceEntrance entrances={entrances} />}
       <SelectedBuildingPage entrances={entrances} place={placeData.data} />
-      {selectedBuilding.selectBuilding?.type !== 'BANK' && <HeroSidebarList isLoading={placeHeroes.isLoading} heroes={placeHeroes.data} />}
+      {selectedBuilding.selectBuilding?.type !== 'BANK' && (
+        <EntitySidebar mode="PLACE" isLoading={placeHeroes.isLoading} heroes={placeHeroes.data} corpses={undefined} creatures={undefined} />
+      )}
     </section>
   );
 };

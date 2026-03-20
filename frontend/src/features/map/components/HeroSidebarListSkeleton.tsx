@@ -4,7 +4,7 @@ import React from 'react';
 export const HeroSidebarListSkeleton = () => {
   const items = Array.from({ length: 8 }, (_, idx) => idx);
   return (
-    <>
+    <ul className="hidden w-full max-w-[200px] select-text flex-col gap-1 p-1.5 sm:flex">
       {items.map((item) => (
         <div className="flex items-center gap-1.5 px-2 py-1" key={item}>
           <Skeleton className="size-8 shrink-0 rounded-full" />
@@ -14,6 +14,6 @@ export const HeroSidebarListSkeleton = () => {
           </div>
         </div>
       ))}
-    </>
+    </ul>
   );
 };
