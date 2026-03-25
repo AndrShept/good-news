@@ -4,8 +4,8 @@ import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
 import { skillExpConfig } from '../lib/config/skill-exp-config';
-import { itemTemplateService } from './item-template-service';
 import { deltaEventsService } from './delta-events-service';
+import { itemTemplateService } from './item-template-service';
 
 export const skillService = {
   getSkillBySkillTemplateId(heroId: string, skillTemplateId: string) {
@@ -59,12 +59,11 @@ export const skillService = {
       result.message = `Your skill in ${skillTemplate.name} has increased by ${increment}. It is now ${skill.level.toFixed(1)}  🔥`;
       result.isLevelUp = true;
     }
-    deltaEventsService.skillInstance.update(skill.id , {
-      currentExperience: 
-      skill.currentExperience,
+    deltaEventsService.skillInstance.update(skill.id, {
+      currentExperience: skill.currentExperience,
       level: skill.level,
-      expToLvl: skill.expToLvl
-    })
+      expToLvl: skill.expToLvl,
+    });
     return result;
   },
 
@@ -77,12 +76,20 @@ export const skillService = {
   },
   getLoreSkillKey(recipe: RecipeTemplate, coreResourceId: string | undefined) {
     const loreSkillByResourceCategory: Record<ResourceCategoryType, LoreSkillKey> = {
-      INGOT: 'INGOT_LORE',
-      LEATHER: 'LEATHER_LORE',
-      CLOTH: 'CLOTH_LORE',
       ORE: 'ORE_LORE',
-      WOOD: 'WOOD_LORE',
+      INGOT: 'METAL_LORE',
+      LOG: 'WOOD_LORE',
+      PLANK: 'WOOD_LORE',
+      HIDE: 'HIDE_LORE',
+      LEATHER: 'LEATHER_LORE',
+      FIBER: 'FIBER_LORE',
       HERB: 'HERB_LORE',
+      CLOTH: 'CLOTH_LORE',
+      FLOWER: 'FLOWER_LORE',
+      MUSHROOM: 'MUSHROOM_LORE',
+      FUR: 'FUR_LORE',
+      CURED_FUR: 'CURED_FUR_LORE',
+      BONE: 'ORE_LORE',
     };
 
     if (coreResourceId) {
@@ -98,12 +105,20 @@ export const skillService = {
     const template = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
     if (!template.resourceInfo) return;
     const loreSkillByResourceCategory: Record<ResourceCategoryType, LoreSkillKey> = {
-      INGOT: 'INGOT_LORE',
-      LEATHER: 'LEATHER_LORE',
-      CLOTH: 'CLOTH_LORE',
       ORE: 'ORE_LORE',
-      WOOD: 'WOOD_LORE',
+      INGOT: 'METAL_LORE',
+      LOG: 'WOOD_LORE',
+      PLANK: 'WOOD_LORE',
+      HIDE: 'HIDE_LORE',
+      LEATHER: 'LEATHER_LORE',
+      FIBER: 'FIBER_LORE',
       HERB: 'HERB_LORE',
+      CLOTH: 'CLOTH_LORE',
+      FLOWER: 'FLOWER_LORE',
+      MUSHROOM: 'MUSHROOM_LORE',
+      FUR: 'FUR_LORE',
+      CURED_FUR: 'CURED_FUR_LORE',
+      BONE: 'ORE_LORE',
     };
 
     return loreSkillByResourceCategory[template.resourceInfo.category];

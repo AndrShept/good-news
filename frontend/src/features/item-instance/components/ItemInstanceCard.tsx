@@ -1,7 +1,7 @@
 import { CustomTooltip } from '@/components/CustomTooltip';
 import { GameItemImg } from '@/components/GameItemImg';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ItemInstance, ItemTemplate } from '@/shared/types';
+import {  ItemInstance, ItemTemplate, ResourceType } from '@/shared/types';
 import { useSelectItemInstanceStore } from '@/store/useSelectItemInstanceStore';
 import { useDraggable } from '@dnd-kit/core';
 import { memo, useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import { useMoveItemInstance } from '../hooks/useMoveItemInstance';
 import { GameItemSlot } from './GameItemSlot';
 import { ItemInstanceCardDropdownMenu } from './ItemInstanceCardDropdownMenu';
 import { ItemInstanceCardHoverTooltip } from './ItemInstanceCardHoverTooltip';
+import { TINT_COLOR } from '@/lib/config';
 
 type Props = ItemInstance & {
   itemTemplate: ItemTemplate;
@@ -50,7 +51,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
           <CustomTooltip>
             <PopoverTrigger className="size-full">
               <CustomTooltip.Trigger>
-                <GameItemImg image={props.itemTemplate.image} />
+                <GameItemImg image={props.itemTemplate.image} tintColor={TINT_COLOR[props.itemTemplate.key as ResourceType]} />
 
                 {props.quantity > 1 && <div className="absolute bottom-0 right-1 text-[12px] font-semibold">{props.quantity}</div>}
               </CustomTooltip.Trigger>
@@ -59,7 +60,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
             <CustomTooltip.Content>
               {!props.isSelect && !isDragging && !over?.id && <ItemInstanceCardHoverTooltip {...props} />}
             </CustomTooltip.Content>
-            <PopoverContent className="bg-secondary flex items-center h-full  select-none w-fit p-1   rounded ">
+            <PopoverContent className="bg-secondary flex h-full w-fit select-none items-center rounded p-1">
               <ItemInstanceCardDropdownMenu {...props} />
             </PopoverContent>
           </CustomTooltip>

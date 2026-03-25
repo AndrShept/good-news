@@ -40,7 +40,7 @@ export const DndInventoryProvider = ({ children }: PropsWithChildren) => {
       }}
     >
       {children}
-      <DragOverlay dropAnimation={null}>{activeItem ? <GameItemImg image={activeItem.itemTemplate.image} /> : null}</DragOverlay>
+      <DragOverlay dropAnimation={null}>{activeItem ? <GameItemImg  image={activeItem.itemTemplate.image} /> : null}</DragOverlay>
     </DndContext>
   );
 };

@@ -1,8 +1,7 @@
 import { GameItemImg } from '@/components/GameItemImg';
 import { Button } from '@/components/ui/button';
 import { useGameData } from '@/features/hero/hooks/useGameData';
-import { materialConfig } from '@/lib/config';
-import { cn } from '@/lib/utils';
+import { materialConfig } from '@/lib/config';import { cn } from '@/lib/utils';
 import { CoreResourceType, QueueCraft } from '@/shared/types';
 import { X } from 'lucide-react';
 import React, { memo, useEffect, useState } from 'react';

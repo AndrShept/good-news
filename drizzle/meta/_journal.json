@@ -50,6 +50,13 @@
       "when": 1772703863194,
       "tag": "0006_condemned_lady_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1774180656552,
+      "tag": "0007_spicy_exodus",
+      "breakpoints": true
     }
   ]
 }

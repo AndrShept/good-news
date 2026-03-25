@@ -1,3 +1,4 @@
+import type { SkillKey } from '@/shared/templates/skill-template';
 import type { ActiveSkillTraining, IHeroStat, THeroRegen, TLocation } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { boolean, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
@@ -9,20 +10,23 @@ import { itemContainerTable } from './item-container-schema';
 import { locationTable } from './location-schema';
 import { modifierTable } from './modifier-schema';
 
-export const stateTypeEnum = pgEnum('state_type_enum', [
-  'IDLE',
-  'BATTLE',
-  'BLACKSMITHING',
-  'ALCHEMY',
-  'FISHING',
-  'LUMBERJACKING',
-  'FORAGING',
-  'SKINNING',
-  'MINING',
-  'SMELTING',
-  'TAILORING',
-  'WALK',
-]);
+const state: Extract<
+  SkillKey,
+  | 'SMELTING'
+  | 'TANNING'
+  | 'WEAVING'
+  | 'SAWMILLING'
+  | 'BLACKSMITHING'
+  | 'TAILORING'
+  | 'ALCHEMY'
+  | 'CARPENTRY'
+  | 'FISHING'
+  | 'LOGGING'
+  | 'MINING'
+  | 'SKINNING'
+  | 'FORAGING'
+>[] = [];
+export const stateTypeEnum = pgEnum('state_type_enum', ['IDLE', 'BATTLE', 'WALK', ...state]);
 
 export const heroTable = pgTable('hero', {
   id: uuid().primaryKey().notNull(),

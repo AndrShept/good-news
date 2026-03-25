@@ -4,7 +4,7 @@ export const armorTemplate = [
   {
     id: 'e0785970-3c64-4187-b00b-13e3c3f34f55',
     name: 'plate armor',
-    image: '/sprites/equipments/breastplates/Icon1.jpg',
+    image: '/sprites/equipments/armor/162.png',
     key: 'plate_armor',
     type: 'ARMOR',
     stackable: false,

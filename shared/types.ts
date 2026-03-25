@@ -18,9 +18,16 @@ import {
 import { userTable } from '../server/db/schema/auth-schema';
 import { commentTable } from '../server/db/schema/comments-schema';
 import type {
+  boneTypeEnum,
   clothTypeEnum,
   coreResourceTypeEnum,
+  curedFurTypeEnum,
+  fiberTypeEnum,
+  furTypeEnum,
+  hideTypeEnum,
   itemInstanceTable,
+  logTypeEnum,
+  plankTypeEnum,
   rarityEnum,
   slotEnum,
 } from '../server/db/schema/item-instance-schema';
@@ -174,10 +181,19 @@ export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
 export type StateType = (typeof stateTypeEnum.enumValues)[number];
 export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];
+
 export type OreType = (typeof oreTypeEnum.enumValues)[number];
-export type LeatherType = (typeof leatherTypeEnum.enumValues)[number];
 export type IngotType = (typeof ingotTypeEnum.enumValues)[number];
+export type HideType = (typeof hideTypeEnum.enumValues)[number];
+export type LeatherType = (typeof leatherTypeEnum.enumValues)[number];
+export type LogType = (typeof logTypeEnum.enumValues)[number];
+export type PlankType = (typeof plankTypeEnum.enumValues)[number];
+export type FurType = (typeof furTypeEnum.enumValues)[number];
+export type CuredFurType = (typeof curedFurTypeEnum.enumValues)[number];
+export type FiberType = (typeof fiberTypeEnum.enumValues)[number];
 export type ClothType = (typeof clothTypeEnum.enumValues)[number];
+export type BoneType = (typeof boneTypeEnum.enumValues)[number];
+
 export type CoreResourceType = (typeof coreResourceTypeEnum.enumValues)[number];
 export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[number];
 export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
@@ -356,7 +372,6 @@ export type ItemTemplate = {
   image: string;
   key: string;
   stackable: boolean;
-  rarity?: RarityType;
   description?: string;
   maxStack?: number;
   buyPrice?: number;

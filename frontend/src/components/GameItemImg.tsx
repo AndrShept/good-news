@@ -1,21 +1,46 @@
 import { cn } from '@/lib/utils';
-import React, { ComponentProps, memo } from 'react';
+import { ComponentProps, memo } from 'react';
 
-interface Props extends ComponentProps<'img'> {
+export interface TintColor {
+  color: [number, number, number];
+  brightness?: number;
+  saturate?: number;
+  contrast?: number;
+}
+
+interface Props extends Omit<ComponentProps<'img'>, 'src'> {
   image: string | undefined;
+  tintColor: TintColor | null | undefined
   isPixelate?: boolean;
 }
 
-export const GameItemImg = memo(({ image, isPixelate = true, className, ...props }: Props) => {
+export const GameItemImg = memo(({ image, tintColor, isPixelate = true, className, ...props }: Props) => {
+  const filter = tintColor ? buildTintFilter(tintColor.color) : undefined;
+  console.log(tintColor);
   return (
-    <>
-      <img
-        {...props}
-        style={{ imageRendering: isPixelate ? 'pixelated' : undefined }}
-        className={cn('size-full object-contain opacity-85 select-none group-hover:opacity-100', className)}
-        src={image}
-        alt={image?.split('/').at(-1)}
-      />
-    </>
+    <img
+      {...props}
+      src={image}
+      alt={image?.split('/').at(-1)}
+      style={{
+        imageRendering: isPixelate ? 'pixelated' : undefined,
+        filter:
+          filter +
+          `
+        saturate(${tintColor?.saturate ?? 1})
+        brightness(${tintColor?.brightness ?? 1})
+        contrast(${tintColor?.contrast ?? 1})
+        `,
+      }}
+      className={cn('size-full select-none object-contain opacity-85 group-hover:opacity-100', className)}
+    />
   );
 });
+
+function buildTintFilter([r, g, b]: [number, number, number]): string {
+  const rm = r / 255;
+  const gm = g / 255;
+  const bm = b / 255;
+
+  return `url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='t'><feColorMatrix type='matrix' values='${rm} 0 0 0 0  0 ${gm} 0 0 0  0 0 ${bm} 0 0  0 0 0 1 0'/></filter></svg>#t")`;
+}
