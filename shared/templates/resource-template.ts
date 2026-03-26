@@ -1,183 +1,155 @@
 import { imageConfig } from '@/shared/config/image-config';
 import { DEFAULT_ITEM_STACK } from '@/shared/constants';
-import type { ItemTemplate } from '@/shared/types';
+import type { ItemTemplate, ResourceCategoryType, ResourceType } from '@/shared/types';
 
-
-
-
-
+const createResource = (id: string, key: ResourceType, category: ResourceCategoryType, image: string): ItemTemplate => ({
+  id,
+  key,
+  name: key.toLowerCase().replace(/_/g, ' '),
+  image,
+  type: 'RESOURCES',
+  stackable: true,
+  maxStack: DEFAULT_ITEM_STACK.RESOURCE,
+  resourceInfo: {
+    category,
+  },
+});
 
 export const resourceTemplate = [
-  {
-    id: '0199df54-be65-7db2-af0a-1002d323d64d',
-    key: 'IRON_ORE',
-    name: 'iron ore',
-    image: imageConfig.icon.RESOURCES.ORE,
-    type: 'RESOURCES',
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'ORE',
-    },
-  },
-  {
-    id: '0199df74-c722-7695-96d9-59a701689d03',
-    key: 'COPPER_ORE',
-    name: 'copper ore',
-    image: imageConfig.icon.RESOURCES.ORE,
-    type: 'RESOURCES',
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'ORE',
-    },
-  },
-  {
-    id: '019ac735-a9c0-7e79-98cb-e392af762b03',
-    key: 'SILVER_ORE',
-    name: 'silver ore',
-    image: imageConfig.icon.RESOURCES.ORE,
-    type: 'RESOURCES',
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'ORE',
-    },
-  },
-  {
-    id: '019ac738-6ec9-7763-b633-d5ed4046b6f0',
-    key: 'GOLD_ORE',
-    name: 'gold ore',
-    image: imageConfig.icon.RESOURCES.ORE,
-    type: 'RESOURCES',
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'ORE',
-    },
-  },
-  {
-    id: '019ac738-e2f2-79a0-9f96-968231e0853e',
-    key: 'MITHRIL_ORE',
-    name: 'mithril ore',
-    image: imageConfig.icon.RESOURCES.ORE,
-    type: 'RESOURCES',
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'ORE',
-    },
-  },
-  {
-    id: '019ac739-be74-7813-9a75-8e8b0710a51e',
-    key: 'ADAMANTINE_ORE',
-    name: 'adamantine ore',
-    image: imageConfig.icon.RESOURCES.ORE,
-    type: 'RESOURCES',
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'ORE',
-    },
-  },
-  {
-    id: '019ac73a-d3f4-7c91-90b5-e0756f68d876',
-    key: 'IRON_INGOT',
-    name: 'iron ingot',
-    image: imageConfig.icon.RESOURCES.INGOT,
-    type: 'RESOURCES',
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'INGOT',
-    },
-  },
-  {
-    id: '019ac73d-200f-7bf0-9afc-567a9fbe6a37',
-    key: 'COPPER_INGOT',
-    name: 'copper ingot',
-    image: imageConfig.icon.RESOURCES.INGOT,
-    type: 'RESOURCES',
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'INGOT',
-    },
-  },
-  {
-    id: '019ac73d-d28e-7d2f-87ed-3de08098de4f',
-    key: 'SILVER_INGOT',
-    name: 'silver ingot',
-    image: imageConfig.icon.RESOURCES.INGOT,
-    type: 'RESOURCES',
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'INGOT',
-    },
-  },
-  {
-    id: '019ac73e-4757-7ab9-9483-b90209e9761a',
-    key: 'GOLD_INGOT',
-    name: 'gold ingot',
-    image: imageConfig.icon.RESOURCES.INGOT,
-    type: 'RESOURCES',
+  // ===== ORE =====
+  createResource('019f0000-0000-7000-8000-000000000001', 'IRON_ORE', 'ORE', imageConfig.icon.RESOURCES.ORE),
+  createResource('019f0000-0000-7000-8000-000000000002', 'COPPER_ORE', 'ORE', imageConfig.icon.RESOURCES.ORE),
+  createResource('019f0000-0000-7000-8000-000000000003', 'SILVER_ORE', 'ORE', imageConfig.icon.RESOURCES.ORE),
+  createResource('019f0000-0000-7000-8000-000000000004', 'GOLD_ORE', 'ORE', imageConfig.icon.RESOURCES.ORE),
+  createResource('019f0000-0000-7000-8000-000000000005', 'MITHRIL_ORE', 'ORE', imageConfig.icon.RESOURCES.ORE),
+  createResource('019f0000-0000-7000-8000-000000000006', 'ADAMANTINE_ORE', 'ORE', imageConfig.icon.RESOURCES.ORE),
 
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'INGOT',
-    },
-  },
-  {
-    id: '019ac73e-bd49-739f-a996-78e034cdb769',
-    key: 'MITHRIL_INGOT',
-    name: 'mithril ingot',
-    image: imageConfig.icon.RESOURCES.INGOT,
-    type: 'RESOURCES',
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'INGOT',
-    },
-  },
-  {
-    id: '019ac73f-2e95-78cf-b9c5-f8e7f33e960d',
-    key: 'ADAMANTINE_INGOT',
-    name: 'adamantine ingot',
-    image: imageConfig.icon.RESOURCES.INGOT,
-    type: 'RESOURCES',
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'INGOT',
-    },
-  },
-  {
-    id: '019abb58-1d6a-7b1f-b277-409189ddfc64',
-    key: 'REGULAR_LEATHER',
-    name: 'regular leather',
-    image: imageConfig.icon.RESOURCES['REGULAR_LEATHER'],
-    type: 'RESOURCES',
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'LEATHER',
-    },
-  },
-  {
-    id: '019d1569-9f05-764c-969c-0b8cdf00566e',
-    key: 'REGULAR_BONE',
-    name: 'regular bone',
-    image: imageConfig.icon.RESOURCES.REGULAR_BONE,
-    type: 'RESOURCES',
-    stackable: true,
-    maxStack: DEFAULT_ITEM_STACK.RESOURCE,
-    resourceInfo: {
-      category: 'BONE',
-    },
-  },
+  // ===== INGOT =====
+  createResource('019f0000-0000-7000-8000-000000000011', 'IRON_INGOT', 'INGOT', imageConfig.icon.RESOURCES.INGOT),
+  createResource('019f0000-0000-7000-8000-000000000012', 'COPPER_INGOT', 'INGOT', imageConfig.icon.RESOURCES.INGOT),
+  createResource('019f0000-0000-7000-8000-000000000013', 'SILVER_INGOT', 'INGOT', imageConfig.icon.RESOURCES.INGOT),
+  createResource('019f0000-0000-7000-8000-000000000014', 'GOLD_INGOT', 'INGOT', imageConfig.icon.RESOURCES.INGOT),
+  createResource('019f0000-0000-7000-8000-000000000015', 'MITHRIL_INGOT', 'INGOT', imageConfig.icon.RESOURCES.INGOT),
+  createResource('019f0000-0000-7000-8000-000000000016', 'ADAMANTINE_INGOT', 'INGOT', imageConfig.icon.RESOURCES.INGOT),
+
+  // ===== LOG =====
+  createResource('019f0000-0000-7000-8000-000000000021', 'REGULAR_LOG', 'LOG', imageConfig.icon.RESOURCES.LOG),
+  createResource('019f0000-0000-7000-8000-000000000022', 'PINE_LOG', 'LOG', imageConfig.icon.RESOURCES.LOG),
+  createResource('019f0000-0000-7000-8000-000000000023', 'OAK_LOG', 'LOG', imageConfig.icon.RESOURCES.LOG),
+  createResource('019f0000-0000-7000-8000-000000000024', 'ASH_LOG', 'LOG', imageConfig.icon.RESOURCES.LOG),
+  createResource('019f0000-0000-7000-8000-000000000025', 'YEW_LOG', 'LOG', imageConfig.icon.RESOURCES.LOG),
+  createResource('019f0000-0000-7000-8000-000000000026', 'MAHOGANY_LOG', 'LOG', imageConfig.icon.RESOURCES.LOG),
+  createResource('019f0000-0000-7000-8000-000000000027', 'EBONY_LOG', 'LOG', imageConfig.icon.RESOURCES.LOG),
+  createResource('019f0000-0000-7000-8000-000000000028', 'BLOOD_LOG', 'LOG', imageConfig.icon.RESOURCES.LOG),
+  createResource('019f0000-0000-7000-8000-000000000029', 'GHOST_LOG', 'LOG', imageConfig.icon.RESOURCES.LOG),
+
+  // ===== PLANK =====
+  createResource('019f0000-0000-7000-8000-000000000031', 'REGULAR_PLANK', 'PLANK', imageConfig.icon.RESOURCES.PLANK),
+  createResource('019f0000-0000-7000-8000-000000000032', 'PINE_PLANK', 'PLANK', imageConfig.icon.RESOURCES.PLANK),
+  createResource('019f0000-0000-7000-8000-000000000033', 'OAK_PLANK', 'PLANK', imageConfig.icon.RESOURCES.PLANK),
+  createResource('019f0000-0000-7000-8000-000000000034', 'ASH_PLANK', 'PLANK', imageConfig.icon.RESOURCES.PLANK),
+  createResource('019f0000-0000-7000-8000-000000000035', 'YEW_PLANK', 'PLANK', imageConfig.icon.RESOURCES.PLANK),
+  createResource('019f0000-0000-7000-8000-000000000036', 'MAHOGANY_PLANK', 'PLANK', imageConfig.icon.RESOURCES.PLANK),
+  createResource('019f0000-0000-7000-8000-000000000037', 'EBONY_PLANK', 'PLANK', imageConfig.icon.RESOURCES.PLANK),
+  createResource('019f0000-0000-7000-8000-000000000038', 'BLOOD_PLANK', 'PLANK', imageConfig.icon.RESOURCES.PLANK),
+  createResource('019f0000-0000-7000-8000-000000000039', 'GHOST_PLANK', 'PLANK', imageConfig.icon.RESOURCES.PLANK),
+
+  // ===== HIDE =====
+  createResource('019f0000-0000-7000-8000-000000000041', 'REGULAR_HIDE', 'HIDE', imageConfig.icon.RESOURCES.HIDE),
+  createResource('019f0000-0000-7000-8000-000000000042', 'ROUGH_HIDE', 'HIDE', imageConfig.icon.RESOURCES.HIDE),
+  createResource('019f0000-0000-7000-8000-000000000043', 'REPTILE_HIDE', 'HIDE', imageConfig.icon.RESOURCES.HIDE),
+  createResource('019f0000-0000-7000-8000-000000000044', 'IRON_HIDE', 'HIDE', imageConfig.icon.RESOURCES.HIDE),
+  createResource('019f0000-0000-7000-8000-000000000045', 'DEMON_HIDE', 'HIDE', imageConfig.icon.RESOURCES.HIDE),
+  createResource('019f0000-0000-7000-8000-000000000046', 'DRAGON_HIDE', 'HIDE', imageConfig.icon.RESOURCES.HIDE),
+
+  // ===== LEATHER =====
+  createResource('019f0000-0000-7000-8000-000000000051', 'REGULAR_LEATHER', 'LEATHER', imageConfig.icon.RESOURCES.LEATHER),
+  createResource('019f0000-0000-7000-8000-000000000052', 'ROUGH_LEATHER', 'LEATHER', imageConfig.icon.RESOURCES.LEATHER),
+  createResource('019f0000-0000-7000-8000-000000000053', 'REPTILE_LEATHER', 'LEATHER', imageConfig.icon.RESOURCES.LEATHER),
+  createResource('019f0000-0000-7000-8000-000000000054', 'IRON_LEATHER', 'LEATHER', imageConfig.icon.RESOURCES.LEATHER),
+  createResource('019f0000-0000-7000-8000-000000000055', 'DEMON_LEATHER', 'LEATHER', imageConfig.icon.RESOURCES.LEATHER),
+  createResource('019f0000-0000-7000-8000-000000000056', 'DRAGON_LEATHER', 'LEATHER', imageConfig.icon.RESOURCES.LEATHER),
+
+  // ===== FUR =====
+  createResource('019f0000-0000-7000-8000-000000000061', 'REGULAR_FUR', 'FUR', imageConfig.icon.RESOURCES.FUR),
+  createResource('019f0000-0000-7000-8000-000000000062', 'THICK_FUR', 'FUR', imageConfig.icon.RESOURCES.FUR),
+  createResource('019f0000-0000-7000-8000-000000000063', 'DARK_FUR', 'FUR', imageConfig.icon.RESOURCES.FUR),
+  createResource('019f0000-0000-7000-8000-000000000064', 'SHADOW_FUR', 'FUR', imageConfig.icon.RESOURCES.FUR),
+  createResource('019f0000-0000-7000-8000-000000000065', 'SNOW_FUR', 'FUR', imageConfig.icon.RESOURCES.FUR),
+
+  // ===== CURED FUR =====
+  createResource('019f0000-0000-7000-8000-000000000071', 'REGULAR_CURED_FUR', 'CURED_FUR', imageConfig.icon.RESOURCES.CURED_FUR),
+  createResource('019f0000-0000-7000-8000-000000000072', 'THICK_CURED_FUR', 'CURED_FUR', imageConfig.icon.RESOURCES.CURED_FUR),
+  createResource('019f0000-0000-7000-8000-000000000073', 'DARK_CURED_FUR', 'CURED_FUR', imageConfig.icon.RESOURCES.CURED_FUR),
+  createResource('019f0000-0000-7000-8000-000000000074', 'SHADOW_CURED_FUR', 'CURED_FUR', imageConfig.icon.RESOURCES.CURED_FUR),
+  createResource('019f0000-0000-7000-8000-000000000075', 'SNOW_CURED_FUR', 'CURED_FUR', imageConfig.icon.RESOURCES.CURED_FUR),
+
+  // ===== FIBER / CLOTH =====
+  createResource('019f0000-0000-7000-8000-000000000081', 'COTTON', 'FIBER', imageConfig.icon.RESOURCES.COTTON),
+  createResource('019f0000-0000-7000-8000-000000000082', 'FLAX', 'FIBER', imageConfig.icon.RESOURCES.FLAX),
+  createResource('019f0000-0000-7000-8000-000000000083', 'REGULAR_CLOTH', 'CLOTH', imageConfig.icon.RESOURCES.CLOTH),
+
+  // ===== BONE =====
+  createResource('019f0000-0000-7000-8000-000000000091', 'REGULAR_BONE', 'BONE', imageConfig.icon.RESOURCES.BONE),
+
+  // ===== MUSHROOMS =====
+  createResource(
+    '019f1000-0000-7000-8000-000000000092',
+    'REDCAP_MUSHROOM',
+    'MUSHROOM',
+    imageConfig.icon.RESOURCES.mushrooms.REDCAP_MUSHROOM,
+  ),
+  createResource(
+    '019f1000-0000-7000-8000-000000000093',
+    'GLOWCAP_MUSHROOM',
+    'MUSHROOM',
+    imageConfig.icon.RESOURCES.mushrooms.GLOWCAP_MUSHROOM,
+  ),
+  createResource(
+    '019f1000-0000-7000-8000-000000000094',
+    'SHADOWCAP_MUSHROOM',
+    'MUSHROOM',
+    imageConfig.icon.RESOURCES.mushrooms.SHADOWCAP_MUSHROOM,
+  ),
+  createResource(
+    '019f1000-0000-7000-8000-000000000095',
+    'IRONCAP_MUSHROOM',
+    'MUSHROOM',
+    imageConfig.icon.RESOURCES.mushrooms.IRONCAP_MUSHROOM,
+  ),
+  createResource(
+    '019f1000-0000-7000-8000-000000000096',
+    'SPORECAP_MUSHROOM',
+    'MUSHROOM',
+    imageConfig.icon.RESOURCES.mushrooms.SPORECAP_MUSHROOM,
+  ),
+  createResource(
+    '019f1000-0000-7000-8000-000000000097',
+    'FROSTCAP_MUSHROOM',
+    'MUSHROOM',
+    imageConfig.icon.RESOURCES.mushrooms.FROSTCAP_MUSHROOM,
+  ),
+
+  // ===== HERBS =====
+  createResource('019f1000-0000-7000-8000-000000000098', 'GREENLEAF', 'HERB', imageConfig.icon.RESOURCES.herbs.GREENLEAF),
+  createResource('019f1000-0000-7000-8000-000000000099', 'SWIFTLEAF', 'HERB', imageConfig.icon.RESOURCES.herbs.SWIFTLEAF),
+  createResource('019f1000-0000-7000-8000-000000000100', 'BITTERROOT', 'HERB', imageConfig.icon.RESOURCES.herbs.BITTERROOT),
+  createResource('019f1000-0000-7000-8000-000000000101', 'SUNGRASS', 'HERB', imageConfig.icon.RESOURCES.herbs.SUNGRASS),
+  createResource('019f1000-0000-7000-8000-000000000102', 'GHOST_HERB', 'HERB', imageConfig.icon.RESOURCES.herbs.GHOST_HERB),
+  createResource('019f1000-0000-7000-8000-000000000103', 'BLOOD_HERB', 'HERB', imageConfig.icon.RESOURCES.herbs.BLOOD_HERB),
+  createResource('019f1000-0000-7000-8000-000000000250', 'JASMINE', 'HERB', imageConfig.icon.RESOURCES.herbs.JASMINE),
+
+  // ===== FLOWERS =====
+  createResource('019f1000-0000-7000-8000-000000000104', 'ROSE', 'FLOWER', imageConfig.icon.RESOURCES.flowers.ROSE),
+  createResource('019f1000-0000-7000-8000-000000000105', 'SUNFLOWER', 'FLOWER', imageConfig.icon.RESOURCES.flowers.SUNFLOWER),
+  createResource('019f1000-0000-7000-8000-000000000106', 'BLUE_ORCHID', 'FLOWER', imageConfig.icon.RESOURCES.flowers.BLUE_ORCHID),
+  createResource('019f1000-0000-7000-8000-000000000107', 'NIGHT_BLOOM', 'FLOWER', imageConfig.icon.RESOURCES.flowers.NIGHT_BLOOM),
+  createResource('019f1000-0000-7000-8000-000000000108', 'FIRE_BLOSSOM', 'FLOWER', imageConfig.icon.RESOURCES.flowers.FIRE_BLOSSOM),
+  createResource('019f1000-0000-7000-8000-000000000109', 'FROST_LILY', 'FLOWER', imageConfig.icon.RESOURCES.flowers.FROST_LILY),
 ] as const satisfies ItemTemplate[];
+
+const resourceKeys = resourceTemplate.map((r) => r.key);
+export type ResourceKey = (typeof resourceKeys)[number];
 
 export const resourceTemplateById = resourceTemplate.reduce(
   (acc, template) => {
@@ -186,9 +158,6 @@ export const resourceTemplateById = resourceTemplate.reduce(
   },
   {} as Record<string, ItemTemplate>,
 );
-
-const resourceKeys = resourceTemplate.map((r) => r.key);
-export type ResourceKey = (typeof resourceKeys)[number];
 
 export const resourceTemplateByKey = resourceTemplate.reduce(
   (acc, template) => {

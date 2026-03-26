@@ -1,14 +1,6 @@
 import { TintColor } from '@/components/GameItemImg';
 import { imageConfig } from '@/shared/config/image-config';
-import {
-  ArmorType,
-  CoreResourceType,
-  EquipmentSlotType,
-
-  ResourceType,
-  WeaponType,
-
-} from '@/shared/types';
+import { ArmorType, ColoredResourceType, CoreResourceType, EquipmentSlotType, ResourceType, WeaponType } from '@/shared/types';
 
 export const parentVariants = {
   hidden: { opacity: 0 },
@@ -179,53 +171,52 @@ export const TINT_COLOR = {
   MITHRIL_ORE: { color: [80, 140, 220], brightness: 1.2, saturate: 1.4, contrast: 1.2 },
   ADAMANTINE_ORE: { color: [60, 200, 140], brightness: 1.3, saturate: 1.5, contrast: 1.2 },
 
-  REGULAR_FUR: null,
-  THICK_FUR: { color: [130, 100, 60], brightness: 0.9, saturate: 1.1, contrast: 1.1 },
-  DARK_FUR: { color: [80, 65, 50], brightness: 0.8, saturate: 1.2, contrast: 1.2 },
-  SHADOW_FUR: { color: [40, 35, 55], brightness: 0.7, saturate: 1.3, contrast: 1.4 },
-  SNOW_FUR: { color: [230, 235, 240], brightness: 1.3, saturate: 0.4, contrast: 1.2 },
+  REGULAR_FUR: { color: [190, 100, 60], brightness: 1.0, saturate: 1.1, contrast: 1 },
+  THICK_FUR: { color: [100, 80, 80], brightness: 1.1, saturate: 1, contrast: 1.2 },
+  DARK_FUR: { color: [30, 30, 40], brightness: 1.2, saturate: 1, contrast: 1.1 },
+  SHADOW_FUR: { color: [40, 25, 55], brightness: 1.1, saturate: 1, contrast: 1.1 },
+  SNOW_FUR: { color: [230, 635, 240], brightness: 1.1, saturate: 0.5, contrast: 1.1 },
 
-  REGULAR_CURED_FUR: null,
-  THICK_CURED_FUR: { color: [130, 100, 60], brightness: 0.9, saturate: 1.1, contrast: 1.1 },
-  DARK_CURED_FUR: { color: [80, 65, 50], brightness: 0.8, saturate: 1.2, contrast: 1.2 },
-  SHADOW_CURED_FUR: { color: [40, 35, 55], brightness: 0.7, saturate: 1.3, contrast: 1.4 },
-  SNOW_CURED_FUR: { color: [230, 235, 240], brightness: 1.3, saturate: 0.4, contrast: 1.2 },
+  REGULAR_CURED_FUR: { color: [190, 100, 60], brightness: 1.0, saturate: 1.1, contrast: 1 },
+  THICK_CURED_FUR: { color: [100, 80, 80], brightness: 1.1, saturate: 1, contrast: 1.2 },
+  DARK_CURED_FUR: { color: [30, 30, 40], brightness: 1.2, saturate: 1, contrast: 1.1 },
+  SHADOW_CURED_FUR: { color: [40, 25, 55], brightness: 1.1, saturate: 1, contrast: 1.1 },
+  SNOW_CURED_FUR: { color: [230, 635, 240], brightness: 1.1, saturate: 0.5, contrast: 1.1 },
 
-  REGULAR_HIDE: null,
-  ROUGH_HIDE: { color: [120, 75, 40], brightness: 0.9, saturate: 1.1, contrast: 1.1 },
-  REPTILE_HIDE: { color: [60, 140, 70], brightness: 0.95, saturate: 1.4, contrast: 1.2 },
-  IRON_HIDE: { color: [180, 180, 190], brightness: 1.0, saturate: 0.8, contrast: 1.2 },
-  DEMON_HIDE: { color: [150, 30, 20], brightness: 0.8, saturate: 1.5, contrast: 1.4 },
-  DRAGON_HIDE: { color: [160, 20, 20], brightness: 0.9, saturate: 1.6, contrast: 1.5 },
+  REGULAR_HIDE: { color: [190, 90, 50], brightness: 0.9, saturate: 1, contrast: 1 },
+  ROUGH_HIDE: { color: [150, 50, 0], brightness: 1, saturate: 1.1, contrast: 1.1 },
+  REPTILE_HIDE: { color: [80, 100, 50], brightness: 1.3, saturate: 1.5, contrast: 1.3 },
+  IRON_HIDE: { color: [180, 180, 190], brightness: 1.2, saturate: 0.8, contrast: 1.2 },
+  DEMON_HIDE: { color: [70, 0, 0], brightness: 1.1, saturate: 1.2, contrast: 1.4 },
+  DRAGON_HIDE: { color: [200, 0, 0], brightness: 1, saturate: 1, contrast: 1 },
 
-  REGULAR_LEATHER: null,
-  ROUGH_LEATHER: { color: [120, 75, 40], brightness: 0.9, saturate: 1.1, contrast: 1.1 },
-  REPTILE_LEATHER: { color: [60, 140, 70], brightness: 0.95, saturate: 1.4, contrast: 1.2 },
-  IRON_LEATHER: { color: [180, 180, 190], brightness: 1.0, saturate: 0.8, contrast: 1.2 },
-  DEMON_LEATHER: { color: [150, 30, 20], brightness: 0.8, saturate: 1.5, contrast: 1.4 },
-  DRAGON_LEATHER: { color: [160, 20, 20], brightness: 0.9, saturate: 1.6, contrast: 1.5 },
+  REGULAR_LEATHER: { color: [190, 90, 50], brightness: 0.9, saturate: 1, contrast: 1 },
+  ROUGH_LEATHER: { color: [150, 50, 0], brightness: 1, saturate: 1.1, contrast: 1.1 },
+  REPTILE_LEATHER: { color: [80, 100, 50], brightness: 1.3, saturate: 1.5, contrast: 1.3 },
+  IRON_LEATHER: { color: [180, 180, 190], brightness: 1.2, saturate: 0.8, contrast: 1.2 },
+  DEMON_LEATHER: { color: [70, 0, 0], brightness: 1.1, saturate: 1.2, contrast: 1.4 },
+  DRAGON_LEATHER: { color: [200, 0, 0], brightness: 1, saturate: 1, contrast: 1 },
 
-  REGULAR_LOG: null,
-  PINE_LOG: { color: [210, 180, 120], brightness: 1.1, saturate: 0.9, contrast: 1.1 },
-  OAK_LOG: { color: [160, 110, 60], brightness: 1.0, saturate: 1.0, contrast: 1.1 },
+  REGULAR_LOG: { color: [190, 90, 60], brightness: 1.1, saturate: 1.0, contrast: 1.1 },
+  PINE_LOG: { color: [250, 240, 50], brightness: 1.1, saturate: 1, contrast: 1.1 },
+  OAK_LOG: { color: [130, 100, 60], brightness: 1.4, saturate: 0.8, contrast: 1.1 },
   ASH_LOG: { color: [200, 195, 180], brightness: 1.1, saturate: 0.7, contrast: 1.0 },
-  YEW_LOG: { color: [140, 70, 50], brightness: 1.0, saturate: 1.2, contrast: 1.2 },
-  MAHOGANY_LOG: { color: [160, 50, 30], brightness: 0.9, saturate: 1.3, contrast: 1.3 },
-  EBONY_LOG: { color: [50, 30, 70], brightness: 0.8, saturate: 1.4, contrast: 1.4 },
-  BLOOD_LOG: { color: [180, 20, 20], brightness: 0.9, saturate: 1.5, contrast: 1.4 },
-  GHOST_LOG: { color: [160, 190, 220], brightness: 1.2, saturate: 0.6, contrast: 1.1 },
+  YEW_LOG: { color: [120, 70, 60], brightness: 1.1, saturate: 1.4, contrast: 1.2 },
+  MAHOGANY_LOG: { color: [170, 0, 30], brightness: 1.2, saturate: 1, contrast: 1 },
+  EBONY_LOG: { color: [100, 0, 250], brightness: 1, saturate: 1, contrast: 1.1 },
+  BLOOD_LOG: { color: [180, 20, 20], brightness: 0.9, saturate: 1.5, contrast: 1.3 },
+  GHOST_LOG: { color: [100, 100, 600], brightness: 1.4, saturate: 0.4, contrast: 1.1 },
 
-  REGULAR_PLANK: null,
-  PINE_PLANK: { color: [210, 180, 120], brightness: 1.1, saturate: 0.9, contrast: 1.1 },
-  OAK_PLANK: { color: [160, 110, 60], brightness: 1.0, saturate: 1.0, contrast: 1.1 },
+  REGULAR_PLANK: { color: [190, 90, 60], brightness: 1.1, saturate: 1.0, contrast: 1.1 },
+  PINE_PLANK: { color: [250, 240, 50], brightness: 1.1, saturate: 1, contrast: 1.1 },
+  OAK_PLANK: { color: [130, 100, 60], brightness: 1.4, saturate: 0.8, contrast: 1.1 },
   ASH_PLANK: { color: [200, 195, 180], brightness: 1.1, saturate: 0.7, contrast: 1.0 },
-  YEW_PLANK: { color: [140, 70, 50], brightness: 1.0, saturate: 1.2, contrast: 1.2 },
-  MAHOGANY_PLANK: { color: [160, 50, 30], brightness: 0.9, saturate: 1.3, contrast: 1.3 },
-  EBONY_PLANK: { color: [50, 30, 70], brightness: 0.8, saturate: 1.4, contrast: 1.4 },
-  BLOOD_PLANK: { color: [180, 20, 20], brightness: 0.9, saturate: 1.5, contrast: 1.4 },
-  GHOST_PLANK: { color: [160, 190, 220], brightness: 1.2, saturate: 0.6, contrast: 1.1 },
+  YEW_PLANK: { color: [120, 70, 60], brightness: 1.1, saturate: 1.4, contrast: 1.2 },
+  MAHOGANY_PLANK: { color: [170, 0, 30], brightness: 1.2, saturate: 1, contrast: 1 },
+  EBONY_PLANK: { color: [100, 0, 250], brightness: 1, saturate: 1, contrast: 1.1 },
+  BLOOD_PLANK: { color: [180, 20, 20], brightness: 0.9, saturate: 1.5, contrast: 1.3 },
+  GHOST_PLANK: { color: [100, 100, 600], brightness: 1.4, saturate: 0.4, contrast: 1.1 },
 
   REGULAR_BONE: null,
   REGULAR_CLOTH: null,
-
-} as const satisfies Record<Exclude<ResourceType, 'FIBER'>, TintColor | null>;
+} as const satisfies Record<ColoredResourceType, TintColor | null>;

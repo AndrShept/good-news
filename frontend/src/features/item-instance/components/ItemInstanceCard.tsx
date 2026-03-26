@@ -1,7 +1,7 @@
 import { CustomTooltip } from '@/components/CustomTooltip';
 import { GameItemImg } from '@/components/GameItemImg';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import {  ItemInstance, ItemTemplate, ResourceType } from '@/shared/types';
+import {  ColoredResourceType, ItemInstance, ItemTemplate } from '@/shared/types';
 import { useSelectItemInstanceStore } from '@/store/useSelectItemInstanceStore';
 import { useDraggable } from '@dnd-kit/core';
 import { memo, useEffect, useState } from 'react';
@@ -51,7 +51,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
           <CustomTooltip>
             <PopoverTrigger className="size-full">
               <CustomTooltip.Trigger>
-                <GameItemImg image={props.itemTemplate.image} tintColor={TINT_COLOR[props.itemTemplate.key as ResourceType]} />
+                <GameItemImg image={props.itemTemplate.image} tintColor={TINT_COLOR[props.itemTemplate.key as ColoredResourceType]} />
 
                 {props.quantity > 1 && <div className="absolute bottom-0 right-1 text-[12px] font-semibold">{props.quantity}</div>}
               </CustomTooltip.Trigger>

@@ -21,7 +21,7 @@ const state: Extract<
   | 'ALCHEMY'
   | 'CARPENTRY'
   | 'FISHING'
-  | 'LOGGING'
+  | 'WOODCUTTING'
   | 'MINING'
   | 'SKINNING'
   | 'FORAGING'

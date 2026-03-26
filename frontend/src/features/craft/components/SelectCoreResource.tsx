@@ -3,8 +3,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
 import { GameItemSlot } from '@/features/item-instance/components/GameItemSlot';
+import { TINT_COLOR } from '@/lib/config';
 import { imageConfig } from '@/shared/config/image-config';
-import { ResourceCategoryType, SelectCoreResourceBuildingType } from '@/shared/types';
+import { ColoredResourceType, ResourceCategoryType, SelectCoreResourceBuildingType } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { X } from 'lucide-react';
 import { useState } from 'react';
@@ -20,8 +21,8 @@ export const SelectCoreResource = ({ type }: Props) => {
   const coreResourceId = useCraftItemStore((state) => state.coreResourceId);
   const [isOpen, setIsOpen] = useState(false);
   const slotImage = {
-    BLACKSMITH: imageConfig.icon.RESOURCES['IRON_INGOT'],
-    TAILOR: imageConfig.icon.RESOURCES['REGULAR_LEATHER'],
+    BLACKSMITH: imageConfig.icon.RESOURCES.INGOT,
+    TAILOR: imageConfig.icon.RESOURCES.LEATHER,
   } satisfies Record<SelectCoreResourceBuildingType, string>;
   const craftCategory = {
     BLACKSMITH: 'INGOT',
@@ -36,6 +37,7 @@ export const SelectCoreResource = ({ type }: Props) => {
           {coreResourceId && !!stackedItems?.[coreResourceId] ? (
             <div className="relative">
               <GameItemImg
+                tintColor={null}
                 className="group-hover:saturate-110 size-full group-hover:opacity-100"
                 image={itemsTemplateById[coreResourceId].image}
               />
@@ -43,7 +45,7 @@ export const SelectCoreResource = ({ type }: Props) => {
               <div className="absolute bottom-0 right-1 text-[12px] font-semibold"> {stackedItems?.[coreResourceId]}</div>
             </div>
           ) : (
-            <GameItemImg className="opacity-20 saturate-0 group-hover:opacity-20" image={slotImage[type]} />
+            <GameItemImg tintColor={null} className="opacity-20 saturate-0 group-hover:opacity-20" image={slotImage[type]} />
           )}
         </GameItemSlot>
       </PopoverTrigger>
@@ -60,7 +62,11 @@ export const SelectCoreResource = ({ type }: Props) => {
                 key={id}
                 className="group relative opacity-80"
               >
-                <GameItemImg className="group-hover:saturate-110 size-10 group-hover:opacity-100" image={template.image} />
+                <GameItemImg
+                  tintColor={TINT_COLOR[template.key as ColoredResourceType]}
+                  className="group-hover:saturate-110 size-10 group-hover:opacity-100"
+                  image={template.image}
+                />
 
                 {<div className="absolute bottom-0 right-1 text-[12px] font-semibold">{amount}</div>}
               </div>

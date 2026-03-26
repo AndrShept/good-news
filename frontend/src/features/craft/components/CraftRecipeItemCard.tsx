@@ -3,8 +3,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
 import { useSkill } from '@/features/skill/hooks/useSkill';
+
 import { cn, formatDurationFromSeconds } from '@/lib/utils';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
+
 
 type Props = { recipeId: string };
 
@@ -17,7 +19,7 @@ export const CraftRecipeItemCard = ({ recipeId }: Props) => {
   return (
     <ScrollArea className="h-full">
       <section className="flex flex-1 flex-col items-center gap-1 text-[15px]">
-        <GameItemImg className="md:size-15 size-11.5" image={itemTemplate.image} />
+        <GameItemImg tintColor={null} className="md:size-15 size-11.5" image={itemTemplate.image} />
         <span className="mb-2 capitalize">{itemTemplate.name}</span>
         <div>
           <span className="text-muted-foreground">type: </span>
@@ -32,7 +34,7 @@ export const CraftRecipeItemCard = ({ recipeId }: Props) => {
           <ul className="flex gap-1">
             {recipe.requirement.resources.map((resource) => (
               <li key={resource.templateId} className="flex items-center">
-                <GameItemImg className="size-7.5" image={itemsTemplateById[resource.templateId].image} />
+                <GameItemImg tintColor={null} className="size-7.5" image={itemsTemplateById[resource.templateId].image} />
                 <p
                   className={cn({
                     'text-red-600': (stackedItems?.[resource.templateId] ?? 0) < resource.amount,

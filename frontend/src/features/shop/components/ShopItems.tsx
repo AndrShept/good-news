@@ -2,9 +2,10 @@ import { CounterBadge } from '@/components/CounterBadge';
 import { GameIcon } from '@/components/GameIcon';
 import { GameItemImg } from '@/components/GameItemImg';
 import { getShopItemsOptions } from '@/features/shop/api/get-shop-items';
+import { TINT_COLOR } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { imageConfig } from '@/shared/config/image-config';
-import { BuildingType } from '@/shared/types';
+import { BuildingType, ColoredResourceType } from '@/shared/types';
 import { useShopItemStore } from '@/store/useShopItemStore';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -40,7 +41,7 @@ export const ShopItems = ({ buildingType }: Props) => {
               'bg-orange-300/10': !!itemsMap[item.id]
             })}
           >
-            <GameItemImg className="size-10" image={item.image} />
+            <GameItemImg tintColor={TINT_COLOR[item.key as ColoredResourceType] } className="size-10" image={item.image} />
             <div className="flex flex-col gap-0.5 truncate text-sm capitalize">
               <span className="truncate">{item.name}</span>
               <div className="flex items-center gap-0.5">

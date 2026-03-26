@@ -19,7 +19,7 @@ interface Props {
   onCenter: () => void;
 }
 
-const gatherSkills: GatheringCategorySkillKey[] = ['FISHING', 'FORAGING', 'LUMBERJACKING', 'MINING', 'SKINNING'];
+const gatherSkills: GatheringCategorySkillKey[] = ['FISHING', 'FORAGING', 'WOODCUTTING', 'MINING', 'SKINNING'];
 
 export const HeroActionsBar = memo(({ heroPosX, heroPosY, map, state, gatheringFinishAt, onCenter }: Props) => {
   const { entranceTile, placeTile } = useHeroActions({

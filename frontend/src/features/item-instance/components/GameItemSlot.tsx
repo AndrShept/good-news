@@ -8,5 +8,5 @@ interface Props extends ComponentProps<'div'> {
 }
 
 export const GameItemSlot = ({ children, className, ...props }: Props) => {
-  return <div className={cn('hover:saturate-120 hover:border-primary/20 group relative size-12 border', className)}>{children}</div>;
+  return <div className={cn('hover:saturate-105 hover:border-primary/20 group relative size-12 border', className)}>{children}</div>;
 };

@@ -42,7 +42,7 @@ export const Equipments = memo(function Equipments({ equipments, characterImage 
                 itemTemplate={itemsTemplateById[equipmentBySlot[equipment.slot].itemTemplateId]}
               />
             ) : (
-              <GameItemImg className="size-10 opacity-20 grayscale" image={equipment.image} />
+              <GameItemImg tintColor={null} className="size-10 opacity-20 grayscale" image={equipment.image} />
             )}
           </li>
         ))}
@@ -60,6 +60,7 @@ export const Equipments = memo(function Equipments({ equipments, characterImage 
               />
             ) : (
               <GameItemImg
+              tintColor={null}
                 className={cn('size-10 opacity-20 grayscale', {
                   'size-8': equipment.slot === 'RING_LEFT' || equipment.slot === 'RING_RIGHT' || equipment.slot === 'AMULET',
                 })}

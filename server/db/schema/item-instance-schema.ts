@@ -71,7 +71,20 @@ const hideValues = ['REGULAR_HIDE', 'ROUGH_HIDE', 'REPTILE_HIDE', 'IRON_HIDE', '
 const leatherValues = ['REGULAR_LEATHER', 'ROUGH_LEATHER', 'REPTILE_LEATHER', 'IRON_LEATHER', 'DEMON_LEATHER', 'DRAGON_LEATHER'] as const;
 const furValues = ['REGULAR_FUR', 'THICK_FUR', 'DARK_FUR', 'SHADOW_FUR', 'SNOW_FUR'] as const;
 const curedFurValues = ['REGULAR_CURED_FUR', 'THICK_CURED_FUR', 'DARK_CURED_FUR', 'SHADOW_CURED_FUR', 'SNOW_CURED_FUR'] as const;
-const fiberValues = ['FIBER'] as const;
+
+const mushroomValues = [
+  'REDCAP_MUSHROOM',
+  'GLOWCAP_MUSHROOM',
+  'SHADOWCAP_MUSHROOM',
+  'IRONCAP_MUSHROOM',
+  'SPORECAP_MUSHROOM',
+  'FROSTCAP_MUSHROOM',
+] as const;
+const flowerValues = ['ROSE', 'SUNFLOWER', 'BLUE_ORCHID', 'NIGHT_BLOOM', 'FIRE_BLOSSOM', 'FROST_LILY'] as const;
+const herbValues = ['GREENLEAF', 'SWIFTLEAF', 'BITTERROOT', 'SUNGRASS', 'GHOST_HERB', 'BLOOD_HERB', 'JASMINE'] as const;
+
+const fiberValues = ['COTTON', 'FLAX'] as const;
+
 const clothValues = ['REGULAR_CLOTH'] as const;
 const boneValues = ['REGULAR_BONE'] as const;
 
@@ -85,6 +98,9 @@ export const furTypeEnum = pgEnum('fur_type_enum', [...furValues]);
 export const curedFurTypeEnum = pgEnum('cured_fur_type_enum', [...curedFurValues]);
 export const clothTypeEnum = pgEnum('cloth_type_enum', [...clothValues]);
 export const fiberTypeEnum = pgEnum('fiber_type_enum', [...fiberValues]);
+export const flowerTypeEnum = pgEnum('flower_type_enum', [...flowerValues]);
+export const mushroomTypeEnum = pgEnum('mushroom_type_enum', [...mushroomValues]);
+export const herbTypeEnum = pgEnum('herb_type_enum', [...herbValues]);
 export const boneTypeEnum = pgEnum('bone_type_enum', [...boneValues]);
 
 export const resourceTypeEnum = pgEnum('resource_type_enum', [
@@ -98,13 +114,16 @@ export const resourceTypeEnum = pgEnum('resource_type_enum', [
   ...curedFurValues,
   ...clothValues,
   ...fiberValues,
+  ...flowerValues,
+  ...herbValues,
+  ...mushroomValues,
   ...boneValues,
 ]);
 export const coreResourceTypeEnum = pgEnum('core_resource_enum', [
-  ...leatherValues,
   ...ingotValues,
   ...clothValues,
   ...plankValues,
+  ...leatherValues,
   ...curedFurValues,
   ...boneValues,
 ]);

@@ -26,7 +26,7 @@ export const gatherTick = (now: number) => {
       const gatherActions = {
         MINING: 'mine',
         FISHING: 'catch',
-        LUMBERJACKING: 'chop',
+        WOODCUTTING: 'chop',
         FORAGING: 'gather',
         SKINNING: 'skin',
       };

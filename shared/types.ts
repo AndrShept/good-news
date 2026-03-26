@@ -23,10 +23,13 @@ import type {
   coreResourceTypeEnum,
   curedFurTypeEnum,
   fiberTypeEnum,
+  flowerTypeEnum,
   furTypeEnum,
+  herbTypeEnum,
   hideTypeEnum,
   itemInstanceTable,
   logTypeEnum,
+  mushroomTypeEnum,
   plankTypeEnum,
   rarityEnum,
   slotEnum,
@@ -180,8 +183,8 @@ export type RarityType = (typeof rarityEnum.enumValues)[number];
 export type WeaponHandType = (typeof weaponHandEnum.enumValues)[number];
 export type WeaponType = (typeof weaponTypeEnum.enumValues)[number];
 export type StateType = (typeof stateTypeEnum.enumValues)[number];
-export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];
 
+export type ResourceType = (typeof resourceTypeEnum.enumValues)[number];
 export type OreType = (typeof oreTypeEnum.enumValues)[number];
 export type IngotType = (typeof ingotTypeEnum.enumValues)[number];
 export type HideType = (typeof hideTypeEnum.enumValues)[number];
@@ -191,11 +194,25 @@ export type PlankType = (typeof plankTypeEnum.enumValues)[number];
 export type FurType = (typeof furTypeEnum.enumValues)[number];
 export type CuredFurType = (typeof curedFurTypeEnum.enumValues)[number];
 export type FiberType = (typeof fiberTypeEnum.enumValues)[number];
+export type FlowerType = (typeof flowerTypeEnum.enumValues)[number];
+export type HerbsType = (typeof herbTypeEnum.enumValues)[number];
+export type MushroomType = (typeof mushroomTypeEnum.enumValues)[number];
 export type ClothType = (typeof clothTypeEnum.enumValues)[number];
 export type BoneType = (typeof boneTypeEnum.enumValues)[number];
-
 export type CoreResourceType = (typeof coreResourceTypeEnum.enumValues)[number];
 export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[number];
+export type ColoredResourceType =
+  | OreType
+  | IngotType
+  | HideType
+  | LeatherType
+  | LogType
+  | PlankType
+  | FurType
+  | CuredFurType
+  | ClothType
+  | BoneType;
+
 export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
 export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number];
 

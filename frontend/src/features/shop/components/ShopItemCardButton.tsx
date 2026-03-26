@@ -9,11 +9,15 @@ import { useShopItemStore } from '@/store/useShopItemStore';
 import { X } from 'lucide-react';
 
 import { ShopBuyButton } from './ShopBuyButton';
+import { TINT_COLOR } from '@/lib/config';
+import { useGameData } from '@/features/hero/hooks/useGameData';
+import { ColoredResourceType } from '@/shared/types';
 
 export const ShopItemCardButton = () => {
   const { isOpen, toggleIsOpen, items, getTotalPrice, clearAllItems, getTotalQuantity, decrement, increment } = useShopItemStore();
   const totalPrice = getTotalPrice();
   const totalQuantity = getTotalQuantity();
+  const {itemsTemplateById} = useGameData()
   if (!totalQuantity) return;
   return (
     <Sheet open={isOpen} onOpenChange={toggleIsOpen} modal={false}>
@@ -37,7 +41,7 @@ export const ShopItemCardButton = () => {
               <li className="flex flex-col items-center justify-between gap-1 md:flex-row" key={item.id}>
                 <div className="flex w-full flex-col items-center truncate md:flex-row md:gap-4">
                   <div className="flex items-center gap-1 truncate">
-                    <GameItemImg className="size-8" image={item.image} />
+                    <GameItemImg tintColor={TINT_COLOR[itemsTemplateById[item.id].key as ColoredResourceType] } className="size-8" image={item.image} />
                     <span className="truncate">{item.name}</span>
                   </div>
 

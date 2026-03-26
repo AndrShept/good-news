@@ -55,7 +55,7 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      unlockSkillKey: skillTemplateByKey.LUMBERJACKING.key,
+      unlockSkillKey: skillTemplateByKey.WOODCUTTING.key,
     },
   },
   {
@@ -120,7 +120,7 @@ export const skillBooks = [
     stackable: false,
     bookInfo: {
       kind: 'UNLOCK',
-      unlockSkillKey: skillTemplateByKey.INGOT_LORE.key,
+      unlockSkillKey: skillTemplateByKey.METAL_LORE.key,
     },
   },
   {

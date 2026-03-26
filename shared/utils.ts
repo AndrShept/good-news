@@ -106,7 +106,7 @@ export const getHeroStateWithGatherSkillKey = (skillKey: GatheringCategorySkillK
   const state: Record<GatheringCategorySkillKey, StateType> = {
     FISHING: 'FISHING',
     FORAGING: 'FORAGING',
-    LUMBERJACKING: 'LUMBERJACKING',
+    WOODCUTTING: 'WOODCUTTING',
     MINING: 'MINING',
     SKINNING: 'SKINNING',
   };

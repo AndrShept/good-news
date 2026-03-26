@@ -59,7 +59,7 @@ export const toolsTemplate = [
       weaponType: 'AXE',
     },
     toolInfo: {
-      skillTemplateId: skillTemplateByKey.LUMBERJACKING.id,
+      skillTemplateId: skillTemplateByKey.WOODCUTTING.id,
     },
 
     coreModifier: {

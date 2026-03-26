@@ -1,7 +1,9 @@
 import { useMoveItemInstance } from '@/features/item-instance/hooks/useMoveItemInstance';
-import { ItemInstance, ItemTemplate } from '@/shared/types';
+import { TINT_COLOR } from '@/lib/config';
+import { ColoredResourceType, ItemInstance, ItemTemplate } from '@/shared/types';
 import { DndContext, DragEndEvent, DragOverlay, MouseSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import React, { PropsWithChildren, useState } from 'react';
+
 import { GameItemImg } from '../GameItemImg';
 
 type DraggableData = ItemInstance & { itemTemplate: ItemTemplate };
@@ -28,7 +30,7 @@ export const DndInventoryProvider = ({ children }: PropsWithChildren) => {
     },
   });
   const sensors = useSensors(mouseSensor);
-
+  console.log(activeItem)
   return (
     <DndContext
       sensors={sensors}
@@ -40,7 +42,11 @@ export const DndInventoryProvider = ({ children }: PropsWithChildren) => {
       }}
     >
       {children}
-      <DragOverlay dropAnimation={null}>{activeItem ? <GameItemImg  image={activeItem.itemTemplate.image} /> : null}</DragOverlay>
+      <DragOverlay dropAnimation={null}>
+        {activeItem ? (
+          <GameItemImg tintColor={TINT_COLOR[activeItem.coreResource ?? activeItem.itemTemplate.key as ColoredResourceType]} image={activeItem.itemTemplate.image} />
+        ) : null}
+      </DragOverlay>
     </DndContext>
   );
 };

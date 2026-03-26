@@ -30,7 +30,7 @@ interface GetGatherReward {
 interface GatheringTilesMap {
   FISHING: FishingTileTpe[];
   FORAGING: ForagingTileTpe[];
-  LUMBERJACKING: LumberTileType[];
+  WOODCUTTING: LumberTileType[];
   MINING: MiningTileType[];
   SKINNING: [];
 }
@@ -60,7 +60,7 @@ export const gatheringService = {
     const tileTypeData: GatheringTilesMap = {
       FISHING: ['DEEP_WATER', 'WATER'],
       FORAGING: ['FOREST', 'MEADOW', 'PLAINS'],
-      LUMBERJACKING: ['FOREST', 'DARK_FOREST'],
+      WOODCUTTING: ['FOREST', 'DARK_FOREST'],
       MINING: ['CAVE', 'STONE'],
       SKINNING: [],
     };
