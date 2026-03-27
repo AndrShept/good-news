@@ -240,7 +240,7 @@ export const skillsTemplate = [
   {
     id: '019d24dc-06bc-76ed-8f1f-a0d41def680b',
     name: 'Cured fur lore',
-    image: imageConfig.icon.skill['FUR_LORE'],
+    image: imageConfig.icon.skill['CURED_FUR_LORE'],
     category: 'LORE',
     key: 'CURED_FUR_LORE',
   },

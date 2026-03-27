@@ -158,16 +158,16 @@ export const BASE_EQUIPMENTS_IMAGE: EquipmentImage[] = [
 
 export const TINT_COLOR = {
   IRON_INGOT: { color: [180, 180, 190], brightness: 1.0, saturate: 0.8, contrast: 1 },
-  COPPER_INGOT: { color: [200, 100, 50], brightness: 1.1, saturate: 1.3, contrast: 1 },
-  SILVER_INGOT: { color: [200, 210, 220], brightness: 2, saturate: 1, contrast: 0.8 },
-  GOLD_INGOT: { color: [220, 180, 40], brightness: 1.2, saturate: 1.4, contrast: 1.1 },
+  COPPER_INGOT: { color: [220, 100, 50], brightness: 1.1, saturate: 1.3, contrast: 1 },
+  SILVER_INGOT: { color: [200, 210, 220], brightness: 2.5, saturate: 1, contrast: 0.8 },
+  GOLD_INGOT: { color: [220, 180, 40], brightness: 1.3, saturate: 1.4, contrast: 1.1 },
   MITHRIL_INGOT: { color: [80, 140, 220], brightness: 1.2, saturate: 1.4, contrast: 1.2 },
   ADAMANTINE_INGOT: { color: [60, 200, 140], brightness: 1.3, saturate: 1.5, contrast: 1.2 },
 
-  IRON_ORE: { color: [180, 180, 190], brightness: 1.0, saturate: 0.8, contrast: 1 },
-  COPPER_ORE: { color: [200, 100, 50], brightness: 1.1, saturate: 1.3, contrast: 1 },
-  SILVER_ORE: { color: [200, 210, 220], brightness: 2, saturate: 1, contrast: 0.8 },
-  GOLD_ORE: { color: [220, 180, 40], brightness: 1.2, saturate: 1.4, contrast: 1.1 },
+  IRON_ORE: { color: [150, 110, 100], brightness: 1.0, saturate: 1, contrast: 1 },
+  COPPER_ORE: { color: [220, 100, 50], brightness: 1.1, saturate: 1.3, contrast: 1 },
+  SILVER_ORE: { color: [200, 210, 220], brightness: 2.5, saturate: 1, contrast: 0.8 },
+  GOLD_ORE: { color: [220, 180, 40], brightness: 1.3, saturate: 1.4, contrast: 1.1 },
   MITHRIL_ORE: { color: [80, 140, 220], brightness: 1.2, saturate: 1.4, contrast: 1.2 },
   ADAMANTINE_ORE: { color: [60, 200, 140], brightness: 1.3, saturate: 1.5, contrast: 1.2 },
 
