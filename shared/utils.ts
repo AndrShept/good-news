@@ -1,13 +1,12 @@
 import type { Layer } from './json-types';
 import { mapTemplate } from './templates/map-template';
 import type { GatheringCategorySkillKey } from './templates/skill-template';
-import type { CraftBuildingType, IHeroStat, IPosition, OmitTileType, StateType, TileType } from './types';
+import type { CraftBuildingKey, IHeroStat, IPosition, OmitTileType, StateType, TileType } from './types';
 
 function isBlocked(x: number, y: number, layers: Layer[], width: number): boolean {
   return layers.some((layer) => {
     const index = y * width + x;
 
-  
     if (layer.name === 'WATER' || layer.name === 'OBJECT') {
       return layer.data?.[index] !== 0;
     }
@@ -37,7 +36,6 @@ function heuristic(a: IPosition, b: IPosition) {
   return Math.max(dx, dy);
 }
 export function buildPathWithObstacles(from: IPosition, to: IPosition, layers: Layer[], width: number, height: number): IPosition[] {
-
   const open = new Set<string>();
   const cameFrom = new Map<string, string>();
   const gScore = new Map<string, number>();
@@ -113,15 +111,16 @@ export const getHeroStateWithGatherSkillKey = (skillKey: GatheringCategorySkillK
   return state[skillKey];
 };
 
-export const getStateWithCraftBuildingType = (craftBuildingType: CraftBuildingType) => {
-  const stateData: Record<CraftBuildingType, StateType> = {
+export const getStateWithCraftBuildingType = (craftBuildingKey: CraftBuildingKey) => {
+  const stateData: Record<CraftBuildingKey, StateType> = {
     BLACKSMITH: 'BLACKSMITHING',
     ALCHEMY: 'ALCHEMY',
     FORGE: 'SMELTING',
     TAILOR: 'TAILORING',
+    CARPENTRY: 'CARPENTRY',
   };
 
-  return stateData[craftBuildingType];
+  return stateData[craftBuildingKey];
 };
 
 export const getTilesAroundHero = (pos: IPosition, radius = 1) => {

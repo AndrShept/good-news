@@ -1,17 +1,22 @@
-import { Building } from '@/shared/types';
+import { Building, Npc } from '@/shared/types';
 import { create } from 'zustand';
 
-interface IUseSelectBuildingStore {
-  selectBuilding: Building | null;
-  setSelectBuilding: (building: Building | null) => void;
- isCraftBuilding: () => boolean; 
+type SelectedPlaceEntities =
+  | {
+      type: 'NPC';
+      payload: Npc;
+    }
+  | {
+      type: 'BUILDING';
+      payload: Building;
+    };
+
+interface UseSelectPlaceEntitiesStore {
+  selectedPlaceEntities: SelectedPlaceEntities | null;
+  setSelectedPlaceEntities: (data: SelectedPlaceEntities | null) => void;
 }
 
-export const useSelectBuildingStore = create<IUseSelectBuildingStore>((set, get) => ({
-  selectBuilding: null,
-  setSelectBuilding: (data) => set({ selectBuilding: data }),
-  isCraftBuilding: () => {
-    const b = get().selectBuilding;
-    return b?.type === 'BLACKSMITH' || b?.type === 'FORGE';
-  },
+export const useSelectPlaceEntitiesStore = create<UseSelectPlaceEntitiesStore>((set, get) => ({
+  selectedPlaceEntities: null,
+  setSelectedPlaceEntities: (data) => set({ selectedPlaceEntities: data }),
 }));

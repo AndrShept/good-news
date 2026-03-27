@@ -1,8 +1,7 @@
-import { BASE_HEALTH_REGEN_TIME, BASE_MANA_REGEN_TIME, BASE_WALK_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
-import type { IMapJson } from '@/shared/json-types';
+
 import { mapTemplate } from '@/shared/templates/map-template';
 import { resourceTemplateById } from '@/shared/templates/resource-template';
-import type { ClothType, CraftBuildingType, IngotType, LeatherType, Modifier, OmitModifier, StateType, TileType } from '@/shared/types';
+import type { ClothType, IngotType, LeatherType, Modifier, OmitModifier, StateType, TileType } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
 import { sql } from 'drizzle-orm';

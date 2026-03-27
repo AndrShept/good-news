@@ -5,34 +5,31 @@ import { CraftSidebar } from '@/features/craft/components/CraftSidebar';
 import { SelectCoreResource } from '@/features/craft/components/SelectCoreResource';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { QueueCraftItemsList } from '@/features/queue/components/QueueCraftItemsList';
-import { CraftBuildingType, SelectCoreResourceBuildingType } from '@/shared/types';
+import { Building, CraftBuildingKey, SelectCoreResourceBuildingKey } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
-import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
-export const CraftBuilding = () => {
-  const selectBuilding = useSelectBuildingStore((state) => state.selectBuilding);
+export const CraftBuilding = ({ selectedBuilding }: { selectedBuilding: Building }) => {
   const heroId = useHeroId();
-  const { data: recipeIds, isLoading } = useQuery(getCraftRecipeOptions(heroId, selectBuilding?.type));
+  const { data: recipeIds, isLoading } = useQuery(getCraftRecipeOptions(heroId, selectedBuilding.key));
   const { recipeId, setRecipeId } = useCraftItemStore();
-  const canSelectCoreResource = selectBuilding?.type === 'TAILOR' || selectBuilding?.type === 'BLACKSMITH';
 
   useEffect(() => {
     setRecipeId(recipeIds?.[0]?.recipeId);
-  }, [recipeIds, selectBuilding?.type]);
+  }, [recipeIds, setRecipeId]);
   if (isLoading) return <p>...</p>;
   return (
     <section className="flex w-full">
       <CraftSidebar recipeIds={recipeIds} onSelect={setRecipeId} selectedItemId={recipeId} />
-      <div className="flex flex-1 flex-col min-w-0 items-center gap-1 p-1">
+      <div className="flex min-w-0 flex-1 flex-col items-center gap-1 p-1">
         <div className="min-h-0 flex-1">{recipeId && <CraftRecipeItemCard recipeId={recipeId} />}</div>
 
         <QueueCraftItemsList />
-        {canSelectCoreResource && <SelectCoreResource type={selectBuilding.type as unknown as SelectCoreResourceBuildingType} />}
-        {selectBuilding?.type && (
+        {canSelectCoreResource && <SelectCoreResource type={selectBuilding.key as unknown as SelectCoreResourceBuildingKey} />}
+        {selectBuilding?.key && (
           <div className="mx-auto">
-            <CraftButton recipeId={recipeId ?? ''} buildingType={selectBuilding.type as unknown as CraftBuildingType} />
+            <CraftButton recipeId={recipeId ?? ''} buildingType={selectBuilding.key as unknown as CraftBuildingKey} />
           </div>
         )}
       </div>

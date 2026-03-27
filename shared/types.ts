@@ -290,12 +290,43 @@ export interface QueueCraft {
   recipeId: string;
   expiresAt: number;
   coreResourceId?: string;
-  craftBuildingType: CraftBuildingType;
+  craftBuildingType: CraftBuildingKey;
   status: (typeof queueCraftStatusEnum.enumValues)[number];
 }
 
-export const buildingValues = ['MAGIC-SHOP', 'TEMPLE', 'BANK', 'BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY'] as const;
-export const craftBuildingValues = ['BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY'] as const;
+export type Npc = {
+  id: string;
+  name: string;
+};
+
+export const buildingValues = [
+  'MAGIC_SHOP',
+  'TEMPLE',
+  'BANK',
+  'BLACKSMITH',
+  'TAILOR',
+  'ALCHEMY',
+  'CARPENTRY',
+  'LOOM',
+  'SAWMILL',
+  'TANNERY',
+  'FORGE',
+] as const;
+export const craftBuildingValues = ['BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY', 'CARPENTRY'] as const;
+export const refiningBuildingValues = ['LOOM', 'SAWMILL', 'TANNERY', 'FORGE'] as const;
+
+export type Building = {
+  id: string;
+  name: string;
+  key: BuildingKey;
+  // workingResourceCategory?: ResourceCategoryType;
+  image: string;
+};
+export type BuildingKey = (typeof buildingValues)[number];
+export type CraftBuildingKey = (typeof craftBuildingValues)[number];
+export type RefiningBuildingKey = (typeof refiningBuildingValues)[number];
+export type SelectCoreResourceBuildingKey = Extract<CraftBuildingKey, 'TAILOR' | 'BLACKSMITH' | 'CARPENTRY'>;
+
 export const tileTypeValues = [
   'OBJECT',
   'GROUND',
@@ -308,24 +339,12 @@ export const tileTypeValues = [
   'MEADOW',
   'PLAINS',
 ] as const;
-export type BuildingType = (typeof buildingValues)[number];
-export type CraftBuildingType = Extract<BuildingType, 'BLACKSMITH' | 'FORGE' | 'TAILOR' | 'ALCHEMY'>;
-export type SelectCoreResourceBuildingType = Extract<CraftBuildingType, 'TAILOR' | 'BLACKSMITH'>;
-
 export type TileType = (typeof tileTypeValues)[number];
 export type OmitTileType = Exclude<TileType, 'OBJECT' | 'GROUND'>;
 export type MiningTileType = Extract<TileType, 'CAVE' | 'STONE'>;
 export type LumberTileType = Extract<TileType, 'FOREST' | 'DARK_FOREST'>;
 export type FishingTileTpe = Extract<TileType, 'WATER' | 'DEEP_WATER'>;
 export type ForagingTileTpe = Extract<TileType, 'FOREST' | 'MEADOW' | 'PLAINS'>;
-
-export type Building = {
-  id: string;
-  name: string;
-  type: BuildingType;
-  workingResourceCategory?: ResourceCategoryType;
-  image: string;
-};
 
 export type OmitModifier = Omit<Modifier, 'id' | 'heroId'>;
 
@@ -342,7 +361,7 @@ export type RecipeTemplate = {
   requirement: {
     resources: { templateId: string; amount: number }[];
     skills: { skillTemplateId: string; level: number }[];
-    building: CraftBuildingType;
+    building: CraftBuildingKey;
     category: ResourceCategoryType;
     isCore?: boolean;
   };

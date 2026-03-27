@@ -3,7 +3,6 @@ import type {
   BuffInstance,
   BuffTemplate,
   Corpse,
-  CraftBuildingType,
   CreatureInstance,
   Hero,
   ItemInstance,

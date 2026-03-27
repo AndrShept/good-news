@@ -1,6 +1,5 @@
 import type { itemInstanceService } from '../server/services/item-instance-service';
 import type {
-  BuildingType,
   Corpse,
   
   EntityPayloadMap,

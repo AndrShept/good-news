@@ -8,16 +8,13 @@ import {
   RESET_STATS_COST,
   WORLD_SEED,
 } from '@/shared/constants';
-import type { HeroUpdateEvent,  MapChunkUpdateEntitiesData } from '@/shared/socket-data-types';
+import type { HeroUpdateEvent, MapChunkUpdateEntitiesData } from '@/shared/socket-data-types';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
 import { gatheringSkillKeysValues, skillsTemplate } from '@/shared/templates/skill-template';
 import { toolTemplateByKey } from '@/shared/templates/tool-template';
 import {
-  type BuffInstance,
-  type CraftBuildingType,
-  type EquipmentSlotType,
   type ErrorResponse,
   type Hero,
   type ItemInstance,
@@ -30,7 +27,6 @@ import {
   type WeaponHandType,
   buildingValues,
   buyItemsSchema,
-  craftBuildingValues,
   createHeroSchema,
   type itemsInstanceDeltaEvent,
   statsSchema,
@@ -400,7 +396,7 @@ export const heroRouter = new Hono<Context>()
       verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.heroId, heroId: hero.id });
       const place = placeTemplate.find((p) => p.id === hero.location.placeId);
       if (!place) throw new HTTPException(409, { message: 'Hero not a place' });
-      if (!place.buildings.some((b) => b.type === 'MAGIC-SHOP')) {
+      if (!place.buildings.some((b) => b.key === 'MAGIC_SHOP')) {
         throw new HTTPException(409, { message: 'this a not a shop' });
       }
 
@@ -744,8 +740,6 @@ export const heroRouter = new Hono<Context>()
       heroState.location.targetX = targetPos.x;
       heroState.location.targetY = targetPos.y;
 
-
-      
       const socketData: MapChunkUpdateEntitiesData = {
         entityId: heroState.id,
         data: {

@@ -37,7 +37,7 @@ export const SelectCoreResource = ({ type }: Props) => {
           {coreResourceId && !!stackedItems?.[coreResourceId] ? (
             <div className="relative">
               <GameItemImg
-                tintColor={null}
+                tintColor={coreResourceId ? TINT_COLOR[itemsTemplateById[coreResourceId].key as ColoredResourceType] : null}
                 className="group-hover:saturate-110 size-full group-hover:opacity-100"
                 image={itemsTemplateById[coreResourceId].image}
               />

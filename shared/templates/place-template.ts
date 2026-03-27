@@ -1,7 +1,7 @@
 import { imageConfig } from '@/shared/config/image-config';
 import type { TPlace } from '@/shared/types';
 
-import { buildingTemplate } from './building-template';
+import { buildingTemplate, buildingTemplateByKey } from './building-template';
 
 export const placeTemplate = [
   {
@@ -10,13 +10,7 @@ export const placeTemplate = [
     image: imageConfig.icon.place.solmer,
     x: 7,
     y: 7,
-    buildings: [
-      buildingTemplate['MAGIC-SHOP'],
-      buildingTemplate.TEMPLE,
-      buildingTemplate.BLACKSMITH,
-      buildingTemplate.FORGE,
-      buildingTemplate.BANK,
-    ],
+    buildings: [...buildingTemplate],
     mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
     entrances: [],
   },
@@ -27,7 +21,7 @@ export const placeTemplate = [
     x: 10,
     y: 10,
     mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
-    buildings: [buildingTemplate.FORGE, buildingTemplate['MAGIC-SHOP']],
+    buildings: [buildingTemplateByKey['FORGE'], buildingTemplateByKey['MAGIC_SHOP']],
     entrances: [
       {
         id: '019c444d-e6e3-75ee-a4ba-81affd7689ab',

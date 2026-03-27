@@ -1,43 +1,51 @@
 import { GameIcon } from '@/components/GameIcon';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useHero } from '@/features/hero/hooks/useHero';
-
+import { cn } from '@/lib/utils';
 import { imageConfig } from '@/shared/config/image-config';
 import { buildingTemplate } from '@/shared/templates/building-template';
-import { CraftBuildingType, Entrance, StateType, TPlace } from '@/shared/types';
-import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
-import { Dispatch, SetStateAction, memo, startTransition, useEffect } from 'react';
+import { CraftBuildingKey, Entrance, RefiningBuildingKey, StateType, TPlace } from '@/shared/types';
+import { useSelectPlaceEntitiesStore } from '@/store/useSelectBuildingStore';
+import { memo, startTransition, useEffect } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 
 import { useLeavePlace } from '../hooks/useLeavePlace';
 import { PlaceSidebarButton } from './PlaceSidebarButton';
-import { cn } from '@/lib/utils';
 
 interface Props {
   place: TPlace | undefined;
-  setEntrances: Dispatch<SetStateAction<Entrance[] | null>>;
   entrances: Entrance[] | null;
 }
-const stateToBuildingMap: Partial<Record<StateType, CraftBuildingType>> = {
+type StateBuilding = Extract<
+  StateType,
+  'SMELTING' | 'TAILORING' | 'ALCHEMY' | 'BLACKSMITHING' | 'CARPENTRY' | 'SMELTING' | 'TANNING' | 'WEAVING' | 'SAWMILLING'
+>;
+const stateToBuildingMap: Record<StateBuilding, CraftBuildingKey | RefiningBuildingKey> = {
   SMELTING: 'FORGE',
   TAILORING: 'TAILOR',
   ALCHEMY: 'ALCHEMY',
   BLACKSMITHING: 'BLACKSMITH',
+  CARPENTRY: 'CARPENTRY',
+  SAWMILLING: 'SAWMILL',
+  TANNING: 'TANNERY',
+  WEAVING: 'LOOM',
 };
-export const PlaceSidebar = memo(({ place, entrances, setEntrances }: Props) => {
+export const PlaceSidebar = memo(({ place, entrances }: Props) => {
   const matches = useMediaQuery('(min-width: 768px)');
   const { mutate, isPending } = useLeavePlace();
-  const { selectBuilding, setSelectBuilding } = useSelectBuildingStore();
+  const { selectedPlaceEntities, setSelectedPlaceEntities } = useSelectPlaceEntitiesStore();
   const state = useHero((data) => data?.state);
   const isButtonDisabled = isPending || state !== 'IDLE';
   useEffect(() => {
     if (!state) return;
 
-    const buildingIdForState = stateToBuildingMap[state];
+    const buildingIdForState = stateToBuildingMap[state as StateBuilding];
     if (!buildingIdForState) return;
 
-    const buildingForState = buildingTemplate[buildingIdForState];
-    setSelectBuilding(buildingForState);
+    const buildingForState = buildingTemplate.find((b) => b.key === buildingIdForState);
+    if (buildingForState) {
+      setSelectedPlaceEntities({ type: 'BUILDING', payload: buildingForState });
+    }
   }, []);
 
   return (
@@ -47,11 +55,10 @@ export const PlaceSidebar = memo(({ place, entrances, setEntrances }: Props) => 
           <PlaceSidebarButton
             disabled={isButtonDisabled}
             matches={matches}
-            variant={!selectBuilding && !entrances?.length ? 'secondary' : 'ghost'}
+            variant={!selectedPlaceEntities ? 'secondary' : 'ghost'}
             size={matches ? 'default' : 'icon'}
             onClick={() => {
-              setSelectBuilding(null);
-              setEntrances(null);
+              setSelectedPlaceEntities(null);
             }}
           >
             <GameIcon
@@ -62,51 +69,30 @@ export const PlaceSidebar = memo(({ place, entrances, setEntrances }: Props) => 
             />
             {matches && <p>Place Info</p>}
           </PlaceSidebarButton>
-          {!!place?.entrances.length && (
-            <PlaceSidebarButton
-              disabled={isButtonDisabled}
-              matches={matches}
-              variant={(entrances?.length ?? 0) > 0 ? 'secondary' : 'ghost'}
-              size={matches ? 'default' : 'icon'}
-              onClick={() => {
-                if (!place) return;
-                setEntrances(place.entrances);
-                setSelectBuilding(null);
-              }}
-            >
-              <GameIcon
-                className={cn('size-7.5', {
-                  'size-8.5': !matches,
-                })}
-                image={imageConfig.icon.entrance.portal}
-              />
-              {matches && <p>Portal</p>}
-            </PlaceSidebarButton>
-          )}
 
-          {place?.buildings?.map((building) => (
-            <PlaceSidebarButton
-              key={building.id}
-              matches={matches}
-              disabled={isButtonDisabled}
-              variant={building.id === selectBuilding?.id ? 'secondary' : 'ghost'}
-              size={matches ? 'default' : 'icon'}
-              onClick={() =>
-                startTransition(() => {
-                  setSelectBuilding(building);
-                  setEntrances(null);
-                })
-              }
-            >
-              <GameIcon
-                className={cn('size-8.5', {
-                  'size-10': !matches,
-                })}
-                image={building.image}
-              />
-              {matches && <p>{building.name}</p>}
-            </PlaceSidebarButton>
-          ))}
+          {selectedPlaceEntities?.type === 'BUILDING' &&
+            place?.buildings?.map((building) => (
+              <PlaceSidebarButton
+                key={building.id}
+                matches={matches}
+                disabled={isButtonDisabled}
+                variant={building.id === selectedPlaceEntities.payload.id ? 'secondary' : 'ghost'}
+                size={matches ? 'default' : 'icon'}
+                onClick={() =>
+                  startTransition(() => {
+                    setSelectedPlaceEntities({ type: 'BUILDING', payload: building });
+                  })
+                }
+              >
+                <GameIcon
+                  className={cn('size-8.5', {
+                    'size-10': !matches,
+                  })}
+                  image={building.image}
+                />
+                {matches && <p>{building.name}</p>}
+              </PlaceSidebarButton>
+            ))}
 
           <PlaceSidebarButton
             className="hover:bg-red-500/10"

@@ -244,6 +244,13 @@ export const skillsTemplate = [
     category: 'LORE',
     key: 'CURED_FUR_LORE',
   },
+  {
+    id: '019d2f60-a904-7d89-bd99-01a5e8a8dc89',
+    name: 'Bone lore',
+    image: imageConfig.icon.skill['BONE_LORE'],
+    category: 'LORE',
+    key: 'BONE_LORE',
+  },
 
   {
     id: '019bbdf2-f6cb-7263-8741-6da30e87dd35',

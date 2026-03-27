@@ -5,13 +5,13 @@ import { getShopItemsOptions } from '@/features/shop/api/get-shop-items';
 import { TINT_COLOR } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { imageConfig } from '@/shared/config/image-config';
-import { BuildingType, ColoredResourceType } from '@/shared/types';
+import { BuildingKey, ColoredResourceType } from '@/shared/types';
 import { useShopItemStore } from '@/store/useShopItemStore';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 interface Props {
-  buildingType: BuildingType;
+  buildingType: BuildingKey
 }
 
 export const ShopItems = ({ buildingType }: Props) => {

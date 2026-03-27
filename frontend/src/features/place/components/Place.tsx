@@ -1,37 +1,34 @@
 import { useHero } from '@/features/hero/hooks/useHero';
 import { EntitySidebar } from '@/features/map/components/EntitySidebar';
-import { Entrance } from '@/shared/types';
-import { useSelectBuildingStore } from '@/store/useSelectBuildingStore';
+import { useSelectPlaceEntitiesStore } from '@/store/useSelectBuildingStore';
 import { useShopItemStore } from '@/store/useShopItemStore';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { getPlaceOptions } from '../api/get-place';
 import { getPlaceHeroesLocationOptions } from '../api/get-place-heroes';
-import { PlaceEntrance } from './PlaceEntrance';
 import { PlaceSidebar } from './PlaceSidebar';
-import { SelectedBuildingPage } from './SelectedBuildingPage';
+import { SelectedPlaceEntitiesPage } from './SelectedPlaceEntitiesPage';
 
 export const Place = () => {
   const placeId = useHero((data) => data?.location?.placeId ?? '');
   const placeData = useQuery(getPlaceOptions(placeId));
   const placeHeroes = useQuery(getPlaceHeroesLocationOptions(placeId));
-  const selectedBuilding = useSelectBuildingStore();
+  const { selectedPlaceEntities, setSelectedPlaceEntities } = useSelectPlaceEntitiesStore();
   const clearAllItems = useShopItemStore((state) => state.clearAllItems);
-  const [entrances, setEntrances] = useState<Entrance[] | null>(null);
+
   useEffect(() => {
     return () => {
-      selectedBuilding.setSelectBuilding(null);
+      setSelectedPlaceEntities(null);
       clearAllItems();
     };
   }, []);
   if (placeData.isLoading) return <p>LOADING ...</p>;
   return (
     <section className="mx-auto flex w-full">
-      <PlaceSidebar entrances={entrances} setEntrances={setEntrances} place={placeData.data} />
-      {!!entrances?.length && <PlaceEntrance entrances={entrances} />}
-      <SelectedBuildingPage entrances={entrances} place={placeData.data} />
-      {selectedBuilding.selectBuilding?.type !== 'BANK' && (
+      <PlaceSidebar entrances={placeData.data?.entrances ?? []} place={placeData.data} />
+      <SelectedPlaceEntitiesPage place={placeData.data} />
+      {selectedPlaceEntities?.type === 'BUILDING' &&  selectedPlaceEntities.payload.key !== 'BANK' && (
         <EntitySidebar mode="PLACE" isLoading={placeHeroes.isLoading} heroes={placeHeroes.data} corpses={undefined} creatures={undefined} />
       )}
     </section>

@@ -40,7 +40,7 @@ export const queueCraftService = {
 
     heroService.checkFreeBackpackCapacity(hero.id);
 
-    const validateRequiredBuilding = place?.buildings?.some((b) => b.type === recipe.requirement.building);
+    const validateRequiredBuilding = place?.buildings?.some((b) => b.key === recipe.requirement.building);
 
     if (!validateRequiredBuilding) {
       throw new HTTPException(400, {
