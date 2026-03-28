@@ -56,8 +56,10 @@ export const queueCraftTick = (now: number) => {
       }
 
       const skillInstance = skillService.getSkillBySkillTemplateId(heroId, recipe.requirement.skills[0].skillTemplateId);
-      const skillKey = skillTemplateById[skillInstance.skillTemplateId].key as SkillKey;
-      const loreSkillKey = skillService.getLoreSkillKey(recipe, queue.coreResourceId);
+      const skillKey = skillTemplateById[skillInstance.skillTemplateId].key;
+
+      const firstFixedMaterial = recipe.requirement.materials.find((m) => m.role === 'FIXED');
+      const loreSkillKey = skillService.getLoreSkillByItemTemplateId(queue.coreResourceId ?? firstFixedMaterial?.templateId!);
       const loreSkillInstance = skillService.getSkillByKey(heroId, loreSkillKey);
       const chance = queueCraftService.getCraftChance({
         coreResourceId: queue.coreResourceId,

@@ -1,11 +1,11 @@
 import { getCraftRecipeOptions } from '@/features/craft/api/get-craft-recipe';
 import { CraftButton } from '@/features/craft/components/CraftButton';
+import { CraftMaterialSlot } from '@/features/craft/components/CraftMaterialSlot';
 import { CraftRecipeItemCard } from '@/features/craft/components/CraftRecipeItemCard';
 import { CraftSidebar } from '@/features/craft/components/CraftSidebar';
-import { SelectCoreResource } from '@/features/craft/components/SelectCoreResource';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { QueueCraftItemsList } from '@/features/queue/components/QueueCraftItemsList';
-import { Building, CraftBuildingKey, SelectCoreResourceBuildingKey } from '@/shared/types';
+import { Building } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
@@ -18,7 +18,9 @@ export const CraftBuilding = ({ selectedBuilding }: { selectedBuilding: Building
   useEffect(() => {
     setRecipeId(recipeIds?.[0]?.recipeId);
   }, [recipeIds, setRecipeId]);
+
   if (isLoading) return <p>...</p>;
+
   return (
     <section className="flex w-full">
       <CraftSidebar recipeIds={recipeIds} onSelect={setRecipeId} selectedItemId={recipeId} />
@@ -26,10 +28,10 @@ export const CraftBuilding = ({ selectedBuilding }: { selectedBuilding: Building
         <div className="min-h-0 flex-1">{recipeId && <CraftRecipeItemCard recipeId={recipeId} />}</div>
 
         <QueueCraftItemsList />
-        {canSelectCoreResource && <SelectCoreResource type={selectBuilding.key as unknown as SelectCoreResourceBuildingKey} />}
-        {selectBuilding?.key && (
+        {recipeId && <CraftMaterialSlot recipeId={recipeId} />}
+        {recipeId && (
           <div className="mx-auto">
-            <CraftButton recipeId={recipeId ?? ''} buildingType={selectBuilding.key as unknown as CraftBuildingKey} />
+            <CraftButton recipeId={recipeId} />
           </div>
         )}
       </div>

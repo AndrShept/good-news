@@ -27,9 +27,12 @@ export const useHeroBackpack = () => {
     [backpack?.itemsInstance],
   );
   const getStackedResourceItemsByCategory = useCallback(
-    (category: ResourceCategoryType) =>
+    (categories: ResourceCategoryType[]) =>
       backpack?.itemsInstance
-        .filter((r) => itemsTemplateById[r.itemTemplateId].resourceInfo?.category === category)
+        .filter((r) => {
+          if (!itemsTemplateById[r.itemTemplateId].resourceInfo?.category) return;
+          return categories.includes(itemsTemplateById[r.itemTemplateId].resourceInfo!.category);
+        })
         .reduce(
           (acc, item) => {
             if (!acc[item.itemTemplateId]) {

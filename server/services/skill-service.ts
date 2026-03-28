@@ -74,36 +74,37 @@ export const skillService = {
     if (skill.level < level)
       throw new HTTPException(409, { message: `Your ${template.name} skill level is too low.`, cause: { canShow: true } });
   },
-  getLoreSkillKey(recipe: RecipeTemplate, coreResourceId: string | undefined) {
-    const loreSkillByResourceCategory: Record<ResourceCategoryType, LoreSkillKey> = {
-      ORE: 'ORE_LORE',
-      INGOT: 'METAL_LORE',
-      LOG: 'WOOD_LORE',
-      PLANK: 'WOOD_LORE',
-      HIDE: 'HIDE_LORE',
-      LEATHER: 'LEATHER_LORE',
-      FIBER: 'FIBER_LORE',
-      HERB: 'HERB_LORE',
-      CLOTH: 'CLOTH_LORE',
-      FLOWER: 'FLOWER_LORE',
-      MUSHROOM: 'MUSHROOM_LORE',
-      FUR: 'FUR_LORE',
-      CURED_FUR: 'CURED_FUR_LORE',
-      BONE: 'ORE_LORE',
-    };
+  // getLoreSkillKey(recipe: RecipeTemplate, coreResourceId: string | undefined) {
+  //   const loreSkillByResourceCategory: Record<ResourceCategoryType, LoreSkillKey> = {
+  //     ORE: 'ORE_LORE',
+  //     INGOT: 'METAL_LORE',
+  //     LOG: 'WOOD_LORE',
+  //     PLANK: 'WOOD_LORE',
+  //     HIDE: 'HIDE_LORE',
+  //     LEATHER: 'LEATHER_LORE',
+  //     FIBER: 'FIBER_LORE',
+  //     HERB: 'HERB_LORE',
+  //     CLOTH: 'CLOTH_LORE',
+  //     FLOWER: 'FLOWER_LORE',
+  //     MUSHROOM: 'MUSHROOM_LORE',
+  //     FUR: 'FUR_LORE',
+  //     CURED_FUR: 'CURED_FUR_LORE',
+  //     BONE: 'ORE_LORE',
+  //   };
 
-    if (coreResourceId) {
-      const template = itemTemplateService.getAllItemsTemplateMapIds()[coreResourceId];
-      if (!template.resourceInfo?.category) throw new Error('getLoreSkillResource template.resourceInfo?.category not found ');
+  //   if (coreResourceId) {
+  //     const template = itemTemplateService.getAllItemsTemplateMapIds()[coreResourceId];
+  //     if (!template.resourceInfo?.category) throw new Error('getLoreSkillResource template.resourceInfo?.category not found ');
 
-      return loreSkillByResourceCategory[template.resourceInfo.category];
-    }
+  //     return loreSkillByResourceCategory[template.resourceInfo.category];
+  //   }
 
-    return loreSkillByResourceCategory[recipe.requirement.category];
-  },
+  //   return loreSkillByResourceCategory[recipe.requirement.category];
+  // },
   getLoreSkillByItemTemplateId(itemTemplateId: string) {
     const template = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
-    if (!template.resourceInfo) return;
+    if (!template.resourceInfo) throw new HTTPException(400, { message: 'getLoreSkillByItemTemplateId template.resourceInfo not found ' });
+
     const loreSkillByResourceCategory: Record<ResourceCategoryType, LoreSkillKey> = {
       ORE: 'ORE_LORE',
       INGOT: 'METAL_LORE',

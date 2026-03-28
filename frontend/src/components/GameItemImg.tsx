@@ -10,13 +10,12 @@ export interface TintColor {
 
 interface Props extends Omit<ComponentProps<'img'>, 'src'> {
   image: string | undefined;
-  tintColor: TintColor | null | undefined
+  tintColor: TintColor | null | undefined;
   isPixelate?: boolean;
 }
 
 export const GameItemImg = memo(({ image, tintColor, isPixelate = true, className, ...props }: Props) => {
   const filter = tintColor ? buildTintFilter(tintColor.color) : undefined;
-  console.log(tintColor);
   return (
     <img
       {...props}

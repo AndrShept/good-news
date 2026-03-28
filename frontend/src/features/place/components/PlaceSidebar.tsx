@@ -25,7 +25,7 @@ const stateToBuildingMap: Record<StateBuilding, CraftBuildingKey | RefiningBuild
   TAILORING: 'TAILOR',
   ALCHEMY: 'ALCHEMY',
   BLACKSMITHING: 'BLACKSMITH',
-  CARPENTRY: 'CARPENTRY',
+  CARPENTRY: 'CARPENTER',
   SAWMILLING: 'SAWMILL',
   TANNING: 'TANNERY',
   WEAVING: 'LOOM',
@@ -70,29 +70,28 @@ export const PlaceSidebar = memo(({ place, entrances }: Props) => {
             {matches && <p>Place Info</p>}
           </PlaceSidebarButton>
 
-          {selectedPlaceEntities?.type === 'BUILDING' &&
-            place?.buildings?.map((building) => (
-              <PlaceSidebarButton
-                key={building.id}
-                matches={matches}
-                disabled={isButtonDisabled}
-                variant={building.id === selectedPlaceEntities.payload.id ? 'secondary' : 'ghost'}
-                size={matches ? 'default' : 'icon'}
-                onClick={() =>
-                  startTransition(() => {
-                    setSelectedPlaceEntities({ type: 'BUILDING', payload: building });
-                  })
-                }
-              >
-                <GameIcon
-                  className={cn('size-8.5', {
-                    'size-10': !matches,
-                  })}
-                  image={building.image}
-                />
-                {matches && <p>{building.name}</p>}
-              </PlaceSidebarButton>
-            ))}
+          {place?.buildings?.map((building) => (
+            <PlaceSidebarButton
+              key={building.id}
+              matches={matches}
+              disabled={isButtonDisabled}
+              variant={building.id === selectedPlaceEntities?.payload.id ? 'secondary' : 'ghost'}
+              size={matches ? 'default' : 'icon'}
+              onClick={() =>
+                startTransition(() => {
+                  setSelectedPlaceEntities({ type: 'BUILDING', payload: building });
+                })
+              }
+            >
+              <GameIcon
+                className={cn('size-8.5', {
+                  'size-10': !matches,
+                })}
+                image={building.image}
+              />
+              {matches && <p>{building.name}</p>}
+            </PlaceSidebarButton>
+          ))}
 
           <PlaceSidebarButton
             className="hover:bg-red-500/10"

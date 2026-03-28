@@ -1,11 +1,11 @@
 import { client } from '@/lib/utils';
-import { BuildingType } from '@/shared/types';
+import { BuildingKey, CraftBuildingKey, craftBuildingValues } from '@/shared/types';
 import { queryOptions } from '@tanstack/react-query';
 
-export const getCraftRecipe = async (heroId: string, buildingType: BuildingType) => {
+export const getCraftRecipe = async (heroId: string, buildingKey: BuildingKey) => {
   try {
     const res = await client.hero[':id']['craft-recipe'][':buildingType'].$get({
-      param: { id: heroId, buildingType },
+      param: { id: heroId, buildingType: buildingKey },
     });
     const data = await res.json();
     if (!res.ok) {
@@ -17,9 +17,9 @@ export const getCraftRecipe = async (heroId: string, buildingType: BuildingType)
   }
 };
 
-export const getCraftRecipeOptions = (heroId: string, buildingType: BuildingType | null | undefined) =>
+export const getCraftRecipeOptions = (heroId: string, buildingKey: BuildingKey) =>
   queryOptions({
-    queryKey: ['craft-recipe', buildingType],
-    queryFn: () => getCraftRecipe(heroId, buildingType!),
-    enabled: buildingType === 'BLACKSMITH' || buildingType === 'FORGE',
+    queryKey: ['craft-recipe', buildingKey],
+    queryFn: () => getCraftRecipe(heroId, buildingKey),
+    enabled: craftBuildingValues.includes(buildingKey as CraftBuildingKey),
   });

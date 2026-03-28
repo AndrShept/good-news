@@ -14,7 +14,7 @@ export const Place = () => {
   const placeId = useHero((data) => data?.location?.placeId ?? '');
   const placeData = useQuery(getPlaceOptions(placeId));
   const placeHeroes = useQuery(getPlaceHeroesLocationOptions(placeId));
-  const { selectedPlaceEntities, setSelectedPlaceEntities } = useSelectPlaceEntitiesStore();
+  const setSelectedPlaceEntities = useSelectPlaceEntitiesStore((state) => state.setSelectedPlaceEntities);
   const clearAllItems = useShopItemStore((state) => state.clearAllItems);
 
   useEffect(() => {
@@ -28,9 +28,8 @@ export const Place = () => {
     <section className="mx-auto flex w-full">
       <PlaceSidebar entrances={placeData.data?.entrances ?? []} place={placeData.data} />
       <SelectedPlaceEntitiesPage place={placeData.data} />
-      {selectedPlaceEntities?.type === 'BUILDING' &&  selectedPlaceEntities.payload.key !== 'BANK' && (
-        <EntitySidebar mode="PLACE" isLoading={placeHeroes.isLoading} heroes={placeHeroes.data} corpses={undefined} creatures={undefined} />
-      )}
+
+      <EntitySidebar mode="PLACE" isLoading={placeHeroes.isLoading} heroes={placeHeroes.data} corpses={undefined} creatures={undefined} />
     </section>
   );
 };

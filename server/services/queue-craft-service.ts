@@ -3,7 +3,14 @@ import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
 import { resourceTemplateById } from '@/shared/templates/resource-template';
 import type { SkillKey } from '@/shared/templates/skill-template';
-import type { CoreResourceType, QueueCraftStatusType, RecipeTemplate, ResourceCategoryType, TItemContainer } from '@/shared/types';
+import type {
+  ColoredResourceCategoryType,
+  CoreResourceType,
+  QueueCraftStatusType,
+  RecipeTemplate,
+  ResourceCategoryType,
+  TItemContainer,
+} from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
@@ -40,7 +47,7 @@ export const queueCraftService = {
 
     heroService.checkFreeBackpackCapacity(hero.id);
 
-    const validateRequiredBuilding = place?.buildings?.some((b) => b.key === recipe.requirement.building);
+    const validateRequiredBuilding = place?.buildings?.some((b) => b.key === recipe.requirement.buildingCraftLocation);
 
     if (!validateRequiredBuilding) {
       throw new HTTPException(400, {
@@ -48,21 +55,17 @@ export const queueCraftService = {
         cause: { canShow: true },
       });
     }
-
-    if (recipe.requirement.isCore && !coreResourceId) {
+    const coreMaterial = recipe.requirement.materials.find((m) => m.role === 'CORE');
+    if (coreMaterial && !coreResourceId) {
       throw new HTTPException(400, {
         message: 'You need select core resource for this craft item.',
         cause: { canShow: true },
       });
     }
-    const copyReqResources = recipe.requirement.resources.map((res) => ({ ...res }));
-    if (coreResourceId && recipe.requirement.isCore) {
+    if (coreResourceId && coreMaterial) {
       const coreResourceTemplate = itemTemplateService.getAllItemsTemplateMapIds()[coreResourceId];
-      const firstRes = copyReqResources.at(0);
-      if (firstRes) {
-        firstRes.templateId = coreResourceId;
-      }
-      if (recipe.requirement.category !== coreResourceTemplate.resourceInfo?.category) {
+
+      if (!coreMaterial.categories?.includes(coreResourceTemplate.resourceInfo!.category as ColoredResourceCategoryType)) {
         throw new HTTPException(400, {
           message: 'Invalid base resource for this craft item.',
           cause: { canShow: true },
@@ -70,31 +73,39 @@ export const queueCraftService = {
       }
     }
 
+    const reqCraftMaterials = recipe.requirement.materials.map((m) => {
+      if (coreResourceId && m.role === 'CORE') {
+        return { ...m, templateId: coreResourceId };
+      }
+      return m;
+    });
+
     for (const reqSkill of recipe.requirement.skills) {
       skillService.checkSkillRequirement(hero.id, reqSkill.skillTemplateId, reqSkill.level);
     }
-    for (const reqResource of copyReqResources) {
-      itemContainerService.checkRequirementsItems(hero.id, reqResource.templateId, reqResource.amount);
+    for (const reqMaterial of reqCraftMaterials) {
+      if (!reqMaterial.templateId) continue;
+      itemContainerService.checkRequirementsItems(hero.id, reqMaterial.templateId, reqMaterial.amount);
     }
   },
 
   consumeAllItemsForCraft(coreResourceId: string | undefined, backpack: TItemContainer, recipe: RecipeTemplate) {
-    const copyReqResources = recipe.requirement.resources.map((res) => ({ ...res }));
-    if (coreResourceId && recipe.requirement.isCore) {
-      const firstRes = copyReqResources.at(0);
-      if (firstRes) {
-        firstRes.templateId = coreResourceId;
+    const reqCraftMaterials = recipe.requirement.materials.map((m) => {
+      if (coreResourceId && m.role === 'CORE') {
+        return { ...m, templateId: coreResourceId };
       }
-    }
-    for (const regResource of copyReqResources) {
-      const item = backpack.itemsInstance.find((i) => i.itemTemplateId === regResource.templateId);
+      return m;
+    });
+
+    for (const reqMaterial of reqCraftMaterials) {
+      const item = backpack.itemsInstance.find((i) => i.itemTemplateId === reqMaterial.templateId);
 
       if (!item) {
         throw new Error('Not enough items');
       }
 
       const itemsDelta = itemContainerService.consumeItem({
-        quantity: regResource.amount,
+        quantity: reqMaterial.amount,
         itemInstanceId: item.id,
         itemContainerId: backpack.id,
         mode: 'all',
@@ -140,12 +151,10 @@ export const queueCraftService = {
 
     const diff = craftSkillLevel - effectiveMin;
 
-
-
     const loreBonus = loreSkillLevel * loreScale;
 
     const chance = baseChance + diff * gainPerLevel + loreBonus;
-    console.log( 'CRAFT-CHANGE' ,chance )
+    console.log('CRAFT-CHANGE', chance);
     return clamp(chance, 3, 99); // ніколи не 100%
   },
 };

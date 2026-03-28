@@ -3,10 +3,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
 import { useSkill } from '@/features/skill/hooks/useSkill';
-
 import { cn, formatDurationFromSeconds } from '@/lib/utils';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
-
 
 type Props = { recipeId: string };
 
@@ -16,6 +14,7 @@ export const CraftRecipeItemCard = ({ recipeId }: Props) => {
   const { itemsTemplateById, skillsTemplateById } = useGameData();
   const recipe = recipeTemplateById[recipeId];
   const itemTemplate = itemsTemplateById[recipe.itemTemplateId];
+
   return (
     <ScrollArea className="h-full">
       <section className="flex flex-1 flex-col items-center gap-1 text-[15px]">
@@ -32,18 +31,28 @@ export const CraftRecipeItemCard = ({ recipeId }: Props) => {
         <div className="flex items-center gap-1">
           <span className="text-muted-foreground">resources:</span>
           <ul className="flex gap-1">
-            {recipe.requirement.resources.map((resource) => (
-              <li key={resource.templateId} className="flex items-center">
-                <GameItemImg tintColor={null} className="size-7.5" image={itemsTemplateById[resource.templateId].image} />
-                <p
-                  className={cn({
-                    'text-red-600': (stackedItems?.[resource.templateId] ?? 0) < resource.amount,
-                  })}
-                >
-                  x{resource.amount}
-                </p>
-              </li>
-            ))}
+            {recipe.requirement.materials.map((material, idx) => {
+              if (material.role !== 'FIXED' && !!material.categories?.length) {
+                return (
+                  <li key={idx}>
+                    {material.categories.join(',')}
+                    <span>x{material.amount}</span>
+                  </li>
+                );
+              }
+              return (
+                <li key={material.templateId} className="flex items-center">
+                  <GameItemImg tintColor={null} className="size-7.5" image={itemsTemplateById[material.templateId!].image} />
+                  <p
+                    className={cn({
+                      'text-red-600': (stackedItems?.[material.templateId!] ?? 0) < material.amount,
+                    })}
+                  >
+                    x{material.amount}
+                  </p>
+                </li>
+              );
+            })}
           </ul>
         </div>
         <div className="flex items-center gap-1">

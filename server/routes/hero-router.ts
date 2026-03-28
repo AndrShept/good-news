@@ -164,9 +164,9 @@ export const heroRouter = new Hono<Context>()
         columns: { recipeId: true },
       });
 
-      const learnedItems = learnedItemsDb.filter((r) => recipeTemplateById[r.recipeId].requirement.building === buildingType);
+      const learnedItems = learnedItemsDb.filter((r) => recipeTemplateById[r.recipeId].requirement.buildingCraftLocation === buildingType);
       const defaultRecipe = recipeTemplate
-        .filter((r) => r.defaultUnlocked === true && r.requirement.building === buildingType)
+        .filter((r) => r.defaultUnlocked === true && r.requirement.buildingCraftLocation === buildingType)
         .map((i) => ({ recipeId: i.id }));
 
       const mergedRecipe = [...learnedItems, ...defaultRecipe];
@@ -1096,7 +1096,7 @@ export const heroRouter = new Hono<Context>()
 
       const recipe = recipeTemplateById[recipeId];
       const last = queueCraft.at(-1);
-      if (last && last.craftBuildingType !== recipe.requirement.building) {
+      if (last && last.craftBuildingType !== recipe.requirement.buildingCraftLocation) {
         throw new HTTPException(400, {
           message: 'You must work only one building',
           cause: { canShow: true },
@@ -1111,16 +1111,17 @@ export const heroRouter = new Hono<Context>()
 
       queueCraftService.canStartCraft(hero.id, coreResourceId, recipeId);
       const now = Date.now();
+      const isCore = recipe.requirement.materials.some((m) => m.role === 'CORE');
       if (!queueCraft.length) {
         queueCraft.push({
           id: generateRandomUuid(),
           recipeId,
-          coreResourceId: recipe.requirement.isCore ? coreResourceId : undefined,
+          coreResourceId: isCore ? coreResourceId : undefined,
           expiresAt: now + recipe.timeMs,
-          craftBuildingType: recipe.requirement.building,
+          craftBuildingType: recipe.requirement.buildingCraftLocation,
           status: 'PROGRESS',
         });
-        const stateData = getStateWithCraftBuildingType(recipe.requirement.building);
+        const stateData = getStateWithCraftBuildingType(recipe.requirement.buildingCraftLocation);
         hero.state = stateData;
         socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, stateData);
       } else {
@@ -1128,9 +1129,9 @@ export const heroRouter = new Hono<Context>()
         queueCraft.push({
           id: generateRandomUuid(),
           recipeId,
-          coreResourceId: recipe.requirement.isCore ? coreResourceId : undefined,
+          coreResourceId: isCore ? coreResourceId : undefined,
           expiresAt: now + Math.max((last ?? 0) - now, 0) + recipe.timeMs,
-          craftBuildingType: recipe.requirement.building,
+          craftBuildingType: recipe.requirement.buildingCraftLocation,
           status: 'PENDING',
         });
       }

@@ -42,8 +42,8 @@ export const buildingTemplate = [
   },
   {
     id: '019d30dd-2045-794c-8a95-bf82a5a028b3',
-    name: 'Carpentry',
-    key: 'CARPENTRY',
+    name: 'Carpenter',
+    key: 'CARPENTER',
     image: imageConfig.icon.building.carpenter,
   },
   {

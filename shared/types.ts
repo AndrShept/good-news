@@ -201,6 +201,7 @@ export type ClothType = (typeof clothTypeEnum.enumValues)[number];
 export type BoneType = (typeof boneTypeEnum.enumValues)[number];
 export type CoreResourceType = (typeof coreResourceTypeEnum.enumValues)[number];
 export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[number];
+export type ColoredResourceCategoryType = Extract<ResourceCategoryType, 'INGOT' | 'LEATHER' | 'CLOTH' | 'PLANK' | 'BONE' | 'CURED_FUR'>;
 export type ColoredResourceType =
   | OreType
   | IngotType
@@ -306,13 +307,13 @@ export const buildingValues = [
   'BLACKSMITH',
   'TAILOR',
   'ALCHEMY',
-  'CARPENTRY',
+  'CARPENTER',
   'LOOM',
   'SAWMILL',
   'TANNERY',
   'FORGE',
 ] as const;
-export const craftBuildingValues = ['BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY', 'CARPENTRY'] as const;
+export const craftBuildingValues = ['BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY', 'CARPENTER'] as const;
 export const refiningBuildingValues = ['LOOM', 'SAWMILL', 'TANNERY', 'FORGE'] as const;
 
 export type Building = {
@@ -325,7 +326,7 @@ export type Building = {
 export type BuildingKey = (typeof buildingValues)[number];
 export type CraftBuildingKey = (typeof craftBuildingValues)[number];
 export type RefiningBuildingKey = (typeof refiningBuildingValues)[number];
-export type SelectCoreResourceBuildingKey = Extract<CraftBuildingKey, 'TAILOR' | 'BLACKSMITH' | 'CARPENTRY'>;
+// export type SelectCoreResourceBuildingKey = Extract<CraftBuildingKey, 'TAILOR' | 'BLACKSMITH' | 'CARPENTRY'>;
 
 export const tileTypeValues = [
   'OBJECT',
@@ -352,6 +353,14 @@ export type TItemContainer = typeof itemContainerTable.$inferSelect & {
   itemsInstance: ItemInstance[];
 };
 
+export type CraftMaterial = {
+  role: 'CORE' | 'OPTIONAL' | 'FIXED';
+
+  amount: number;
+  templateId?: string;
+  categories?: ColoredResourceCategoryType[];
+};
+
 export type RecipeTemplate = {
   id: string;
 
@@ -359,11 +368,9 @@ export type RecipeTemplate = {
 
   timeMs: number;
   requirement: {
-    resources: { templateId: string; amount: number }[];
+    materials: CraftMaterial[];
     skills: { skillTemplateId: string; level: number }[];
-    building: CraftBuildingKey;
-    category: ResourceCategoryType;
-    isCore?: boolean;
+    buildingCraftLocation: CraftBuildingKey;
   };
 
   defaultUnlocked: boolean;
