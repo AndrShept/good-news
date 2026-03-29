@@ -1,6 +1,6 @@
 import type { CoreResourceType, RecipeTemplate } from '@/shared/types';
 
-import { CORE_RESOURCE_TABLE } from '../lib/table/crafting-table';
+import { resourceMetaConfig } from '../lib/config/resource-config';
 import { clamp } from '../lib/utils';
 import { itemTemplateService } from './item-template-service';
 
@@ -31,7 +31,7 @@ export const progressionService = {
 
     if (coreResourceId) {
       const template = itemTemplateService.getAllItemsTemplateMapIds()[coreResourceId];
-      const resourceRequired = CORE_RESOURCE_TABLE[template.key as CoreResourceType].requiredMinSkill;
+      const resourceRequired = resourceMetaConfig[template.key as CoreResourceType].requiredMinSkill;
 
       exp += resourceRequired * 4;
     }
@@ -51,7 +51,7 @@ export const progressionService = {
     const baseXp = 5 + requiredMinSkill * 1.5;
 
     // 2️⃣ Бонус за час
-    const timeBonus = 0   // (timeMs / 1000) * 0.4;
+    const timeBonus = 0; // (timeMs / 1000) * 0.4;
 
     // 3️⃣ Якщо рівень сильно перевищує складність — менше EXP
     const levelDiff = (loreSkillLevel ?? 0) - requiredMinSkill;

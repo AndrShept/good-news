@@ -1,7 +1,7 @@
 import { GameItemImg } from '@/components/GameItemImg';
 import { Button } from '@/components/ui/button';
 import { useGameData } from '@/features/hero/hooks/useGameData';
-import { materialConfig, TINT_COLOR } from '@/lib/config';import { cn } from '@/lib/utils';
+import {  TINT_COLOR } from '@/lib/config';import { cn } from '@/lib/utils';
 import { ColoredResourceType, CoreResourceType, QueueCraft } from '@/shared/types';
 import { X } from 'lucide-react';
 import React, { memo, useEffect, useState } from 'react';
@@ -43,7 +43,7 @@ export const QueueCraftItemCard = memo(function QueueCraftItemCard(props: Props)
       <GameItemImg tintColor={TINT_COLOR[template.key as ColoredResourceType]} image={template.image} className="size-10" />
       <div className="flex flex-col items-center">
         <h2 className="truncate text-[15px]">{template.name}</h2>
-        {coreResource && <p className={cn('text-xs truncate', materialConfig[coreResource.key as CoreResourceType]?.color)}>{coreResource.name}</p>}
+        {coreResource && <p className={cn('text-xs truncate')}>{coreResource.name}</p>}
         <p
           className={cn('text-sm', {
             'text-muted': props.status === 'PENDING',

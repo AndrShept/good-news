@@ -154,7 +154,7 @@ export const itemInstanceTable = pgTable('item_instance', {
   itemTemplateId: uuid().notNull(),
   location: itemLocationEnum().notNull(),
   coreResource: coreResourceTypeEnum(),
-  coreResourceModifier: jsonb('coreResourceModifier').$type<Partial<OmitModifier>>(),
+  modifier: jsonb('modifier').$type<Partial<OmitModifier>>(),
   durability: jsonb('durability').$type<ItemDurability>(),
   slot: slotEnum(),
   marketPrice: integer(),

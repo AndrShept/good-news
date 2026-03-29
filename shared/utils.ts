@@ -117,7 +117,7 @@ export const getStateWithCraftBuildingType = (craftBuildingKey: CraftBuildingKey
     ALCHEMY: 'ALCHEMY',
     FORGE: 'SMELTING',
     TAILOR: 'TAILORING',
-    CARPENTRY: 'CARPENTRY',
+    CARPENTER: 'CARPENTRY',
   };
 
   return stateData[craftBuildingKey];

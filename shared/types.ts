@@ -424,7 +424,7 @@ export type ItemTemplate = {
   bookInfo?: BookInfo;
   potionInfo?: PotionInfo;
   toolInfo?: ToolInfo;
-  coreModifier?: Partial<OmitModifier>;
+  modifier?: Partial<OmitModifier>;
 };
 
 export type EffectSource = 'POTION' | 'BOOK' | 'FOOD' | 'SKILL' | 'ZONE' | 'EVENT';

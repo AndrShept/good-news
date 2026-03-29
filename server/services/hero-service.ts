@@ -5,7 +5,7 @@ import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
 import { calculate } from '../lib/calculate';
-import { getModifierByResourceKey, sumAllModifier } from '../lib/utils';
+import {  sumAllModifier } from '../lib/utils';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
 
@@ -53,11 +53,11 @@ export const heroService = {
     const hero = this.getHero(heroId);
     const buffs = serverState.buff.get(heroId) ?? [];
 
-    const itemsMapIds = itemTemplateService.getAllItemsTemplateMapIds();
+    // const itemsMapIds = itemTemplateService.getAllItemsTemplateMapIds();
     const modifiers = [
       ...buffs.map((b) => buffTemplateMapIds[b.buffTemplateId].modifier),
-      ...(hero.equipments ?? []).map((e) => itemsMapIds[e.itemTemplateId].coreModifier),
-      ...(hero.equipments ?? []).map((e) => e.coreResourceModifier),
+      // ...(hero.equipments ?? []).map((e) => itemsMapIds[e.itemTemplateId].modifier),
+      ...(hero.equipments ?? []).map((e) => e.modifier),
     ];
 
     const sumModifier = sumAllModifier(...modifiers);

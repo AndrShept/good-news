@@ -3,8 +3,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
 import { useSkill } from '@/features/skill/hooks/useSkill';
+import { TINT_COLOR } from '@/lib/config';
 import { cn, formatDurationFromSeconds } from '@/lib/utils';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
+import { ColoredResourceType } from '@/shared/types';
 
 type Props = { recipeId: string };
 
@@ -30,22 +32,27 @@ export const CraftRecipeItemCard = ({ recipeId }: Props) => {
         </div>
         <div className="flex items-center gap-1">
           <span className="text-muted-foreground">resources:</span>
-          <ul className="flex gap-1">
+          <ul className="flex items-center gap-1">
             {recipe.requirement.materials.map((material, idx) => {
-              if (material.role !== 'FIXED' && !!material.categories?.length) {
+              if ( !material.templateId) {
                 return (
-                  <li key={idx}>
-                    {material.categories.join(',')}
-                    <span>x{material.amount}</span>
+                  <li key={idx} className="lowercase">
+                    {material.categories?.join(' or ')}
+                    <span className="ml-1">x{material.amount}</span>
                   </li>
                 );
               }
+              const materialTemplate = itemsTemplateById[material.templateId];
               return (
                 <li key={material.templateId} className="flex items-center">
-                  <GameItemImg tintColor={null} className="size-7.5" image={itemsTemplateById[material.templateId!].image} />
+                  <GameItemImg
+                    tintColor={TINT_COLOR[materialTemplate.key as ColoredResourceType]}
+                    className="size-7.5"
+                    image={itemsTemplateById[material.templateId!].image}
+                  />
                   <p
                     className={cn({
-                      'text-red-600': (stackedItems?.[material.templateId!] ?? 0) < material.amount,
+                      'text-red-600': (stackedItems?.[material.templateId] ?? 0) < material.amount,
                     })}
                   >
                     x{material.amount}

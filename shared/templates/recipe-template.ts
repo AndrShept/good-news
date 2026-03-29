@@ -1,5 +1,6 @@
 import type { RecipeTemplate } from '@/shared/types';
 
+import { resourceTemplateByKey } from './resource-template';
 import { skillTemplateByKey } from './skill-template';
 import { weaponTemplateByKey } from './weapon-template';
 
@@ -11,12 +12,14 @@ export const recipeTemplate = [
     itemTemplateId: weaponTemplateByKey.broadsword.id,
     timeMs: 10_000,
     requirement: {
-      materials: [{ amount: 9 , role: 'CORE', categories: ['INGOT', 'PLANK']}],
+      materials: [
+        { amount: 9, role: 'CORE', categories: ['INGOT', 'PLANK'] },
+        { role: 'FIXED', amount: 3, templateId: resourceTemplateByKey.REGULAR_LEATHER.id },
+      ],
       skills: [{ skillTemplateId: skillTemplateByKey.BLACKSMITHING.id, level: 1 }],
-      buildingCraftLocation: 'BLACKSMITH'
+      buildingCraftLocation: 'BLACKSMITH',
     },
   },
- 
 ] as const satisfies RecipeTemplate[];
 
 export const recipeTemplateById = recipeTemplate.reduce(

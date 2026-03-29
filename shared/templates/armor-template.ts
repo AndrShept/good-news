@@ -12,10 +12,10 @@ export const armorTemplate = [
       armorType: 'CHEST',
       armorCategory: 'PLATE',
     },
-    coreModifier: {
+    modifier: {
       armor: 20,
       evasion: -30,
-      constitution: 10
+      constitution: 10,
     },
   },
 ] as const satisfies ItemTemplate[];

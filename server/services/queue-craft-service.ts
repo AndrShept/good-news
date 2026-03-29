@@ -1,3 +1,4 @@
+import { MAX_SKILL } from '@/shared/constants';
 import { socketEvents } from '@/shared/socket-events';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
@@ -6,6 +7,7 @@ import type { SkillKey } from '@/shared/templates/skill-template';
 import type {
   ColoredResourceCategoryType,
   CoreResourceType,
+  OmitModifier,
   QueueCraftStatusType,
   RecipeTemplate,
   ResourceCategoryType,
@@ -15,7 +17,7 @@ import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
 import { serverState } from '../game/state/server-state';
-import { CORE_RESOURCE_TABLE } from '../lib/table/crafting-table';
+import { resourceMetaConfig } from '../lib/config/resource-config';
 import { clamp } from '../lib/utils';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
@@ -97,21 +99,22 @@ export const queueCraftService = {
       return m;
     });
 
+    const resultDelta = [];
     for (const reqMaterial of reqCraftMaterials) {
       const item = backpack.itemsInstance.find((i) => i.itemTemplateId === reqMaterial.templateId);
 
       if (!item) {
         throw new Error('Not enough items');
       }
-
       const itemsDelta = itemContainerService.consumeItem({
         quantity: reqMaterial.amount,
         itemInstanceId: item.id,
         itemContainerId: backpack.id,
         mode: 'all',
       });
-      return itemsDelta;
+      resultDelta.push(...itemsDelta);
     }
+    return resultDelta;
   },
   updateStatus(heroId: string, queueCraftId: string, status: QueueCraftStatusType) {
     const queuesCrafts = serverState.queueCraft.get(heroId);
@@ -143,7 +146,7 @@ export const queueCraftService = {
 
     if (coreResourceId) {
       const template = itemTemplateService.getAllItemsTemplateMapIds()[coreResourceId];
-      resourceMin = CORE_RESOURCE_TABLE[template.key as CoreResourceType]?.requiredMinSkill ?? 0;
+      resourceMin = resourceMetaConfig[template.key as CoreResourceType]?.requiredMinSkill ?? 0;
     }
 
     // Складність = що складніше: рецепт чи ресурс
@@ -156,5 +159,25 @@ export const queueCraftService = {
     const chance = baseChance + diff * gainPerLevel + loreBonus;
     console.log('CRAFT-CHANGE', chance);
     return clamp(chance, 3, 99); // ніколи не 100%
+  },
+  calculateFinalCraftModifiers(heroId: string, coreResourceId: string, modifier: Partial<OmitModifier>) {
+    const loreSkillKey = skillService.getLoreSkillByItemTemplateId(coreResourceId);
+    const loreSkillInstance = skillService.getSkillByKey(heroId, loreSkillKey);
+
+    const skillFactor = loreSkillInstance.level / MAX_SKILL;
+
+    const modifierWithLoreSkill = Object.entries(modifier).reduce((acc, [key, value]) => {
+      acc[key as keyof OmitModifier] = Math.floor(value * (0.5 + 0.5 * skillFactor));
+
+      return acc;
+    }, {} as OmitModifier);
+
+    return modifierWithLoreSkill;
+  },
+  calculateFinalCraftDurability(durability: number, coreResourceId: string) {
+    const coreResource = resourceTemplateById[coreResourceId];
+
+    const resourceConfig = resourceMetaConfig[coreResource.key as CoreResourceType];
+    return resourceConfig.durabilityMultiplier * durability;
   },
 };

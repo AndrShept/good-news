@@ -5,10 +5,8 @@ import { useCraftItemStore } from '@/store/useCraftItemStore';
 
 import { useCreateQueueCraftItemMutation } from '../../queue/hooks/useCreateQueueCraftItemMutation';
 
-
 interface Props {
   recipeId: string;
-
 }
 
 export const CraftButton = ({ recipeId }: Props) => {
@@ -22,12 +20,10 @@ export const CraftButton = ({ recipeId }: Props) => {
         mutate({
           recipeId,
           coreResourceId,
-        
         })
       }
     >
-      <GameIcon className='size-6.5' image={imageConfig.icon.state.BLACKSMITHING} />
-      Add
+      + Craft queue
     </Button>
   );
 };

@@ -1,7 +1,7 @@
 import type { ArmorType, ClothType, IngotType, LeatherType, OmitModifier, ResourceType, WeaponHandType, WeaponType } from '@/shared/types';
 
 export interface ItemDurabilityConfig {
-  WEAPON: Record<WeaponHandType, Record<WeaponType, number>>;
+  WEAPON: Record<WeaponType, number>;
   SHIELD: number;
   ARMOR: {
     PLATE: Record<ArmorType, number>;
@@ -9,25 +9,16 @@ export interface ItemDurabilityConfig {
     LEATHER: Record<ArmorType, number>;
     CLOTH: Record<ArmorType, number>;
   };
-  TOOL: Record<WeaponHandType, Record<WeaponType, number>>;
+  TOOL: Record<WeaponType, number>;
 }
 
 export const itemDurabilityConfig: ItemDurabilityConfig = {
   WEAPON: {
-    ONE_HANDED: {
-      AXE: 60,
-      DAGGER: 40,
-      MACE: 70,
-      STAFF: 120,
-      SWORD: 55,
-    },
-    TWO_HANDED: {
-      AXE: 100,
-      DAGGER: 70,
-      MACE: 130,
-      STAFF: 120,
-      SWORD: 100,
-    },
+    AXE: 60,
+    DAGGER: 40,
+    MACE: 70,
+    STAFF: 50,
+    SWORD: 55,
   },
   SHIELD: 70,
   ARMOR: {
@@ -69,19 +60,10 @@ export const itemDurabilityConfig: ItemDurabilityConfig = {
     },
   },
   TOOL: {
-    ONE_HANDED: {
-      AXE: 60,
-      DAGGER: 40,
-      MACE: 70,
-      STAFF: 120,
-      SWORD: 55,
-    },
-    TWO_HANDED: {
-      AXE: 100,
-      DAGGER: 70,
-      MACE: 130,
-      STAFF: 120,
-      SWORD: 100,
-    },
+    AXE: 60,
+    DAGGER: 40,
+    MACE: 70,
+    STAFF: 50,
+    SWORD: 55,
   },
 };

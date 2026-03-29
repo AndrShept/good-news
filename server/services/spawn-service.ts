@@ -3,7 +3,7 @@ import { mapTemplate } from '@/shared/templates/map-template';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
-import { spawnConfig } from '../lib/config/spawn-config';
+import { SPAWN_CREATURE_TABLE } from '../lib/table/spawn-creature-table';
 import { generateRandomUuid, getTileExists } from '../lib/utils';
 import { mapService } from './map-service';
 
@@ -65,9 +65,9 @@ export const spawnService = {
           mapId: map.id,
           chunkId,
           creatureTemplateId: creatureTemplateByKey[creatureKey].id,
-          radius: spawnConfig[creatureKey].radius,
-          maxCreatures: spawnConfig[creatureKey].maxCreatures,
-          respawnTime: spawnConfig[creatureKey].respawnTime,
+          radius: SPAWN_CREATURE_TABLE[creatureKey].radius,
+          maxCreatures: SPAWN_CREATURE_TABLE[creatureKey].maxCreatures,
+          respawnTime: SPAWN_CREATURE_TABLE[creatureKey].respawnTime,
           alive: 0,
           respawnAt: null,
         });

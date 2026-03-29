@@ -5,12 +5,13 @@ import { HTTPException } from 'hono/http-exception';
 import { serverState } from '../game/state/server-state';
 import { itemDurabilityConfig } from '../lib/config/item-dutability-config';
 import { materialModifierConfig } from '../lib/config/material-modifier-config';
-import { generateRandomUuid, getDisplayName, getModifierByResourceKey } from '../lib/utils';
+import { generateRandomUuid, getDisplayName, getModifierByResourceKey, sumAllModifier } from '../lib/utils';
 import { deltaEventsService } from './delta-events-service';
 import { equipmentService } from './equipment-service';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
+import { queueCraftService } from './queue-craft-service';
 
 interface ICreateItem {
   itemTemplateId: string;
@@ -34,15 +35,24 @@ export const itemInstanceService = {
   createItem({ heroId, itemContainerId, itemTemplateId, quantity, location, coreResourceId, isAddPendingEvents }: ICreateItem) {
     heroService.checkFreeBackpackCapacity(heroId);
     let coreResource: null | CoreResourceType = null;
-    let coreResourceModifier: null | Partial<OmitModifier> = null;
+    let finalModifier: null | Partial<OmitModifier> = null;
     let displayName: string | null = null;
+    const craftItem = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
     if (coreResourceId) {
       const resource = resourceTemplateById[coreResourceId];
       coreResource = resource.key as CoreResourceType;
-      coreResourceModifier = getModifierByResourceKey(coreResource, itemTemplateId);
+      const resourceModifier = getModifierByResourceKey(coreResource, itemTemplateId);
+      const craftItemModifier = craftItem.modifier;
+      const sumModifier = sumAllModifier(resourceModifier, craftItemModifier);
+
+      finalModifier = queueCraftService.calculateFinalCraftModifiers(heroId, resource.id, sumModifier);
+
       displayName = getDisplayName(itemTemplateId, resource.id) as string | null;
     }
-    const durability = this.getDurability(itemTemplateId);
+    let durability = this.getDurability(itemTemplateId);
+    if (durability && coreResourceId) {
+      durability = queueCraftService.calculateFinalCraftDurability(durability, coreResourceId);
+    }
     const newItem: ItemInstance = {
       id: generateRandomUuid(),
       displayName,
@@ -52,7 +62,7 @@ export const itemInstanceService = {
       itemTemplateId,
       ownerHeroId: heroId,
       marketPrice: null,
-      coreResourceModifier,
+      modifier: finalModifier ?? (craftItem.modifier ? craftItem.modifier : null),
       coreResource,
       slot: null,
       durability: durability ? { current: durability, max: durability } : null,
@@ -75,8 +85,8 @@ export const itemInstanceService = {
       case 'WEAPON':
       case 'TOOL': {
         if (!template.equipInfo?.weaponHand || !template.equipInfo.weaponType) return;
-
-        return itemDurabilityConfig['WEAPON'][template.equipInfo.weaponHand][template.equipInfo.weaponType];
+        const durability = itemDurabilityConfig['WEAPON'][template.equipInfo.weaponType];
+        return template.equipInfo.weaponHand === 'TWO_HANDED' ? Math.floor(durability * 1.6) : durability;
       }
       case 'ARMOR': {
         if (!template.equipInfo?.armorCategory || !template.equipInfo.armorType) return;

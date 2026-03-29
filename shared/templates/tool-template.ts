@@ -20,9 +20,9 @@ export const toolsTemplate = [
       skillTemplateId: skillTemplateByKey.BLACKSMITHING.id,
     },
 
-    coreModifier: {
+    modifier: {
       minDamage: 5,
-      maxDamage: 10,
+      maxDamage: 9,
     },
   },
   {
@@ -41,7 +41,7 @@ export const toolsTemplate = [
       skillTemplateId: skillTemplateByKey.FISHING.id,
     },
 
-    coreModifier: {
+    modifier: {
       minDamage: 5,
       maxDamage: 9,
     },
@@ -55,16 +55,16 @@ export const toolsTemplate = [
     stackable: false,
 
     equipInfo: {
-      weaponHand: 'TWO_HANDED',
+      weaponHand: 'ONE_HANDED',
       weaponType: 'AXE',
     },
     toolInfo: {
       skillTemplateId: skillTemplateByKey.WOODCUTTING.id,
     },
 
-    coreModifier: {
-      minDamage: 7,
-      maxDamage: 13,
+    modifier: {
+      minDamage: 5,
+      maxDamage: 7,
     },
   },
   {
@@ -83,9 +83,9 @@ export const toolsTemplate = [
       skillTemplateId: skillTemplateByKey.MINING.id,
     },
 
-    coreModifier: {
-      minDamage: 6,
-      maxDamage: 9,
+    modifier: {
+      minDamage: 4,
+      maxDamage: 7,
     },
   },
 ] as const satisfies ItemTemplate[];

@@ -1,7 +1,6 @@
-
 import { mapTemplate } from '@/shared/templates/map-template';
 import { resourceTemplateById } from '@/shared/templates/resource-template';
-import type { ClothType, IngotType, LeatherType, Modifier, OmitModifier, StateType, TileType } from '@/shared/types';
+import type { ClothType, CoreResourceType, IngotType, LeatherType, Modifier, OmitModifier, PlankType, StateType, TileType } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
 import { sql } from 'drizzle-orm';
@@ -146,7 +145,7 @@ export const delay = (time: number) => {
   return new Promise((resolve) => setTimeout(resolve, time));
 };
 
-export const getModifierByResourceKey = (resourceKey: string, itemTemplateId: string) => {
+export const getModifierByResourceKey = ( resourceKey: CoreResourceType, itemTemplateId: string) => {
   const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
 
   switch (itemTemplate.type) {
@@ -165,10 +164,16 @@ export const getModifierByResourceKey = (resourceKey: string, itemTemplateId: st
       }
     }
 
-    case 'WEAPON':
+    case 'WEAPON': {
+      if (itemTemplate.equipInfo?.weaponType === 'STAFF') {
+        return materialModifierConfig.STAFF[resourceKey as PlankType];
+      }
+
       return materialModifierConfig.WEAPON[resourceKey as IngotType];
+    }
     case 'SHIELD':
-      return materialModifierConfig.SHIELD[resourceKey as IngotType];
+      return materialModifierConfig.SHIELD[resourceKey as IngotType | PlankType];
+
     default:
       return null;
   }
@@ -181,8 +186,6 @@ export const getDisplayName = (itemTemplateId: string, resourceId: string | unde
   const displayName = `${resource.name.split(' ')[0]} ${itemTemplate.name}`;
   return displayName;
 };
-
-
 
 export function hash(x: number, y: number, seed: number) {
   let n = x * 374761393 + y * 668265263 + seed * 1446647;

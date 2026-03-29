@@ -13,7 +13,7 @@ export const weaponTemplate = [
       weaponType: 'SWORD',
     },
 
-    coreModifier: {
+    modifier: {
       minDamage: 10,
       maxDamage: 17,
     },

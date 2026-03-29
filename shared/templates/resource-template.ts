@@ -148,8 +148,8 @@ export const resourceTemplate = [
   createResource('019f1000-0000-7000-8000-000000000109', 'FROST_LILY', 'FLOWER', imageConfig.icon.RESOURCES.flowers.FROST_LILY),
 ] as const satisfies ItemTemplate[];
 
-const resourceKeys = resourceTemplate.map((r) => r.key);
-export type ResourceKey = (typeof resourceKeys)[number];
+// const resourceKeys = resourceTemplate.map((r) => r.key);
+// export type ResourceKey = (typeof resourceKeys)[number];
 
 export const resourceTemplateById = resourceTemplate.reduce(
   (acc, template) => {
@@ -161,8 +161,8 @@ export const resourceTemplateById = resourceTemplate.reduce(
 
 export const resourceTemplateByKey = resourceTemplate.reduce(
   (acc, template) => {
-    acc[template.key] = template;
+    acc[template.key as ResourceType] = template;
     return acc;
   },
-  {} as Record<ResourceKey, ItemTemplate>,
+  {} as Record<ResourceType, ItemTemplate>,
 );

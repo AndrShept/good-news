@@ -12,7 +12,7 @@ export const shieldTemplate = [
       armorType: 'SHIELD',
     },
 
-    coreModifier: {
+    modifier: {
       armor: 20,
       evasion: -10,
     },
