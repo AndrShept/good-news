@@ -313,7 +313,7 @@ export const buildingValues = [
   'TANNERY',
   'FORGE',
 ] as const;
-export const craftBuildingValues = ['BLACKSMITH', 'FORGE', 'TAILOR', 'ALCHEMY', 'CARPENTER'] as const;
+export const craftBuildingValues = ['BLACKSMITH', 'TAILOR', 'ALCHEMY', 'CARPENTER'] as const;
 export const refiningBuildingValues = ['LOOM', 'SAWMILL', 'TANNERY', 'FORGE'] as const;
 
 export type Building = {
@@ -578,6 +578,9 @@ export interface GameSysMessage {
 
 //API RESPONSE
 export type ApiGetHeroResponse = InferResponseType<(typeof client.hero)['$get']>['data'];
+export type ApiGetItemContainerResponse = InferResponseType<
+  (typeof client.hero)[':id']['item-container'][':itemContainerId']['$get']
+>['data'];
 export type ApiMapResponse = InferResponseType<(typeof client.map)[':id']['$get']>['data'];
 export type ApiGeChunkMapEntities = InferResponseType<(typeof client.map)[':id']['entities']['$get']>['data'];
 export type ApiGetPlaceHeroes = InferResponseType<(typeof client.place)[':id']['heroes']['$get']>['data'];

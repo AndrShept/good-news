@@ -1,7 +1,20 @@
+import {
+  boneValues,
+  clothValues,
+  curedFurValues,
+  fiberValues,
+  furValues,
+  hideValues,
+  ingotValues,
+  leatherValues,
+  logValues,
+  oreValues,
+  plankValues,
+} from '../server/db/schema';
 import type { Layer } from './json-types';
 import { mapTemplate } from './templates/map-template';
 import type { GatheringCategorySkillKey } from './templates/skill-template';
-import type { CraftBuildingKey, IHeroStat, IPosition, OmitTileType, StateType, TileType } from './types';
+import type { CraftBuildingKey, IPosition, ItemTemplateType, OmitTileType, RefiningBuildingKey, StateType } from './types';
 
 function isBlocked(x: number, y: number, layers: Layer[], width: number): boolean {
   return layers.some((layer) => {
@@ -115,7 +128,6 @@ export const getStateWithCraftBuildingType = (craftBuildingKey: CraftBuildingKey
   const stateData: Record<CraftBuildingKey, StateType> = {
     BLACKSMITH: 'BLACKSMITHING',
     ALCHEMY: 'ALCHEMY',
-    FORGE: 'SMELTING',
     TAILOR: 'TAILORING',
     CARPENTER: 'CARPENTRY',
   };
@@ -161,4 +173,19 @@ export const getMapLayerNameAtHeroPos = ({ mapId, pos, radius, tilesType }: GetM
     }
   }
   return result;
+};
+
+export const refineItems: Record<RefiningBuildingKey, Record<Extract<ItemTemplateType, 'RESOURCES' | 'ARMOR' | 'WEAPON'>, string[]>> = {
+  FORGE: {
+    RESOURCES: [...oreValues],
+    WEAPON: [...ingotValues],
+    ARMOR: [...ingotValues],
+  },
+  LOOM: {
+    RESOURCES: [...fiberValues],
+    ARMOR: [...clothValues],
+    WEAPON: [],
+  },
+  SAWMILL: { RESOURCES: [...logValues], WEAPON: [...plankValues], ARMOR: [] },
+  TANNERY: { RESOURCES: [...furValues, ...hideValues], ARMOR: [...curedFurValues, ...leatherValues, ...boneValues], WEAPON: [] },
 };

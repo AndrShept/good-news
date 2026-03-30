@@ -41,11 +41,11 @@ export const resourceCategoryEnum = pgEnum('resource_category_enum', [
   'BONE',
 ]);
 
-const oreValues = ['IRON_ORE', 'COPPER_ORE', 'SILVER_ORE', 'GOLD_ORE', 'MITHRIL_ORE', 'ADAMANTINE_ORE'] as const;
+export const oreValues = ['IRON_ORE', 'COPPER_ORE', 'SILVER_ORE', 'GOLD_ORE', 'MITHRIL_ORE', 'ADAMANTINE_ORE'] as const;
+ 
+export const ingotValues = ['IRON_INGOT', 'COPPER_INGOT', 'SILVER_INGOT', 'GOLD_INGOT', 'MITHRIL_INGOT', 'ADAMANTINE_INGOT'] as const;
 
-const ingotValues = ['IRON_INGOT', 'COPPER_INGOT', 'SILVER_INGOT', 'GOLD_INGOT', 'MITHRIL_INGOT', 'ADAMANTINE_INGOT'] as const;
-
-const logValues = [
+export const logValues = [
   'REGULAR_LOG',
   'PINE_LOG',
   'OAK_LOG',
@@ -56,7 +56,7 @@ const logValues = [
   'BLOOD_LOG',
   'GHOST_LOG',
 ] as const;
-const plankValues = [
+export const plankValues = [
   'REGULAR_PLANK',
   'PINE_PLANK',
   'OAK_PLANK',
@@ -67,10 +67,10 @@ const plankValues = [
   'BLOOD_PLANK',
   'GHOST_PLANK',
 ] as const;
-const hideValues = ['REGULAR_HIDE', 'ROUGH_HIDE', 'REPTILE_HIDE', 'IRON_HIDE', 'DEMON_HIDE', 'DRAGON_HIDE'] as const;
-const leatherValues = ['REGULAR_LEATHER', 'ROUGH_LEATHER', 'REPTILE_LEATHER', 'IRON_LEATHER', 'DEMON_LEATHER', 'DRAGON_LEATHER'] as const;
-const furValues = ['REGULAR_FUR', 'THICK_FUR', 'DARK_FUR', 'SHADOW_FUR', 'SNOW_FUR'] as const;
-const curedFurValues = ['REGULAR_CURED_FUR', 'THICK_CURED_FUR', 'DARK_CURED_FUR', 'SHADOW_CURED_FUR', 'SNOW_CURED_FUR'] as const;
+export const hideValues = ['REGULAR_HIDE', 'ROUGH_HIDE', 'REPTILE_HIDE', 'IRON_HIDE', 'DEMON_HIDE', 'DRAGON_HIDE'] as const;
+export const leatherValues = ['REGULAR_LEATHER', 'ROUGH_LEATHER', 'REPTILE_LEATHER', 'IRON_LEATHER', 'DEMON_LEATHER', 'DRAGON_LEATHER'] as const;
+export const furValues = ['REGULAR_FUR', 'THICK_FUR', 'DARK_FUR', 'SHADOW_FUR', 'SNOW_FUR'] as const;
+export const curedFurValues = ['REGULAR_CURED_FUR', 'THICK_CURED_FUR', 'DARK_CURED_FUR', 'SHADOW_CURED_FUR', 'SNOW_CURED_FUR'] as const;
 
 const mushroomValues = [
   'REDCAP_MUSHROOM',
@@ -83,10 +83,10 @@ const mushroomValues = [
 const flowerValues = ['ROSE', 'SUNFLOWER', 'BLUE_ORCHID', 'NIGHT_BLOOM', 'FIRE_BLOSSOM', 'FROST_LILY'] as const;
 const herbValues = ['GREENLEAF', 'SWIFTLEAF', 'BITTERROOT', 'SUNGRASS', 'GHOST_HERB', 'BLOOD_HERB', 'JASMINE'] as const;
 
-const fiberValues = ['COTTON', 'FLAX'] as const;
+export const fiberValues = ['COTTON', 'FLAX'] as const;
 
-const clothValues = ['REGULAR_CLOTH'] as const;
-const boneValues = ['REGULAR_BONE'] as const;
+export const clothValues = ['REGULAR_CLOTH'] as const;
+export const boneValues = ['REGULAR_BONE'] as const;
 
 export const oreTypeEnum = pgEnum('ore_type_enum', [...oreValues]);
 export const ingotTypeEnum = pgEnum('ingot_type_enum', [...ingotValues]);
@@ -130,7 +130,17 @@ export const coreResourceTypeEnum = pgEnum('core_resource_enum', [
 
 //////////////
 
-export const itemLocationEnum = pgEnum('item_location_enum', ['BANK', 'BACKPACK', 'EQUIPMENT', 'LOOT', 'MARKET']);
+export const itemLocationEnum = pgEnum('item_location_enum', [
+  'BACKPACK',
+  'BANK',
+  'MARKET',
+  'CORPSE',
+  'LOOM',
+  'SAWMILL',
+  'TANNERY',
+  'FORGE',
+  'EQUIPMENT',
+]);
 export const rarityEnum = pgEnum('rarity_enum', ['COMMON', 'UNCOMMON', 'MAGIC', 'RARE', 'EPIC', 'LEGENDARY']);
 export const slotEnum = pgEnum('equipment_slot_enum', [
   'RIGHT_HAND',

@@ -1,7 +1,6 @@
 import type { itemInstanceService } from '../server/services/item-instance-service';
 import type {
   Corpse,
-  
   EntityPayloadMap,
   GameSysMessageType,
   Hero,
@@ -97,7 +96,7 @@ export type QueueCraftItemSocketEvent =
 
 export type SelfHeroEvent =
   | RemoveBuffEvent
-  | SkillUpEvent
+  | SkillExpUpEvent
   | HeroUpdateEvent
   | FinishGatheringEvent
   | LoadMapChunkEntityEvent
@@ -143,11 +142,18 @@ export type FinishGatheringEvent = {
     equipmentDeltas?: itemsInstanceDeltaEvent[];
   };
 };
-export type SkillUpEvent = {
-  type: 'SKILL_UP';
-  payload: {
-    skill: SkillInstance;
-    message: string;
-    expAmount: number;
-  };
+export type SkillExpUpEvent = {
+  type: 'SKILL_EXP_UP';
+  heroId: string;
+  payload: { isShowMessageOnlyLvlUp: boolean; expResult: SkillExpUpEventPayload }[]
+};
+
+export type SkillExpUpEventPayload = {
+  message: string;
+  expAmount: number;
+  isLevelUp: boolean;
+  skillInstanceId: string;
+  level: number;
+  currentExperience: number;
+  expToLvl: number;
 };

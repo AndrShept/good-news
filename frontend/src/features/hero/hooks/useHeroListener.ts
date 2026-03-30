@@ -5,13 +5,12 @@ import { useMapChunkEntitiesUpdate } from '@/features/map/hooks/useMapChunkEntit
 import { useSkillUpdate } from '@/features/skill/hooks/useSkillUpdate';
 import { SelfHeroEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import { Corpse,  MapChunkEntitiesData, MapChunkEntitiesType, MapHero } from '@/shared/types';
+import { Corpse, MapChunkEntitiesData, MapChunkEntitiesType, MapHero } from '@/shared/types';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect } from 'react';
 
 import { useBuff } from './useBuff';
 import { useEquipmentsUpdate } from './useEquipmentsUpdate';
-
 import { useHero } from './useHero';
 import { useHeroId } from './useHeroId';
 import { useHeroUpdate } from './useHeroUpdate';
@@ -35,9 +34,17 @@ export const useHeroListener = () => {
           updateHero({ ...data.payload.hero });
           removeBuff(data.payload.buffInstanceId);
           break;
-        case 'SKILL_UP':
-          updateSkill(data.payload.skill.id, data.payload.skill);
-          setGameMessage({ type: 'SKILL_EXP', text: data.payload.message, expAmount: data.payload.expAmount });
+        case 'SKILL_EXP_UP':
+          for (const updateData of data.payload) {
+            updateSkill(updateData.expResult.skillInstanceId, {
+              level: updateData.expResult.level,
+              currentExperience: updateData.expResult.currentExperience,
+              expToLvl: updateData.expResult.expToLvl,
+            });
+            if (!updateData.isShowMessageOnlyLvlUp || updateData.expResult.isLevelUp) {
+              setGameMessage({ type: 'SKILL_EXP', text: updateData.expResult.message, expAmount: updateData.expResult.expAmount });
+            }
+          }
           break;
         case 'UPDATE_HERO':
           updateHero({ ...data.payload });
@@ -99,11 +106,10 @@ export const useHeroListener = () => {
           break;
         }
         case 'REMOVE_OLD_ENTITY':
-      
           if (data.payload.corpses.length) {
             removeChunkEntities(data.payload.corpses, 'CORPSE');
           }
-          if (data.payload.creatures.length ) {
+          if (data.payload.creatures.length) {
             removeChunkEntities(data.payload.creatures, 'CREATURE');
           }
           if (data.payload.heroes.length) {

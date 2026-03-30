@@ -4,7 +4,17 @@ import { integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-
 import { heroTable } from './hero-schema';
 import { itemInstanceTable } from './item-instance-schema';
 
-export const itemContainerTypeEnum = pgEnum('item_container_type_enum', ['BACKPACK', 'BANK']);
+export const itemContainerTypeEnum = pgEnum('item_container_type_enum', [
+  'BACKPACK',
+  'BANK',
+  'MARKET',
+  'CORPSE',
+  'LOOM',
+  'SAWMILL',
+  'TANNERY',
+  'FORGE',
+  'EQUIPMENT',
+]);
 
 export const itemContainerTable = pgTable('item_container', {
   id: uuid().defaultRandom().primaryKey(),

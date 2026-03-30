@@ -29,6 +29,7 @@ import {
   buyItemsSchema,
   createHeroSchema,
   type itemsInstanceDeltaEvent,
+  refiningBuildingValues,
   statsSchema,
 } from '@/shared/types';
 import {
@@ -99,7 +100,7 @@ export const heroRouter = new Hono<Context>()
             group: true,
             location: true,
 
-            itemContainers: { columns: { id: true, type: true, name: true }, where: eq(itemContainerTable.type, 'BACKPACK') },
+            itemContainers: { columns: { id: true, type: true, name: true }, where: ne(itemContainerTable.type, 'BANK') },
           },
         });
         if (!hero) {
@@ -250,6 +251,14 @@ export const heroRouter = new Hono<Context>()
         type: 'BACKPACK',
         heroId: newHero.id,
       });
+      for (const refineBuilding of refiningBuildingValues) {
+        await tx.insert(itemContainerTable).values({
+          name: refineBuilding.toLowerCase(),
+          type: refineBuilding,
+          heroId: newHero.id,
+          capacity: 5,
+        });
+      }
       await tx.insert(itemContainerTable).values({
         name: '1',
         type: 'BANK',

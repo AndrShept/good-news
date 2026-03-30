@@ -94,12 +94,16 @@ export const gatherTick = (now: number) => {
         success: gatherResult.success,
         timeMs: BASE_GATHERING_TIME,
       });
-      if (loreSkillKey) {
-        const expLoreResult = skillService.addExp(heroId, loreSkillKey, expLore);
-        socketService.sendToClientExpResult({ heroId, expResult: expLoreResult });
-      }
-      const expResult = skillService.addExp(heroId, gatherSkill, exp);
-      socketService.sendToClientExpResult({ heroId, expResult });
+
+      const expGatherResult = skillService.addExp(heroId, gatherSkill, exp);
+      const expLoreResult = skillService.addExp(heroId, loreSkillKey, expLore);
+      socketService.sendToClientExpResult({
+        heroId,
+        data: [
+          { isShowMessageOnlyLvlUp: false, expResult: expGatherResult },
+          { isShowMessageOnlyLvlUp: false, expResult: expLoreResult },
+        ],
+      });
 
       const equippedTool = equipmentService.findEquipTool(heroId, gatherSkill);
 

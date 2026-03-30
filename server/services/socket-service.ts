@@ -4,7 +4,7 @@ import type {
   MapChunkSpawnEntityData,
   MapChunkUpdateEntitiesData,
   PlaceUpdateEvent,
-  SkillUpEvent,
+  SkillExpUpEvent,
 } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import type { GameSysMessage, MapChunkEntitiesData, MapChunkEntitiesType, StateType } from '@/shared/types';
@@ -18,8 +18,7 @@ import { skillService } from './skill-service';
 
 interface SendToClientExpResult {
   heroId: string;
-  expResult: ReturnType<typeof skillService.addExp>;
-  onlyLevelUp?: boolean;
+  data: { expResult: ReturnType<typeof skillService.addExp>; isShowMessageOnlyLvlUp: boolean }[];
 }
 
 type SendMapChunkSpawnEntities = {
@@ -140,14 +139,12 @@ export const socketService = {
   sendToClientSysMessage(heroId: string, msgData: GameSysMessage) {
     io.to(heroId).emit(socketEvents.selfMessage(), msgData);
   },
-  sendToClientExpResult({ expResult, heroId, onlyLevelUp = false }: SendToClientExpResult) {
-    if (!onlyLevelUp || expResult.isLevelUp) {
-      const skill = skillService.getSkillByInstanceId(heroId, expResult.skillInstanceId);
-      const socketData: SkillUpEvent = {
-        type: 'SKILL_UP',
-        payload: { skill, message: expResult.message, expAmount: expResult.amount },
-      };
-      io.to(heroId).emit(socketEvents.selfData(), socketData);
-    }
+  sendToClientExpResult({ heroId, data }: SendToClientExpResult) {
+    const socketData: SkillExpUpEvent = {
+      type: 'SKILL_EXP_UP',
+      heroId,
+      payload: data,
+    };
+    io.to(heroId).emit(socketEvents.selfData(), socketData);
   },
 };

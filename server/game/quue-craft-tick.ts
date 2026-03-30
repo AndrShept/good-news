@@ -112,8 +112,14 @@ export const queueCraftTick = (now: number) => {
           itemsDelta,
         },
       };
-      socketService.sendToClientExpResult({ expResult, heroId });
-      socketService.sendToClientExpResult({ expResult: expResultLoreSkill, heroId });
+
+      socketService.sendToClientExpResult({
+        heroId,
+        data: [
+          { isShowMessageOnlyLvlUp: false, expResult },
+          { isShowMessageOnlyLvlUp: false, expResult: expResultLoreSkill },
+        ],
+      });
       io.to(heroId).emit(socketEvents.queueCraft(), socketData);
       if (next) {
         queueCraftService.setNextQueue(heroId, next.id, recipeTemplateById[next.recipeId].timeMs);

@@ -39,7 +39,7 @@ export const buffTick = (now: number) => {
             const skillInstance = skillService.getSkillByKey(heroId, buffTemplate.reward.skillKey);
             const amount = progressionService.calculateBookExp(skillInstance.level, buffTemplate.duration);
             const expResult = skillService.addExp(heroId, buffTemplate.reward.skillKey, amount);
-            socketService.sendToClientExpResult({ heroId, expResult });
+            socketService.sendToClientExpResult({ heroId, data: [{ isShowMessageOnlyLvlUp: false, expResult }] });
             break;
           }
         }

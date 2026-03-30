@@ -1,7 +1,4 @@
-import type { SkillUpEvent } from '@/shared/socket-data-types';
-import { socketEvents } from '@/shared/socket-events';
 
-import { io } from '..';
 import { skillService } from '../services/skill-service';
 import { socketService } from '../services/socket-service';
 import { serverState } from './state/server-state';
@@ -23,9 +20,8 @@ export const regenTick = (now: number, TICK_RATE: number) => {
         const result = skillService.addExp(heroId, 'REGENERATION', gain);
 
         socketService.sendToClientExpResult({
-          expResult: result,
           heroId,
-          onlyLevelUp: true,
+          data: [{ isShowMessageOnlyLvlUp: true, expResult: result }],
         });
       }
     }
@@ -40,9 +36,8 @@ export const regenTick = (now: number, TICK_RATE: number) => {
         const result = skillService.addExp(heroId, 'MEDITATION', gain);
 
         socketService.sendToClientExpResult({
-          expResult: result,
           heroId,
-          onlyLevelUp: true,
+          data: [{ isShowMessageOnlyLvlUp: true, expResult: result }],
         });
       }
     }

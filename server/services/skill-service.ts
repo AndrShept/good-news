@@ -1,3 +1,4 @@
+import type { SkillExpUpEvent, SkillExpUpEventPayload } from '@/shared/socket-data-types';
 import { type LoreSkillKey, type SkillKey, skillTemplateById, skillTemplateByKey } from '@/shared/templates/skill-template';
 import type { RecipeTemplate, ResourceCategoryType, SkillInstance } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
@@ -43,11 +44,14 @@ export const skillService = {
     let expToLevel = this.getExpSkillToNextLevel(skillKey, skill.level);
     skill.currentExperience += amount;
 
-    const result = {
+    const result: SkillExpUpEventPayload = {
       message: `Your gain skill ${skillTemplate.name}`,
       isLevelUp: false,
-      amount,
+      expAmount: amount,
       skillInstanceId: skill.id,
+      currentExperience: skill.currentExperience,
+      expToLvl: expToLevel,
+      level: skill.level,
     };
     let increment = 0;
     while (skill.currentExperience >= expToLevel) {
@@ -56,8 +60,11 @@ export const skillService = {
       skill.currentExperience -= expToLevel;
       expToLevel = this.getExpSkillToNextLevel(skillKey, skill.level);
       skill.expToLvl = expToLevel;
-      result.message = `Your skill in ${skillTemplate.name} has increased by ${increment}. It is now ${skill.level.toFixed(1)}  🔥`;
+      result.message = `Your skill in ${skillTemplate.name} has increased by ${increment.toFixed(1)}. It is now ${skill.level.toFixed(1)}  🔥`;
       result.isLevelUp = true;
+      result.currentExperience = skill.currentExperience;
+      result.expToLvl = skill.expToLvl;
+      result.level = skill.level;
     }
     deltaEventsService.skillInstance.update(skill.id, {
       currentExperience: skill.currentExperience,
@@ -74,33 +81,7 @@ export const skillService = {
     if (skill.level < level)
       throw new HTTPException(409, { message: `Your ${template.name} skill level is too low.`, cause: { canShow: true } });
   },
-  // getLoreSkillKey(recipe: RecipeTemplate, coreResourceId: string | undefined) {
-  //   const loreSkillByResourceCategory: Record<ResourceCategoryType, LoreSkillKey> = {
-  //     ORE: 'ORE_LORE',
-  //     INGOT: 'METAL_LORE',
-  //     LOG: 'WOOD_LORE',
-  //     PLANK: 'WOOD_LORE',
-  //     HIDE: 'HIDE_LORE',
-  //     LEATHER: 'LEATHER_LORE',
-  //     FIBER: 'FIBER_LORE',
-  //     HERB: 'HERB_LORE',
-  //     CLOTH: 'CLOTH_LORE',
-  //     FLOWER: 'FLOWER_LORE',
-  //     MUSHROOM: 'MUSHROOM_LORE',
-  //     FUR: 'FUR_LORE',
-  //     CURED_FUR: 'CURED_FUR_LORE',
-  //     BONE: 'ORE_LORE',
-  //   };
 
-  //   if (coreResourceId) {
-  //     const template = itemTemplateService.getAllItemsTemplateMapIds()[coreResourceId];
-  //     if (!template.resourceInfo?.category) throw new Error('getLoreSkillResource template.resourceInfo?.category not found ');
-
-  //     return loreSkillByResourceCategory[template.resourceInfo.category];
-  //   }
-
-  //   return loreSkillByResourceCategory[recipe.requirement.category];
-  // },
   getLoreSkillByItemTemplateId(itemTemplateId: string) {
     const template = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
     if (!template.resourceInfo) throw new HTTPException(400, { message: 'getLoreSkillByItemTemplateId template.resourceInfo not found ' });

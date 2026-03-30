@@ -14,8 +14,9 @@ export const getItemContainer = async (id: string, itemContainerId: string) => {
   }
 };
 
-export const getItemContainerOptions = (heroId: string, itemContainerId: string) =>
+export const getItemContainerOptions = (heroId: string, itemContainerId: string | undefined) =>
   queryOptions({
     queryKey: ['container', itemContainerId],
-    queryFn: () => getItemContainer(heroId, itemContainerId),
+    queryFn: () => getItemContainer(heroId, itemContainerId!),
+    enabled: !!itemContainerId,
   });

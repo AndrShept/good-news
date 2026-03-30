@@ -34,8 +34,8 @@ const SelectPlaceBuilding = ({ selectedBuilding, place }: { selectedBuilding: Bu
       {isMagicShop && <ShopItems buildingType={selectedBuilding.key} />}
       {isTemple && <Temple />}
       {isBank && <Bank place={place} />}
-      {isCraftBuilding && <CraftBuilding selectedBuilding={selectedBuilding}  />}
-      {isRefiningBuilding && <RefiningBuilding />}
+      {isCraftBuilding && <CraftBuilding selectedBuilding={selectedBuilding} />}
+      {isRefiningBuilding && <RefiningBuilding selectedBuilding={selectedBuilding} />}
     </>
   );
 };
