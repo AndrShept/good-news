@@ -12,7 +12,7 @@ import { ContainerCapacityInfo } from './ContainerCapacityInfo';
 
 type Props = TItemContainer;
 
-export const ItemContainer = memo(({ capacity, id, itemsInstance }: Props) => {
+export const ItemContainer = memo(({ capacity, id, itemsInstance, name }: Props) => {
   const { isOver, setNodeRef, active } = useDroppable({
     id,
     data: { to: id },
@@ -32,7 +32,8 @@ export const ItemContainer = memo(({ capacity, id, itemsInstance }: Props) => {
       })}
     >
       <div className="flex items-center gap-2">
-        <ContainerCapacityInfo usedCapacity={itemsInstance.length } capacity={capacity} iconSize="size-6" />
+        <ContainerCapacityInfo usedCapacity={itemsInstance.length} capacity={capacity} iconSize="size-6" />
+        <p>{name}</p>
       </div>
 
       <ul className="flex w-full flex-wrap gap-1">

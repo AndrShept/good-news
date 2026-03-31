@@ -265,6 +265,7 @@ export type TPlace = {
   mapId: string;
   buildings: Building[];
   entrances: Entrance[];
+  itemContainers: { id: string; name: string; color: string | null; type: ItemContainerType }[];
 };
 
 export type itemsInstanceDeltaEvent =

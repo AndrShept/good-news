@@ -134,6 +134,9 @@ io.on('connection', async (socket) => {
   socket.join('global');
   const hero = serverState.hero.get(heroId);
   if (hero) {
+    if (hero.offlineTimer) {
+      hero.offlineTimer = undefined;
+    }
     if (hero.location.placeId) {
       socket.join(hero.location.placeId);
     }

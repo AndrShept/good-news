@@ -1,6 +1,5 @@
-import { getHeroOptions } from '@/features/hero/api/get-hero';
-import { useHero } from '@/features/hero/hooks/useHero';
-import { useQuery } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { PropsWithChildren, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
@@ -37,27 +36,29 @@ export const SocketProvider = ({
     [heroId, user],
   );
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const { refetch } = useQuery(getHeroOptions());
-
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   useEffect(() => {
     if (user) {
       socket.connect();
     }
-    function onConnect() {
+     function onConnect() {
       setIsConnected(true);
-      refetch();
     }
-
-    async function onDisconnect() {
+     function onDisconnect() {
       setIsConnected(false);
+      queryClient.clear();
+      navigate({ to: '/' });
     }
 
     socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
     return () => {
+      socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
       socket.disconnect();
     };
-  }, [heroId, refetch, socket, user]);
+  }, [heroId, navigate, queryClient, socket, user]);
 
   return <SocketContext.Provider value={{ socket, isConnected }}>{children}</SocketContext.Provider>;
 };

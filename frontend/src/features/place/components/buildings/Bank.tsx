@@ -1,38 +1,32 @@
-import { Spinner } from '@/components/Spinner';
+
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { getBankItemContainersOptions } from '@/features/item-container/api/get-bank-item-containers';
 import { BankItemContainer } from '@/features/item-container/components/BankItemContainer';
 import { BankItemContainerTabMenu } from '@/features/item-container/components/BankItemContainerTabMenu';
 import { CreateBankItemContainerModal } from '@/features/item-container/components/CreateBankItemContainerModal';
 import { HeroBackpack } from '@/features/item-container/components/HeroBackpack';
 import { capitalize, cn } from '@/lib/utils';
 import { TPlace } from '@/shared/types';
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type Props = {
-  place: TPlace | undefined | null;
+  place: TPlace;
 };
 
 export const Bank = ({ place }: Props) => {
-  const heroId = useHeroId();
-  const { data: itemContainers, isLoading } = useQuery(getBankItemContainersOptions(heroId));
   const [select, setSelect] = useState('');
-
+  const itemContainers = useMemo(() => place.itemContainers.filter((c) => c.type === 'BANK'), [place.itemContainers]);
   useEffect(() => {
     setSelect(select ? select : (itemContainers?.[0].id ?? ''));
   }, [itemContainers, select]);
-  if (isLoading) return <Spinner size={'sm'} />;
   return (
-    <section className="mx-auto flex w-full  flex-col">
+    <section className="mx-auto flex w-full flex-col">
       <h2 className="mb-2 text-center text-xl text-blue-400">{capitalize(place?.name)} bank</h2>
-      <div className="flex ">
+      <div className="flex">
         <Tabs className="max-w-1/2" value={select} onValueChange={setSelect} defaultValue={itemContainers?.[0]?.id}>
           <ScrollArea className="w-full min-w-0 pb-2">
             <TabsList className="bg-background h-fit min-w-0 flex-1 gap-0.5">
-              {itemContainers?.map((container) => (
+              {itemContainers.map((container) => (
                 <div key={container.id} className="group flex h-9 min-w-14 items-center">
                   <TabsTrigger
                     className={cn('rounded-none', {
@@ -58,7 +52,7 @@ export const Bank = ({ place }: Props) => {
           ))}
         </Tabs>
 
-        <div className="mt-14.5 ">
+        <div className="mt-14.5">
           <HeroBackpack />
         </div>
       </div>

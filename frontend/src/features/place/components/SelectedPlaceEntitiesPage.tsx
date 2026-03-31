@@ -33,9 +33,9 @@ const SelectPlaceBuilding = ({ selectedBuilding, place }: { selectedBuilding: Bu
     <div className="mx-auto w-full max-w-2xl">
       {isMagicShop && <ShopItems buildingType={selectedBuilding.key} />}
       {isTemple && <Temple />}
-      {isBank && <Bank place={place} />}
+      {isBank && place && <Bank place={place} />}
       {isCraftBuilding && <CraftBuilding selectedBuilding={selectedBuilding} />}
-      {isRefiningBuilding && <RefiningBuilding selectedBuilding={selectedBuilding} />}
+      {isRefiningBuilding && place && <RefiningBuilding selectedBuilding={selectedBuilding} place={place} />}
     </div>
   );
 };

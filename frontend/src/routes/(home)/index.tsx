@@ -1,17 +1,17 @@
 import { RainbowButton } from '@/components/magicui/rainbow-button';
 import { SparklesText } from '@/components/magicui/sparkles-text';
+import { useSocket } from '@/components/providers/SocketProvider';
 import { TextEffect } from '@/components/ui/text-effect';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import * as m from 'motion/react-m';
 
 export const Route = createFileRoute('/(home)/')({
   component: RouteComponent,
-
 });
 
 function RouteComponent() {
   const navigate = useNavigate();
-
+  const { isConnected } = useSocket();
   return (
     <section className="flex-co flex flex-1">
       <m.div
@@ -35,6 +35,7 @@ function RouteComponent() {
           <RainbowButton onClick={() => navigate({ to: '/game' })} className="h-12 w-full">
             PLAY
           </RainbowButton>
+          {!isConnected && <p>SERVER OFF !</p>}
           {/* <RainbowButton variant={'outline'} className="w-full">
             REGISTER
           </RainbowButton> */}

@@ -13,6 +13,7 @@ export const placeTemplate = [
     buildings: [...buildingTemplate],
     mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
     entrances: [],
+    itemContainers: []
   },
   {
     id: '0199df1f-88e5-747c-b54b-afe86110b246',
@@ -35,6 +36,7 @@ export const placeTemplate = [
         image: imageConfig.icon.entrance.mine,
       },
     ],
+    itemContainers: []
   },
 ] as const satisfies TPlace[];
 

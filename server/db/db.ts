@@ -18,7 +18,8 @@ import type { ExtractTablesWithRelations } from 'drizzle-orm';
 //   schema,
 // });
 export type TTransaction = PgTransaction<NeonQueryResultHKT, typeof schema, ExtractTablesWithRelations<typeof schema>>
-export type TDataBase = typeof db
+export type TDataBase = typeof db.transaction
+export type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 const pool = new Pool({ connectionString: processEnv.DATABASE_URL });
 export const db = drizzle({ client: pool, schema })
