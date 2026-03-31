@@ -37,6 +37,7 @@ import {
   getHeroStateWithGatherSkillKey,
   getMapLayerNameAtHeroPos,
   getStateWithCraftBuildingType,
+  getStateWithRefiningBuildingKey,
   getTilesAroundHero,
 } from '@/shared/utils';
 import { zValidator } from '@hono/zod-validator';
@@ -1057,6 +1058,38 @@ export const heroRouter = new Hono<Context>()
       success: true,
     });
   })
+  .post(
+    '/:id/action/refine/:craftBuildingKey',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string(), craftBuildingKey: z.enum(refiningBuildingValues) })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id, craftBuildingKey } = c.req.valid('param');
+      const hero = heroService.getHero(id);
+
+      if (hero.state !== 'IDLE') {
+        throw new HTTPException(409, {
+          message: 'Hero is currently busy with another action',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      const refineContainer = itemContainerService.getContainer()
+
+      const state = getStateWithRefiningBuildingKey(craftBuildingKey);
+      const refiningTime = Date.now() + 10_000;
+
+      hero.state = state;
+      hero.gatheringFinishAt = gatheringTime;
+
+      return c.json<SuccessResponse<typeof returnData>>({
+        message: `You begin ${state.toLowerCase()}.`,
+        success: true,
+        data: returnData,
+      });
+    },
+  )
 
   .get(
     '/:id/queue-craft',

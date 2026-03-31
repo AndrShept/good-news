@@ -21,7 +21,7 @@ export const placeTemplate = [
     x: 10,
     y: 10,
     mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
-    buildings: [buildingTemplateByKey['FORGE'], buildingTemplateByKey['MAGIC_SHOP']],
+    buildings: [buildingTemplateByKey['FORGE'], buildingTemplateByKey['MAGIC_SHOP'], buildingTemplateByKey['BANK']],
     entrances: [
       {
         id: '019c444d-e6e3-75ee-a4ba-81affd7689ab',

@@ -30,13 +30,13 @@ const SelectPlaceBuilding = ({ selectedBuilding, place }: { selectedBuilding: Bu
   const isCraftBuilding = selectedBuilding.key ? craftBuildingValues.includes(selectedBuilding.key as CraftBuildingKey) : false;
   const isRefiningBuilding = selectedBuilding.key ? refiningBuildingValues.includes(selectedBuilding.key as RefiningBuildingKey) : false;
   return (
-    <>
+    <div className="mx-auto w-full max-w-2xl">
       {isMagicShop && <ShopItems buildingType={selectedBuilding.key} />}
       {isTemple && <Temple />}
       {isBank && <Bank place={place} />}
       {isCraftBuilding && <CraftBuilding selectedBuilding={selectedBuilding} />}
       {isRefiningBuilding && <RefiningBuilding selectedBuilding={selectedBuilding} />}
-    </>
+    </div>
   );
 };
 

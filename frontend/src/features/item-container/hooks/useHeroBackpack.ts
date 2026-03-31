@@ -48,33 +48,36 @@ export const useHeroBackpack = () => {
     [backpack?.itemsInstance, itemsTemplateById],
   );
 
-  const filteredByRefineBuilding = (building: RefiningBuildingKey) => {
-    if (!backpack) return;
+  const filteredByRefineBuilding = useMemo(
+    () => (building: RefiningBuildingKey) => {
+      if (!backpack) return;
 
-    return {
-      ...backpack,
+      return {
+        ...backpack,
 
-      itemsInstance: backpack.itemsInstance.filter((i) => {
-        const itemTemplate = i.coreResource ? itemsTemplateById[i.itemTemplateId] : resourceTemplateById[i.itemTemplateId];
-        switch (itemTemplate.type) {
-          case 'RESOURCES':
-            return refineItems[building].RESOURCES.includes(itemTemplate.key);
-          case 'WEAPON': {
-            if (i.coreResource) {
-              return refineItems[building].WEAPON.includes(i.coreResource);
+        itemsInstance: backpack.itemsInstance.filter((i) => {
+          const itemTemplate = i.coreResource ? itemsTemplateById[i.itemTemplateId] : resourceTemplateById[i.itemTemplateId];
+          switch (itemTemplate.type) {
+            case 'RESOURCES':
+              return refineItems[building].RESOURCES.includes(itemTemplate.key);
+            case 'WEAPON': {
+              if (i.coreResource) {
+                return refineItems[building].WEAPON.includes(i.coreResource);
+              }
+              break;
             }
-            break;
-          }
-          case 'ARMOR': {
-            if (i.coreResource) {
-              return refineItems[building].ARMOR.includes(i.coreResource);
+            case 'ARMOR': {
+              if (i.coreResource) {
+                return refineItems[building].ARMOR.includes(i.coreResource);
+              }
+              break;
             }
-            break;
           }
-        }
-      }),
-    };
-  };
+        }),
+      };
+    },
+    [backpack, itemsTemplateById],
+  );
 
   return {
     backpack,

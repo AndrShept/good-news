@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { getItemContainerOptions } from '@/features/item-container/api/get-item-container';
@@ -23,7 +24,7 @@ export const RefiningBuilding = ({ selectedBuilding }: { selectedBuilding: Build
       ) : (
         refineContainerData.data && <ItemContainer {...refineContainerData.data} />
       )}
-
+      <Button>Refine</Button>
       {!!filteredBackpack && <ItemContainer {...filteredBackpack} />}
     </section>
   );

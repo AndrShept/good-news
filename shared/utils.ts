@@ -134,6 +134,16 @@ export const getStateWithCraftBuildingType = (craftBuildingKey: CraftBuildingKey
 
   return stateData[craftBuildingKey];
 };
+export const getStateWithRefiningBuildingKey = (refineBuildingKey: RefiningBuildingKey) => {
+  const stateData: Record<RefiningBuildingKey, StateType> = {
+    FORGE: 'SMELTING',
+    LOOM: 'WEAVING',
+    SAWMILL: 'SAWMILLING',
+    TANNERY: 'TANNING',
+  };
+
+  return stateData[refineBuildingKey];
+};
 
 export const getTilesAroundHero = (pos: IPosition, radius = 1) => {
   const tiles: IPosition[] = [];

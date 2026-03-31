@@ -20,8 +20,8 @@ export const moveItemInstance = async ({
     },
   });
   if (!res.ok) {
-    const err = (await res.json()) as unknown as ErrorResponse;
-    throw new Error(err.message);
+       const err = (await res.json()) as unknown as ErrorResponse;
+    throw new Error(err.message, { cause: { canShow: err.canShow } });
   }
 
   return await res.json();
