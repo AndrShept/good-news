@@ -10,50 +10,56 @@ import { memo } from 'react';
 import { useCreateContainerItems } from '../hooks/useCreateContainerItems';
 import { ContainerCapacityInfo } from './ContainerCapacityInfo';
 
-type Props = TItemContainer;
+type Props = TItemContainer & {
+  isShowContainerHeader?: boolean;
+  isCapacityLength?: boolean;
+};
 
-export const ItemContainer = memo(({ capacity, id, itemsInstance, name }: Props) => {
-  const { isOver, setNodeRef, active } = useDroppable({
-    id,
-    data: { to: id },
-  });
+export const ItemContainer = memo(
+  ({ capacity, id, itemsInstance, name, isShowContainerHeader = true, isCapacityLength = false }: Props) => {
+    const { isOver, setNodeRef, active } = useDroppable({
+      id,
+      data: { to: id },
+    });
 
-  const setSelectedItemInstance = useSetSelectedItem();
-  const selectedItemId = useSelectedItemId();
+    const setSelectedItemInstance = useSetSelectedItem();
+    const selectedItemId = useSelectedItemId();
+    const items = useCreateContainerItems(isCapacityLength ? itemsInstance.length + 5 : capacity, itemsInstance);
+    const { itemsTemplateById } = useGameData();
 
-  const items = useCreateContainerItems(capacity, itemsInstance);
-  const { itemsTemplateById } = useGameData();
-
-  return (
-    <section
-      ref={setNodeRef}
-      className={cn('flex w-full select-none flex-col gap-0.5 border-2 border-transparent', {
-        'h-fit border-green-400/50 bg-green-700/10': isOver && active?.data.current?.itemContainerId !== id,
-      })}
-    >
-      <div className="flex items-center gap-2">
-        <ContainerCapacityInfo usedCapacity={itemsInstance.length} capacity={capacity} iconSize="size-6" />
-        <p>{name}</p>
-      </div>
-
-      <ul className="flex w-full flex-wrap gap-1">
-        {items?.map((itemInstance) => {
-          if (!itemInstance) {
-            const id = crypto.randomUUID();
-            return <GameItemSlot key={id} />;
-          }
-          const itemTemplate = itemsTemplateById[itemInstance.itemTemplateId];
-          return (
-            <ItemInstanceCard
-              key={itemInstance.id}
-              isSelect={selectedItemId === itemInstance.id}
-              setSelectItemOnContainer={setSelectedItemInstance}
-              {...itemInstance}
-              itemTemplate={itemTemplate}
-            />
-          );
+    return (
+      <section
+        ref={setNodeRef}
+        className={cn('flex w-full select-none flex-col gap-0.5 border-2 border-transparent', {
+          'h-fit border-green-400/50 bg-green-700/10': isOver && active?.data.current?.itemContainerId !== id,
         })}
-      </ul>
-    </section>
-  );
-});
+      >
+        {isShowContainerHeader && (
+          <div className="flex items-center gap-2">
+            <ContainerCapacityInfo usedCapacity={itemsInstance.length} capacity={capacity} iconSize="size-6" />
+            <p>{name}</p>
+          </div>
+        )}
+
+        <ul className="flex w-full flex-wrap gap-1">
+          {items?.map((itemInstance) => {
+            if (!itemInstance) {
+              const id = crypto.randomUUID();
+              return <GameItemSlot key={id} />;
+            }
+            const itemTemplate = itemsTemplateById[itemInstance.itemTemplateId];
+            return (
+              <ItemInstanceCard
+                key={itemInstance.id}
+                isSelect={selectedItemId === itemInstance.id}
+                setSelectItemOnContainer={setSelectedItemInstance}
+                {...itemInstance}
+                itemTemplate={itemTemplate}
+              />
+            );
+          })}
+        </ul>
+      </section>
+    );
+  },
+);

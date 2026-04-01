@@ -14,7 +14,7 @@ interface Props {
 }
 export const RefiningBuilding = ({ selectedBuilding, place }: Props) => {
   const heroId = useHeroId();
-  const refineContainer = place.itemContainers.find((c) => c.type === selectedBuilding.key)
+  const refineContainer = place.itemContainers.find((c) => c.type === selectedBuilding.key);
   const refineContainerData = useQuery(getItemContainerOptions(heroId, refineContainer?.id));
   const { filteredByRefineBuilding } = useHeroBackpack();
   const filteredBackpack = filteredByRefineBuilding(selectedBuilding.key as RefiningBuildingKey);
@@ -27,8 +27,8 @@ export const RefiningBuilding = ({ selectedBuilding, place }: Props) => {
       ) : (
         refineContainerData.data && <ItemContainer {...refineContainerData.data} />
       )}
-      <Button>Refine</Button>
-      {!!filteredBackpack && <ItemContainer {...filteredBackpack} />}
+      <Button className="w-fit">Refine!</Button>
+      {!!filteredBackpack && <ItemContainer {...filteredBackpack} isShowContainerHeader={false} isCapacityLength={true} />}
     </section>
   );
 };

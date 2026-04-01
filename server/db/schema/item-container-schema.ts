@@ -18,7 +18,7 @@ export const itemContainerTypeEnum = pgEnum('item_container_type_enum', [
 
 export const itemContainerTable = pgTable('item_container', {
   id: uuid().defaultRandom().primaryKey(),
-  heroId: uuid()
+  ownerId: uuid()
     .notNull()
     .references(() => heroTable.id, { onDelete: 'cascade' }),
   placeId: text(),
@@ -31,7 +31,7 @@ export const itemContainerTable = pgTable('item_container', {
 
 export const itemContainerTableRelations = relations(itemContainerTable, ({ one, many }) => ({
   hero: one(heroTable, {
-    fields: [itemContainerTable.heroId],
+    fields: [itemContainerTable.ownerId],
     references: [heroTable.id],
   }),
   itemsInstance: many(itemInstanceTable),

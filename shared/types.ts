@@ -578,7 +578,7 @@ export interface GameSysMessage {
 }
 
 //API RESPONSE
-export type ApiGetHeroResponse = InferResponseType<(typeof client.hero)['$get']>['data'];
+export type ApiGetHeroResponse = NonNullable<InferResponseType<(typeof client.hero)['$get']>['data']>;
 export type ApiGetItemContainerResponse = InferResponseType<
   (typeof client.hero)[':id']['item-container'][':itemContainerId']['$get']
 >['data'];

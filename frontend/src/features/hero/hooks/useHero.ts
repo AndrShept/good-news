@@ -2,7 +2,7 @@ import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { ApiGetHeroResponse, Hero } from '@/shared/types';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 
-export const useHero = <T = Hero>(select: (data: ApiGetHeroResponse | undefined) => T): T => {
+export const useHero = <T = ApiGetHeroResponse>(select: (data: ApiGetHeroResponse | undefined) => T): T => {
   const { data } = useSuspenseQuery({
     ...getHeroOptions(),
     select,
@@ -11,9 +11,9 @@ export const useHero = <T = Hero>(select: (data: ApiGetHeroResponse | undefined)
   return data;
 };
 
-export const useHeroRef = <T = Hero>(fn: (data: Hero) => T): T => {
+export const useHeroRef = <T = ApiGetHeroResponse>(fn: (data: ApiGetHeroResponse) => T): T => {
   const queryClient = useQueryClient();
-  const hero = queryClient.getQueryData<Hero>(getHeroOptions().queryKey);
+  const hero = queryClient.getQueryData<ApiGetHeroResponse>(getHeroOptions().queryKey);
   if (!hero) throw new Error('useHeroRef hero not found');
   const data = fn(hero);
   return data;

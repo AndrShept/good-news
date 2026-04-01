@@ -33,7 +33,7 @@ export const gatherTick = (now: number) => {
       if (!tileState) continue;
 
       hero.state = 'IDLE';
-      hero.gatheringFinishAt = null;
+      hero.gatheringFinishAt = undefined;
       if (hero.location.chunkId) {
         const socketData: HeroUpdateEvent = {
           type: 'UPDATE_HERO',

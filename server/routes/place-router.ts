@@ -39,13 +39,13 @@ export const placeRouter = new Hono<Context>()
       const containers = Array.from(serverState.container.values());
 
       let itemContainers = containers
-        .filter((i) => i.placeId === place.id && i.heroId === heroId)
+        .filter((i) => i.placeId === place.id && i.ownerId === heroId)
         .map((c) => ({ id: c.id, color: c.color, name: c.name, type: c.type }));
 
       if (!itemContainers.length) {
         console.log('LOADING PLACE CONTAINER');
         const dbContainers = await db.query.itemContainerTable.findMany({
-          where: and(eq(itemContainerTable.heroId, heroId), eq(itemContainerTable.placeId, place.id)),
+          where: and(eq(itemContainerTable.ownerId, heroId), eq(itemContainerTable.placeId, place.id)),
           with: { itemsInstance: true },
         });
         for (const container of dbContainers) {

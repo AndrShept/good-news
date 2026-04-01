@@ -51,7 +51,7 @@ export const useHeroListener = () => {
           break;
 
         case 'FINISH_GATHERING':
-          updateHero({ gatheringFinishAt: null });
+          updateHero({ gatheringFinishAt: undefined, state: 'IDLE' });
           setGameMessage({
             type: data.payload.itemName ? 'SUCCESS' : 'ERROR',
             text: data.payload.message,

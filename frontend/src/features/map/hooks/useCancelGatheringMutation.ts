@@ -18,7 +18,7 @@ export const useCancelGatheringMutation = () => {
     onSuccess() {
       updateHero({
         state: 'IDLE',
-        gatheringFinishAt: null,
+        gatheringFinishAt: undefined,
       });
     },
   });

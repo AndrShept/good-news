@@ -65,21 +65,23 @@ export const mapRouter = new Hono<Context>()
 
       copyMap.places = placesByChunkId.filter((p) => chunkAroundHero.includes(p.chunkId));
 
-      copyMap.layers = copyMap.layers.map((l) =>
-        l.data
-          ? {
-              ...l,
-              data: mapService.sliceChunksLayerData({
-                data: l.data,
-                sliceHeight,
-                sliceWidth,
-                startX,
-                startY,
-                width: map.width,
-              }),
-            }
-          : l,
-      );
+      copyMap.layers = copyMap.layers
+        .filter((l) => l.name === 'GROUND' || l.name === 'OBJECT' || l.name === 'WATER')
+        .map((l) =>
+          l.data
+            ? {
+                ...l,
+                data: mapService.sliceChunksLayerData({
+                  data: l.data,
+                  sliceHeight,
+                  sliceWidth,
+                  startX,
+                  startY,
+                  width: map.width,
+                }),
+              }
+            : l,
+        );
 
       copyMap.width = sliceWidth;
       copyMap.height = sliceHeight;
@@ -117,7 +119,6 @@ export const mapRouter = new Hono<Context>()
 
       const chunkIds = mapService.getAroundChunkIds({ mapId: map.id, x: hero.location.x, y: hero.location.y });
       const returnData = mapService.getMapEntitiesByChunkIds(chunkIds);
-
 
       return c.json<SuccessResponse<typeof returnData>>({
         message: 'map  entities fetched!',

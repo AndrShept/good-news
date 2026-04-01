@@ -1,8 +1,8 @@
-import { getCraftRecipeOptions } from '@/features/craft/api/get-craft-recipe';
-import { CraftButton } from '@/features/craft/components/CraftButton';
-import { CraftMaterialSlot } from '@/features/craft/components/CraftMaterialSlot';
-import { CraftRecipeItemCard } from '@/features/craft/components/CraftRecipeItemCard';
-import { CraftSidebar } from '@/features/craft/components/CraftSidebar';
+import { getCraftRecipeOptions } from '@/features/place/api/get-craft-recipe';
+import { CraftButton } from '@/features/place/components/CraftButton';
+import { CraftMaterialSlot } from '@/features/place/components/CraftMaterialSlot';
+import { CraftRecipeItemCard } from '@/features/place/components/CraftRecipeItemCard';
+import { CraftSidebar } from '@/features/place/components/CraftSidebar';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { QueueCraftItemsList } from '@/features/queue/components/QueueCraftItemsList';
 import { Building } from '@/shared/types';

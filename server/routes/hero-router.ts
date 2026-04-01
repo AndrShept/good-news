@@ -64,7 +64,7 @@ import {
   stateTypeEnum,
 } from '../db/schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
-import { type TileState, serverState } from '../game/state/server-state';
+import { type HeroRuntime, type TileState, serverState } from '../game/state/server-state';
 import { calculate } from '../lib/calculate';
 import { heroOnline } from '../lib/heroOnline';
 import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
@@ -110,8 +110,7 @@ export const heroRouter = new Hono<Context>()
           });
         }
         heroId = hero.id;
-
-        console.log('FETCH HERO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        console.log('FETCH HERO');
         const equipments = await db.query.itemInstanceTable.findMany({
           where: and(eq(itemInstanceTable.ownerHeroId, hero.id), eq(itemInstanceTable.location, 'EQUIPMENT')),
         });
@@ -126,8 +125,11 @@ export const heroRouter = new Hono<Context>()
         serverState.buff.set(hero.id, buffs);
         serverState.queueCraft.set(hero.id, []);
 
-        const setData = { ...hero, equipments: equipments ?? [], buffs: [] };
-        serverState.hero.set(hero.id, setData as Hero);
+        serverState.hero.set(hero.id, {
+          ...hero,
+          equipments: equipments ?? [],
+          buffs: [],
+        } as HeroRuntime);
         heroOnline(hero.id);
       }
 
@@ -135,7 +137,7 @@ export const heroRouter = new Hono<Context>()
       verifyHeroOwnership({ heroUserId: stateHero?.userId, userId });
       stateHero.offlineTimer = undefined;
       stateHero.isOnline = true;
-      const { paths, offlineTimer, ...returnData } = stateHero;
+      const { paths, offlineTimer, selectedGatherTile, ...returnData } = stateHero;
 
       return c.json<SuccessResponse<typeof returnData>>({
         success: true,
@@ -250,7 +252,7 @@ export const heroRouter = new Hono<Context>()
       await tx.insert(itemContainerTable).values({
         name: 'Main Backpack',
         type: 'BACKPACK',
-        heroId: newHero.id,
+        ownerId: newHero.id,
       });
 
       await itemContainerService.createPlaceContainers(tx, place.id, newHero.id);
@@ -363,7 +365,7 @@ export const heroRouter = new Hono<Context>()
 
         containerState = itemContainer;
 
-        verifyHeroOwnership({ heroUserId: heroState.userId, userId, containerHeroId: containerState.heroId, heroId: heroState.id });
+        verifyHeroOwnership({ heroUserId: heroState.userId, userId, containerHeroId: containerState.ownerId, heroId: heroState.id });
 
         serverState.container.set(itemContainer.id, itemContainer);
       }
@@ -392,7 +394,7 @@ export const heroRouter = new Hono<Context>()
       const hero = heroService.getHero(id);
       const backpack = itemContainerService.getBackpack(hero.id);
 
-      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.heroId, heroId: hero.id });
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.ownerId, heroId: hero.id });
       const place = placeTemplate.find((p) => p.id === hero.location.placeId);
       if (!place) throw new HTTPException(409, { message: 'Hero not a place' });
       if (!place.buildings.some((b) => b.key === 'MAGIC_SHOP')) {
@@ -463,7 +465,7 @@ export const heroRouter = new Hono<Context>()
       const hero = heroService.getHero(id);
       const container = itemContainerService.getContainer(itemContainerId);
 
-      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: container.heroId, heroId: hero.id });
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: container.ownerId, heroId: hero.id });
 
       const findIndex = container.itemsInstance.findIndex((i) => i.id === itemInstanceId);
       if (findIndex === -1) {
@@ -498,7 +500,7 @@ export const heroRouter = new Hono<Context>()
       const userId = c.get('user')?.id as string;
       const hero = heroService.getHero(id);
       const backpack = itemContainerService.getBackpack(hero.id);
-      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.heroId, heroId: hero.id });
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.ownerId, heroId: hero.id });
 
       if (hero.state !== 'IDLE') {
         throw new HTTPException(403, { message: 'You cannot use item during some action.', cause: { canShow: true } });
@@ -549,7 +551,7 @@ export const heroRouter = new Hono<Context>()
       const userId = c.get('user')?.id as string;
       const hero = heroService.getHero(id);
       const backpack = itemContainerService.getBackpack(hero.id);
-      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.heroId, heroId: hero.id });
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.ownerId, heroId: hero.id });
 
       if (hero.state !== 'IDLE') {
         throw new HTTPException(403, { message: 'You cannot use item during some action.', cause: { canShow: true } });
@@ -620,7 +622,7 @@ export const heroRouter = new Hono<Context>()
       const toContainer = itemContainerService.getContainer(to);
       const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[itemInstance.itemTemplateId];
       for (const container of [fromContainer, toContainer]) {
-        verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: container.heroId, heroId: hero.id });
+        verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: container.ownerId, heroId: hero.id });
       }
 
       if (hero.state === 'BATTLE') {
@@ -640,7 +642,7 @@ export const heroRouter = new Hono<Context>()
         inventoryDeltas.push({ type: 'CREATE', itemContainerId: toContainer.id, item: itemInstance });
         deltaEventsService.itemInstance.update(itemInstanceId, {
           itemContainerId: toContainer.id,
-          ownerHeroId: toContainer.heroId,
+          ownerHeroId: toContainer.ownerId,
           location: toContainer.type,
         });
       } else {
@@ -1044,45 +1046,51 @@ export const heroRouter = new Hono<Context>()
     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
     hero.state = 'IDLE';
-    hero.gatheringFinishAt = null;
+    hero.gatheringFinishAt = undefined
 
     return c.json<SuccessResponse>({
       message: `You cancel gathering.`,
       success: true,
     });
   })
-  // .post(
-  //   '/:id/action/refine/:craftBuildingKey',
-  //   loggedIn,
-  //   zValidator('param', z.object({ id: z.string(), craftBuildingKey: z.enum(refiningBuildingValues) })),
+  .post(
+    '/:id/action/refine/:craftBuildingKey',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string(), refineBuildingKey: z.enum(refiningBuildingValues) })),
+    zValidator('json', z.object({ containerId: z.string().uuid() })),
 
-  //   async (c) => {
-  //     const user = c.get('user');
-  //     const { id, craftBuildingKey } = c.req.valid('param');
-  //     const hero = heroService.getHero(id);
+    async (c) => {
+      const user = c.get('user');
+      const { id, refineBuildingKey } = c.req.valid('param');
+      const { containerId } = c.req.valid('json');
+      const hero = heroService.getHero(id);
 
-  //     if (hero.state !== 'IDLE') {
-  //       throw new HTTPException(409, {
-  //         message: 'Hero is currently busy with another action',
-  //       });
-  //     }
-  //     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+      if (hero.state !== 'IDLE') {
+        throw new HTTPException(409, {
+          message: 'Hero is currently busy with another action',
+        });
+      }
+      const refineContainer = itemContainerService.getContainer(containerId);
+      if (refineContainer.placeId !== hero.location.placeId) {
+        throw new HTTPException(400, {
+          message: 'Hero is not a place',
+        });
+      }
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id, containerHeroId: refineContainer.ownerId, heroId: hero.id });
 
-  //     const refineContainer = itemContainerService.getContainer()
+      const state = getStateWithRefiningBuildingKey(refineBuildingKey);
+      const refiningTime = Date.now() + 10_000;
 
-  //     const state = getStateWithRefiningBuildingKey(craftBuildingKey);
-  //     const refiningTime = Date.now() + 10_000;
-
-  //     hero.state = state;
-  //     hero.gatheringFinishAt = gatheringTime;
-
-  //     return c.json<SuccessResponse<typeof returnData>>({
-  //       message: `You begin ${state.toLowerCase()}.`,
-  //       success: true,
-  //       data: returnData,
-  //     });
-  //   },
-  // )
+      hero.state = state;
+      hero.gatheringFinishAt = refiningTime;
+      const returnData = { refiningTime };
+      return c.json<SuccessResponse<typeof returnData>>({
+        message: `You begin ${state.toLowerCase()}.`,
+        success: true,
+        data: returnData,
+      });
+    },
+  )
 
   .get(
     '/:id/queue-craft',
@@ -1249,32 +1257,14 @@ export const heroRouter = new Hono<Context>()
       data: skills,
     });
   })
-  // .get('/:id/item-container', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
-  //   const user = c.get('user');
-  //   const { id } = c.req.valid('param');
-  //   const hero = heroService.getHero(id);
 
-  //   const itemContainers = await db.query.itemContainerTable.findMany({
-  //     where: and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.placeId, hero.location?.placeId!)),
-
-  //     orderBy: asc(itemContainerTable.createdAt),
-  //   });
-
-  //   verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-
-  //   return c.json<SuccessResponse<typeof itemContainers>>({
-  //     message: 'bank containers fetched',
-  //     success: true,
-  //     data: itemContainers,
-  //   });
-  // })
   .post('/:id/item-container/create', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
     const user = c.get('user');
     const { id } = c.req.valid('param');
 
     const hero = heroService.getHero(id);
 
-    const count = await db.$count(itemContainerTable, and(eq(itemContainerTable.heroId, hero.id), eq(itemContainerTable.type, 'BANK')));
+    const count = await db.$count(itemContainerTable, and(eq(itemContainerTable.ownerId, hero.id), eq(itemContainerTable.type, 'BANK')));
     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
     const newPremiumCoinsValue = await db.transaction(async (tx) => {
@@ -1283,7 +1273,7 @@ export const heroRouter = new Hono<Context>()
       const [newContainer] = await tx
         .insert(itemContainerTable)
         .values({
-          heroId: hero.id,
+          ownerId: hero.id,
           placeId: hero.location?.placeId,
           type: 'BANK',
           name: `${count + 1}`,
@@ -1318,7 +1308,7 @@ export const heroRouter = new Hono<Context>()
       const data = c.req.valid('json');
       const hero = heroService.getHero(id);
       const itemContainer = itemContainerService.getContainer(itemContainerId);
-      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id, heroId: hero.id, containerHeroId: itemContainer.heroId });
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id, heroId: hero.id, containerHeroId: itemContainer.ownerId });
 
       await db
         .update(itemContainerTable)

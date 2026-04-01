@@ -27,6 +27,9 @@ interface IObtainStackableItem {
   heroId: string;
   location: ItemLocationType;
 }
+  function findContainer(type: string, heroId: string, placeId: string) {
+    return Array.from(serverState.container.values()).find((c) => c.type === type && c.ownerId === heroId && c.placeId === placeId);
+  }
 
 export const itemContainerService = {
   getContainer(containerId: string) {
@@ -45,20 +48,23 @@ export const itemContainerService = {
     const backpack = this.getContainer(backpackId);
     return backpack;
   },
+
+
   async createPlaceContainers(db: DbTransaction, placeId: string, heroId: string) {
     const place = placeTemplate.find((p) => p.id === placeId);
     if (!place) {
       throw new HTTPException(400, { message: 'place not found' });
     }
+
     for (const building of place.buildings) {
       switch (building.key) {
         case 'BANK': {
           const container =
-            serverState.container.values().find((c) => c.type === 'BANK' && c.heroId === heroId && placeId === c.placeId) ??
+            findContainer('BANK', heroId, placeId) ??
             (await db.query.itemContainerTable.findFirst({
               where: and(
                 eq(itemContainerTable.type, 'BANK'),
-                eq(itemContainerTable.heroId, heroId),
+                eq(itemContainerTable.ownerId, heroId),
                 eq(itemContainerTable.placeId, placeId),
               ),
               with: { itemsInstance: true },
@@ -66,25 +72,19 @@ export const itemContainerService = {
           if (!container) {
             const [newContainer] = await db
               .insert(itemContainerTable)
-              .values({
-                heroId,
-                placeId: place.id,
-                name: '1',
-                type: 'BANK',
-              })
+              .values({ ownerId: heroId, placeId: place.id, name: '1', type: 'BANK' })
               .returning();
             serverState.container.set(newContainer.id, { ...newContainer, itemsInstance: [] });
-            break;
           }
           break;
         }
         case 'FORGE': {
           const container =
-            serverState.container.values().find((c) => c.type === 'FORGE' && c.heroId === heroId && placeId === c.placeId) ??
+            findContainer('FORGE', heroId, placeId) ??
             (await db.query.itemContainerTable.findFirst({
               where: and(
                 eq(itemContainerTable.type, 'FORGE'),
-                eq(itemContainerTable.heroId, heroId),
+                eq(itemContainerTable.ownerId, heroId),
                 eq(itemContainerTable.placeId, placeId),
               ),
               with: { itemsInstance: true },
@@ -92,26 +92,19 @@ export const itemContainerService = {
           if (!container) {
             const [newContainer] = await db
               .insert(itemContainerTable)
-              .values({
-                heroId,
-                placeId: place.id,
-                name: 'forge',
-                type: 'FORGE',
-                capacity: 5,
-              })
+              .values({ ownerId: heroId, placeId: place.id, name: 'forge', type: 'FORGE', capacity: 5 })
               .returning();
             serverState.container.set(newContainer.id, { ...newContainer, itemsInstance: [] });
-            break;
           }
           break;
         }
         case 'LOOM': {
           const container =
-            serverState.container.values().find((c) => c.type === 'LOOM' && c.heroId === heroId && placeId === c.placeId) ??
+            findContainer('LOOM', heroId, placeId) ??
             (await db.query.itemContainerTable.findFirst({
               where: and(
                 eq(itemContainerTable.type, 'LOOM'),
-                eq(itemContainerTable.heroId, heroId),
+                eq(itemContainerTable.ownerId, heroId),
                 eq(itemContainerTable.placeId, placeId),
               ),
               with: { itemsInstance: true },
@@ -119,26 +112,19 @@ export const itemContainerService = {
           if (!container) {
             const [newContainer] = await db
               .insert(itemContainerTable)
-              .values({
-                heroId,
-                placeId: place.id,
-                name: 'loom',
-                type: 'LOOM',
-                capacity: 5,
-              })
+              .values({ ownerId: heroId, placeId: place.id, name: 'loom', type: 'LOOM', capacity: 5 })
               .returning();
             serverState.container.set(newContainer.id, { ...newContainer, itemsInstance: [] });
-            break;
           }
           break;
         }
         case 'SAWMILL': {
           const container =
-            serverState.container.values().find((c) => c.type === 'SAWMILL' && c.heroId === heroId && placeId === c.placeId) ??
+            findContainer('SAWMILL', heroId, placeId) ??
             (await db.query.itemContainerTable.findFirst({
               where: and(
                 eq(itemContainerTable.type, 'SAWMILL'),
-                eq(itemContainerTable.heroId, heroId),
+                eq(itemContainerTable.ownerId, heroId),
                 eq(itemContainerTable.placeId, placeId),
               ),
               with: { itemsInstance: true },
@@ -146,26 +132,19 @@ export const itemContainerService = {
           if (!container) {
             const [newContainer] = await db
               .insert(itemContainerTable)
-              .values({
-                heroId,
-                placeId: place.id,
-                name: 'sawmill',
-                type: 'SAWMILL',
-                capacity: 5,
-              })
+              .values({ ownerId: heroId, placeId: place.id, name: 'sawmill', type: 'SAWMILL', capacity: 5 })
               .returning();
             serverState.container.set(newContainer.id, { ...newContainer, itemsInstance: [] });
-            break;
           }
           break;
         }
         case 'TANNERY': {
           const container =
-            serverState.container.values().find((c) => c.type === 'TANNERY' && c.heroId === heroId && placeId === c.placeId) ??
+            findContainer('TANNERY', heroId, placeId) ??
             (await db.query.itemContainerTable.findFirst({
               where: and(
                 eq(itemContainerTable.type, 'TANNERY'),
-                eq(itemContainerTable.heroId, heroId),
+                eq(itemContainerTable.ownerId, heroId),
                 eq(itemContainerTable.placeId, placeId),
               ),
               with: { itemsInstance: true },
@@ -173,16 +152,9 @@ export const itemContainerService = {
           if (!container) {
             const [newContainer] = await db
               .insert(itemContainerTable)
-              .values({
-                heroId,
-                placeId: place.id,
-                name: 'tannery',
-                type: 'TANNERY',
-                capacity: 5,
-              })
+              .values({ ownerId: heroId, placeId: place.id, name: 'tannery', type: 'TANNERY', capacity: 5 })
               .returning();
             serverState.container.set(newContainer.id, { ...newContainer, itemsInstance: [] });
-            break;
           }
           break;
         }

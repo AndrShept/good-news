@@ -57,6 +57,7 @@ export const useHeroBackpack = () => {
 
         itemsInstance: backpack.itemsInstance.filter((i) => {
           const itemTemplate = i.coreResource ? itemsTemplateById[i.itemTemplateId] : resourceTemplateById[i.itemTemplateId];
+          if (!itemTemplate) return;
           switch (itemTemplate.type) {
             case 'RESOURCES':
               return refineItems[building].RESOURCES.includes(itemTemplate.key);

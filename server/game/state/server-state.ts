@@ -21,6 +21,9 @@ import type { itemInstanceTable, skillInstanceTable } from '../../db/schema';
 export type HeroRuntime = Hero & {
   paths?: PathNode[];
   offlineTimer?: number;
+  gatheringFinishAt?: number;
+  refiningFinishAt?: number;
+
   selectedGatherTile?: {
     x: number;
     y: number;
