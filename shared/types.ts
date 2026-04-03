@@ -46,7 +46,6 @@ import type {
   weaponHandEnum,
   weaponTypeEnum,
 } from '../server/db/schema/item-instance-schema';
-import type { locationTable } from '../server/db/schema/location-schema';
 import { postTable } from '../server/db/schema/posts-schema';
 import type { queueCraftItemTable, queueCraftStatusEnum } from '../server/db/schema/queue-craft-item-schema';
 import type { skillInstanceTable } from '../server/db/schema/skill-instance-schema';
@@ -165,12 +164,6 @@ export type PaginatedResponse<T> = {
   data: T;
 } & Omit<SuccessResponse, 'data'>;
 
-export type OmitDeepHero = Omit<Partial<Hero>, 'location' | 'group' | 'regen'> & {
-  location?: Partial<Hero['location']>;
-  group?: Partial<Hero['group']>;
-  regen?: Partial<Hero['regen']>;
-};
-
 export type PathNode = { x: number; y: number; mapId: string; completedAt: number };
 
 export type GetPostsData = InferResponseType<typeof client.post.$get>;
@@ -219,10 +212,16 @@ export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number
 
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
-export type TLocation = typeof locationTable.$inferSelect;
+export type TLocation = {
+  placeId: string | null;
+  mapId: string | null;
+  chunkId: string | null;
+  x: number;
+  y: number;
+  targetX: number | null;
+  targetY: number | null;
+};
 
-// export const placeValues = ['TOWN', 'DUNGEON', 'MINE'] as const;
-// export type PlaceType = (typeof placeValues)[number];
 
 export const placeEntranceValues = ['DUNGEON', 'MINE'] as const;
 export type PlaceEntranceType = (typeof placeEntranceValues)[number];
@@ -576,6 +575,14 @@ export interface GameSysMessage {
   type: GameSysMessageType;
   createdAt?: number;
 }
+
+export type OmitDeepHero = {
+  location?: Partial<ApiGetHeroResponse['location']>;
+  group?: Partial<ApiGetHeroResponse['group']>;
+  regen?: Partial<ApiGetHeroResponse['regen']>;
+} & Omit<Partial<ApiGetHeroResponse>, 'location' | 'group' | 'regen'>;
+
+
 
 //API RESPONSE
 export type ApiGetHeroResponse = NonNullable<InferResponseType<(typeof client.hero)['$get']>['data']>;

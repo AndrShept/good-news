@@ -11,10 +11,21 @@ import {
   oreValues,
   plankValues,
 } from '../server/db/schema';
+import { itemTemplateService } from '../server/services/item-template-service';
 import type { Layer } from './json-types';
 import { mapTemplate } from './templates/map-template';
+import { resourceTemplateById } from './templates/resource-template';
 import type { GatheringCategorySkillKey } from './templates/skill-template';
-import type { CraftBuildingKey, IPosition, ItemTemplateType, OmitTileType, RefiningBuildingKey, StateType } from './types';
+import type {
+  CoreResourceType,
+  CraftBuildingKey,
+  IPosition,
+  ItemInstance,
+  ItemTemplateType,
+  OmitTileType,
+  RefiningBuildingKey,
+  StateType,
+} from './types';
 
 function isBlocked(x: number, y: number, layers: Layer[], width: number): boolean {
   return layers.some((layer) => {
@@ -198,4 +209,32 @@ export const refineItems: Record<RefiningBuildingKey, Record<Extract<ItemTemplat
   },
   SAWMILL: { RESOURCES: [...logValues], WEAPON: [...plankValues], ARMOR: [] },
   TANNERY: { RESOURCES: [...furValues, ...hideValues], ARMOR: [...curedFurValues, ...leatherValues, ...boneValues], WEAPON: [] },
+};
+
+type ItemRefineableForBuilding = {
+  coreResource: CoreResourceType | null;
+  itemTemplateId: string;
+  refiningBuildingKey: RefiningBuildingKey;
+};
+
+export const itemRefineableForBuilding = ({ coreResource, itemTemplateId, refiningBuildingKey }: ItemRefineableForBuilding) => {
+  const itemsTemplateById = itemTemplateService.getAllItemsTemplateMapIds();
+  const itemTemplate = coreResource ? itemsTemplateById[itemTemplateId] : resourceTemplateById[itemTemplateId];
+  if (!itemTemplate) return 
+  switch (itemTemplate.type) {
+    case 'RESOURCES':
+      return { isCanRefine: refineItems[refiningBuildingKey].RESOURCES.includes(itemTemplate.key), itemTemplate };
+    case 'WEAPON': {
+      if (coreResource) {
+        return { isCanRefine: refineItems[refiningBuildingKey].WEAPON.includes(coreResource), itemTemplate };
+      }
+      break;
+    }
+    case 'ARMOR': {
+      if (coreResource) {
+        return { isCanRefine: refineItems[refiningBuildingKey].ARMOR.includes(coreResource), itemTemplate };
+      }
+      break;
+    }
+  }
 };

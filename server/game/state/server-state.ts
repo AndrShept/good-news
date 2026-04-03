@@ -12,6 +12,7 @@ import type {
   QueueCraft,
   SkillInstance,
   SpawnPoint,
+  THeroRegen,
   TItemContainer,
 } from '@/shared/types';
 import type { Socket } from 'socket.io';
@@ -23,6 +24,7 @@ export type HeroRuntime = Hero & {
   offlineTimer?: number;
   gatheringFinishAt?: number;
   refiningFinishAt?: number;
+  regen: THeroRegen;
 
   selectedGatherTile?: {
     x: number;

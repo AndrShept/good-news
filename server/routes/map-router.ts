@@ -1,7 +1,7 @@
 import { MAP_CHUNK_SIZE } from '@/shared/constants';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
-import type { Corpse, MapHero, SuccessResponse, TMap, TPlace } from '@/shared/types';
+import type {  SuccessResponse, TMap } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -9,8 +9,6 @@ import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
 import type { Context } from '../context';
-import { db } from '../db/db';
-import { heroTable, locationTable } from '../db/schema';
 import { serverState } from '../game/state/server-state';
 import { loggedIn } from '../middleware/loggedIn';
 import { heroService } from '../services/hero-service';

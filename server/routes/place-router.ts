@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { db } from '../db/db';
-import { heroTable, itemContainerTable, locationTable } from '../db/schema';
+import { heroTable, itemContainerTable } from '../db/schema';
 import { serverState } from '../game/state/server-state';
 import { loggedIn } from '../middleware/loggedIn';
 import { heroService } from '../services/hero-service';

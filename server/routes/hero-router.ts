@@ -12,6 +12,7 @@ import type { HeroUpdateEvent, MapChunkUpdateEntitiesData } from '@/shared/socke
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
+import { resourceTemplateById } from '@/shared/templates/resource-template';
 import { gatheringSkillKeysValues, skillsTemplate } from '@/shared/templates/skill-template';
 import { toolTemplateByKey } from '@/shared/templates/tool-template';
 import {
@@ -39,6 +40,7 @@ import {
   getStateWithCraftBuildingType,
   getStateWithRefiningBuildingKey,
   getTilesAroundHero,
+  itemRefineableForBuilding,
 } from '@/shared/utils';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq, lt, lte, ne, sql } from 'drizzle-orm';
@@ -56,7 +58,6 @@ import {
   heroTable,
   itemContainerTable,
   itemInstanceTable,
-  locationTable,
   modifierTable,
   resourceTypeEnum,
   skillInstanceTable,
@@ -99,7 +100,6 @@ export const heroRouter = new Hono<Context>()
           with: {
             modifier: true,
             group: true,
-            location: true,
 
             itemContainers: { columns: { id: true, type: true, name: true }, where: eq(itemContainerTable.type, 'BACKPACK') },
           },
@@ -129,14 +129,21 @@ export const heroRouter = new Hono<Context>()
           ...hero,
           equipments: equipments ?? [],
           buffs: [],
+          location: { ...hero.location, targetX: null, targetY: null },
+          regen: {
+            healthAcc: 0,
+            healthTimeMs: 0,
+            manaAcc: 0,
+            manaTimeMs: 0,
+          },
         } as HeroRuntime);
         heroOnline(hero.id);
+        heroService.updateModifier(heroId);
       }
 
       const stateHero = heroService.getHero(heroId);
       verifyHeroOwnership({ heroUserId: stateHero?.userId, userId });
       stateHero.offlineTimer = undefined;
-      stateHero.isOnline = true;
       const { paths, offlineTimer, selectedGatherTile, ...returnData } = stateHero;
 
       return c.json<SuccessResponse<typeof returnData>>({
@@ -219,12 +226,6 @@ export const heroRouter = new Hono<Context>()
         message: 'Hero already exists for this user.',
       });
     }
-    const regen: THeroRegen = {
-      healthAcc: 0,
-      manaAcc: 0,
-      healthTimeMs: calculate.healthRegenTime(stat.constitution),
-      manaTimeMs: calculate.manaRegenTime(stat.wisdom),
-    };
 
     await db.transaction(async (tx) => {
       const characterImage = '/sprites/new/newb-mage.webp';
@@ -240,14 +241,21 @@ export const heroRouter = new Hono<Context>()
           freeStatPoints,
           maxHealth: stat.constitution * HP_MULTIPLIER_COST,
           maxMana: stat.wisdom * MANA_MULTIPLIER_INT,
-          regen,
+          location: {
+            placeId: place.id,
+            x: place.x,
+            y: place.y,
+            chunkId: null,
+            mapId: null,
+            targetX: null,
+            targetY: null,
+          },
         })
         .returning();
       await tx.insert(modifierTable).values({
         id: generateRandomUuid(),
         heroId: newHero.id,
       });
-      await tx.insert(locationTable).values({ placeId: place.id, heroId: newHero.id, x: place.x, y: place.y });
 
       await tx.insert(itemContainerTable).values({
         name: 'Main Backpack',
@@ -261,6 +269,7 @@ export const heroRouter = new Hono<Context>()
         await tx.insert(skillInstanceTable).values({
           heroId: newHero.id,
           skillTemplateId: skill.id,
+          level: 0,
           expToLvl: skillService.getExpSkillToNextLevel(skill.key, 1),
         });
       }
@@ -824,13 +833,6 @@ export const heroRouter = new Hono<Context>()
 
         await db.transaction(async (tx) => {
           await itemContainerService.createPlaceContainers(tx, place.id, hero.id);
-          await tx
-            .update(locationTable)
-            .set({
-              mapId: null,
-              placeId: place.id,
-            })
-            .where(eq(locationTable.heroId, id));
         });
 
         const socket = socketService.getSocket(hero.id);
@@ -923,7 +925,7 @@ export const heroRouter = new Hono<Context>()
     loggedIn,
     zValidator('param', z.object({ id: z.string() })),
 
-    async (c) => {
+    (c) => {
       const user = c.get('user');
       const { id } = c.req.valid('param');
 
@@ -947,16 +949,6 @@ export const heroRouter = new Hono<Context>()
         y: place.y,
         mapId: place.mapId,
       });
-      await db
-        .update(locationTable)
-        .set({
-          mapId: place.mapId,
-          chunkId,
-          x: place.x,
-          y: place.y,
-          placeId: null,
-        })
-        .where(eq(locationTable.heroId, id));
 
       hero.location.chunkId = chunkId;
       hero.location.mapId = place.mapId;
@@ -1046,7 +1038,7 @@ export const heroRouter = new Hono<Context>()
     verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
     hero.state = 'IDLE';
-    hero.gatheringFinishAt = undefined
+    hero.gatheringFinishAt = undefined;
 
     return c.json<SuccessResponse>({
       message: `You cancel gathering.`,
@@ -1054,7 +1046,7 @@ export const heroRouter = new Hono<Context>()
     });
   })
   .post(
-    '/:id/action/refine/:craftBuildingKey',
+    '/:id/action/refine/:refineBuildingKey',
     loggedIn,
     zValidator('param', z.object({ id: z.string(), refineBuildingKey: z.enum(refiningBuildingValues) })),
     zValidator('json', z.object({ containerId: z.string().uuid() })),
@@ -1064,7 +1056,6 @@ export const heroRouter = new Hono<Context>()
       const { id, refineBuildingKey } = c.req.valid('param');
       const { containerId } = c.req.valid('json');
       const hero = heroService.getHero(id);
-
       if (hero.state !== 'IDLE') {
         throw new HTTPException(409, {
           message: 'Hero is currently busy with another action',
@@ -1076,13 +1067,33 @@ export const heroRouter = new Hono<Context>()
           message: 'Hero is not a place',
         });
       }
+      if (!refineContainer.itemsInstance.length) {
+        throw new HTTPException(400, {
+          message: 'refine container is empty ',
+          cause: { canShow: true },
+        });
+      }
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id, containerHeroId: refineContainer.ownerId, heroId: hero.id });
+
+      for (const itemInstance of refineContainer.itemsInstance) {
+        const refineItem = itemRefineableForBuilding({
+          coreResource: itemInstance.coreResource,
+          itemTemplateId: itemInstance.itemTemplateId,
+          refiningBuildingKey: refineBuildingKey,
+        });
+        console.log(refineItem);
+        if (!refineItem?.isCanRefine)
+          throw new HTTPException(400, {
+            message: `${itemInstance.displayName ?? refineItem?.itemTemplate.name} cannot be refined`,
+            cause: { canShow: true },
+          });
+      }
 
       const state = getStateWithRefiningBuildingKey(refineBuildingKey);
       const refiningTime = Date.now() + 10_000;
 
-      hero.state = state;
-      hero.gatheringFinishAt = refiningTime;
+      // hero.state = state;
+      // hero.refiningFinishAt = refiningTime;
       const returnData = { refiningTime };
       return c.json<SuccessResponse<typeof returnData>>({
         message: `You begin ${state.toLowerCase()}.`,

@@ -2,10 +2,12 @@ import { useGameData } from '@/features/hero/hooks/useGameData';
 import { GameItemSlot } from '@/features/item-instance/components/GameItemSlot';
 import { ItemInstanceCard } from '@/features/item-instance/components/ItemInstanceCard';
 import { cn } from '@/lib/utils';
-import { TItemContainer } from '@/shared/types';
+import { RefiningBuildingKey, TItemContainer, refiningBuildingValues } from '@/shared/types';
+import { itemRefineableForBuilding } from '@/shared/utils';
+import { useSelectPlaceEntitiesStore } from '@/store/useSelectBuildingStore';
 import { useSelectedItemId, useSetSelectedItem } from '@/store/useSelectItemInstanceStore';
 import { useDroppable } from '@dnd-kit/core';
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 
 import { useCreateContainerItems } from '../hooks/useCreateContainerItems';
 import { ContainerCapacityInfo } from './ContainerCapacityInfo';
@@ -21,11 +23,14 @@ export const ItemContainer = memo(
       id,
       data: { to: id },
     });
-
+    const selectedPlaceEntities = useSelectPlaceEntitiesStore((state) => state.selectedPlaceEntities);
     const setSelectedItemInstance = useSetSelectedItem();
     const selectedItemId = useSelectedItemId();
     const items = useCreateContainerItems(isCapacityLength ? itemsInstance.length + 5 : capacity, itemsInstance);
     const { itemsTemplateById } = useGameData();
+    const isRefiningBuilding =
+      selectedPlaceEntities?.type === 'BUILDING' &&
+      refiningBuildingValues.includes(selectedPlaceEntities.payload.key as RefiningBuildingKey);
 
     return (
       <section
@@ -55,6 +60,19 @@ export const ItemContainer = memo(
                 setSelectItemOnContainer={setSelectedItemInstance}
                 {...itemInstance}
                 itemTemplate={itemTemplate}
+                isHighlight={
+                  isRefiningBuilding
+                    ? itemRefineableForBuilding({
+                        coreResource: itemInstance.coreResource,
+                        itemTemplateId: itemInstance.itemTemplateId,
+                        refiningBuildingKey: selectedPlaceEntities.payload.key as RefiningBuildingKey,
+                      })?.isCanRefine
+                    : false
+                }
+                isRefiningBuilding={
+                  selectedPlaceEntities?.type === 'BUILDING' &&
+                  refiningBuildingValues.includes(selectedPlaceEntities.payload.key as RefiningBuildingKey)
+                }
               />
             );
           })}

@@ -36,8 +36,8 @@ export const itemInstanceService = {
     heroService.checkFreeBackpackCapacity(heroId);
     let coreResource: null | CoreResourceType = null;
     let finalModifier: null | Partial<OmitModifier> = null;
-    let displayName: string | null = null;
     const craftItem = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
+    let displayName = craftItem.name;
     if (coreResourceId) {
       const resource = resourceTemplateById[coreResourceId];
       coreResource = resource.key as CoreResourceType;
@@ -47,7 +47,7 @@ export const itemInstanceService = {
 
       finalModifier = queueCraftService.calculateFinalCraftModifiers(heroId, resource.id, sumModifier);
 
-      displayName = getDisplayName(itemTemplateId, resource.id) as string | null;
+      displayName = getDisplayName(itemTemplateId, resource.id);
     }
     let durability = this.getDurability(itemTemplateId);
     if (durability && coreResourceId) {

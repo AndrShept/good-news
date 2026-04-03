@@ -1,5 +1,5 @@
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
-import { ApiGroupMembersResponse, Hero } from '@/shared/types';
+import { ApiGroupMembersResponse } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const useRemoveGroup = () => {

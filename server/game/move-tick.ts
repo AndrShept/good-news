@@ -14,7 +14,7 @@ export const moveTick = (now: number) => {
     if (!hero) continue;
     if (offlineTimer && offlineTimer <= now) {
       heroOffline(heroId, userId);
-      console.log(' heroOffline', hero.isOnline);
+      console.log(' heroOffline');
     }
 
     if (!paths?.length) continue;

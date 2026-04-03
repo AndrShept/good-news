@@ -1,6 +1,6 @@
 import { HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '@/shared/constants';
 import { buffTemplateMapIds } from '@/shared/templates/buff-template';
-import type { Hero, MapHero, OmitModifier } from '@/shared/types';
+import type {  MapHero } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';

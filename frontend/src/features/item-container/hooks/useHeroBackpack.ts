@@ -1,8 +1,7 @@
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { resourceTemplateById } from '@/shared/templates/resource-template';
 import { RefiningBuildingKey, ResourceCategoryType } from '@/shared/types';
-import { refineItems } from '@/shared/utils';
+import { itemRefineableForBuilding } from '@/shared/utils';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 
@@ -56,28 +55,15 @@ export const useHeroBackpack = () => {
         ...backpack,
 
         itemsInstance: backpack.itemsInstance.filter((i) => {
-          const itemTemplate = i.coreResource ? itemsTemplateById[i.itemTemplateId] : resourceTemplateById[i.itemTemplateId];
-          if (!itemTemplate) return;
-          switch (itemTemplate.type) {
-            case 'RESOURCES':
-              return refineItems[building].RESOURCES.includes(itemTemplate.key);
-            case 'WEAPON': {
-              if (i.coreResource) {
-                return refineItems[building].WEAPON.includes(i.coreResource);
-              }
-              break;
-            }
-            case 'ARMOR': {
-              if (i.coreResource) {
-                return refineItems[building].ARMOR.includes(i.coreResource);
-              }
-              break;
-            }
-          }
+          return itemRefineableForBuilding({
+            coreResource: i.coreResource,
+            itemTemplateId: i.itemTemplateId,
+            refiningBuildingKey: building,
+          })?.isCanRefine;
         }),
       };
     },
-    [backpack, itemsTemplateById],
+    [backpack],
   );
 
   return {

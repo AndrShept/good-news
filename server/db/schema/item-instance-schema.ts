@@ -158,7 +158,7 @@ export const slotEnum = pgEnum('equipment_slot_enum', [
 ]);
 export const itemInstanceTable = pgTable('item_instance', {
   id: uuid().primaryKey().defaultRandom().notNull(),
-  displayName: text(),
+  displayName: text().notNull(),
   ownerHeroId: uuid().references(() => heroTable.id, { onDelete: 'cascade' }),
   itemContainerId: uuid().references(() => itemContainerTable.id, { onDelete: 'cascade' }),
   itemTemplateId: uuid().notNull(),

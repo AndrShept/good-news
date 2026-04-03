@@ -1,7 +1,10 @@
 import { CustomTooltip } from '@/components/CustomTooltip';
 import { GameItemImg } from '@/components/GameItemImg';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import {  ColoredResourceType, ItemInstance, ItemTemplate } from '@/shared/types';
+import { TINT_COLOR } from '@/lib/config';
+import { cn } from '@/lib/utils';
+import { ColoredResourceType, ItemInstance, ItemTemplate } from '@/shared/types';
+import { itemRefineableForBuilding } from '@/shared/utils';
 import { useSelectItemInstanceStore } from '@/store/useSelectItemInstanceStore';
 import { useDraggable } from '@dnd-kit/core';
 import { memo, useEffect, useState } from 'react';
@@ -10,12 +13,13 @@ import { useMoveItemInstance } from '../hooks/useMoveItemInstance';
 import { GameItemSlot } from './GameItemSlot';
 import { ItemInstanceCardDropdownMenu } from './ItemInstanceCardDropdownMenu';
 import { ItemInstanceCardHoverTooltip } from './ItemInstanceCardHoverTooltip';
-import { TINT_COLOR } from '@/lib/config';
 
 type Props = ItemInstance & {
   itemTemplate: ItemTemplate;
   setSelectItemOnContainer: (data: ItemInstance | null) => void;
   isSelect: boolean;
+  isRefiningBuilding: boolean;
+  isHighlight: boolean | undefined;
 };
 
 export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
@@ -39,7 +43,11 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
     }
   }, [isDragging]);
   return (
-    <GameItemSlot className={props.isSelect ? 'rounded ring-1 ring-yellow-200' : undefined}>
+    <GameItemSlot
+      className={cn('', {
+        'rounded ring-1 ring-yellow-200': props.isSelect,
+      })}
+    >
       <div ref={setNodeRef} {...attributes} {...listeners} style={style} className="size-full select-none">
         <Popover
           open={isOpen}
@@ -51,7 +59,18 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
           <CustomTooltip>
             <PopoverTrigger className="size-full">
               <CustomTooltip.Trigger>
-                <GameItemImg image={props.itemTemplate.image} tintColor={TINT_COLOR[props.itemTemplate.key as ColoredResourceType]} />
+                <GameItemImg
+                  className={cn('', {
+                    'opacity-100': props.isHighlight,
+                    'grayscale-100 opacity-20 group-hover:opacity-20': props.isRefiningBuilding && !props.isHighlight,
+                  })}
+                  image={props.itemTemplate.image}
+                  tintColor={
+                    props.isRefiningBuilding && !props.isHighlight
+                      ? undefined
+                      : TINT_COLOR[props.coreResource ?? (props.itemTemplate.key as ColoredResourceType)]
+                  }
+                />
 
                 {props.quantity > 1 && <div className="absolute bottom-0 right-1 text-[12px] font-semibold">{props.quantity}</div>}
               </CustomTooltip.Trigger>

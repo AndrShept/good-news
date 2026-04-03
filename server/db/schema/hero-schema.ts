@@ -7,7 +7,6 @@ import { userTable } from './auth-schema';
 import { buffInstanceTable } from './buff-instance-schema';
 import { groupTable } from './group-schema';
 import { itemContainerTable } from './item-container-schema';
-import { locationTable } from './location-schema';
 import { modifierTable } from './modifier-schema';
 
 const state: Extract<
@@ -36,7 +35,6 @@ export const heroTable = pgTable('hero', {
   level: integer().default(1).notNull(),
   goldCoins: integer().default(100).notNull(),
   premiumCoins: integer().default(0).notNull(),
-  isOnline: boolean().default(true).notNull(),
   maxQueueCraftCount: integer().default(4).notNull(),
   state: stateTypeEnum().default('IDLE').notNull(),
   freeStatPoints: integer().default(10).notNull(),
@@ -46,8 +44,9 @@ export const heroTable = pgTable('hero', {
   maxHealth: integer().default(0).notNull(),
   maxMana: integer().default(0).notNull(),
   stat: jsonb('stat').$type<IHeroStat>().notNull(),
-  regen: jsonb('regen').$type<THeroRegen>().notNull(),
+  // regen: jsonb('regen').$type<THeroRegen>().notNull(),
   activeSkillTraining: jsonb('activeSkillTraining ').$type<ActiveSkillTraining>(),
+  location: jsonb('location ').$type<TLocation>().notNull(),
 
   groupId: uuid().references(() => groupTable.id, {
     onDelete: 'set null',
@@ -68,7 +67,6 @@ export const heroTable = pgTable('hero', {
 
 export const heroRelations = relations(heroTable, ({ one, many }) => ({
   modifier: one(modifierTable),
-  location: one(locationTable),
   group: one(groupTable, {
     fields: [heroTable.groupId],
     references: [groupTable.id],

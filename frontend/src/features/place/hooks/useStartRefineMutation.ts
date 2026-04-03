@@ -8,7 +8,7 @@ export const useStartRefineMutation = () => {
 
   return useMutation({
     mutationFn: async ({ refineBuildingKey, containerId }: { refineBuildingKey: RefiningBuildingKey; containerId: string }) => {
-      const res = await client.hero[':id'].action.refine[':craftBuildingKey'].$post({
+      const res = await client.hero[':id'].action.refine[':refineBuildingKey'].$post({
         param: {
           id,
           refineBuildingKey,

@@ -23,13 +23,9 @@ export const GameItemImg = memo(({ image, tintColor, isPixelate = true, classNam
       alt={image?.split('/').at(-1)}
       style={{
         imageRendering: isPixelate ? 'pixelated' : undefined,
-        filter:
-          filter +
-          `
-        saturate(${tintColor?.saturate ?? 1})
-        brightness(${tintColor?.brightness ?? 1})
-        contrast(${tintColor?.contrast ?? 1})
-        `,
+        filter: tintColor
+          ? `${filter} saturate(${tintColor.saturate ?? 1}) brightness(${tintColor.brightness ?? 1}) contrast(${tintColor.contrast ?? 1})`
+          : undefined,
       }}
       className={cn('size-full select-none object-contain opacity-85 group-hover:opacity-100', className)}
     />

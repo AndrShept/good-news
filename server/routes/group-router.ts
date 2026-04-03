@@ -32,7 +32,7 @@ export const groupRouter = new Hono<Context>()
       const offset = (page - 1) * limit;
 
       const where = and(
-        eq(heroTable.isOnline, true),
+        eq(heroTable.level, 1),
         isNull(heroTable.groupId),
         ne(heroTable.id, selfId),
         ilike(heroTable.name, `%${searchTerm}%`),

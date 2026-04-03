@@ -1,6 +1,5 @@
 import type { ErrorResponse, MapHero } from '@/shared/types';
 import { serve } from '@hono/node-server';
-import { createAdapter } from '@socket.io/redis-adapter';
 import 'dotenv/config';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -8,12 +7,9 @@ import { serveStatic } from 'hono/bun';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 
 import { type Context } from './context';
-import { db } from './db/db';
-import { heroTable } from './db/schema';
-import { locationTable } from './db/schema/location-schema';
 import { gameLoop } from './game/gameLoop';
 import { saveItemsDb } from './game/save-items-db';
 import { saveSkillsDb } from './game/save-skills-db';
@@ -117,14 +113,6 @@ export const io = new Server(httpServer, {
   transports: ['websocket'],
 });
 
-await db.update(heroTable).set({
-  isOnline: false,
-  state: 'IDLE',
-});
-await db.update(locationTable).set({
-  targetX: null,
-  targetY: null,
-});
 
 io.on('connection', async (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };
