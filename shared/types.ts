@@ -222,7 +222,6 @@ export type TLocation = {
   targetY: number | null;
 };
 
-
 export const placeEntranceValues = ['DUNGEON', 'MINE'] as const;
 export type PlaceEntranceType = (typeof placeEntranceValues)[number];
 
@@ -351,6 +350,25 @@ export type OmitModifier = Omit<Modifier, 'id' | 'heroId'>;
 
 export type TItemContainer = typeof itemContainerTable.$inferSelect & {
   itemsInstance: ItemInstance[];
+};
+
+export type RefiningRecipe = {
+  input: string;
+  inputQuantity: number;
+  output: CoreResourceType;
+  outputQuantity: number;
+  requiredMinSkill: number;
+  refiningTimeMs: number;
+};
+
+export type RefineOperation = {
+  input: { itemInstanceId: string; itemTemplateId: string; quantity: number; name: string };
+  output: { itemTemplateId: string; quantity: number; name: string };
+  finishAt: number;
+  refineChance: number;
+  refineSkillInstanceId: string;
+  loreSKillInstanceId: string;
+  itemContainerId: string;
 };
 
 export type CraftMaterial = {
@@ -581,8 +599,6 @@ export type OmitDeepHero = {
   group?: Partial<ApiGetHeroResponse['group']>;
   regen?: Partial<ApiGetHeroResponse['regen']>;
 } & Omit<Partial<ApiGetHeroResponse>, 'location' | 'group' | 'regen'>;
-
-
 
 //API RESPONSE
 export type ApiGetHeroResponse = NonNullable<InferResponseType<(typeof client.hero)['$get']>['data']>;

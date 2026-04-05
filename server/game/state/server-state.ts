@@ -10,6 +10,7 @@ import type {
   OmitTileType,
   PathNode,
   QueueCraft,
+  RefineOperation,
   SkillInstance,
   SpawnPoint,
   THeroRegen,
@@ -77,6 +78,7 @@ export const serverState = {
   queueCraft: new Map<string, QueueCraft[]>(),
   socket: new Map<string, Socket>(),
   worldResourceTiles: new Map<string, Map<string, TileState>>(),
+  queueRefine: new Map<string, RefineOperation[]>(),
   itemInstancePendingDeltaEvents: new Set<ItemInstancePendingDeltaEvents>(),
   skillInstancePendingDeltaEvents: new Set<SkillInstancePendingDeltaEvents>(),
 };

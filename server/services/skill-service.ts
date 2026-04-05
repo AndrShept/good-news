@@ -1,6 +1,6 @@
 import type { SkillExpUpEvent, SkillExpUpEventPayload } from '@/shared/socket-data-types';
 import { type LoreSkillKey, type SkillKey, skillTemplateById, skillTemplateByKey } from '@/shared/templates/skill-template';
-import type { RecipeTemplate, ResourceCategoryType, SkillInstance } from '@/shared/types';
+import type { RecipeTemplate, RefiningBuildingKey, ResourceCategoryType, SkillInstance } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
@@ -104,5 +104,16 @@ export const skillService = {
     };
 
     return loreSkillByResourceCategory[template.resourceInfo.category];
+  },
+
+  getRefiningSkillByBuilding(refineBuildingKey: RefiningBuildingKey) {
+    const skillByBuilding: Record<RefiningBuildingKey, SkillKey> = {
+      FORGE: 'SMELTING',
+      LOOM: 'WEAVING',
+      SAWMILL: 'SAWMILLING',
+      TANNERY: 'TANNING',
+    };
+
+    return skillByBuilding[refineBuildingKey];
   },
 };

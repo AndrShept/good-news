@@ -82,6 +82,7 @@ import { itemInstanceService } from '../services/item-instance-service';
 import { itemTemplateService } from '../services/item-template-service';
 import { mapService } from '../services/map-service';
 import { queueCraftService } from '../services/queue-craft-service';
+import { refiningService } from '../services/refining-service';
 import { skillService } from '../services/skill-service';
 import { socketService } from '../services/socket-service';
 
@@ -634,7 +635,7 @@ export const heroRouter = new Hono<Context>()
         verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: container.ownerId, heroId: hero.id });
       }
 
-      if (hero.state === 'BATTLE') {
+      if (hero.state !== 'IDLE') {
         throw new HTTPException(403, { message: 'You cannot use item during some action.', cause: { canShow: true } });
       }
 
@@ -1081,20 +1082,28 @@ export const heroRouter = new Hono<Context>()
           itemTemplateId: itemInstance.itemTemplateId,
           refiningBuildingKey: refineBuildingKey,
         });
-        console.log(refineItem);
+
         if (!refineItem?.isCanRefine)
           throw new HTTPException(400, {
             message: `${itemInstance.displayName ?? refineItem?.itemTemplate.name} cannot be refined`,
             cause: { canShow: true },
           });
       }
+      refiningService.createQueue(hero.id, refineBuildingKey, refineContainer.itemsInstance);
+      console.log(serverState.queueRefine);
+      const refiningQueues = refiningService.getQueueRefine(hero.id);
 
       const state = getStateWithRefiningBuildingKey(refineBuildingKey);
-      const refiningTime = Date.now() + 10_000;
+      const lastItem = refiningQueues.at(-1);
+      const refiningFinishAt = Date.now() + (lastItem?.finishAt ?? 0);
 
-      // hero.state = state;
-      // hero.refiningFinishAt = refiningTime;
-      const returnData = { refiningTime };
+      hero.state = state;
+      hero.refiningFinishAt = refiningFinishAt;
+
+      const returnData = { refiningFinishAt };
+
+      socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, state);
+
       return c.json<SuccessResponse<typeof returnData>>({
         message: `You begin ${state.toLowerCase()}.`,
         success: true,
@@ -1102,6 +1111,28 @@ export const heroRouter = new Hono<Context>()
       });
     },
   )
+  .post('/:id/refine/cancel', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
+    const user = c.get('user');
+    const { id } = c.req.valid('param');
+    const hero = heroService.getHero(id);
+
+    if (hero.state === 'IDLE') {
+      throw new HTTPException(400, {
+        message: 'You need refining ',
+      });
+    }
+    verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+    hero.state = 'IDLE';
+    hero.refiningFinishAt = undefined;
+    serverState.queueRefine.clear();
+    socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, 'IDLE');
+
+    return c.json<SuccessResponse>({
+      message: `You cancel refining.`,
+      success: true,
+    });
+  })
 
   .get(
     '/:id/queue-craft',

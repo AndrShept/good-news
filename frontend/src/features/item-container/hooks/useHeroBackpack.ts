@@ -47,31 +47,12 @@ export const useHeroBackpack = () => {
     [backpack?.itemsInstance, itemsTemplateById],
   );
 
-  const filteredByRefineBuilding = useMemo(
-    () => (building: RefiningBuildingKey) => {
-      if (!backpack) return;
-
-      return {
-        ...backpack,
-
-        itemsInstance: backpack.itemsInstance.filter((i) => {
-          return itemRefineableForBuilding({
-            coreResource: i.coreResource,
-            itemTemplateId: i.itemTemplateId,
-            refiningBuildingKey: building,
-          })?.isCanRefine;
-        }),
-      };
-    },
-    [backpack],
-  );
-
   return {
     backpack,
     backpackId,
     isLoading,
     stackedItems,
     getStackedResourceItemsByCategory,
-    filteredByRefineBuilding,
+
   };
 };

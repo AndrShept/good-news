@@ -7,18 +7,18 @@ import { itemRefineableForBuilding } from '@/shared/utils';
 import { useSelectPlaceEntitiesStore } from '@/store/useSelectBuildingStore';
 import { useSelectedItemId, useSetSelectedItem } from '@/store/useSelectItemInstanceStore';
 import { useDroppable } from '@dnd-kit/core';
-import { memo, useCallback } from 'react';
+import { memo } from 'react';
 
 import { useCreateContainerItems } from '../hooks/useCreateContainerItems';
 import { ContainerCapacityInfo } from './ContainerCapacityInfo';
 
 type Props = TItemContainer & {
   isShowContainerHeader?: boolean;
-  isCapacityLength?: boolean;
+
 };
 
 export const ItemContainer = memo(
-  ({ capacity, id, itemsInstance, name, isShowContainerHeader = true, isCapacityLength = false }: Props) => {
+  ({ capacity, id, itemsInstance, name, isShowContainerHeader = true}: Props) => {
     const { isOver, setNodeRef, active } = useDroppable({
       id,
       data: { to: id },
@@ -26,7 +26,7 @@ export const ItemContainer = memo(
     const selectedPlaceEntities = useSelectPlaceEntitiesStore((state) => state.selectedPlaceEntities);
     const setSelectedItemInstance = useSetSelectedItem();
     const selectedItemId = useSelectedItemId();
-    const items = useCreateContainerItems(isCapacityLength ? itemsInstance.length + 5 : capacity, itemsInstance);
+    const items = useCreateContainerItems( capacity, itemsInstance);
     const { itemsTemplateById } = useGameData();
     const isRefiningBuilding =
       selectedPlaceEntities?.type === 'BUILDING' &&

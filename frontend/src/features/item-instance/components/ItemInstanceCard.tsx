@@ -18,8 +18,8 @@ type Props = ItemInstance & {
   itemTemplate: ItemTemplate;
   setSelectItemOnContainer: (data: ItemInstance | null) => void;
   isSelect: boolean;
-  isRefiningBuilding: boolean;
-  isHighlight: boolean | undefined;
+  isRefiningBuilding?: boolean;
+  isHighlight?: boolean | undefined;
 };
 
 export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
@@ -28,7 +28,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
   const { attributes, listeners, setNodeRef, isDragging, over } = useDraggable({
     id: props.id,
     data: props,
-    disabled: props.location === 'EQUIPMENT' || moveItemMutation.isPending,
+    disabled: props.location === 'EQUIPMENT' || moveItemMutation.isPending || (props.isRefiningBuilding && !props.isHighlight),
   });
   const [isOpen, setIsOpen] = useState(false);
   const style: React.CSSProperties = {

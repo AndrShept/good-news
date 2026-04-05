@@ -101,7 +101,7 @@ export const queueCraftTick = (now: number) => {
       }
 
       const consumeItemsDelta = queueCraftService.consumeAllItemsForCraft(queue.coreResourceId, backpack, recipe);
-      itemsDelta.push(...(consumeItemsDelta ?? []));
+      itemsDelta.push(...(consumeItemsDelta));
       const socketData: QueueCraftItemSocketEvent = {
         type: 'COMPLETE',
         payload: {

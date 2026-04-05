@@ -189,11 +189,15 @@ export const getModifierByResourceKey = (resourceKey: CoreResourceType, itemTemp
   }
 };
 
-export const getDisplayName = (itemTemplateId: string, resourceId: string) => {
+export const getDisplayName = (itemTemplateId: string, coreResourceId: string | undefined) => {
   const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
-
-  const resource = resourceTemplateById[resourceId];
-  const displayName = `${resource.name.split(' ')[0]} ${itemTemplate.name}`;
+  let displayName = '';
+  if (coreResourceId) {
+    const resource = resourceTemplateById[coreResourceId];
+     displayName = `${resource.name.split(' ')[0]} ${itemTemplate.name}`;
+  } else {
+    displayName = itemTemplate.name;
+  }
   return displayName;
 };
 

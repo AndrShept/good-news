@@ -7,7 +7,6 @@ import { BracketsIcon } from 'lucide-react';
 import { memo } from 'react';
 
 import { GatherSkillButton } from './GatherSkillButton';
-import { GatheringPanel } from './GatheringPanel';
 import { TravelButton } from './TravelButton';
 
 interface Props {

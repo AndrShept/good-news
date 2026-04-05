@@ -1,4 +1,4 @@
-import type { CoreResourceType, RecipeTemplate } from '@/shared/types';
+import type { CoreResourceType, RecipeTemplate, RefiningRecipe } from '@/shared/types';
 
 import { resourceMetaConfig } from '../lib/config/resource-config';
 import { clamp } from '../lib/utils';
@@ -22,6 +22,14 @@ interface CalculateGatherExp {
   requiredMinSkill: number;
   gatherSkillLevel: number;
   success: boolean;
+}
+
+interface CalculateRefineExp {
+  recipe: RefiningRecipe;
+  chance: number;
+  success: boolean;
+  refineSkillLevel: number;
+  loreSkillLevel?: number;
 }
 
 export const progressionService = {
@@ -98,4 +106,27 @@ export const progressionService = {
 
     return Math.floor(attemptXp + successXp);
   },
+
+  calculateRefineExp({ recipe, chance, success, refineSkillLevel, loreSkillLevel }: CalculateRefineExp): number {
+  // База від складності матеріалу — як craftExp від recipeLevel
+  let exp = recipe.requiredMinSkill * 5;
+
+  // Мінімум щоб IRON_ORE (requiredMinSkill: 0) давав хоч щось
+  exp = Math.max(exp, 10);
+
+  // Ризик-бонус — аналогічно крафту
+  exp *= clamp(1.2 - chance / 100, 0.3, 1);
+
+  // Overlevel penalty — як в calculateGatherExp
+  const levelDiff = refineSkillLevel - recipe.requiredMinSkill;
+  const penalty = levelDiff > 0 ? clamp(1 - levelDiff * 0.02, 0.2, 1) : 1;
+  exp *= penalty;
+
+  // Фейл дає менше ніж крафт (0.25) але більше ніж lore (0.5)
+  if (!success) {
+    exp *= 0.35;
+  }
+
+  return Math.max(1, Math.floor(exp));
+},
 };
