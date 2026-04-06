@@ -5,9 +5,17 @@ import type {
   MapChunkUpdateEntitiesData,
   PlaceUpdateEvent,
   SkillExpUpEvent,
+  UpdateItemDeltaEvent,
 } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import type { GameSysMessage, MapChunkEntitiesData, MapChunkEntitiesType, StateType } from '@/shared/types';
+import type {
+  GameSysMessage,
+  ItemsInstanceDeltaEvent,
+  MapChunkEntitiesData,
+  MapChunkEntitiesType,
+  StateType,
+ 
+} from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
@@ -144,6 +152,13 @@ export const socketService = {
       type: 'SKILL_EXP_UP',
       heroId,
       payload: data,
+    };
+    io.to(heroId).emit(socketEvents.selfData(), socketData);
+  },
+  sendToClientItemsDelta(heroId: string, itemsDelta: ItemsInstanceDeltaEvent[]) {
+    const socketData: UpdateItemDeltaEvent = {
+      type: 'ITEM_DELTA',
+      payload: { itemsDelta },
     };
     io.to(heroId).emit(socketEvents.selfData(), socketData);
   },

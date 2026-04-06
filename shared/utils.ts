@@ -24,6 +24,7 @@ import type {
   ItemTemplateType,
   OmitTileType,
   RefiningBuildingKey,
+  RefiningRecipe,
   StateType,
 } from './types';
 
@@ -215,6 +216,7 @@ type ItemRefineableForBuilding = {
   coreResource: CoreResourceType | null;
   itemTemplateId: string;
   refiningBuildingKey: RefiningBuildingKey;
+
 };
 
 export const itemRefineableForBuilding = ({ coreResource, itemTemplateId, refiningBuildingKey }: ItemRefineableForBuilding) => {

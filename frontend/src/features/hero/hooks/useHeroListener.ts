@@ -5,7 +5,7 @@ import { useMapChunkEntitiesUpdate } from '@/features/map/hooks/useMapChunkEntit
 import { useSkillUpdate } from '@/features/skill/hooks/useSkillUpdate';
 import { SelfHeroEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import { Corpse, MapChunkEntitiesData, MapChunkEntitiesType, MapHero } from '@/shared/types';
+import { MapChunkEntitiesData } from '@/shared/types';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect } from 'react';
 
@@ -20,7 +20,7 @@ export const useHeroListener = () => {
   const { removeBuff } = useBuff();
   const { updateHero } = useHeroUpdate();
   const { updateSkill } = useSkillUpdate();
-  const { addItemInstance, updateItemInstance } = useItemContainerUpdate();
+  const { addItemInstance, updateItemInstance, updateItemByDeltaEvents } = useItemContainerUpdate();
   const { updateEquip, removeEquip } = useEquipmentsUpdate();
   const mapId = useHero((data) => data?.location.mapId ?? '');
   const { removeChunkEntities, addChunkEntities } = useMapChunkEntitiesUpdate(mapId);
@@ -117,6 +117,10 @@ export const useHeroListener = () => {
           }
 
           break;
+
+        case 'ITEM_DELTA':
+          updateItemByDeltaEvents(data.payload.itemsDelta);
+          break;
       }
     };
 
@@ -125,18 +129,5 @@ export const useHeroListener = () => {
     return () => {
       socket.off(socketEvents.selfData(), listener);
     };
-  }, [
-    addChunkEntities,
-    addItemInstance,
-    heroId,
-    removeBuff,
-    removeChunkEntities,
-    removeEquip,
-    setGameMessage,
-    socket,
-    updateEquip,
-    updateHero,
-    updateItemInstance,
-    updateSkill,
-  ]);
+  }, [addChunkEntities, addItemInstance, heroId, removeBuff, removeChunkEntities, removeEquip, setGameMessage, socket, updateEquip, updateHero, updateItemByDeltaEvents, updateItemInstance, updateSkill]);
 };

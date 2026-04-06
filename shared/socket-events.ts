@@ -15,4 +15,5 @@ export const socketEvents = {
   entityDespawn: () => 'ENTITY:DESPAWN',
   entityUpdate: () => 'ENTITY:UPDATE',
   finishMove: () => 'FINISH:MOVE',
+
 };

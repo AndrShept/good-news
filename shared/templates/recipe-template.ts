@@ -10,7 +10,7 @@ export const recipeTemplate = [
 
     defaultUnlocked: true,
     itemTemplateId: weaponTemplateByKey.broadsword.id,
-    timeMs: 10_000,
+    timeMs: 5_000,
     requirement: {
       materials: [
         { amount: 9, role: 'CORE', categories: ['INGOT'] },

@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { ColoredResourceType, ItemInstance, ItemTemplate } from '@/shared/types';
 import { itemRefineableForBuilding } from '@/shared/utils';
 import { useSelectItemInstanceStore } from '@/store/useSelectItemInstanceStore';
-import { useDraggable } from '@dnd-kit/core';
+import { useDndMonitor, useDraggable } from '@dnd-kit/core';
 import { memo, useEffect, useState } from 'react';
 
 import { useMoveItemInstance } from '../hooks/useMoveItemInstance';
@@ -24,8 +24,8 @@ type Props = ItemInstance & {
 
 export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
   const moveItemMutation = useMoveItemInstance();
-  const setItemInstance = useSelectItemInstanceStore((state) => state.setItemInstance);
-  const { attributes, listeners, setNodeRef, isDragging, over } = useDraggable({
+  // const setItemInstance = useSelectItemInstanceStore((state) => state.setItemInstance);
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: props.id,
     data: props,
     disabled: props.location === 'EQUIPMENT' || moveItemMutation.isPending || (props.isRefiningBuilding && !props.isHighlight),
@@ -36,12 +36,12 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
     opacity: isDragging || moveItemMutation.isPending ? 0.4 : 1,
     touchAction: 'none',
   };
-  useEffect(() => {
-    if (isDragging) {
+
+    useDndMonitor({ 
+    onDragStart() {
       setIsOpen(false);
-      setItemInstance(null);
-    }
-  }, [isDragging]);
+    },
+  });
   return (
     <GameItemSlot
       className={cn('', {
@@ -49,6 +49,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
       })}
     >
       <div ref={setNodeRef} {...attributes} {...listeners} style={style} className="size-full select-none">
+        
         <Popover
           open={isOpen}
           onOpenChange={(open) => {
@@ -77,7 +78,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
             </PopoverTrigger>
 
             <CustomTooltip.Content>
-              {!props.isSelect && !isDragging && !over?.id && <ItemInstanceCardHoverTooltip {...props} />}
+              {!props.isSelect && !isDragging  && <ItemInstanceCardHoverTooltip {...props} />}
             </CustomTooltip.Content>
             <PopoverContent className="bg-secondary flex h-full w-fit select-none items-center rounded p-1">
               <ItemInstanceCardDropdownMenu {...props} />

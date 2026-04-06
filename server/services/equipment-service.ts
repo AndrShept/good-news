@@ -1,6 +1,6 @@
 import { type GatheringCategorySkillKey, skillTemplateByKey } from '@/shared/templates/skill-template';
 import { toolsTemplate } from '@/shared/templates/tool-template';
-import type { EquipmentSlotType, ItemInstance, ItemTemplate, itemsInstanceDeltaEvent } from '@/shared/types';
+import type { EquipmentSlotType, ItemInstance, ItemsInstanceDeltaEvent, ItemTemplate } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { deltaEventsService } from './delta-events-service';
@@ -77,7 +77,7 @@ export const equipmentService = {
     const backpack = itemContainerService.getBackpack(hero.id);
     const itemInstance = itemInstanceService.getItemInstance(backpack.id, itemInstanceId);
     const template = itemTemplateService.getAllItemsTemplateMapIds()[itemInstance.itemTemplateId];
-    let resultDeltas: itemsInstanceDeltaEvent[] = [];
+    let resultDeltas: ItemsInstanceDeltaEvent[] = [];
 
     const equipData = this.getEquipSlotData(hero.id, template);
     if (!equipData || !equipData.slot) return [];
@@ -109,7 +109,7 @@ export const equipmentService = {
     const backpack = itemContainerService.getBackpack(hero.id);
     const equippedItem = this.findEquipItemByInstanceId(heroId, itemInstanceId);
     const template = itemTemplateService.getAllItemsTemplateMapIds()[equippedItem.itemTemplateId];
-    const resultDeltas: itemsInstanceDeltaEvent[] = [];
+    const resultDeltas: ItemsInstanceDeltaEvent[] = [];
     heroService.checkFreeBackpackCapacity(heroId);
     const findIndex = hero.equipments.findIndex((e) => e.id === itemInstanceId);
     if (findIndex === -1) throw new HTTPException(404, { message: 'unEquipItem findIndex not found' });

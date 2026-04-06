@@ -30,7 +30,6 @@ export const DndInventoryProvider = ({ children }: PropsWithChildren) => {
     },
   });
   const sensors = useSensors(mouseSensor);
-  console.log(activeItem)
   return (
     <DndContext
       sensors={sensors}

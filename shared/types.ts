@@ -266,7 +266,7 @@ export type TPlace = {
   itemContainers: { id: string; name: string; color: string | null; type: ItemContainerType }[];
 };
 
-export type itemsInstanceDeltaEvent =
+export type ItemsInstanceDeltaEvent =
   | {
       type: 'CREATE';
       item: ItemInstance;
@@ -369,6 +369,7 @@ export type RefineOperation = {
   refineSkillInstanceId: string;
   loreSKillInstanceId: string;
   itemContainerId: string;
+  recipe: RefiningRecipe;
 };
 
 export type CraftMaterial = {

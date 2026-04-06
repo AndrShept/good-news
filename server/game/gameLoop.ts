@@ -4,6 +4,7 @@ import { buffTick } from './buff-tick';
 import { gatherTick } from './gather-tick';
 import { moveTick } from './move-tick';
 import { queueCraftTick } from './quue-craft-tick';
+import { refineTick } from './refine-tick';
 import { regenTick } from './regen-tick';
 import { resourceRespawnTick } from './resource-respawn-tick';
 import { spawnCreatureTick } from './spawn-creature-tick';
@@ -28,8 +29,9 @@ export const gameLoop = () => {
     queueCraftTick(lastTick);
     gatherTick(lastTick);
     resourceRespawnTick(lastTick);
-    spawnCreatureTick(lastTick)
+    spawnCreatureTick(lastTick);
     // regenTick(lastTick, TICK_RATE)
+    refineTick(lastTick);
 
     lastTick += TICK_RATE;
     ticks++;

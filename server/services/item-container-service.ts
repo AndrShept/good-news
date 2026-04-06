@@ -1,5 +1,5 @@
 import { placeTemplate } from '@/shared/templates/place-template';
-import type { ItemInstance, ItemLocationType, itemsInstanceDeltaEvent } from '@/shared/types';
+import type { ItemInstance, ItemLocationType, ItemsInstanceDeltaEvent } from '@/shared/types';
 import { and, eq } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
@@ -192,7 +192,7 @@ export const itemContainerService = {
     const templateById = itemTemplateService.getAllItemsTemplateMapIds();
     const template = templateById[itemTemplateId];
     const location = 'BACKPACK';
-    let result: itemsInstanceDeltaEvent[] = [];
+    let result: ItemsInstanceDeltaEvent[] = [];
     if (!template.stackable) {
       for (let i = 0; i < quantity; i++) {
         const newItem = itemInstanceService.createItem({
@@ -216,7 +216,7 @@ export const itemContainerService = {
     const container = itemContainerService.getContainer(itemContainerId);
     const templateById = itemTemplateService.getAllItemsTemplateMapIds();
     const template = templateById[itemTemplateId];
-    const resultData: itemsInstanceDeltaEvent[] = [];
+    const resultData: ItemsInstanceDeltaEvent[] = [];
     let remaining = quantity;
 
     // 1️⃣ Заповнюємо існуючі стеки
@@ -268,7 +268,7 @@ export const itemContainerService = {
     const container = this.getContainer(itemContainerId);
     const itemInstance = itemInstanceService.getItemInstance(itemContainerId, itemInstanceId);
     const template = itemTemplateService.getAllItemsTemplateMapIds()[itemInstance.itemTemplateId];
-    const resultData: itemsInstanceDeltaEvent[] = [];
+    const resultData: ItemsInstanceDeltaEvent[] = [];
     // ❌ non-stackable
     if (!template.stackable) {
       itemContainerService.deleteItem(itemContainerId, itemInstanceId);
@@ -329,7 +329,7 @@ export const itemContainerService = {
         resultData.push({ type: 'DELETE', itemContainerId, itemInstanceId: inst.id, itemName: '' });
         deltaEventsService.itemInstance.delete(inst.id);
       } else {
-        resultData.push({ type: 'UPDATE', itemContainerId, itemInstanceId, updateData: { quantity: inst.quantity } });
+        resultData.push({ type: 'UPDATE', itemContainerId, itemInstanceId: inst.id, updateData: { quantity: inst.quantity } });
         deltaEventsService.itemInstance.update(itemInstanceId, { quantity: inst.quantity });
       }
     }

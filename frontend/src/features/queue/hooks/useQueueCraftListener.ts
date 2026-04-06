@@ -13,7 +13,7 @@ export const useQueueCraftListener = () => {
   const { socket } = useSocket();
   const heroId = useHeroId();
   const backpackId = useGetBackpackId();
-  const { addItemInstance, removeItemInstance, updateItemInstance } = useItemContainerUpdate();
+  const { addItemInstance, removeItemInstance, updateItemInstance, updateItemByDeltaEvents } = useItemContainerUpdate();
   const { updateQueueCraftItems, removeQueueCraftItems } = useQueueCraftItem();
   const setGameMessage = useSetGameMessage();
   useEffect(() => {
@@ -23,19 +23,7 @@ export const useQueueCraftListener = () => {
           removeQueueCraftItems(data.payload.queueItemCraftId);
 
           if (data.payload.itemsDelta) {
-            for (const i of data.payload.itemsDelta) {
-              switch (i.type) {
-                case 'UPDATE':
-                  updateItemInstance(i.itemContainerId ?? '', i.itemInstanceId, i.updateData);
-                  break;
-                case 'DELETE':
-                  removeItemInstance(i.itemContainerId ?? '', i.itemInstanceId);
-                  break;
-                case 'CREATE':
-                  addItemInstance(i.itemContainerId ?? '', i.item);
-                  break;
-              }
-            }
+            updateItemByDeltaEvents(data.payload.itemsDelta);
           }
 
           setGameMessage({
@@ -62,15 +50,5 @@ export const useQueueCraftListener = () => {
     return () => {
       socket.off(socketEvents.queueCraft(), listener);
     };
-  }, [
-    addItemInstance,
-    backpackId,
-    heroId,
-    removeItemInstance,
-    removeQueueCraftItems,
-    setGameMessage,
-    socket,
-    updateItemInstance,
-    updateQueueCraftItems,
-  ]);
+  }, [addItemInstance, backpackId, heroId, removeItemInstance, removeQueueCraftItems, setGameMessage, socket, updateItemByDeltaEvents, updateItemInstance, updateQueueCraftItems]);
 };

@@ -30,6 +30,11 @@ interface GetCraftChance {
   coreResourceId: string | undefined;
   recipeMin: number;
 }
+interface CalculateCraftTime {
+  baseTimeMs: number;
+  craftSkillLevel: number;
+  requiredMinSkill: number;
+}
 
 export const queueCraftService = {
   getQueueCraft(heroId: string) {
@@ -179,5 +184,15 @@ export const queueCraftService = {
 
     const resourceConfig = resourceMetaConfig[coreResource.key as CoreResourceType];
     return resourceConfig.durabilityMultiplier * durability;
+  },
+
+  calculateCraftTime({ baseTimeMs, craftSkillLevel, requiredMinSkill }: CalculateCraftTime): number {
+    const maxReduction = 0.4; // максимум 40% — крафт складніший тому менше скорочується
+    const reductionPerLevel = 0.003; // 0.3% за рівень — повільніше ніж рефайн
+
+    const levelDiff = craftSkillLevel - requiredMinSkill;
+    const reduction = levelDiff > 0 ? clamp(levelDiff * reductionPerLevel, 0, maxReduction) : 0;
+
+    return Math.max(5_000, Math.floor(baseTimeMs * (1 - reduction)));
   },
 };

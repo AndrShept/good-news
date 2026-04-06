@@ -13,8 +13,7 @@ interface CalculateCraftExp {
 
 interface CalculateLoreExp {
   success: boolean;
-  loreSkillLevel: number | undefined;
-  timeMs: number;
+  loreSkillLevel: number
   requiredMinSkill: number;
 }
 
@@ -54,18 +53,15 @@ export const progressionService = {
     return Math.max(1, Math.floor(exp));
   },
 
-  calculateLoreExp({ timeMs, requiredMinSkill, loreSkillLevel, success }: CalculateLoreExp): number {
+  calculateLoreExp({ requiredMinSkill, loreSkillLevel, success }: CalculateLoreExp): number {
     // 1️⃣ База від складності
     const baseXp = 5 + requiredMinSkill * 1.5;
-
-    // 2️⃣ Бонус за час
-    const timeBonus = 0; // (timeMs / 1000) * 0.4;
 
     // 3️⃣ Якщо рівень сильно перевищує складність — менше EXP
     const levelDiff = (loreSkillLevel ?? 0) - requiredMinSkill;
     const overlevelPenalty = levelDiff > 0 ? clamp(1 - levelDiff * 0.03, 0.2, 1) : 1;
 
-    let exp = (baseXp + timeBonus) * overlevelPenalty;
+    let exp = baseXp * overlevelPenalty;
 
     // 4️⃣ Фейл дає менше
     if (!success) {
@@ -108,25 +104,25 @@ export const progressionService = {
   },
 
   calculateRefineExp({ recipe, chance, success, refineSkillLevel, loreSkillLevel }: CalculateRefineExp): number {
-  // База від складності матеріалу — як craftExp від recipeLevel
-  let exp = recipe.requiredMinSkill * 5;
+    // База від складності матеріалу — як craftExp від recipeLevel
+    let exp = recipe.requiredMinSkill * 5;
 
-  // Мінімум щоб IRON_ORE (requiredMinSkill: 0) давав хоч щось
-  exp = Math.max(exp, 10);
+    // Мінімум щоб IRON_ORE (requiredMinSkill: 0) давав хоч щось
+    exp = Math.max(exp, 10);
 
-  // Ризик-бонус — аналогічно крафту
-  exp *= clamp(1.2 - chance / 100, 0.3, 1);
+    // Ризик-бонус — аналогічно крафту
+    exp *= clamp(1.2 - chance / 100, 0.3, 1);
 
-  // Overlevel penalty — як в calculateGatherExp
-  const levelDiff = refineSkillLevel - recipe.requiredMinSkill;
-  const penalty = levelDiff > 0 ? clamp(1 - levelDiff * 0.02, 0.2, 1) : 1;
-  exp *= penalty;
+    // Overlevel penalty — як в calculateGatherExp
+    const levelDiff = refineSkillLevel - recipe.requiredMinSkill;
+    const penalty = levelDiff > 0 ? clamp(1 - levelDiff * 0.02, 0.2, 1) : 1;
+    exp *= penalty;
 
-  // Фейл дає менше ніж крафт (0.25) але більше ніж lore (0.5)
-  if (!success) {
-    exp *= 0.35;
-  }
+    // Фейл дає менше ніж крафт (0.25) але більше ніж lore (0.5)
+    if (!success) {
+      exp *= 0.35;
+    }
 
-  return Math.max(1, Math.floor(exp));
-},
+    return Math.max(1, Math.floor(exp));
+  },
 };

@@ -19,6 +19,7 @@ import {
   type ErrorResponse,
   type Hero,
   type ItemInstance,
+  type ItemsInstanceDeltaEvent,
   type PathNode,
   type QueueCraft,
   type StateType,
@@ -29,7 +30,6 @@ import {
   buildingValues,
   buyItemsSchema,
   createHeroSchema,
-  type itemsInstanceDeltaEvent,
   refiningBuildingValues,
   statsSchema,
 } from '@/shared/types';
@@ -517,7 +517,7 @@ export const heroRouter = new Hono<Context>()
       }
       let message: null | string = null;
       const equipItem = hero.equipments.find((e) => e.id === itemInstanceId);
-      let itemsDelta: itemsInstanceDeltaEvent[] = [];
+      let itemsDelta: ItemsInstanceDeltaEvent[] = [];
 
       if (equipItem) {
         itemsDelta = equipmentService.unEquipItem(hero.id, itemInstanceId);
@@ -642,7 +642,7 @@ export const heroRouter = new Hono<Context>()
       itemContainerService.checkFreeContainerCapacity(toContainer.id);
 
       const existContainer = toContainer.itemsInstance.some((i) => i.itemTemplateId === itemTemplate.id);
-      let inventoryDeltas: itemsInstanceDeltaEvent[] = [];
+      let inventoryDeltas: ItemsInstanceDeltaEvent[] = [];
       if ((!existContainer && itemTemplate.stackable) || !itemTemplate.stackable) {
         itemInstance.itemContainerId = to;
         itemInstance.location = toContainer.type;
@@ -1089,19 +1089,23 @@ export const heroRouter = new Hono<Context>()
             cause: { canShow: true },
           });
       }
+
       refiningService.createQueue(hero.id, refineBuildingKey, refineContainer.itemsInstance);
       console.log(serverState.queueRefine);
       const refiningQueues = refiningService.getQueueRefine(hero.id);
 
       const state = getStateWithRefiningBuildingKey(refineBuildingKey);
       const lastItem = refiningQueues.at(-1);
-      const refiningFinishAt = Date.now() + (lastItem?.finishAt ?? 0);
+
+      if (!lastItem) {
+        throw new HTTPException(400, { message: 'Not enough items or no refineable items found', cause: { canShow: true } });
+      }
+      const refiningFinishAt = Date.now() + lastItem?.finishAt
 
       hero.state = state;
       hero.refiningFinishAt = refiningFinishAt;
 
       const returnData = { refiningFinishAt };
-
       socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, state);
 
       return c.json<SuccessResponse<typeof returnData>>({

@@ -131,7 +131,7 @@ export const gatheringService = {
     console.log(tilesAroundHero);
 
     if (!tilesAroundHero.length) {
-      throw new HTTPException(409, { message: `nothing to ${gatherSkill.toLowerCase()} this area`, cause: { canShow: true } });
+      throw new HTTPException(409, { message: `Nothing to ${gatherSkill.toLowerCase()} this area`, cause: { canShow: true } });
     }
 
     let resultTileState: undefined | TileState = undefined;

@@ -5,6 +5,7 @@ import type {
   GameSysMessageType,
   Hero,
   HeroSidebarItem,
+  ItemsInstanceDeltaEvent,
   MapChunkEntitiesData,
   MapChunkEntitiesType,
   MapCorpse,
@@ -12,10 +13,6 @@ import type {
   MapHero,
   OmitDeepHero,
   QueueCraftStatusType,
-  SkillInstance,
-  StateType,
-  TItemContainer,
-  itemsInstanceDeltaEvent,
 } from './types';
 
 export type SocketGroupResponse = {
@@ -78,7 +75,7 @@ export type QueueCraftItemSocketEvent =
         itemName: string;
         message: string;
         successCraft: boolean;
-        itemsDelta: itemsInstanceDeltaEvent[] | undefined;
+        itemsDelta: ItemsInstanceDeltaEvent[] | undefined;
       };
     }
   | {
@@ -100,7 +97,15 @@ export type SelfHeroEvent =
   | HeroUpdateEvent
   | FinishGatheringEvent
   | LoadMapChunkEntityEvent
-  | RemoveMapChunkEntityEvent;
+  | RemoveMapChunkEntityEvent
+  | UpdateItemDeltaEvent;
+
+export type UpdateItemDeltaEvent = {
+  type: 'ITEM_DELTA';
+  payload: {
+    itemsDelta: ItemsInstanceDeltaEvent[];
+  };
+};
 
 export type LoadMapChunkEntityEvent = {
   type: 'LOAD_MORE_ENTITY';
@@ -138,14 +143,14 @@ export type FinishGatheringEvent = {
     itemName?: string;
     quantity?: number;
     message: string;
-    inventoryDeltas?: itemsInstanceDeltaEvent[];
-    equipmentDeltas?: itemsInstanceDeltaEvent[];
+    inventoryDeltas?: ItemsInstanceDeltaEvent[];
+    equipmentDeltas?: ItemsInstanceDeltaEvent[];
   };
 };
 export type SkillExpUpEvent = {
   type: 'SKILL_EXP_UP';
   heroId: string;
-  payload: { isShowMessageOnlyLvlUp: boolean; expResult: SkillExpUpEventPayload }[]
+  payload: { isShowMessageOnlyLvlUp: boolean; expResult: SkillExpUpEventPayload }[];
 };
 
 export type SkillExpUpEventPayload = {

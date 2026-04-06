@@ -1,7 +1,6 @@
-import { BASE_GATHERING_TIME } from '@/shared/constants';
+
 import type { FinishGatheringEvent, HeroUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import type { itemsInstanceDeltaEvent } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
@@ -14,6 +13,7 @@ import { progressionService } from '../services/progression-service';
 import { skillService } from '../services/skill-service';
 import { socketService } from '../services/socket-service';
 import { serverState } from './state/server-state';
+import type { ItemsInstanceDeltaEvent } from '@/shared/types';
 
 export const gatherTick = (now: number) => {
   for (const [heroId, hero] of serverState.hero.entries()) {
@@ -62,16 +62,16 @@ export const gatherTick = (now: number) => {
 
       const luck = hero.stat.luck;
       const loreSkillKey = skillService.getLoreSkillByItemTemplateId(itemTemplate.id);
-      const lorSkillInstance = loreSkillKey ? skillService.getSkillByKey(heroId, loreSkillKey) : undefined;
+      const lorSkillInstance = skillService.getSkillByKey(heroId, loreSkillKey)
       const backpack = itemContainerService.getBackpack(heroId);
 
       const quantity = gatheringService.getGatherRewardQuantity({
         luck,
         gatherSkillLevel: gatherSkillInstance.level,
-        loreSkillLevel: lorSkillInstance?.level,
+        loreSkillLevel: lorSkillInstance.level,
         maxQuantity: gatherResult.gatherItem.maxGatherQuantity,
       });
-      let inventoryDeltas: itemsInstanceDeltaEvent[] = [];
+      let inventoryDeltas: ItemsInstanceDeltaEvent[] = [];
       if (gatherResult.success) {
         tileState.charges -= quantity;
         inventoryDeltas = itemContainerService.createItem({
@@ -89,10 +89,10 @@ export const gatherTick = (now: number) => {
         success: gatherResult.success,
       });
       const expLore = progressionService.calculateLoreExp({
-        loreSkillLevel: lorSkillInstance?.level,
+        loreSkillLevel: lorSkillInstance.level,
         requiredMinSkill: gatherResult.gatherItem.requiredMinSkill,
         success: gatherResult.success,
-        timeMs: BASE_GATHERING_TIME,
+       
       });
 
       const expGatherResult = skillService.addExp(heroId, gatherSkill, exp);

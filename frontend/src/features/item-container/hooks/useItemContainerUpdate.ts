@@ -1,6 +1,6 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { getItemContainerOptions } from '@/features/item-container/api/get-item-container';
-import { ItemInstance, TItemContainer } from '@/shared/types';
+import { ItemInstance, ItemsInstanceDeltaEvent, TItemContainer } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
@@ -56,5 +56,21 @@ export const useItemContainerUpdate = () => {
     [heroId],
   );
 
-  return { updateItemContainer, removeItemInstance, addItemInstance, updateItemInstance };
+  const updateItemByDeltaEvents = (itemsDelta: ItemsInstanceDeltaEvent[]) => {
+    for (const i of itemsDelta) {
+      switch (i.type) {
+        case 'UPDATE':
+          updateItemInstance(i.itemContainerId ?? '', i.itemInstanceId, i.updateData);
+          break;
+        case 'DELETE':
+          removeItemInstance(i.itemContainerId ?? '', i.itemInstanceId);
+          break;
+        case 'CREATE':
+          addItemInstance(i.itemContainerId ?? '', i.item);
+          break;
+      }
+    }
+  };
+
+  return { updateItemContainer, removeItemInstance, addItemInstance, updateItemInstance, updateItemByDeltaEvents };
 };

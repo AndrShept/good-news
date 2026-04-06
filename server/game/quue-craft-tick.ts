@@ -2,7 +2,7 @@ import type { QueueCraftItemSocketEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
 import { type SkillKey, skillTemplateById, skillTemplateByKey } from '@/shared/templates/skill-template';
-import type { itemsInstanceDeltaEvent } from '@/shared/types';
+import type { ItemsInstanceDeltaEvent } from '@/shared/types';
 
 import { io } from '..';
 import { getDisplayName, rollChance } from '../lib/utils';
@@ -76,7 +76,6 @@ export const queueCraftTick = (now: number) => {
       });
       const finalExpLoreSkill = progressionService.calculateLoreExp({
         loreSkillLevel: loreSkillInstance.level,
-        timeMs: recipe.timeMs,
         requiredMinSkill: recipe.requirement.skills[0].level,
         success: successCraft,
       });
@@ -84,7 +83,7 @@ export const queueCraftTick = (now: number) => {
       const expResultLoreSkill = skillService.addExp(heroId, loreSkillKey, finalExpLoreSkill);
 
       const displayName = getDisplayName(recipe.itemTemplateId, queue.coreResourceId);
-      const itemsDelta: itemsInstanceDeltaEvent[] = [];
+      const itemsDelta: ItemsInstanceDeltaEvent[] = [];
       if (successCraft) {
         const newItemDelta = itemContainerService.createItem({
           itemContainerId: backpack.id,
@@ -101,7 +100,8 @@ export const queueCraftTick = (now: number) => {
       }
 
       const consumeItemsDelta = queueCraftService.consumeAllItemsForCraft(queue.coreResourceId, backpack, recipe);
-      itemsDelta.push(...(consumeItemsDelta));
+      itemsDelta.push(...consumeItemsDelta);
+    
       const socketData: QueueCraftItemSocketEvent = {
         type: 'COMPLETE',
         payload: {

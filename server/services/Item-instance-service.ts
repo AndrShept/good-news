@@ -1,10 +1,9 @@
 import { resourceTemplateById } from '@/shared/templates/resource-template';
-import type { CoreResourceType, ItemInstance, ItemLocationType, OmitModifier, WeaponType, itemsInstanceDeltaEvent } from '@/shared/types';
+import type { CoreResourceType, ItemInstance, ItemLocationType, ItemsInstanceDeltaEvent, OmitModifier, WeaponType } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
 import { itemDurabilityConfig } from '../lib/config/item-dutability-config';
-import { materialModifierConfig } from '../lib/config/material-modifier-config';
 import { generateRandomUuid, getDisplayName, getModifierByResourceKey, sumAllModifier } from '../lib/utils';
 import { deltaEventsService } from './delta-events-service';
 import { equipmentService } from './equipment-service';
@@ -102,7 +101,7 @@ export const itemInstanceService = {
     const itemInstance = equipmentService.findEquipItemByInstanceId(heroId, itemInstanceId);
     const itemTemplate = itemTemplateService.getAllItemsTemplateMapIds()[itemInstance.itemTemplateId];
 
-    let result: itemsInstanceDeltaEvent | undefined = undefined;
+    let result: ItemsInstanceDeltaEvent | undefined = undefined;
     if (itemInstance.durability) {
       itemInstance.durability.current -= value;
       result = {
