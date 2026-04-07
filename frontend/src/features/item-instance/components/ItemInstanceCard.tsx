@@ -3,7 +3,7 @@ import { GameItemImg } from '@/components/GameItemImg';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TINT_COLOR } from '@/lib/config';
 import { cn } from '@/lib/utils';
-import { ColoredResourceType, ItemInstance, ItemTemplate } from '@/shared/types';
+import { ColoredResourceType, ItemInstance, ItemTemplate, StateType } from '@/shared/types';
 import { itemRefineableForBuilding } from '@/shared/utils';
 import { useSelectItemInstanceStore } from '@/store/useSelectItemInstanceStore';
 import { useDndMonitor, useDraggable } from '@dnd-kit/core';
@@ -16,6 +16,7 @@ import { ItemInstanceCardHoverTooltip } from './ItemInstanceCardHoverTooltip';
 
 type Props = ItemInstance & {
   itemTemplate: ItemTemplate;
+  heroState: StateType;
   setSelectItemOnContainer: (data: ItemInstance | null) => void;
   isSelect: boolean;
   isRefiningBuilding?: boolean;
@@ -28,7 +29,11 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: props.id,
     data: props,
-    disabled: props.location === 'EQUIPMENT' || moveItemMutation.isPending || (props.isRefiningBuilding && !props.isHighlight),
+    disabled:
+      props.location === 'EQUIPMENT' ||
+      moveItemMutation.isPending ||
+      (props.isRefiningBuilding && !props.isHighlight) ||
+      props.heroState !== 'IDLE',
   });
   const [isOpen, setIsOpen] = useState(false);
   const style: React.CSSProperties = {
@@ -37,7 +42,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
     touchAction: 'none',
   };
 
-    useDndMonitor({ 
+  useDndMonitor({
     onDragStart() {
       setIsOpen(false);
     },
@@ -49,7 +54,6 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
       })}
     >
       <div ref={setNodeRef} {...attributes} {...listeners} style={style} className="size-full select-none">
-        
         <Popover
           open={isOpen}
           onOpenChange={(open) => {
@@ -77,9 +81,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
               </CustomTooltip.Trigger>
             </PopoverTrigger>
 
-            <CustomTooltip.Content>
-              {!props.isSelect && !isDragging  && <ItemInstanceCardHoverTooltip {...props} />}
-            </CustomTooltip.Content>
+            <CustomTooltip.Content>{!props.isSelect && !isDragging && <ItemInstanceCardHoverTooltip {...props} />}</CustomTooltip.Content>
             <PopoverContent className="bg-secondary flex h-full w-fit select-none items-center rounded p-1">
               <ItemInstanceCardDropdownMenu {...props} />
             </PopoverContent>

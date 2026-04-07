@@ -11,7 +11,7 @@ type Props = ItemInstance & {
 };
 export const ItemInstanceCardHoverTooltip = memo((props: Props) => {
   return (
-    <section className={cn('bg-secondary/80 flex max-w-sm flex-col items-center justify-center truncate rounded border px-4 py-2')}>
+    <section className={cn('bg-secondary/80 flex max-w-[280px] flex-col items-center justify-center truncate rounded border px-4 py-2')}>
       <h3 className={cn('truncate text-base capitalize')}>{props.displayName ?? props.itemTemplate.name}</h3>
 
       <p className="text-muted-foreground">{props.itemTemplate.type.toLocaleLowerCase().replace('_', ' ')}</p>

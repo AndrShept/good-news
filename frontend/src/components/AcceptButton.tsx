@@ -10,7 +10,7 @@ type Props = ComponentProps<'button'> & {
 
 export const AcceptButton = ({ className, children, ...props }: Props) => {
   return (
-    <Button {...props} variant={'secondary'} className={cn('hover:text-green-500', className)}>
+    <Button  {...props} variant={'secondary'} className={cn('hover:text-green-500', className)}>
       <CheckIcon className="size-5" />
       {children}
     </Button>

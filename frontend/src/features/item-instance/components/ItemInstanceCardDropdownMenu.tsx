@@ -6,8 +6,10 @@ import { imageConfig } from '@/shared/config/image-config';
 import { ItemInstance, ItemTemplate, ItemTemplateType } from '@/shared/types';
 import { useModalStore } from '@/store/useModalStore';
 import { useSelectItemInstanceStore } from '@/store/useSelectItemInstanceStore';
-import { X } from 'lucide-react';
+import { ArrowLeftRightIcon, X } from 'lucide-react';
 import { ReactElement } from 'react';
+
+import { SplitItemInstanceQuantityPopover } from './SplitItemInstanceQuantityPopover';
 
 interface Props extends ItemInstance {
   itemTemplate: ItemTemplate;
@@ -76,6 +78,9 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
         >
           <GameIcon className="size-5" image={imageConfig.icon.action.unEquip} />
         </Button>
+      )}
+      {(props.location === 'BACKPACK' || props.location === 'BANK') && props.itemTemplate.stackable && props.quantity > 1 && (
+        <SplitItemInstanceQuantityPopover maxQuantity={props.quantity - 1} />
       )}
 
       {(props.location === 'BACKPACK' || props.location === 'BANK') && (

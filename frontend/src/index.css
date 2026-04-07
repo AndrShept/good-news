@@ -295,7 +295,9 @@ textarea {
     }
   }
 }
-
+@utility animate-spin-slow {
+  animation: spin 3s linear infinite;
+}
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -27,7 +27,7 @@ export const refineTick = (now: number) => {
       const refineSkillKey = skillTemplateById[refineSkillInstance.skillTemplateId].key;
       const loreSkillKey = skillTemplateById[loreSkillInstance.skillTemplateId].key;
       let result = {
-        message: `You fail refining ${queue.output.name} and lost some resource`,
+        message: `Failed to refine ${queue.input.name} — resources lost`,
         success: false,
       };
       if (isSuccess) {
@@ -44,7 +44,7 @@ export const refineTick = (now: number) => {
           quantity,
         });
         itemsDelta.push(...newItem);
-        result.message = `Success refining ${queue.input.name} x${queue.input.quantity} and create ${queue.output.name} x${quantity}`;
+        result.message = `Successfully refined ${queue.input.name} x${queue.input.quantity} into ${queue.output.name} x${quantity}`;
         result.success = true;
       }
 

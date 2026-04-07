@@ -1,3 +1,4 @@
+import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
@@ -6,6 +7,7 @@ import { ItemContainer } from '@/features/item-container/components/ItemContaine
 import { ItemContainerSkeleton } from '@/features/item-container/components/ItemContainerSkeleton';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
 import { ActionTimerPanel } from '@/features/map/components/ActionTimerPanel';
+import { imageConfig } from '@/shared/config/image-config';
 import { Building, RefiningBuildingKey, TPlace } from '@/shared/types';
 import { useQuery } from '@tanstack/react-query';
 
@@ -33,13 +35,17 @@ export const RefiningBuilding = ({ selectedBuilding, place }: Props) => {
       ) : (
         refineContainerData.data && <ItemContainer {...refineContainerData.data} />
       )}
-      <Button
-        onClick={() => mutate({ containerId: refineContainer?.id ?? '', refineBuildingKey: selectedBuilding.key as RefiningBuildingKey })}
-        disabled={isPending || state !== 'IDLE'}
-        className="w-fit"
-      >
-        Refine!
-      </Button>
+      <div className="flex items-center gap-1">
+        <Button
+          onClick={() => mutate({ containerId: refineContainer?.id ?? '', refineBuildingKey: selectedBuilding.key as RefiningBuildingKey })}
+          disabled={isPending || state !== 'IDLE'}
+          className="w-fit"
+        >
+          Refine!
+        </Button>
+        {!!state && state !== 'IDLE' && !!refiningFinishAt && <GameIcon className='animate-spin-slow' image={imageConfig.icon.ui.refine} />}
+      </div>
+
       {!!state && state !== 'IDLE' && !!refiningFinishAt && (
         <ActionTimerPanel
           heroState={state}
