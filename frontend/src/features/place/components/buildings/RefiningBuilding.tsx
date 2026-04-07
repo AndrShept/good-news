@@ -40,7 +40,7 @@ export const RefiningBuilding = ({ selectedBuilding, place }: Props) => {
       >
         Refine!
       </Button>
-      {!!state && !!refiningFinishAt && (
+      {!!state && state !== 'IDLE' && !!refiningFinishAt && (
         <ActionTimerPanel
           heroState={state}
           actionFinishAt={refiningFinishAt}

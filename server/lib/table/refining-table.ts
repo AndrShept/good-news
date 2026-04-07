@@ -51,3 +51,4 @@ export const refiningRecipes = [
 ] as const satisfies RefiningRecipe[];
 
 export const refiningRecipeByInput = Object.fromEntries(refiningRecipes.map((r) => [r.input, r])) as Record<string, RefiningRecipe>;
+export const refiningRecipeByOutput = Object.fromEntries(refiningRecipes.map((r) => [r.output, r])) as Record<string, RefiningRecipe>;

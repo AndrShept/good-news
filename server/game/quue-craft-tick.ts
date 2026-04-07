@@ -101,7 +101,7 @@ export const queueCraftTick = (now: number) => {
 
       const consumeItemsDelta = queueCraftService.consumeAllItemsForCraft(queue.coreResourceId, backpack, recipe);
       itemsDelta.push(...consumeItemsDelta);
-    
+
       const socketData: QueueCraftItemSocketEvent = {
         type: 'COMPLETE',
         payload: {
@@ -126,6 +126,7 @@ export const queueCraftTick = (now: number) => {
       }
       if (!queueCraftItems.length) {
         socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, 'IDLE');
+     
         hero.state = 'IDLE';
       }
     }

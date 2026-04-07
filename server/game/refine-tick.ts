@@ -1,3 +1,4 @@
+import type { HeroUpdateEvent } from '@/shared/socket-data-types';
 import { skillTemplateById } from '@/shared/templates/skill-template';
 import type { ItemsInstanceDeltaEvent } from '@/shared/types';
 
@@ -30,19 +31,20 @@ export const refineTick = (now: number) => {
         success: false,
       };
       if (isSuccess) {
+        const quantity = refiningService.getRefineOutputQuantity({
+          loreSkillLevel: loreSkillInstance.level,
+          refineSkillLevel: refineSkillInstance.level,
+          recipe: queue.recipe,
+        });
         const newItem = itemContainerService.obtainStackableItem({
           location: 'BACKPACK',
           heroId,
           itemContainerId: backpack.id,
           itemTemplateId: queue.output.itemTemplateId,
-          quantity: refiningService.getRefineOutputQuantity({
-            loreSkillLevel: loreSkillInstance.level,
-            refineSkillLevel: refineSkillInstance.level,
-            recipe: queue.recipe,
-          }),
+          quantity,
         });
         itemsDelta.push(...newItem);
-        result.message = `Success refining ${queue.input.name}x${queue.input.quantity} and create ${queue.output.name} x${queue.output.quantity}`;
+        result.message = `Success refining ${queue.input.name} x${queue.input.quantity} and create ${queue.output.name} x${quantity}`;
         result.success = true;
       }
 
@@ -79,7 +81,9 @@ export const refineTick = (now: number) => {
       if (!refineQueues.length) {
         hero.state = 'IDLE';
         hero.refiningFinishAt = undefined;
+
         socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, 'IDLE');
+        socketService.sendToClientUpdateSelfHeroData(hero.id, { refiningFinishAt: undefined });
       }
     }
   }

@@ -25,7 +25,7 @@ export const useStartRefineMutation = () => {
       return await res.json();
     },
     onSuccess: ({ message, data }) => {
-      updateHero({ refiningFinishAt: data?.refiningFinishAt });
+      updateHero({ refiningFinishAt: data?.refiningFinishAt, state: data?.state });
       setGameMessage({
         type: 'SUCCESS',
         text: message,

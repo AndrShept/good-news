@@ -13,8 +13,8 @@ import type {
   ItemsInstanceDeltaEvent,
   MapChunkEntitiesData,
   MapChunkEntitiesType,
+  OmitDeepHero,
   StateType,
- 
 } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
@@ -150,6 +150,14 @@ export const socketService = {
   sendToClientExpResult({ heroId, data }: SendToClientExpResult) {
     const socketData: SkillExpUpEvent = {
       type: 'SKILL_EXP_UP',
+      heroId,
+      payload: data,
+    };
+    io.to(heroId).emit(socketEvents.selfData(), socketData);
+  },
+  sendToClientUpdateSelfHeroData(heroId: string, data: OmitDeepHero) {
+    const socketData: HeroUpdateEvent = {
+      type: 'UPDATE_HERO',
       heroId,
       payload: data,
     };

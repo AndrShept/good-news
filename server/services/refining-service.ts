@@ -1,10 +1,10 @@
-import { recipeTemplateById } from '@/shared/templates/recipe-template';
+import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
 import { resourceTemplateById, resourceTemplateByKey } from '@/shared/templates/resource-template';
 import type { ItemInstance, RefineOperation, RefiningBuildingKey, RefiningRecipe } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
-import { refiningRecipeByInput } from '../lib/table/refining-table';
+import { refiningRecipeByInput, refiningRecipeByOutput } from '../lib/table/refining-table';
 import { clamp } from '../lib/utils';
 import { itemTemplateService } from './item-template-service';
 import { skillService } from './skill-service';
@@ -38,21 +38,22 @@ export const refiningService = {
     const refineSkillKey = skillService.getRefiningSkillByBuilding(refineBuildingKey);
     const refineSkillInstance = skillService.getSkillByKey(heroId, refineSkillKey);
 
+    let itemIndex = 0;
     for (const itemInstance of itemInstances) {
       const itemTemplate = itemInstance.coreResource
         ? itemTemplateService.getAllItemsTemplateMapIds()[itemInstance.itemTemplateId]
         : resourceTemplateById[itemInstance.itemTemplateId];
-
       if (!itemTemplate) continue;
       switch (itemTemplate.type) {
         case 'RESOURCES': {
           const recipe = refiningRecipeByInput[itemTemplate.key];
-          const loreSkillKey = skillService.getLoreSkillByItemTemplateId(itemTemplate.id);
+          const loreSkillKey = skillService.getLoreSkillByItemTemplateId(resourceTemplateByKey[recipe.output].id);
 
           const loreSkillInstance = skillService.getSkillByKey(heroId, loreSkillKey);
           const iterationCount = Math.floor(itemInstance.quantity / recipe.inputQuantity);
 
           for (let i = 0; i < iterationCount; i++) {
+            itemIndex++;
             refiningData.push({
               input: {
                 itemInstanceId: itemInstance.id,
@@ -65,11 +66,14 @@ export const refiningService = {
                 name: resourceTemplateByKey[recipe.output].name,
                 quantity: recipe.outputQuantity,
               },
-              finishAt: refiningService.calculateRefineTime({
-                baseTimeMs: Date.now() + 10_000 * (i + 1),
-                requiredMinSkill: recipe.requiredMinSkill,
-                refineSkillLevel: refineSkillInstance.level,
-              }),
+              finishAt:
+                Date.now() +
+                refiningService.calculateRefineTime({
+                  baseTimeMs: 10_000,
+                  requiredMinSkill: recipe.requiredMinSkill,
+                  refineSkillLevel: refineSkillInstance.level,
+                }) *
+                  itemIndex,
               loreSKillInstanceId: loreSkillInstance.id,
               refineSkillInstanceId: refineSkillInstance.id,
               itemContainerId: itemInstance.itemContainerId!,
@@ -88,10 +92,14 @@ export const refiningService = {
         case 'SHIELD':
         case 'ARMOR':
         case 'WEAPON':
+          itemIndex++;
           if (!itemInstance.coreResource) return;
-          const coreResourceRecipe = refiningRecipeByInput[itemInstance.coreResource];
+          const coreResourceRecipe = refiningRecipeByOutput[itemInstance.coreResource];
           const coreResourceTemplate = resourceTemplateByKey[itemInstance.coreResource];
-          const craftItemRecipe = recipeTemplateById[itemTemplate.id];
+          const craftItemRecipe = recipeTemplate.find((r) => r.itemTemplateId === itemTemplate.id);
+          if (!craftItemRecipe) {
+            return;
+          }
           const loreSKillKey = skillService.getLoreSkillByItemTemplateId(coreResourceTemplate.id);
           const loreSkillInstance = skillService.getSkillByKey(heroId, loreSKillKey);
           const reqCoreMaterial = craftItemRecipe.requirement.materials.find((m) => m.role === 'CORE');
@@ -123,7 +131,8 @@ export const refiningService = {
                 refineSkillLevel: refineSkillInstance.level,
                 requiredMinSkill: coreResourceRecipe.requiredMinSkill,
                 baseTimeMs: craftItemRecipe.timeMs,
-              }),
+              }) *
+                itemIndex,
           });
           break;
       }

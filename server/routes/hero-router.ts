@@ -1100,12 +1100,12 @@ export const heroRouter = new Hono<Context>()
       if (!lastItem) {
         throw new HTTPException(400, { message: 'Not enough items or no refineable items found', cause: { canShow: true } });
       }
-      const refiningFinishAt = Date.now() + lastItem?.finishAt
+      const refiningFinishAt = lastItem?.finishAt;
 
       hero.state = state;
       hero.refiningFinishAt = refiningFinishAt;
 
-      const returnData = { refiningFinishAt };
+      const returnData = { refiningFinishAt, state: hero.state };
       socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, state);
 
       return c.json<SuccessResponse<typeof returnData>>({
