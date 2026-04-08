@@ -80,7 +80,11 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
         </Button>
       )}
       {(props.location === 'BACKPACK' || props.location === 'BANK') && props.itemTemplate.stackable && props.quantity > 1 && (
-        <SplitItemInstanceQuantityPopover maxQuantity={props.quantity - 1} />
+        <SplitItemInstanceQuantityPopover
+          itemInstanceId={props.id}
+          itemContainerId={props.itemContainerId ?? ''}
+          maxQuantity={props.quantity - 1}
+        />
       )}
 
       {(props.location === 'BACKPACK' || props.location === 'BANK') && (

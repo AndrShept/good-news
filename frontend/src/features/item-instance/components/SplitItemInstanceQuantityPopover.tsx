@@ -6,9 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeftRightIcon } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as z from 'zod';
+
+import { useSplitItemInstance } from '../hooks/useSplitItemInstance';
 
 const createFormSchema = (maxQuantity: number) =>
   z.object({
@@ -17,10 +19,13 @@ const createFormSchema = (maxQuantity: number) =>
 
 type Props = {
   maxQuantity: number;
+  itemContainerId: string;
+  itemInstanceId: string;
 };
-export const SplitItemInstanceQuantityPopover = ({ maxQuantity }: Props) => {
+export const SplitItemInstanceQuantityPopover = ({ maxQuantity, itemContainerId, itemInstanceId }: Props) => {
   const formSchema = createFormSchema(maxQuantity);
   const [isOpen, setIsOpen] = useState(false);
+  const splitItem = useSplitItemInstance();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -28,8 +33,11 @@ export const SplitItemInstanceQuantityPopover = ({ maxQuantity }: Props) => {
     },
   });
   function onSubmit(data: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    console.log(data);
+    splitItem.mutate({
+      itemContainerId,
+      itemInstanceId,
+      quantity: data.quantity,
+    });
   }
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -54,16 +62,21 @@ export const SplitItemInstanceQuantityPopover = ({ maxQuantity }: Props) => {
 
           <div className="mt-2 flex justify-between">
             <div className="space-x-0.5">
-              <Button type="button" onClick={() => form.setValue('quantity', 1)} variant={'outline'}>
+              <Button disabled={splitItem.isPending} type="button" onClick={() => form.setValue('quantity', 1)} variant={'outline'}>
                 min
               </Button>
-              <Button type="button" onClick={() => form.setValue('quantity', maxQuantity)} variant={'outline'}>
+              <Button
+                disabled={splitItem.isPending}
+                type="button"
+                onClick={() => form.setValue('quantity', maxQuantity)}
+                variant={'outline'}
+              >
                 max
               </Button>
             </div>
             <div>
-              <AcceptButton type="submit" className="size-8" />
-              <CancelButton type="reset" className="size-8" onClick={() => setIsOpen(false)} />
+              <AcceptButton disabled={splitItem.isPending} type="submit" className="size-8" />
+              <CancelButton disabled={splitItem.isPending} type="reset" className="size-8" onClick={() => setIsOpen(false)} />
             </div>
           </div>
         </form>

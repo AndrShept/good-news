@@ -44,6 +44,7 @@ import {
 } from '@/shared/utils';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq, lt, lte, ne, sql } from 'drizzle-orm';
+import { PgTimestampStringBuilder } from 'drizzle-orm/pg-core';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
@@ -600,6 +601,73 @@ export const heroRouter = new Hono<Context>()
       return c.json<SuccessResponse<typeof returnData>>({
         success: true,
         message: 'success consume item',
+        data: returnData,
+      });
+    },
+  )
+  .post(
+    '/:id/item/:itemInstanceId/split',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string().uuid(),
+        itemInstanceId: z.string().uuid(),
+      }),
+    ),
+    zValidator(
+      'json',
+      z.object({
+        itemContainerId: z.string().uuid(),
+        quantity: z.number().int().positive(),
+      }),
+    ),
+    async (c) => {
+      const { id, itemInstanceId } = c.req.valid('param');
+      const { itemContainerId, quantity } = c.req.valid('json');
+      const userId = c.get('user')?.id as string;
+      const hero = heroService.getHero(id);
+      const itemContainer = itemContainerService.getContainer(itemContainerId);
+      const itemInstance = itemInstanceService.getItemInstance(itemContainerId, itemInstanceId);
+
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.ownerId, heroId: hero.id });
+      if (itemInstance.quantity === 1 || itemInstance.quantity === quantity) {
+        throw new HTTPException(400, { message: 'Quantity must be less than available amount' });
+      }
+
+      if (itemInstance.itemContainerId !== itemContainerId) {
+        throw new HTTPException(404, { message: 'Item does not belong to the specified container' });
+      }
+      if (hero.state !== 'IDLE') {
+        throw new HTTPException(403, { message: 'You cannot use item during some action.', cause: { canShow: true } });
+      }
+      let itemsDelta: ItemsInstanceDeltaEvent[] = [];
+
+      itemsDelta = itemContainerService.consumeItem({
+        itemContainerId,
+        itemInstanceId,
+        quantity,
+        mode: 'use',
+      });
+
+      const newItem = itemInstanceService.createItem({
+        heroId: id,
+        itemContainerId,
+        itemTemplateId: itemInstance.itemTemplateId,
+        quantity,
+        location: itemInstance.location,
+        coreResourceId: undefined,
+        isAddPendingEvents: true,
+      });
+      itemsDelta.push({ type: 'CREATE', itemContainerId, item: newItem });
+
+      const returnData = {
+        itemsDelta,
+      };
+
+      return c.json<SuccessResponse<typeof returnData>>({
+        success: true,
+        message: 'success split item',
         data: returnData,
       });
     },

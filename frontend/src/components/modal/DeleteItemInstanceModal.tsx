@@ -28,7 +28,7 @@ export const DeleteItemInstanceModal = () => {
       <DialogOverlay className="" />
       <DialogContent className="rounded sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle className="text-red-300">Are you sure?</DialogTitle>
+          <DialogTitle className="text-red-500/90">Are you sure?</DialogTitle>
           <DialogDescription>This action cannot be undone. The item will be permanently deleted.</DialogDescription>
         </DialogHeader>
         <div className="mx-auto">
@@ -44,7 +44,7 @@ export const DeleteItemInstanceModal = () => {
         <DialogFooter>
           <AcceptButton disabled={isPending} onClick={handleSubmit} />
           <DialogClose asChild>
-            <CancelButton disabled={isPending} />
+            <CancelButton  disabled={isPending} />
           </DialogClose>
         </DialogFooter>
       </DialogContent>

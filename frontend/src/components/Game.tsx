@@ -28,7 +28,7 @@ export const Game = () => {
               actionFinishAt={gatheringFinishAt}
               cancelActionMutation={cancelGatheringMutation.mutate}
               cancelIsPending={cancelGatheringMutation.isPending}
-              className="top-27 bg-muted/80 absolute left-1/2 z-50 -translate-x-1/2 rounded-b border backdrop-blur-sm sm:top-11"
+              className="top-27  absolute left-1/2 z-50 -translate-x-1/2 sm:top-11"
             />
           )}
 

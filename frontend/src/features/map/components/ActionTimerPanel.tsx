@@ -25,7 +25,7 @@ export const ActionTimerPanel = ({ heroState, actionFinishAt, cancelActionMutati
     };
   }, []);
   return (
-    <section className={cn(className, 'bg-muted/80 flex h-fit w-fit items-center gap-3 rounded-md px-3.5 py-2 text-sm')}>
+    <section className={cn(className, 'bg-muted/80 backdrop-blur-md flex h-fit w-fit items-center gap-3 rounded-md px-3.5 py-2 text-sm')}>
       <AnimatedShinyText className="flex items-center gap-2">
         <GameIcon className="size-5" image={imageConfig.icon.state[heroState]} />
         <span>{heroState.toLowerCase()}...</span>

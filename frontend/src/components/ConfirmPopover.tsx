@@ -65,7 +65,7 @@ ConfirmPopover.Content = ({ children, side }) => {
   const { setIsOpen, onConfirm, setIsShow, isPending, startTransition } = useConfirmPopover();
 
   return (
-    <PopoverContent side={side} className="flex flex-col gap-4 text-sm">
+    <PopoverContent side={side} className="flex flex-col bg-secondary gap-4 text-sm">
       {children}
       <section className="ml-auto flex gap-1">
         <AcceptButton
