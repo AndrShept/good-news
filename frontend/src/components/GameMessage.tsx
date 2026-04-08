@@ -44,18 +44,18 @@ export const GameMessage = memo(() => {
               })}
             >
               <div className="space-x-1">
-                <time className="text-primary">{getTimeFns(message.createdAt!)} </time>
+                <time className="text-foreground">{getTimeFns(message.createdAt!)} </time>
                 <span>{message.text}</span>
                 {!!message.expAmount && (
                   <>
-                    <span className="text-primary">{message.expAmount}</span>
+                    <span >{message.expAmount}</span>
                     <span className="text-violet-500">EXP</span>
                   </>
                 )}
               </div>
 
               {!!message.data?.length && (
-                <ul className="text-primary inline-flex flex-wrap gap-0.5">
+                <ul className="text-foreground inline-flex flex-wrap gap-0.5">
                   [
                   {message.data.map((m, idx) => (
                     <li key={`${message.createdAt}-${m.name}-${idx}`}>

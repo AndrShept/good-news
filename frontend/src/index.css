@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-
+/* @import "@fontsource-variable/jetbrains-mono"; */
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
@@ -27,7 +27,7 @@ textarea {
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(0.488 0.243 264.376);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -68,7 +68,7 @@ textarea {
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.145 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
+    --primary: oklch(0.424 0.199 265.638);
   --primary-foreground: oklch(0.205 0 0);
   --secondary: #1c1c1c;
   --secondary-foreground: oklch(0.985 0 0);
@@ -102,6 +102,8 @@ textarea {
 }
 
 @theme inline {
+      --font-heading: var(--font-mono);
+    --font-mono: 'JetBrains Mono Variable', monospace;
   --color-rarity-common: var(--rarity-common);
   --color-rarity-magic: var(--rarity-magic);
   --color-rarity-rare: var(--rarity-rare);
@@ -295,17 +297,6 @@ textarea {
     }
   }
 }
-@utility animate-spin-slow {
-  animation: spin 3s linear infinite;
-}
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-muted-foreground;
-  }
-}
 
 @layer base {
   * {
@@ -314,6 +305,13 @@ textarea {
   body {
     @apply bg-background text-foreground;
   }
+  html {
+    /* @apply font-mono; */
+  }
+}
+
+@utility animate-spin-slow {
+  animation: spin 3s linear infinite;
 }
 
 @keyframes glow_silver {

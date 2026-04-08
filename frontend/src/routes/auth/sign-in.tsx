@@ -45,14 +45,14 @@ function SignIn() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-[320px] flex-col gap-4 md:w-[380px]">
-        <h1 className="text-primary scroll-m-20 border-b pb-2 text-center text-3xl font-semibold tracking-tight">Sign In</h1>
+        <h1 className=" scroll-m-20 border-b pb-2 text-center text-3xl font-semibold tracking-tight">Sign In</h1>
         <p className="mb-4"> Enter your details to login an account</p>
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-primary">Email</FormLabel>
+              <FormLabel >Email</FormLabel>
               <FormControl>
                 <Input disabled={isLoading} className="placeholder:text-sm" {...field} />
               </FormControl>
@@ -66,7 +66,7 @@ function SignIn() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-primary">Password</FormLabel>
+              <FormLabel>Password</FormLabel>
               <FormControl>
                 <Input disabled={isLoading} type="password" className="placeholder:text-sm" {...field} />
               </FormControl>

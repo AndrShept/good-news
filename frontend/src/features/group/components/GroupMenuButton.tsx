@@ -21,7 +21,7 @@ export const GroupMenuButton = () => {
   return (
     <Popover open={isShow} onOpenChange={setIsShow}>
       <PopoverTrigger asChild>
-        <Button variant={isShow ? 'secondary' : 'outline'} size={'icon'}>
+        <Button variant={isShow ? 'secondary' : 'outline'}  size="icon-lg">
           <GameIcon image={imageConfig.icon.ui.group} />
         </Button>
       </PopoverTrigger>

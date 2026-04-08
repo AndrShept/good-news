@@ -22,7 +22,7 @@ export const ShopItemCardButton = () => {
   return (
     <Sheet open={isOpen} onOpenChange={toggleIsOpen} modal={false}>
       <SheetTrigger asChild>
-        <Button variant={'outline'} size="icon" className="relative">
+        <Button variant={'outline'}  size="icon-lg" className="relative">
           <GameIcon image={imageConfig.icon.ui['shop-cart']} />
           <CounterBadge value={totalQuantity} />
         </Button>

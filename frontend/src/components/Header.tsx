@@ -55,7 +55,7 @@ export const Header = memo(() => {
           {!user && <Link to={'/auth/sign-in'}>login</Link>}
           <Sheet>
             <SheetTrigger asChild>
-              <Button className="hover:text-primary md:hidden" size={'icon'} variant={'outline'}>
+              <Button className=" md:hidden" size={'icon'} variant={'outline'}>
                 <MenuIcon />
               </Button>
             </SheetTrigger>

@@ -38,12 +38,12 @@ export const MovingPanel = memo(function MovingPathInfo({ heroState }: Props) {
 
   if (!movementPathTiles.length) return;
   return (
-    <section className="bg-accent/70 sm:top-11 border top-27 absolute left-1/2 z-50 flex h-fit -translate-x-1/2 items-center gap-2 rounded-b px-4 py-2 text-sm backdrop-blur-sm">
+    <section className="bg-muted/80 top-27 absolute left-1/2 z-50 flex h-fit -translate-x-1/2 items-center gap-2 rounded-md border px-3 py-1.5 text-sm backdrop-blur-sm sm:top-11">
       <span className="text-muted-foreground">
-        step: <span className="text-primary">{movementPathTiles.length}</span>
+        step: <span className="text-foreground">{movementPathTiles.length}</span>
       </span>
       <span className="text-muted-foreground">
-        time: <span className="text-primary">{resultTime ? `${resultTime.toFixed(0)}s` : '???'}</span>
+        time: <span className="text-foreground">{resultTime ? `${resultTime.toFixed(0)}s` : '???'}</span>
       </span>
 
       {heroState === 'IDLE' && (

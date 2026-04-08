@@ -38,7 +38,7 @@ export const SplitItemInstanceQuantityPopover = ({ maxQuantity }: Props) => {
           <ArrowLeftRightIcon className="size-6" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="bg-secondary flex max-w-[160px] flex-col p-0 px-2 py-1">
+      <PopoverContent className="bg-secondary flex max-w-[180px] flex-col px-3 py-1.5">
         <form className="flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
           <Controller
             name="quantity"
@@ -46,7 +46,7 @@ export const SplitItemInstanceQuantityPopover = ({ maxQuantity }: Props) => {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor={field.name}>Quantity</FieldLabel>
-                <Input {...field} id={field.name} type="number" aria-invalid={fieldState.invalid} />
+                <Input {...field} id={field.name} autoComplete={''} type="number" aria-invalid={fieldState.invalid} />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
@@ -54,10 +54,10 @@ export const SplitItemInstanceQuantityPopover = ({ maxQuantity }: Props) => {
 
           <div className="mt-2 flex justify-between">
             <div className="space-x-0.5">
-              <Button type="button" onClick={() => form.setValue('quantity', 1)} className="size-7" variant={'outline'}>
+              <Button type="button" onClick={() => form.setValue('quantity', 1)} variant={'outline'}>
                 min
               </Button>
-              <Button type="button" onClick={() => form.setValue('quantity', maxQuantity)} className="size-7" variant={'outline'}>
+              <Button type="button" onClick={() => form.setValue('quantity', maxQuantity)} variant={'outline'}>
                 max
               </Button>
             </div>

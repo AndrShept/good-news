@@ -23,9 +23,9 @@ export const CharacterPaperdollButton = (props: Props) => {
           setUiType(props.type);
         });
       }}
-      size="icon"
+      size="icon-lg"
       disabled={state !== 'IDLE'}
-      variant={uiType === props.type ? 'default' : 'outline'}
+      variant={uiType === props.type ? 'secondary' : 'outline'}
     >
       <GameIcon className='size-6' image={icon[props.type]} />
     </Button>

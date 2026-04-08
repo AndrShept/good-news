@@ -127,7 +127,7 @@ const TooltipTrigger = ({ children }: { children: ReactNode }) => {
 
   return (
     <div
-       style={{ touchAction: 'manipulation' }}
+      style={{ touchAction: 'manipulation' }}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={onHide}
@@ -147,7 +147,10 @@ const TooltipContent = ({ children, className, ...props }: TooltipContentProps) 
     <div
       {...props}
       ref={tooltipRef}
-      className={cn('bg-background/80 text-primary pointer-events-none fixed z-50 text-sm shadow backdrop-blur-lg', className)}
+      className={cn(
+        'bg-muted/80 pointer-events-none fixed z-50 flex max-w-[280px] flex-col items-center justify-center truncate rounded-sm border px-3 py-1.5 text-sm shadow backdrop-blur-lg',
+        className,
+      )}
       style={{ top: tooltipPos.y, left: tooltipPos.x }}
     >
       {children}

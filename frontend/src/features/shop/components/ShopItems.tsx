@@ -49,7 +49,7 @@ export const ShopItems = ({ buildingType }: Props) => {
                 <span>{item.buyPrice}</span>
               </div>
             </div>
-            {!!itemsMap[item.id] && <CounterBadge className="text-primary -left-3" value={itemsMap[item.id]} />}
+            {!!itemsMap[item.id] && <CounterBadge className="text-foreground -left-3" value={itemsMap[item.id]} />}
           </li>
         ))}
       </ul>

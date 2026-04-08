@@ -16,7 +16,7 @@ import { ItemInstanceCardHoverTooltip } from './ItemInstanceCardHoverTooltip';
 
 type Props = ItemInstance & {
   itemTemplate: ItemTemplate;
-  heroState: StateType;
+  heroState?: StateType;
   setSelectItemOnContainer: (data: ItemInstance | null) => void;
   isSelect: boolean;
   isRefiningBuilding?: boolean;
@@ -82,7 +82,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
             </PopoverTrigger>
 
             <CustomTooltip.Content>{!props.isSelect && !isDragging && <ItemInstanceCardHoverTooltip {...props} />}</CustomTooltip.Content>
-            <PopoverContent className="bg-secondary flex h-full w-fit select-none items-center rounded p-1">
+            <PopoverContent className="bg-secondary flex h-full w-fit select-none items-center  p-1">
               <ItemInstanceCardDropdownMenu {...props} />
             </PopoverContent>
           </CustomTooltip>

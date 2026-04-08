@@ -59,8 +59,8 @@ function SheetContent({
         {...props}
       >
         {children}
-        <SheetPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary bg-primary rounded-xs focus:outline-hidden absolute -left-6 top-2 opacity-70 transition-opacity hover:opacity-100 focus:ring-2 disabled:pointer-events-none">
-          <XIcon className="size-4.5 text-black" />
+        <SheetPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary bg-primary rounded-xs focus:outline-hidden absolute -left-6 top-2  transition-opacity hover:opacity-80 focus:ring-2 disabled:pointer-events-none">
+          <XIcon className="size-4.5 " />
           <span className="sr-only">Close</span>
         </SheetPrimitive.Close>
       </SheetPrimitive.Content>

@@ -42,14 +42,14 @@ function SignUp() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-[320px] flex-col gap-4 md:w-[380px]">
-        <h1 className="text-primary scroll-m-20 border-b pb-2 text-center text-3xl font-semibold tracking-tight">Sign Up</h1>
+        <h1 className=" scroll-m-20 border-b pb-2 text-center text-3xl font-semibold tracking-tight">Sign Up</h1>
         <p className="mb-4"> Enter your details to create an account</p>
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-primary">Email*</FormLabel>
+              <FormLabel >Email*</FormLabel>
               <FormControl>
                 <Input disabled={isLoading} className="placeholder:text-sm" {...field} />
               </FormControl>
@@ -63,7 +63,7 @@ function SignUp() {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-primary">Username*</FormLabel>
+              <FormLabel className="">Username*</FormLabel>
               <FormControl>
                 <Input disabled={isLoading} className="placeholder:text-sm" {...field} />
               </FormControl>
@@ -77,7 +77,7 @@ function SignUp() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-primary">Password*</FormLabel>
+              <FormLabel className="">Password*</FormLabel>
               <FormControl>
                 <Input disabled={isLoading} type="password" className="placeholder:text-sm" {...field} />
               </FormControl>
@@ -91,7 +91,7 @@ function SignUp() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-primary">Confirm password*</FormLabel>
+              <FormLabel className="">Confirm password*</FormLabel>
               <FormControl>
                 <Input disabled={isLoading} type="password" className="placeholder:text-sm" {...field} />
               </FormControl>
@@ -107,7 +107,7 @@ function SignUp() {
         </Button>
         <div className="mx-auto flex items-center gap-1">
           <p className="text-muted-foreground"> Already have an account? </p>
-          <Link disabled={isLoading} className="text-blue-500 hover:underline" to={'/auth/sign-in'}>
+          <Link disabled={isLoading} className="text-blue-400 hover:underline" to={'/auth/sign-in'}>
             login
           </Link>
         </div>

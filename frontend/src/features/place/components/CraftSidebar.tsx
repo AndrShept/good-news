@@ -24,7 +24,7 @@ export const CraftSidebar = memo(({ recipeIds, onSelect, selectedItemId }: Props
               <li
                 key={recipeTemplate.id}
                 className={cn('px-1.5 py-0.5 truncate', {
-                  'bg-secondary/50 text-primary': selectedItemId === item.recipeId,
+                  'bg-secondary/50 text-foreground': selectedItemId === item.recipeId,
                 })}
                 onClick={() => onSelect(item.recipeId)}
               >

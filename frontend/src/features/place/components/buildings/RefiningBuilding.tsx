@@ -52,7 +52,7 @@ export const RefiningBuilding = ({ selectedBuilding, place }: Props) => {
           actionFinishAt={refiningFinishAt}
           cancelActionMutation={cancelRefiningMutation.mutate}
           cancelIsPending={cancelRefiningMutation.isPending}
-          className="bg-accent/60"
+          
         />
       )}
       {!!backpack && <ItemContainer {...backpack} isShowContainerHeader={true} />}

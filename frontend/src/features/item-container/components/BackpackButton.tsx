@@ -13,8 +13,8 @@ export const BackpackButton = () => {
     <>
       <Sheet open={isOpen} onOpenChange={onOpen} modal={false}>
         <SheetTrigger asChild>
-          <Button variant={isOpen ? 'default' : 'outline'} size="icon">
-            <GameIcon className='size-6.5' image={imageConfig.icon.ui.backpack} />
+          <Button variant={isOpen ? 'secondary' : 'outline'}  size="icon-lg">
+            <GameIcon className="size-6.5" image={imageConfig.icon.ui.backpack} />
           </Button>
         </SheetTrigger>
         <SheetContent

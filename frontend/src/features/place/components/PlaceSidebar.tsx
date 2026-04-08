@@ -51,7 +51,7 @@ export const PlaceSidebar = memo(({ place, entrances }: Props) => {
   return (
     <aside className="top-18 sticky h-[calc(100vh-330px)] max-w-[200px] rounded p-1.5">
       <ScrollArea className="h-full">
-        <ul className="flex flex-col gap-1.5">
+        <ul className="flex flex-col gap-1">
           <PlaceSidebarButton
             disabled={isButtonDisabled}
             matches={matches}
