@@ -20,16 +20,17 @@ interface ICreateItem {
   isAddPendingEvents: boolean;
 }
 
-interface IObtainStackableItem {
+interface ObtainStackableItem {
   quantity: number;
   itemContainerId: string;
   itemTemplateId: string;
+  targetItemInstanceId?: string;
   heroId: string;
   location: ItemLocationType;
 }
-  function findContainer(type: string, heroId: string, placeId: string) {
-    return Array.from(serverState.container.values()).find((c) => c.type === type && c.ownerId === heroId && c.placeId === placeId);
-  }
+function findContainer(type: string, heroId: string, placeId: string) {
+  return Array.from(serverState.container.values()).find((c) => c.type === type && c.ownerId === heroId && c.placeId === placeId);
+}
 
 export const itemContainerService = {
   getContainer(containerId: string) {
@@ -48,7 +49,6 @@ export const itemContainerService = {
     const backpack = this.getContainer(backpackId);
     return backpack;
   },
-
 
   async createPlaceContainers(db: DbTransaction, placeId: string, heroId: string) {
     const place = placeTemplate.find((p) => p.id === placeId);
@@ -212,11 +212,24 @@ export const itemContainerService = {
     result = this.obtainStackableItem({ heroId, itemContainerId, itemTemplateId, location, quantity });
     return result;
   },
-  obtainStackableItem({ heroId, itemContainerId, itemTemplateId, location, quantity }: IObtainStackableItem) {
+  obtainStackableItem({ heroId, itemContainerId, itemTemplateId, location, quantity, targetItemInstanceId }: ObtainStackableItem) {
     const container = itemContainerService.getContainer(itemContainerId);
-    const templateById = itemTemplateService.getAllItemsTemplateMapIds();
-    const template = templateById[itemTemplateId];
+
+    const template = itemTemplateService.getTemplateByItemTemplateId(itemTemplateId);
     const resultData: ItemsInstanceDeltaEvent[] = [];
+    if (targetItemInstanceId) {
+      const targetItemTemplate = itemTemplateService.getTemplateByItemTemplateId(itemTemplateId);
+      const targetItem = container.itemsInstance.find((i) => i.id === targetItemInstanceId);
+      if (targetItem) {
+        const space = targetItemTemplate.maxStack! - targetItem.quantity;
+        const add = Math.min(space, quantity);
+        targetItem.quantity += add;
+        quantity -= add;
+        resultData.push({ type: 'UPDATE', itemContainerId, itemInstanceId: targetItem.id, updateData: { quantity: targetItem.quantity } });
+        deltaEventsService.itemInstance.update(targetItem.id, { quantity: targetItem.quantity });
+      }
+    }
+    if (!quantity) return resultData;
     let remaining = quantity;
 
     // 1️⃣ Заповнюємо існуючі стеки
@@ -279,6 +292,7 @@ export const itemContainerService = {
 
     // 🧪 USE MODE — тільки один стек
     if (mode === 'use') {
+
       if (itemInstance.quantity < quantity) {
         throw new Error('Not enough items in this stack');
       }

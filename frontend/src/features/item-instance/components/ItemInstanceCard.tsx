@@ -7,7 +7,6 @@ import { ColoredResourceType, ItemInstance, ItemTemplate, StateType } from '@/sh
 import { useDndContext, useDndMonitor, useDraggable, useDroppable } from '@dnd-kit/core';
 import { memo, useState } from 'react';
 
-import { useMoveItemInstance } from '../hooks/useMoveItemInstance';
 import { GameItemSlot } from './GameItemSlot';
 import { ItemInstanceCardDropdownMenu } from './ItemInstanceCardDropdownMenu';
 import { ItemInstanceCardHoverTooltip } from './ItemInstanceCardHoverTooltip';
@@ -30,15 +29,10 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
     draggedItem?.itemTemplateId === props.itemTemplateId &&
     draggedItem?.id !== props.id &&
     draggedItem?.itemContainerId === props.itemContainerId;
-  const moveItemMutation = useMoveItemInstance();
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: props.id,
     data: props,
-    disabled:
-      props.location === 'EQUIPMENT' ||
-      moveItemMutation.isPending ||
-      (props.isRefiningBuilding && !props.isHighlight) ||
-      props.heroState !== 'IDLE',
+    disabled: props.location === 'EQUIPMENT' || (props.isRefiningBuilding && !props.isHighlight) || props.heroState !== 'IDLE',
   });
   const { setNodeRef: setDropRef, isOver } = useDroppable({
     id: `drop-${props.id}`,
@@ -49,29 +43,14 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const style: React.CSSProperties = {
     // transform: CSS.Translate.toString(transform),
-    opacity: isDragging || moveItemMutation.isPending ? 0.4 : 1,
+    opacity: isDragging ? 0.4 : 1,
     touchAction: 'none',
   };
 
   useDndMonitor({
     onDragStart() {
       setIsOpen(false);
-    },
-    onDragEnd({ active, over }) {
-      if (!over) return;
-      const draggedItem = active.data.current as ItemInstance;
-      const overItem = over.data.current as ItemInstance;
-
-      if (
-        draggedItem.itemTemplateId === overItem.itemTemplateId &&
-        draggedItem.id !== overItem.id &&
-        draggedItem.itemContainerId === overItem.itemContainerId
-      ) {
-        console.log('STACK');
-        return;
-      }
-
-      
+      props.setSelectItemOnContainer(null);
     },
   });
   return (
@@ -104,7 +83,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
                   className={cn('', {
                     'opacity-100': props.isHighlight,
                     'grayscale-100 opacity-20 group-hover:opacity-20': props.isRefiningBuilding && !props.isHighlight,
-                    'ring-2 ring-green-500': isOver && canStack,
+                    'ring-2 ring-green-500 duration-200': isOver && canStack,
                   })}
                   image={props.itemTemplate.image}
                   tintColor={
@@ -118,7 +97,11 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
               </CustomTooltip.Trigger>
             </PopoverTrigger>
 
-            <CustomTooltip.Content>{!props.isSelect && !isDragging && <ItemInstanceCardHoverTooltip {...props} />}</CustomTooltip.Content>
+            {!props.isSelect && !active?.data.current && (
+              <CustomTooltip.Content>
+                <ItemInstanceCardHoverTooltip {...props} />
+              </CustomTooltip.Content>
+            )}
             <PopoverContent className="bg-secondary flex h-full w-fit select-none items-center p-1">
               <ItemInstanceCardDropdownMenu {...props} />
             </PopoverContent>

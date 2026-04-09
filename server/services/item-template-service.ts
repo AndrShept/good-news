@@ -6,8 +6,16 @@ import { skillBooks } from '@/shared/templates/skill-book-template';
 import { toolsTemplate } from '@/shared/templates/tool-template';
 import { weaponTemplate } from '@/shared/templates/weapon-template';
 import type { ItemTemplate } from '@/shared/types';
+import { HTTPException } from 'hono/http-exception';
 
 export const itemTemplateService = {
+  getTemplateByItemTemplateId(itemTemplateId: string) {
+    const itemTemplate = this.getAllItemsTemplateMapIds()[itemTemplateId];
+    if (!itemTemplate) {
+      throw new HTTPException(400, { message: 'getTemplateByItemTemplateId  itemTemplate not found' });
+    }
+    return itemTemplate;
+  },
   getAllItemsTemplate() {
     const allItemsTemplate = [
       ...armorTemplate,

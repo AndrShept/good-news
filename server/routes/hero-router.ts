@@ -673,6 +673,80 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post(
+    '/:id/item/stack',
+    loggedIn,
+    zValidator(
+      'param',
+      z.object({
+        id: z.string().uuid(),
+      }),
+    ),
+    zValidator(
+      'json',
+      z.object({
+        fromItemInstanceId: z.string().uuid(),
+        toItemInstanceId: z.string().uuid(),
+        itemContainerId: z.string().uuid(),
+      }),
+    ),
+
+    async (c) => {
+      const { id } = c.req.valid('param');
+      const { fromItemInstanceId, toItemInstanceId, itemContainerId } = c.req.valid('json');
+      const userId = c.get('user')?.id as string;
+      const hero = heroService.getHero(id);
+      const itemContainer = itemContainerService.getContainer(itemContainerId);
+      const fromItemInstance = itemInstanceService.getItemInstance(itemContainerId, fromItemInstanceId);
+      const toItemInstance = itemInstanceService.getItemInstance(itemContainerId, toItemInstanceId);
+
+      verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: itemContainer.ownerId, heroId: hero.id });
+
+      const toItemTemplate = itemTemplateService.getTemplateByItemTemplateId(toItemInstance.itemTemplateId);
+      const fromItemTemplate = itemTemplateService.getTemplateByItemTemplateId(fromItemInstance.itemTemplateId);
+      if (fromItemInstance.quantity >= (fromItemTemplate.maxStack ?? 1) || toItemInstance.quantity >= (toItemTemplate.maxStack ?? 1)) {
+        throw new HTTPException(400, { message: 'Quantity must be less than available amount' });
+      }
+      if (fromItemInstance.id === toItemInstance.id) {
+        throw new HTTPException(400, { message: 'Item does not stack your self' });
+      }
+
+      if (fromItemInstance.itemContainerId !== itemContainerId || toItemInstance.itemContainerId !== itemContainerId) {
+        throw new HTTPException(404, { message: 'Item does not belong to the specified container' });
+      }
+      if (hero.state !== 'IDLE') {
+        throw new HTTPException(403, { message: 'You cannot use item during some action.', cause: { canShow: true } });
+      }
+      let itemsDelta: ItemsInstanceDeltaEvent[] = [];
+      const space = (toItemTemplate.maxStack ?? 1) - toItemInstance.quantity;
+      const quantity = Math.min(space, fromItemInstance.quantity);
+      itemsDelta = itemContainerService.consumeItem({
+        itemContainerId,
+        itemInstanceId: fromItemInstance.id,
+        quantity,
+        mode: 'use',
+      });
+      const obtainItemsDelta = itemContainerService.obtainStackableItem({
+        heroId: id,
+        itemContainerId,
+        itemTemplateId: toItemInstance.itemTemplateId,
+        location: toItemInstance.location,
+        quantity,
+        targetItemInstanceId: toItemInstance.id,
+      });
+
+      itemsDelta.push(...obtainItemsDelta);
+      const returnData = {
+        itemsDelta,
+      };
+
+      return c.json<SuccessResponse<typeof returnData>>({
+        success: true,
+        message: 'success stack item',
+        data: returnData,
+      });
+    },
+  )
+  .post(
     '/:id/item/:itemInstanceId/move',
     loggedIn,
     zValidator(

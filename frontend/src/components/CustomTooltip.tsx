@@ -7,13 +7,12 @@ interface Props {
 }
 
 interface IContext {
-  handleMouseMove: (e: React.MouseEvent) => void;
+  updatePosition: (x: number, y: number) => void;
   handleTouchStart: (e: React.TouchEvent) => void;
   handleTouchEnd: () => void;
   handleTouchMove: (e: React.TouchEvent) => void;
   onShow: (x: number, y: number) => void;
   onHide: () => void;
-  tooltipPos: { x: number; y: number };
   showTooltip: boolean;
   tooltipRef: RefObject<HTMLDivElement | null>;
 }
@@ -26,40 +25,48 @@ const TooltipContext = createContext<IContext | null>(null);
 
 const useCustomTooltip = () => {
   const context = useContext(TooltipContext);
-  if (!context) {
-    throw new Error('Tooltip context not initialized');
-  }
+  if (!context) throw new Error('Tooltip context not initialized');
   return context;
 };
 
 export const CustomTooltip = ({ children }: Props) => {
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const [showTooltip, setShowTooltip] = useState(false);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const calculatePosition = (x: number, y: number) => {
-    const offset = 15;
-    const tooltipWidth = tooltipRef.current?.offsetWidth || 200;
-    const fitsRight = x + offset + tooltipWidth < window.innerWidth;
+  const updatePosition = (x: number, y: number) => {
+    const tooltipEl = tooltipRef.current;
+    if (!tooltipEl) return;
 
-    setTooltipPos({
-      x: fitsRight ? x + offset : x - tooltipWidth - 5,
-      y: y + offset,
-    });
+    const offset = 15;
+    const tooltipWidth = tooltipEl.offsetWidth || 200;
+    const tooltipHeight = tooltipEl.offsetHeight || 50;
+
+    const newX = x + offset + tooltipWidth < window.innerWidth ? x + offset : x - tooltipWidth - 5;
+    const newY = y + offset + tooltipHeight < window.innerHeight ? y + offset : y - tooltipHeight - 5;
+
+    tooltipEl.style.transform = `translate(${newX}px, ${newY}px)`;
+    tooltipEl.style.opacity = '1';
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    calculatePosition(e.clientX, e.clientY);
+  const onShow = (x: number, y: number) => {
+    setShowTooltip(true);
+
+  };
+
+  const onHide = () => {
+    setShowTooltip(false);
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
-
     longPressTimerRef.current = setTimeout(() => {
-      calculatePosition(touch.clientX, touch.clientY);
-      setShowTooltip(true);
-    }, 300); // 300ms для long press
+      onShow(touch.clientX, touch.clientY);
+    }, 300);
   };
 
   const handleTouchEnd = () => {
@@ -71,65 +78,42 @@ export const CustomTooltip = ({ children }: Props) => {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    // Скасувати long press при русі пальцем
     if (longPressTimerRef.current) {
       clearTimeout(longPressTimerRef.current);
       longPressTimerRef.current = null;
     }
-
-    // Оновити позицію якщо tooltip вже показаний
     if (showTooltip) {
       const touch = e.touches[0];
-      calculatePosition(touch.clientX, touch.clientY);
-    }
-  };
-
-  const onShow = (x: number, y: number) => {
-    calculatePosition(x, y);
-    setShowTooltip(true);
-  };
-
-  const onHide = () => {
-    setShowTooltip(false);
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
+      updatePosition(touch.clientX, touch.clientY);
     }
   };
 
   return (
-    <div>
-      <TooltipContext.Provider
-        value={{
-          handleMouseMove,
-          handleTouchStart,
-          handleTouchEnd,
-          handleTouchMove,
-          onHide,
-          onShow,
-          showTooltip,
-          tooltipPos,
-          tooltipRef,
-        }}
-      >
-        {children}
-      </TooltipContext.Provider>
-    </div>
+    <TooltipContext.Provider
+      value={{
+        updatePosition,
+        handleTouchStart,
+        handleTouchEnd,
+        handleTouchMove,
+        onShow,
+        onHide,
+        showTooltip,
+        tooltipRef,
+      }}
+    >
+      {children}
+    </TooltipContext.Provider>
   );
 };
 
 const TooltipTrigger = ({ children }: { children: ReactNode }) => {
-  const { handleMouseMove, handleTouchStart, handleTouchEnd, handleTouchMove, onHide, onShow } = useCustomTooltip();
-
-  const handleMouseEnter = (e: React.MouseEvent) => {
-    onShow(e.clientX, e.clientY);
-  };
+  const { updatePosition, onShow, onHide, handleTouchStart, handleTouchEnd, handleTouchMove } = useCustomTooltip();
 
   return (
     <div
       style={{ touchAction: 'manipulation' }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
+      onMouseMove={(e) => updatePosition(e.clientX, e.clientY)}
+      onMouseEnter={(e) => onShow(e.clientX, e.clientY)}
       onMouseLeave={onHide}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -141,17 +125,22 @@ const TooltipTrigger = ({ children }: { children: ReactNode }) => {
 };
 
 const TooltipContent = ({ children, className, ...props }: TooltipContentProps) => {
-  const { tooltipPos, showTooltip, tooltipRef } = useCustomTooltip();
+  const { showTooltip, tooltipRef } = useCustomTooltip();
+
   if (!showTooltip) return null;
+
   return createPortal(
     <div
       {...props}
       ref={tooltipRef}
       className={cn(
-        'bg-muted/80 pointer-events-none fixed z-50 flex max-w-[280px] flex-col items-center justify-center truncate rounded-sm border px-3 py-1.5 text-sm shadow backdrop-blur-lg',
+        'bg-muted/80 pointer-events-none fixed left-0 top-0 z-50 flex max-w-[280px] flex-col items-center justify-center truncate rounded-sm border px-3 py-1.5 text-sm shadow backdrop-blur-lg',
         className,
       )}
-      style={{ top: tooltipPos.y, left: tooltipPos.x }}
+      style={{
+        opacity: 0,
+        transform: 'translate(-9999px, -9999px)',
+      }}
     >
       {children}
     </div>,
