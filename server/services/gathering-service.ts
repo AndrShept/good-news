@@ -6,7 +6,16 @@ import { getMapLayerNameAtHeroPos } from '@/shared/utils';
 import { HTTPException } from 'hono/http-exception';
 
 import { type TileState, serverState } from '../game/state/server-state';
-import {  MINING_TABLE, type GatheringItemTable } from '../lib/table/gathering-item-table';
+import {
+  FISHING_TABLE,
+  FORAGING_TABLE,
+  type FishingItemTable,
+  type ForagingItemTable,
+  MINING_TABLE,
+  type MiningItemTable,
+  WOODCUTTING_TABLE,
+  type WoodcuttingItemTable,
+} from '../lib/table/gathering-item-table';
 import { clamp, getRandomValue, hash } from '../lib/utils';
 import { equipmentService } from './equipment-service';
 import { heroService } from './hero-service';
@@ -153,11 +162,20 @@ export const gatheringService = {
     }
   },
   getGatherTableItem({ gatherSkill, tileType, x, y, heroId }: GetGatherReward) {
-    let table: GatheringItemTable[] | null = null;
+    let table: (MiningItemTable | WoodcuttingItemTable | FishingItemTable | ForagingItemTable)[] | null = null;
     const skillInstance = skillService.getSkillByKey(heroId, gatherSkill);
     switch (gatherSkill) {
       case 'MINING':
         table = MINING_TABLE[tileType as MiningTileType];
+        break;
+      case 'FISHING':
+        table = FISHING_TABLE[tileType as FishingTileTpe];
+        break;
+      case 'FORAGING':
+        table = FORAGING_TABLE[tileType as ForagingTileTpe];
+        break;
+      case 'WOODCUTTING':
+        table = WOODCUTTING_TABLE[tileType as LumberTileType];
         break;
     }
     if (!table) return;

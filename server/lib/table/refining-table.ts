@@ -20,13 +20,13 @@ export const refiningRecipes = [
 
   //-------- LOG => PLANK --------//
   // Дерево дає більше планок з одного лога
-  { input: 'REGULAR_LOG', inputQuantity: 1, output: 'REGULAR_PLANK', outputQuantity: 3, requiredMinSkill: 0, refiningTimeMs: 45_000 },
-  { input: 'PINE_LOG', inputQuantity: 1, output: 'PINE_PLANK', outputQuantity: 3, requiredMinSkill: 10, refiningTimeMs: 50_000 },
-  { input: 'OAK_LOG', inputQuantity: 1, output: 'OAK_PLANK', outputQuantity: 3, requiredMinSkill: 20, refiningTimeMs: 60_000 },
-  { input: 'ASH_LOG', inputQuantity: 1, output: 'ASH_PLANK', outputQuantity: 2, requiredMinSkill: 30, refiningTimeMs: 75_000 },
-  { input: 'YEW_LOG', inputQuantity: 1, output: 'YEW_PLANK', outputQuantity: 2, requiredMinSkill: 50, refiningTimeMs: 90_000 },
-  { input: 'MAHOGANY_LOG', inputQuantity: 1, output: 'MAHOGANY_PLANK', outputQuantity: 2, requiredMinSkill: 60, refiningTimeMs: 105_000 },
-  { input: 'EBONY_LOG', inputQuantity: 1, output: 'EBONY_PLANK', outputQuantity: 2, requiredMinSkill: 70, refiningTimeMs: 120_000 },
+  { input: 'REGULAR_LOG', inputQuantity: 1, output: 'REGULAR_PLANK', outputQuantity: 2, requiredMinSkill: 0, refiningTimeMs: 45_000 },
+  { input: 'PINE_LOG', inputQuantity: 1, output: 'PINE_PLANK', outputQuantity: 2, requiredMinSkill: 10, refiningTimeMs: 50_000 },
+  { input: 'OAK_LOG', inputQuantity: 1, output: 'OAK_PLANK', outputQuantity: 2, requiredMinSkill: 20, refiningTimeMs: 60_000 },
+  { input: 'ASH_LOG', inputQuantity: 1, output: 'ASH_PLANK', outputQuantity: 1, requiredMinSkill: 30, refiningTimeMs: 75_000 },
+  { input: 'YEW_LOG', inputQuantity: 1, output: 'YEW_PLANK', outputQuantity: 1, requiredMinSkill: 50, refiningTimeMs: 90_000 },
+  { input: 'MAHOGANY_LOG', inputQuantity: 1, output: 'MAHOGANY_PLANK', outputQuantity: 1, requiredMinSkill: 60, refiningTimeMs: 105_000 },
+  { input: 'EBONY_LOG', inputQuantity: 1, output: 'EBONY_PLANK', outputQuantity: 1, requiredMinSkill: 70, refiningTimeMs: 120_000 },
   { input: 'BLOOD_LOG', inputQuantity: 1, output: 'BLOOD_PLANK', outputQuantity: 1, requiredMinSkill: 85, refiningTimeMs: 150_000 },
   { input: 'GHOST_LOG', inputQuantity: 1, output: 'GHOST_PLANK', outputQuantity: 1, requiredMinSkill: 95, refiningTimeMs: 180_000 },
 

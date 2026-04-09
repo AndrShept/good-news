@@ -1,4 +1,5 @@
 import { armorTemplate } from '@/shared/templates/armor-template';
+import { foodTemplate } from '@/shared/templates/food-template';
 import { potionTemplate } from '@/shared/templates/potion-template';
 import { resourceTemplate } from '@/shared/templates/resource-template';
 import { shieldTemplate } from '@/shared/templates/shield-template';
@@ -19,12 +20,13 @@ export const itemTemplateService = {
   getAllItemsTemplate() {
     const allItemsTemplate = [
       ...armorTemplate,
-      ...potionTemplate,
-      ...resourceTemplate,
       ...weaponTemplate,
       ...shieldTemplate,
-      ...skillBooks,
       ...toolsTemplate,
+      ...potionTemplate,
+      ...resourceTemplate,
+      ...foodTemplate,
+      ...skillBooks,
     ];
     return allItemsTemplate;
   },

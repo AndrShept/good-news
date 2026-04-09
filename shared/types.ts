@@ -23,6 +23,7 @@ import type {
   coreResourceTypeEnum,
   curedFurTypeEnum,
   fiberTypeEnum,
+  fishTypeEnum,
   flowerTypeEnum,
   furTypeEnum,
   herbTypeEnum,
@@ -192,6 +193,7 @@ export type HerbsType = (typeof herbTypeEnum.enumValues)[number];
 export type MushroomType = (typeof mushroomTypeEnum.enumValues)[number];
 export type ClothType = (typeof clothTypeEnum.enumValues)[number];
 export type BoneType = (typeof boneTypeEnum.enumValues)[number];
+export type FishType = (typeof fishTypeEnum.enumValues)[number];
 export type CoreResourceType = (typeof coreResourceTypeEnum.enumValues)[number];
 export type ResourceCategoryType = (typeof resourceCategoryEnum.enumValues)[number];
 export type ColoredResourceCategoryType = Extract<ResourceCategoryType, 'INGOT' | 'LEATHER' | 'CLOTH' | 'PLANK' | 'BONE' | 'CURED_FUR'>;

@@ -1,5 +1,6 @@
 import { armorTemplate } from '@/shared/templates/armor-template';
 import { buffTemplate } from '@/shared/templates/buff-template';
+import { foodTemplate } from '@/shared/templates/food-template';
 import { potionTemplate } from '@/shared/templates/potion-template';
 import { recipeTemplate } from '@/shared/templates/recipe-template';
 import { resourceTemplate } from '@/shared/templates/resource-template';
@@ -13,15 +14,16 @@ import { queryOptions } from '@tanstack/react-query';
 export const getGameData = () => {
   const itemsTemplate = [
     ...armorTemplate,
+    ...weaponTemplate,
+    ...shieldTemplate,
+    ...toolsTemplate,
     ...potionTemplate,
     ...resourceTemplate,
-    ...shieldTemplate,
-    ...weaponTemplate,
+    ...foodTemplate,
     ...skillBooks,
-    ...toolsTemplate,
   ];
 
-  return { itemsTemplate, skillsTemplate, recipeTemplate, buffTemplate  };
+  return { itemsTemplate, skillsTemplate, recipeTemplate, buffTemplate };
 };
 
 export const getGameDataOptions = () =>

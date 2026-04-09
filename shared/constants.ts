@@ -28,6 +28,7 @@ export const TILE_BASE_RESPAWN_TIME = 40_000;
 
 export const DEFAULT_ITEM_STACK = {
   RESOURCE: 20,
+  FOOD: 20,
   POTION: 10,
   GOLD: 1000,
 } as const;

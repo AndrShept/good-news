@@ -1,5 +1,5 @@
 import type { SkillKey } from '../templates/skill-template';
-import type { ArmorType, IHeroStat, ResourceType, StateType, WeaponType } from '../types';
+import type { ArmorType, FishType, IHeroStat, ResourceType, StateType, WeaponType } from '../types';
 
 export const imageConfig = {
   icon: {
@@ -208,6 +208,21 @@ export const imageConfig = {
         BLOOD_HERB: '/sprites/icons/resources/herbs/bloodherb.png',
         JASMINE: '/sprites/icons/resources/herbs/jasmine.png',
       },
+    },
+    FOOD: {
+      fish: {
+        TUNA: '/sprites/icons/food/fish/tuna.png',
+        SQUID: '/sprites/icons/food/fish/squid.png',
+        SMALL_FISH: '/sprites/icons/food/fish/small-fish.png',
+        SHARK: '/sprites/icons/food/fish/shark.png',
+        SALMON: '/sprites/icons/food/fish/salmon.png',
+        PUFFERFISH: '/sprites/icons/food/fish/pufferfish.png',
+        PERCH: '/sprites/icons/food/fish/perch.png',
+        JELLYFISH: '/sprites/icons/food/fish/jellyfish.png',
+        CATFISH: '/sprites/icons/food/fish/catfish.png',
+        CARP: '/sprites/icons/food/fish/carp.png',
+        ANGLERFISH: '/sprites/icons/food/fish/anglerfish.png',
+      } as Record<FishType, string>,
     },
   },
   bg: {

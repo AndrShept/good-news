@@ -15,6 +15,7 @@ export const itemTemplateEnum = pgEnum('item_template_enum', [
   'ACCESSORY',
   'SKILL_BOOK',
   'TOOL',
+  'FOOD',
 ]);
 
 export const armorCategoryEnum = pgEnum('armor_category_enum', ['PLATE', 'MAIL', 'LEATHER', 'CLOTH']);
@@ -42,7 +43,7 @@ export const resourceCategoryEnum = pgEnum('resource_category_enum', [
 ]);
 
 export const oreValues = ['IRON_ORE', 'COPPER_ORE', 'SILVER_ORE', 'GOLD_ORE', 'MITHRIL_ORE', 'ADAMANTINE_ORE'] as const;
- 
+
 export const ingotValues = ['IRON_INGOT', 'COPPER_INGOT', 'SILVER_INGOT', 'GOLD_INGOT', 'MITHRIL_INGOT', 'ADAMANTINE_INGOT'] as const;
 
 export const logValues = [
@@ -68,7 +69,14 @@ export const plankValues = [
   'GHOST_PLANK',
 ] as const;
 export const hideValues = ['REGULAR_HIDE', 'ROUGH_HIDE', 'REPTILE_HIDE', 'IRON_HIDE', 'DEMON_HIDE', 'DRAGON_HIDE'] as const;
-export const leatherValues = ['REGULAR_LEATHER', 'ROUGH_LEATHER', 'REPTILE_LEATHER', 'IRON_LEATHER', 'DEMON_LEATHER', 'DRAGON_LEATHER'] as const;
+export const leatherValues = [
+  'REGULAR_LEATHER',
+  'ROUGH_LEATHER',
+  'REPTILE_LEATHER',
+  'IRON_LEATHER',
+  'DEMON_LEATHER',
+  'DRAGON_LEATHER',
+] as const;
 export const furValues = ['REGULAR_FUR', 'THICK_FUR', 'DARK_FUR', 'SHADOW_FUR', 'SNOW_FUR'] as const;
 export const curedFurValues = ['REGULAR_CURED_FUR', 'THICK_CURED_FUR', 'DARK_CURED_FUR', 'SHADOW_CURED_FUR', 'SNOW_CURED_FUR'] as const;
 
@@ -88,6 +96,20 @@ export const fiberValues = ['COTTON', 'FLAX'] as const;
 export const clothValues = ['REGULAR_CLOTH'] as const;
 export const boneValues = ['REGULAR_BONE'] as const;
 
+export const fishValues = [
+  'SMALL_FISH',
+  'PERCH',
+  'CARP',
+  'CATFISH',
+  'SALMON',
+  'ANGLERFISH',
+  'TUNA',
+  'PUFFERFISH',
+  'SQUID',
+  'SHARK',
+  'JELLYFISH',
+] as const;
+
 export const oreTypeEnum = pgEnum('ore_type_enum', [...oreValues]);
 export const ingotTypeEnum = pgEnum('ingot_type_enum', [...ingotValues]);
 export const logTypeEnum = pgEnum('log_type_enum', [...logValues]);
@@ -102,6 +124,7 @@ export const flowerTypeEnum = pgEnum('flower_type_enum', [...flowerValues]);
 export const mushroomTypeEnum = pgEnum('mushroom_type_enum', [...mushroomValues]);
 export const herbTypeEnum = pgEnum('herb_type_enum', [...herbValues]);
 export const boneTypeEnum = pgEnum('bone_type_enum', [...boneValues]);
+export const fishTypeEnum = pgEnum('fish_type_enum', [...fishValues]);
 
 export const resourceTypeEnum = pgEnum('resource_type_enum', [
   ...oreValues,
