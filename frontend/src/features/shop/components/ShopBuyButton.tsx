@@ -47,7 +47,7 @@ export const ShopBuyButton = ({ items }: Props) => {
         })
       }
       variant={'outline'}
-      className="flex-1"
+      className="w-fit"
     >
       <GameIcon className="size-6" image={imageConfig.icon.ui.buy} /> Buy
     </Button>

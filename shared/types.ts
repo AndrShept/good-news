@@ -264,6 +264,7 @@ export type TPlace = {
   y: number;
   mapId: string;
   buildings: Building[];
+  npcs: NPC[];
   entrances: Entrance[];
   itemContainers: { id: string; name: string; color: string | null; type: ItemContainerType }[];
 };
@@ -296,9 +297,38 @@ export interface QueueCraft {
   status: (typeof queueCraftStatusEnum.enumValues)[number];
 }
 
-export type Npc = {
+export const npcValues = ['ALCHEMIST', 'BLACKSMITH', 'TINKER', 'INSCRIBER', 'COOK'] as const;
+
+export type NPCType = (typeof npcValues)[number];
+
+export type NPC = {
   id: string;
+  image: string;
   name: string;
+  key: string;
+  type: NPCType;
+  greetings: string[];
+};
+
+export type NPCShopTable = {
+  sells: NPCSellItem[];
+  buys: NPCBuyItem[];
+};
+export type NPCSellItem = {
+  itemTemplateId: string;
+  price: number;
+  stock?: number;
+};
+
+export type NPCBuyItem = {
+  itemTemplateId: string;
+  price: number; // скільки він платить гравцю
+};
+
+// 3. Окремо — які квести він дає
+export type NPCQuestTable = {
+  npcId: string;
+  questIds: string[];
 };
 
 export const buildingValues = [

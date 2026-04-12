@@ -174,3 +174,16 @@ export const potionTemplate = [
     },
   },
 ] as const satisfies ItemTemplate[];
+
+
+const potionKeys = potionTemplate.map((w) => w.key);
+
+type PotionKeyType = (typeof potionKeys)[number];
+export const potionTemplateByKey = potionTemplate.reduce(
+  (acc, item) => {
+    acc[item.key] = item;
+
+    return acc;
+  },
+  {} as Record<PotionKeyType, ItemTemplate>,
+);

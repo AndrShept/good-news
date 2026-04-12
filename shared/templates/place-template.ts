@@ -2,6 +2,7 @@ import { imageConfig } from '@/shared/config/image-config';
 import type { TPlace } from '@/shared/types';
 
 import { buildingTemplate, buildingTemplateByKey } from './building-template';
+import { npcTemplate } from './npc-template';
 
 export const placeTemplate = [
   {
@@ -12,6 +13,7 @@ export const placeTemplate = [
     y: 7,
     buildings: [...buildingTemplate],
     mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
+    npcs: [...npcTemplate],
     entrances: [],
     itemContainers: []
   },
@@ -23,6 +25,7 @@ export const placeTemplate = [
     y: 10,
     mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
     buildings: [buildingTemplateByKey['FORGE'], buildingTemplateByKey['MAGIC_SHOP'], buildingTemplateByKey['BANK']],
+    npcs: [],
     entrances: [
       {
         id: '019c444d-e6e3-75ee-a4ba-81affd7689ab',

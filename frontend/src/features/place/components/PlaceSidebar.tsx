@@ -92,6 +92,28 @@ export const PlaceSidebar = memo(({ place, entrances }: Props) => {
               {matches && <p>{building.name}</p>}
             </PlaceSidebarButton>
           ))}
+          {place?.npcs?.map((npc) => (
+            <PlaceSidebarButton
+              key={npc.id}
+              matches={matches}
+              disabled={isButtonDisabled}
+              variant={npc.id === selectedPlaceEntities?.payload.id ? 'secondary' : 'ghost'}
+              size={matches ? 'default' : 'icon'}
+              onClick={() =>
+                startTransition(() => {
+                  setSelectedPlaceEntities({ type: 'NPC', payload: npc });
+                })
+              }
+            >
+              <GameIcon
+                className={cn('size-8.5', {
+                  'size-10': !matches,
+                })}
+                image={npc.image}
+              />
+              {matches && <p className="capitalize">{npc.name}</p>}
+            </PlaceSidebarButton>
+          ))}
 
           <PlaceSidebarButton
             className="hover:bg-red-500/10"

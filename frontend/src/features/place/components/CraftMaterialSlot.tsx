@@ -5,7 +5,7 @@ import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack
 import { GameItemSlot } from '@/features/item-instance/components/GameItemSlot';
 import { TINT_COLOR } from '@/lib/config';
 import { imageConfig } from '@/shared/config/image-config';
-import { ColoredResourceCategoryType, ColoredResourceType, ResourceCategoryType } from '@/shared/types';
+import { ColoredResourceCategoryType, ColoredResourceType } from '@/shared/types';
 import { useCraftItemStore } from '@/store/useCraftItemStore';
 import { X } from 'lucide-react';
 import { useState } from 'react';
@@ -35,7 +35,7 @@ export const CraftMaterialSlot = ({ recipeId }: { recipeId: string }) => {
         return (
           <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger>
-              <GameItemSlot>
+              <GameItemSlot key={m.templateId}>
                 {coreResourceId && !!stackedItems?.[coreResourceId] ? (
                   <div className="relative">
                     <GameItemImg
@@ -61,11 +61,12 @@ export const CraftMaterialSlot = ({ recipeId }: { recipeId: string }) => {
 
                 return (
                   <div
+                    key={id}
                     onClick={() => {
                       setCoreResourceId(id);
                       setIsOpen(false);
                     }}
-                    key={id}
+                 
                     className="group relative opacity-80"
                   >
                     <GameItemImg

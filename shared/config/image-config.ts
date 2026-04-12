@@ -242,6 +242,13 @@ export const imageConfig = {
       bat: '/sprites/creatures/beasts/bat.png',
     },
   },
+  npc: {
+    vex: '/sprites/npc/vex.png',
+    aldric: '/sprites/npc/aldric.png',
+    brom: '/sprites/npc/brom.png',
+    lyra: '/sprites/npc/lyra.png',
+    maria: '/sprites/npc/maria.png',
+  },
   equipments: {
     tools: {
       'blacksmith-hammer': '/sprites/equipments/tools/blacksmith-hammer.png',

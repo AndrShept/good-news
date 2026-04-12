@@ -134,7 +134,7 @@ const TooltipContent = ({ children, className, ...props }: TooltipContentProps) 
       {...props}
       ref={tooltipRef}
       className={cn(
-        'bg-muted/80 pointer-events-none fixed left-0 top-0 z-50 flex max-w-[280px] flex-col items-center justify-center truncate rounded-sm border px-3 py-1.5 text-sm shadow backdrop-blur-lg',
+        'bg-muted/80 pointer-events-none fixed left-0 top-0 z-50 flex max-w-[280px] flex-col  items-center justify-center truncate rounded-sm border px-3 py-1.5 text-sm shadow backdrop-blur-lg',
         className,
       )}
       style={{

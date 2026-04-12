@@ -26,7 +26,7 @@ export const BuffCard = memo(function BuffCard(props: Props) {
     <article>
       <CustomTooltip>
         <CustomTooltip.Trigger>
-          <div className="hover:border-primary/20 relative flex justify-center rounded border">
+          <div className="hover:border-foreground/20 relative 3 flex justify-center rounded border">
             <img
               src={props.buffTemplate.image}
               alt={props.buffTemplate.name}
@@ -37,8 +37,8 @@ export const BuffCard = memo(function BuffCard(props: Props) {
           </div>
         </CustomTooltip.Trigger>
         <CustomTooltip.Content>
-          <div className="flex flex-col gap-2 border p-3">
-            <div>
+          <>
+            <div className='text-center'>
               <h3 className="line-clamp-2 text-[15px] font-semibold">
                 {props.buffTemplate.name.charAt(0).toUpperCase() + props.buffTemplate.name.slice(1)}
               </h3>
@@ -49,7 +49,7 @@ export const BuffCard = memo(function BuffCard(props: Props) {
             </div>
             <ModifierInfoCard modifiersArgs={[props.buffTemplate.modifier]} />
             <p className="text-muted-foreground text-xs">Expires in: {time.toFixed(0)} minutes</p>
-          </div>
+          </>
         </CustomTooltip.Content>
       </CustomTooltip>
     </article>
