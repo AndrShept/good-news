@@ -298,7 +298,8 @@ export interface QueueCraft {
 }
 
 export const npcValues = ['ALCHEMIST', 'BLACKSMITH', 'TINKER', 'INSCRIBER', 'COOK'] as const;
-
+export const npcTabValues = ['BUY', 'SELL', 'QUEST'] as const;
+export type NpcTabType = (typeof npcTabValues)[number];
 export type NPCType = (typeof npcValues)[number];
 
 export type NPC = {

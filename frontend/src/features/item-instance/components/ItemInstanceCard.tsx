@@ -18,6 +18,7 @@ type Props = ItemInstance & {
   isSelect: boolean;
   isRefiningBuilding?: boolean;
   isHighlight?: boolean | undefined;
+
 };
 
 export const ItemInstanceCard = memo(function GameItemCard(props: Props) {

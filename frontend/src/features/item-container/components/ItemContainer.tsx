@@ -17,10 +17,10 @@ type Props = TItemContainer & {
   isShowContainerHeader?: boolean;
 };
 
-export const ItemContainer = memo(({ capacity, id, type,itemsInstance, name, isShowContainerHeader = true }: Props) => {
+export const ItemContainer = memo(({ capacity, id, type, itemsInstance, name, isShowContainerHeader = true }: Props) => {
   const { isOver, setNodeRef, active } = useDroppable({
     id,
-    data: { to: {id, type} },
+    data: { to: { id, type } },
   });
   const selectedPlaceEntities = useSelectPlaceEntitiesStore((state) => state.selectedPlaceEntities);
   const setSelectedItemInstance = useSetSelectedItem();

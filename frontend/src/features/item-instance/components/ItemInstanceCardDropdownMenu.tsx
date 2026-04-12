@@ -5,8 +5,9 @@ import { useItemEquipMutation } from '@/features/hero/hooks/useItemEquipMutation
 import { imageConfig } from '@/shared/config/image-config';
 import { ItemInstance, ItemTemplate, ItemTemplateType } from '@/shared/types';
 import { useModalStore } from '@/store/useModalStore';
+import { useNpcActiveTabStore } from '@/store/useNpcActiveTabStore';
 import { useSelectItemInstanceStore } from '@/store/useSelectItemInstanceStore';
-import { ArrowLeftRightIcon, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { ReactElement } from 'react';
 
 import { SplitItemInstanceQuantityPopover } from './SplitItemInstanceQuantityPopover';
@@ -14,7 +15,7 @@ import { SplitItemInstanceQuantityPopover } from './SplitItemInstanceQuantityPop
 interface Props extends ItemInstance {
   itemTemplate: ItemTemplate;
 }
-const buttonIconVariants: Record<Exclude<ItemTemplateType, 'MISC' | 'RESOURCES'>, ReactElement> = {
+const buttonIconVariants: Record<Exclude<ItemTemplateType, 'MISC' | 'RESOURCES' | 'FOOD'>, ReactElement> = {
   WEAPON: <GameIcon className="size-5.5" image={imageConfig.icon.action.equip} />,
   TOOL: <GameIcon className="size-5.5" image={imageConfig.icon.action.equip} />,
   SHIELD: <GameIcon className="size-5.5" image={imageConfig.icon.action.equip} />,
@@ -29,6 +30,7 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
   const isDisabled = itemConsumeMutation.isPending || itemEquipMutation.isPending;
   const setItemInstance = useSelectItemInstanceStore((state) => state.setItemInstance);
   const { setModalData } = useModalStore();
+  const { npcActiveTab } = useNpcActiveTabStore();
   const onItemConsume = () => {
     itemConsumeMutation.mutate({
       itemInstanceId: props.id,
@@ -43,7 +45,7 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
     });
     setItemInstance(null);
   };
-  const icon = buttonIconVariants[props.itemTemplate.type as Exclude<ItemTemplateType, 'MISC' | 'RESOURCES'>];
+  const icon = buttonIconVariants[props.itemTemplate.type as Exclude<ItemTemplateType, 'MISC' | 'RESOURCES' | 'FOOD'>];
   const onDeleteInventoryItem = () => {
     setModalData({ type: 'DELETE_ITEM_INSTANCE', id: props.id, itemInstance: props });
   };
@@ -87,6 +89,16 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
         />
       )}
 
+      {props.location === 'BACKPACK' && npcActiveTab === 'SELL' && (
+        <Button
+          className="w-10 opacity-70 hover:bg-transparent hover:opacity-100"
+          variant="ghost"
+          onClick={onDeleteInventoryItem}
+          disabled={isDisabled}
+        >
+          <GameIcon image={imageConfig.icon.ui.sell} />
+        </Button>
+      )}
       {(props.location === 'BACKPACK' || props.location === 'BANK') && (
         <Button
           className="w-10 opacity-70 hover:bg-transparent hover:opacity-100"

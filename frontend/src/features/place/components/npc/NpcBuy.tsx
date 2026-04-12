@@ -5,8 +5,10 @@ import { TINT_COLOR } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { imageConfig } from '@/shared/config/image-config';
 import { ColoredResourceType, NPC, NPCSellItem } from '@/shared/types';
+import { useNpcActiveTabStore } from '@/store/useNpcActiveTabStore';
+import { useNpcMessageStore } from '@/store/useNpcMessageStore';
 import { useShopItemStore } from '@/store/useShopItemStore';
-import React, { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { ShopAvatar } from './ShopAvatar';
 import { ShopItemCart } from './ShopItemCart';
@@ -17,8 +19,11 @@ interface Props {
 }
 
 export const NpcBuy = ({ sellItems, npc }: Props) => {
-  const addShopItem = useShopItemStore((state) => state.addShopItem);
   const items = useShopItemStore((state) => state.items);
+  const addShopItem = useShopItemStore((state) => state.addShopItem);
+  const { setNpcActiveTab } = useNpcActiveTabStore();
+  const getEmptyMessage = useNpcMessageStore((state) => state.getEmptyMessage);
+
   const itemsMap = useMemo(() => {
     return items.reduce(
       (acc, item) => {
@@ -29,6 +34,12 @@ export const NpcBuy = ({ sellItems, npc }: Props) => {
     );
   }, [items]);
   const { itemsTemplateById } = useGameData();
+  useEffect(() => {
+    if (!sellItems?.length) {
+      setNpcActiveTab(null);
+      getEmptyMessage({ npcType: npc.type, npcTab: 'BUY' });
+    }
+  }, [sellItems?.length]);
   return (
     <section className="flex h-full gap-1">
       <div className="flex flex-col gap-1.5 border-r px-2">
