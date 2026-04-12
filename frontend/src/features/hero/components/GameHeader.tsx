@@ -23,7 +23,7 @@ export const GameHeader = memo(() => {
   const { pathname } = useLocation();
   const isMobile = useMediaQuery('(max-width: 640px)');
   return (
-    <header className="bg-background/80 backdrop-blur-xs sticky top-0 z-50 mb-3 flex items-center justify-between border-b px-4 py-2">
+    <header className="bg-background/80 backdrop-blur-xs sticky top-0 z-50 mb-1 flex items-center justify-between border-b px-4 py-2">
       <section>
         <Link to="/">
           <GameIcon image={imageConfig.icon.ui.logo} />

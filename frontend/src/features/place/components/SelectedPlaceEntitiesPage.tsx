@@ -5,16 +5,16 @@ import { NPC_SHOP_TABLE } from '@/shared/table/npc-shop-table';
 import { Building, CraftBuildingKey, NPC, RefiningBuildingKey, TPlace, craftBuildingValues, refiningBuildingValues } from '@/shared/types';
 import { useSelectPlaceEntitiesStore } from '@/store/useSelectBuildingStore';
 import * as m from 'motion/react-m';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { Bank } from './buildings/Bank';
 import { CraftBuilding } from './buildings/CraftBuilding';
 import { RefiningBuilding } from './buildings/RefiningBuilding';
 import { Temple } from './buildings/Temple';
-import { BuyShopHeader } from './npc/BuyShopHeader';
 import { NpcBuy } from './npc/NpcBuy';
 import { NpcGreeting } from './npc/NpcGreeting';
 import { NpcSell } from './npc/NpcSell';
+import { ShopHeader } from './npc/ShopHeader';
 
 type Props = {
   place: TPlace | undefined | null;
@@ -58,8 +58,8 @@ const SelectPlaceNpc = ({ selectedNpc }: { selectedNpc: NPC }) => {
   const [shopState, setShopState] = useState<ShopStateType | null>(null);
 
   return (
-    <m.section variants={parentVariants} initial="hidden" animate="visible" className="mx-auto w-full flex flex-col gap-1 max-w-2xl">
-      {shopState && <BuyShopHeader setShopState={setShopState} />}
+    <m.section variants={parentVariants} initial="hidden" animate="visible" className="mx-auto flex w-full max-w-2xl flex-col gap-1">
+      {shopState && <ShopHeader shopState={shopState} setShopState={setShopState} />}
       {!shopState && (
         <div>
           <NpcGreeting npc={selectedNpc} />
@@ -79,7 +79,7 @@ const SelectPlaceNpc = ({ selectedNpc }: { selectedNpc: NPC }) => {
         </div>
       )}
       {shopState === 'BUY' && <NpcBuy sellItems={shop.sells} npc={selectedNpc} />}
-      {shopState === 'SELL' && <NpcSell />}
+      {shopState === 'SELL' && <NpcSell buyItems={shop.buys} npc={selectedNpc} />}
     </m.section>
   );
 };

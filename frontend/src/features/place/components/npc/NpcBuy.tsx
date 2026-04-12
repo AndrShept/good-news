@@ -1,6 +1,5 @@
 import { GameIcon } from '@/components/GameIcon';
 import { GameItemImg } from '@/components/GameItemImg';
-import { HeroAvatar } from '@/components/HeroAvatar';
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { TINT_COLOR } from '@/lib/config';
 import { cn } from '@/lib/utils';
@@ -9,7 +8,8 @@ import { ColoredResourceType, NPC, NPCSellItem } from '@/shared/types';
 import { useShopItemStore } from '@/store/useShopItemStore';
 import React, { useMemo } from 'react';
 
-import { BuyItemCart } from './BuyItemCart';
+import { ShopAvatar } from './ShopAvatar';
+import { ShopItemCart } from './ShopItemCart';
 
 interface Props {
   sellItems: NPCSellItem[];
@@ -28,15 +28,11 @@ export const NpcBuy = ({ sellItems, npc }: Props) => {
       {} as Record<string, number>,
     );
   }, [items]);
-  console.log(npc);
   const { itemsTemplateById } = useGameData();
   return (
     <section className="flex h-full gap-1">
       <div className="flex flex-col gap-1.5 border-r px-2">
-        <div className="flex items-center gap-1 capitalize">
-          <HeroAvatar src={npc.image} />
-          <p className="text-muted-foreground">{npc.name}</p>
-        </div>
+        <ShopAvatar image={npc.image} name={npc.name} />
 
         <ul className="flex flex-1 flex-col gap-1">
           {sellItems?.map((i) => {
@@ -67,7 +63,7 @@ export const NpcBuy = ({ sellItems, npc }: Props) => {
         </ul>
       </div>
 
-      <BuyItemCart />
+      <ShopItemCart />
     </section>
   );
 };

@@ -12,9 +12,11 @@ import { useMutation } from '@tanstack/react-query';
 
 interface Props {
   items: { id: string; quantity: number }[];
+  iconImage: string;
+  btnText: string;
 }
 
-export const ShopBuyButton = ({ items }: Props) => {
+export const ShopAcceptButton = ({ items, iconImage, btnText }: Props) => {
   const setGameMessage = useSetGameMessage();
   const heroId = useHeroId();
   const backpackId = useGetBackpackId();
@@ -39,7 +41,7 @@ export const ShopBuyButton = ({ items }: Props) => {
 
   return (
     <Button
-      disabled={isPending}
+      disabled={isPending || !items.length}
       onClick={() =>
         mutate({
           id: heroId,
@@ -49,7 +51,7 @@ export const ShopBuyButton = ({ items }: Props) => {
       variant={'outline'}
       className="w-fit"
     >
-      <GameIcon className="size-6" image={imageConfig.icon.ui.buy} /> Buy
+      <GameIcon className="size-6" image={iconImage} /> {btnText}
     </Button>
   );
 };
