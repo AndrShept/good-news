@@ -21,8 +21,9 @@ type Props = {
   maxQuantity: number;
   itemContainerId: string;
   itemInstanceId: string;
+  disabled: boolean;
 };
-export const SplitItemInstanceQuantityPopover = ({ maxQuantity, itemContainerId, itemInstanceId }: Props) => {
+export const SplitItemInstanceQuantityPopover = ({ disabled, maxQuantity, itemContainerId, itemInstanceId }: Props) => {
   const formSchema = createFormSchema(maxQuantity);
   const [isOpen, setIsOpen] = useState(false);
   const splitItem = useSplitItemInstance();
@@ -42,7 +43,7 @@ export const SplitItemInstanceQuantityPopover = ({ maxQuantity, itemContainerId,
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button className="w-10 opacity-70 hover:bg-transparent hover:opacity-100" variant="ghost">
+        <Button disabled={disabled} className="w-10 opacity-70 hover:bg-transparent hover:opacity-100" variant="ghost">
           <ArrowLeftRightIcon className="size-6" />
         </Button>
       </PopoverTrigger>

@@ -12,12 +12,11 @@ import {
   npcTabValues,
   refiningBuildingValues,
 } from '@/shared/types';
-import { useNpcActiveTabStore } from '@/store/useNpcActiveTabStore';
-import { useNpcMessageStore } from '@/store/useNpcMessageStore';
+import { useNpcStore } from '@/store/useNpcStore';
 import { useSelectPlaceEntitiesStore } from '@/store/useSelectBuildingStore';
 import { useShopItemStore } from '@/store/useShopItemStore';
 import * as m from 'motion/react-m';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { Bank } from './buildings/Bank';
 import { CraftBuilding } from './buildings/CraftBuilding';
@@ -66,10 +65,8 @@ const SelectPlaceBuilding = ({ selectedBuilding, place }: { selectedBuilding: Bu
 
 const SelectPlaceNpc = ({ selectedNpc }: { selectedNpc: NPC }) => {
   const shop = NPC_SHOP_TABLE[selectedNpc.id];
-  const { npcActiveTab, setNpcActiveTab } = useNpcActiveTabStore();
+  const { npcActiveTab, setNpcActiveTab, setNpcMessage, setNpcId } = useNpcStore();
   const clearAllItems = useShopItemStore((state) => state.clearAllItems);
-
-  const { setNpcMessage } = useNpcMessageStore();
 
   useEffect(() => {
     clearAllItems();
@@ -77,11 +74,12 @@ const SelectPlaceNpc = ({ selectedNpc }: { selectedNpc: NPC }) => {
 
     const idx = Math.floor(Math.random() * selectedNpc.greetings.length);
     setNpcMessage(selectedNpc.greetings[idx]);
+    setNpcId(selectedNpc.id);
   }, [selectedNpc.id]);
 
   return (
     <m.section variants={parentVariants} initial="hidden" animate="visible" className="mx-auto flex w-full max-w-2xl flex-col gap-1">
-      {npcActiveTab && <ShopHeader shopState={npcActiveTab} setShopState={setNpcActiveTab} />}
+      {npcActiveTab && <ShopHeader />}
 
       {npcActiveTab === 'BUY' && <NpcBuy sellItems={shop?.sells ?? []} npc={selectedNpc} />}
       {npcActiveTab === 'SELL' && <NpcSell buyItems={shop?.buys ?? []} npc={selectedNpc} />}

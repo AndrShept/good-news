@@ -216,13 +216,11 @@ type ItemRefineableForBuilding = {
   coreResource: CoreResourceType | null;
   itemTemplateId: string;
   refiningBuildingKey: RefiningBuildingKey;
-
 };
 
 export const itemRefineableForBuilding = ({ coreResource, itemTemplateId, refiningBuildingKey }: ItemRefineableForBuilding) => {
-  const itemsTemplateById = itemTemplateService.getAllItemsTemplateMapIds();
-  const itemTemplate = coreResource ? itemsTemplateById[itemTemplateId] : resourceTemplateById[itemTemplateId];
-  if (!itemTemplate) return 
+  const itemTemplate = itemTemplateService.getTemplateByItemTemplateId(itemTemplateId);
+
   switch (itemTemplate.type) {
     case 'RESOURCES':
       return { isCanRefine: refineItems[refiningBuildingKey].RESOURCES.includes(itemTemplate.key), itemTemplate };
@@ -238,5 +236,7 @@ export const itemRefineableForBuilding = ({ coreResource, itemTemplateId, refini
       }
       break;
     }
+    default:
+      return { isCanRefine: false };
   }
 };

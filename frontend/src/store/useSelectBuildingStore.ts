@@ -1,10 +1,10 @@
-import { Building, Npc } from '@/shared/types';
+import { Building, NPC } from '@/shared/types';
 import { create } from 'zustand';
 
 type SelectedPlaceEntities =
   | {
       type: 'NPC';
-      payload: Npc;
+      payload: NPC;
     }
   | {
       type: 'BUILDING';

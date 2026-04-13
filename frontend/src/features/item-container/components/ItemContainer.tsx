@@ -7,6 +7,7 @@ import { RefiningBuildingKey, TItemContainer, refiningBuildingValues } from '@/s
 import { itemRefineableForBuilding } from '@/shared/utils';
 import { useSelectPlaceEntitiesStore } from '@/store/useSelectBuildingStore';
 import { useSelectedItemId, useSetSelectedItem } from '@/store/useSelectItemInstanceStore';
+import { useShopItemStore } from '@/store/useShopItemStore';
 import { useDroppable } from '@dnd-kit/core';
 import { memo } from 'react';
 
@@ -26,6 +27,7 @@ export const ItemContainer = memo(({ capacity, id, type, itemsInstance, name, is
   const setSelectedItemInstance = useSetSelectedItem();
   const selectedItemId = useSelectedItemId();
   const items = useCreateContainerItems(capacity, itemsInstance);
+  const sellItems = useShopItemStore((state) => state.items);
   const { itemsTemplateById } = useGameData();
   const isRefiningBuilding =
     selectedPlaceEntities?.type === 'BUILDING' && refiningBuildingValues.includes(selectedPlaceEntities.payload.key as RefiningBuildingKey);
@@ -51,6 +53,7 @@ export const ItemContainer = memo(({ capacity, id, type, itemsInstance, name, is
             return <GameItemSlot key={id} />;
           }
           const itemTemplate = itemsTemplateById[itemInstance.itemTemplateId];
+          const isSellItem = sellItems.some((i) => i.instanceId === itemInstance.id);
           return (
             <ItemInstanceCard
               key={itemInstance.id}
@@ -66,12 +69,11 @@ export const ItemContainer = memo(({ capacity, id, type, itemsInstance, name, is
                       itemTemplateId: itemInstance.itemTemplateId,
                       refiningBuildingKey: selectedPlaceEntities.payload.key as RefiningBuildingKey,
                     })?.isCanRefine
-                  : false
+                  : isSellItem
+                    ? false
+                    : undefined
               }
-              isRefiningBuilding={
-                selectedPlaceEntities?.type === 'BUILDING' &&
-                refiningBuildingValues.includes(selectedPlaceEntities.payload.key as RefiningBuildingKey)
-              }
+    
             />
           );
         })}

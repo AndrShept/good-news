@@ -32,9 +32,8 @@ export const GameHeader = memo(() => {
       <section className="flex gap-0.5">
         <CharacterPaperdollButton type="CHARACTER" />
         <BackpackButton />
-        <SkillsPopover />
+      <SkillsPopover />
         <GroupMenuButton />
-        {/* {placeId && <ShopItemCardButton />} */}
       </section>
       <section className="flex items-center gap-1 text-[15px]">
         {pathname === '/' && <LogOutButton />}

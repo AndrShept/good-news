@@ -16,9 +16,8 @@ type Props = ItemInstance & {
   heroState?: StateType;
   setSelectItemOnContainer: (data: ItemInstance | null) => void;
   isSelect: boolean;
-  isRefiningBuilding?: boolean;
-  isHighlight?: boolean | undefined;
 
+  isHighlight?: boolean | undefined;
 };
 
 export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
@@ -33,7 +32,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: props.id,
     data: props,
-    disabled: props.location === 'EQUIPMENT' || (props.isRefiningBuilding && !props.isHighlight) || props.heroState !== 'IDLE',
+    disabled: props.location === 'EQUIPMENT' || props.isHighlight === false || props.heroState !== 'IDLE',
   });
   const { setNodeRef: setDropRef, isOver } = useDroppable({
     id: `drop-${props.id}`,
@@ -82,13 +81,14 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
               <CustomTooltip.Trigger>
                 <GameItemImg
                   className={cn('', {
-                    'opacity-100': props.isHighlight,
-                    'grayscale-100 opacity-20 group-hover:opacity-20': props.isRefiningBuilding && !props.isHighlight,
+                    'grayscale-0': props.isHighlight === undefined,
+
+                    'grayscale-100 opacity-20 group-hover:opacity-20': props.isHighlight === false,
                     'ring-2 ring-green-500 duration-200': isOver && canStack,
                   })}
                   image={props.itemTemplate.image}
                   tintColor={
-                    props.isRefiningBuilding && !props.isHighlight
+                    props.isHighlight === false
                       ? undefined
                       : TINT_COLOR[props.coreResource ?? (props.itemTemplate.key as ColoredResourceType)]
                   }

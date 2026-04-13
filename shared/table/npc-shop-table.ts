@@ -10,6 +10,7 @@ export const NPC_SHOP_TABLE: Record<string, NPCShopTable> = {
     sells: [
       { itemTemplateId: potionTemplateByKey.small_health_potion.id, price: 50 },
       { itemTemplateId: potionTemplateByKey.small_mana_potion.id, price: 60 },
+      { itemTemplateId: resourceTemplateByKey.REDCAP_MUSHROOM.id, price: 20 },
     ],
     buys: [
       { itemTemplateId: resourceTemplateByKey.GREENLEAF.id, price: 5 },

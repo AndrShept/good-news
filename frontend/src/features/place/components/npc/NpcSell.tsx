@@ -1,8 +1,7 @@
 import { ItemContainer } from '@/features/item-container/components/ItemContainer';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
 import { NPC, NPCSellItem } from '@/shared/types';
-import { useNpcActiveTabStore } from '@/store/useNpcActiveTabStore';
-import { useNpcMessageStore } from '@/store/useNpcMessageStore';
+import { useNpcStore } from '@/store/useNpcStore';
 import { useEffect, useMemo } from 'react';
 
 import { ShopAvatar } from './ShopAvatar';
@@ -15,8 +14,7 @@ interface Props {
 
 export const NpcSell = ({ npc, buyItems }: Props) => {
   const { backpack } = useHeroBackpack();
-  const { setNpcActiveTab } = useNpcActiveTabStore();
-  const getEmptyMessage = useNpcMessageStore((state) => state.getEmptyMessage);
+  const { setNpcActiveTab, getEmptyMessage } = useNpcStore();
   const newBackpack = useMemo(() => {
     if (!backpack) return null;
     return {
@@ -36,7 +34,7 @@ export const NpcSell = ({ npc, buyItems }: Props) => {
       <div className="flex min-w-[170px] flex-col gap-1.5 border-r px-2">
         <ShopAvatar image={npc.image} name={npc.name} />
 
-        <ShopItemCart />
+        <ShopItemCart mode="SELL" />
       </div>
       {newBackpack.itemsInstance?.length ? (
         <ItemContainer {...newBackpack} capacity={newBackpack.itemsInstance.length} isShowContainerHeader={false} />

@@ -1,14 +1,12 @@
 import { NPC } from '@/shared/types';
-import { useNpcActiveTabStore } from '@/store/useNpcActiveTabStore';
-import { useNpcMessageStore } from '@/store/useNpcMessageStore';
+import { useNpcStore } from '@/store/useNpcStore';
 import { useEffect } from 'react';
 
 interface Props {
   npc: NPC;
 }
 export const NpcQuest = ({ npc }: Props) => {
-  const { setNpcActiveTab } = useNpcActiveTabStore();
-  const getEmptyMessage = useNpcMessageStore((state) => state.getEmptyMessage);
+  const { setNpcActiveTab, getEmptyMessage } = useNpcStore();
   useEffect(() => {
     setNpcActiveTab(null);
     getEmptyMessage({ npcType: npc.type, npcTab: 'QUEST' });

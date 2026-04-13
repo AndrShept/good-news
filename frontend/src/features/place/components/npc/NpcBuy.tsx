@@ -5,8 +5,7 @@ import { TINT_COLOR } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { imageConfig } from '@/shared/config/image-config';
 import { ColoredResourceType, NPC, NPCSellItem } from '@/shared/types';
-import { useNpcActiveTabStore } from '@/store/useNpcActiveTabStore';
-import { useNpcMessageStore } from '@/store/useNpcMessageStore';
+import { useNpcStore } from '@/store/useNpcStore';
 import { useShopItemStore } from '@/store/useShopItemStore';
 import { useEffect, useMemo } from 'react';
 
@@ -21,8 +20,7 @@ interface Props {
 export const NpcBuy = ({ sellItems, npc }: Props) => {
   const items = useShopItemStore((state) => state.items);
   const addShopItem = useShopItemStore((state) => state.addShopItem);
-  const { setNpcActiveTab } = useNpcActiveTabStore();
-  const getEmptyMessage = useNpcMessageStore((state) => state.getEmptyMessage);
+  const { setNpcActiveTab, getEmptyMessage } = useNpcStore();
 
   const itemsMap = useMemo(() => {
     return items.reduce(
@@ -74,7 +72,7 @@ export const NpcBuy = ({ sellItems, npc }: Props) => {
         </ul>
       </div>
 
-      <ShopItemCart />
+      <ShopItemCart mode="BUY" />
     </section>
   );
 };

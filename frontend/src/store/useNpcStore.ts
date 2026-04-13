@@ -28,12 +28,22 @@ export const NPC_EMPTY_MESSAGES: Record<NPCType, Record<NpcTabType, string>> = {
     QUEST: 'Nothing broken, nothing needed. Come back when that changes.',
   },
 };
-interface UseNpcMessageStore {
+
+interface UseNpcStore {
+  npcId: string;
+  setNpcId: (id: string) => void;
+  npcActiveTab: NpcTabType | null;
+  setNpcActiveTab: (type: NpcTabType | null) => void;
   message: string;
   setNpcMessage: (msg: string) => void;
   getEmptyMessage: (data: { npcType: NPCType; npcTab: NpcTabType }) => void;
 }
-export const useNpcMessageStore = create<UseNpcMessageStore>((set) => ({
+
+export const useNpcStore = create<UseNpcStore>((set) => ({
+  npcId: '',
+  setNpcId: (id) => set({ npcId: id }),
+  npcActiveTab: null,
+  setNpcActiveTab: (type) => set({ npcActiveTab: type }),
   message: '',
   setNpcMessage: (msg) => set({ message: msg }),
   getEmptyMessage: ({ npcTab, npcType }) => set({ message: NPC_EMPTY_MESSAGES[npcType][npcTab] }),

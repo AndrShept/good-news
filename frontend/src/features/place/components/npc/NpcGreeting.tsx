@@ -1,13 +1,13 @@
 import { GameIcon } from '@/components/GameIcon';
 import { TypingAnimation } from '@/components/ui/typing-animation';
-import { useNpcMessageStore } from '@/store/useNpcMessageStore';
+import { useNpcStore } from '@/store/useNpcStore';
 
 interface Props {
   name: string;
   image: string;
 }
 export const NpcGreeting = ({ image, name }: Props) => {
-  const message = useNpcMessageStore((state) => state.message);
+  const message = useNpcStore((state) => state.message);
   return (
     <div className="flex gap-2">
       <GameIcon className="md:size-30 sm:size-25 size-20" image={image} />
