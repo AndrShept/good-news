@@ -34,6 +34,7 @@ export const PlaceSidebar = memo(({ place, entrances }: Props) => {
   const matches = useMediaQuery('(min-width: 768px)');
   const { mutate, isPending } = useLeavePlace();
   const { selectedPlaceEntities, setSelectedPlaceEntities } = useSelectPlaceEntitiesStore();
+
   const state = useHero((data) => data?.state);
   const isButtonDisabled = isPending || state !== 'IDLE';
   useEffect(() => {
@@ -121,7 +122,10 @@ export const PlaceSidebar = memo(({ place, entrances }: Props) => {
             disabled={isButtonDisabled}
             variant={'ghost'}
             size={matches ? 'default' : 'icon'}
-            onClick={() => mutate()}
+            onClick={() => {
+              mutate();
+              setSelectedPlaceEntities(null);
+            }}
           >
             <GameIcon
               className={cn('size-7.5', {

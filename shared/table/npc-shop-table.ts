@@ -11,6 +11,7 @@ export const NPC_SHOP_TABLE: Record<string, NPCShopTable> = {
       { itemTemplateId: potionTemplateByKey.small_health_potion.id, price: 50 },
       { itemTemplateId: potionTemplateByKey.small_mana_potion.id, price: 60 },
       { itemTemplateId: resourceTemplateByKey.REDCAP_MUSHROOM.id, price: 20 },
+      { itemTemplateId: resourceTemplateByKey.GREENLEAF.id, price: 10 },
     ],
     buys: [
       { itemTemplateId: resourceTemplateByKey.GREENLEAF.id, price: 5 },
@@ -22,7 +23,7 @@ export const NPC_SHOP_TABLE: Record<string, NPCShopTable> = {
     // Brom Tinker
     sells: [
       { itemTemplateId: toolTemplateByKey.Mining_Pickaxe.id, price: 120 },
-      { itemTemplateId: toolTemplateByKey.Fishing_Rod.id, price: 100 },
+      { itemTemplateId: toolTemplateByKey['Lumber-Axe'].id, price: 100 },
       { itemTemplateId: toolTemplateByKey.Fishing_Rod.id, price: 80 },
     ],
     buys: [],

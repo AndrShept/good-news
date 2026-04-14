@@ -5,7 +5,7 @@ import { TINT_COLOR } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { ColoredResourceType, ItemInstance, ItemTemplate, StateType } from '@/shared/types';
 import { useDndContext, useDndMonitor, useDraggable, useDroppable } from '@dnd-kit/core';
-import { memo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 
 import { GameItemSlot } from './GameItemSlot';
 import { ItemInstanceCardDropdownMenu } from './ItemInstanceCardDropdownMenu';
@@ -37,20 +37,23 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
   const { setNodeRef: setDropRef, isOver } = useDroppable({
     id: `drop-${props.id}`,
     data: props,
-    disabled: !canStack,
+    disabled: !canStack || props.isHighlight === false,
   });
 
   const [isOpen, setIsOpen] = useState(false);
+
   const style: React.CSSProperties = {
     // transform: CSS.Translate.toString(transform),
     opacity: isDragging ? 0.4 : 1,
     touchAction: 'none',
   };
-
+  const onClose = useCallback(() => {
+    setIsOpen(false);
+    props.setSelectItemOnContainer(null);
+  }, []);
   useDndMonitor({
     onDragStart() {
-      setIsOpen(false);
-      props.setSelectItemOnContainer(null);
+      onClose();
     },
   });
   return (
@@ -104,7 +107,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
               </CustomTooltip.Content>
             )}
             <PopoverContent className="bg-secondary flex h-full w-fit select-none items-center p-1">
-              <ItemInstanceCardDropdownMenu {...props} />
+              <ItemInstanceCardDropdownMenu {...props} onClose={onClose} />
             </PopoverContent>
           </CustomTooltip>
         </Popover>

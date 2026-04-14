@@ -53,7 +53,7 @@ export const ItemContainer = memo(({ capacity, id, type, itemsInstance, name, is
             return <GameItemSlot key={id} />;
           }
           const itemTemplate = itemsTemplateById[itemInstance.itemTemplateId];
-          const isSellItem = sellItems.some((i) => i.instanceId === itemInstance.id);
+          const isSellItem = sellItems.some((i) => i.itemInstanceId === itemInstance.id);
           return (
             <ItemInstanceCard
               key={itemInstance.id}
@@ -73,7 +73,6 @@ export const ItemContainer = memo(({ capacity, id, type, itemsInstance, name, is
                     ? false
                     : undefined
               }
-    
             />
           );
         })}

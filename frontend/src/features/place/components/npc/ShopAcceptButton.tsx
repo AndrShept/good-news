@@ -1,17 +1,17 @@
 import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
-import { shopBuyItems } from '@/features/hero/api/shopBuyItems';
+import { acceptShopItems } from '@/features/hero/api/acceptShopItems';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useHeroUpdate } from '@/features/hero/hooks/useHeroUpdate';
-import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
 import { useItemContainerUpdate } from '@/features/item-container/hooks/useItemContainerUpdate';
-import { imageConfig } from '@/shared/config/image-config';
+import { ShopCartItem } from '@/shared/types';
 import { useSetGameMessage } from '@/store/useGameMessages';
+import { useNpcStore } from '@/store/useNpcStore';
 import { useShopItemStore } from '@/store/useShopItemStore';
 import { useMutation } from '@tanstack/react-query';
 
 interface Props {
-  items: { id: string; quantity: number }[];
+  items: ShopCartItem[];
   iconImage: string;
   btnText: string;
 }
@@ -19,17 +19,17 @@ interface Props {
 export const ShopAcceptButton = ({ items, iconImage, btnText }: Props) => {
   const setGameMessage = useSetGameMessage();
   const heroId = useHeroId();
-  const backpackId = useGetBackpackId();
-  const { clearAllItems, onClose } = useShopItemStore();
+  const { clearAllItems } = useShopItemStore();
+  const { npcId, npcActiveTab } = useNpcStore();
   const { updateHero } = useHeroUpdate();
-  const { updateItemContainer } = useItemContainerUpdate();
+  const { updateItemByDeltaEvents } = useItemContainerUpdate();
+
   const { mutate, isPending } = useMutation({
-    mutationFn: shopBuyItems,
+    mutationFn: acceptShopItems,
 
     async onSuccess({ message, data }) {
       updateHero({ goldCoins: data?.goldCoins });
-      updateItemContainer(backpackId, data?.itemContainer);
-      onClose();
+      updateItemByDeltaEvents(data?.itemsDelta ?? []);
       clearAllItems();
       setGameMessage({
         text: message,
@@ -46,6 +46,8 @@ export const ShopAcceptButton = ({ items, iconImage, btnText }: Props) => {
         mutate({
           id: heroId,
           items,
+          npcId,
+          action: npcActiveTab === 'BUY' ? 'buy' : 'sell',
         })
       }
       variant={'outline'}

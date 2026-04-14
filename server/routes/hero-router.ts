@@ -9,6 +9,7 @@ import {
   WORLD_SEED,
 } from '@/shared/constants';
 import type { HeroUpdateEvent, MapChunkUpdateEntitiesData } from '@/shared/socket-data-types';
+import { NPC_SHOP_TABLE } from '@/shared/table/npc-shop-table';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
@@ -82,6 +83,7 @@ import { itemContainerService } from '../services/item-container-service';
 import { itemInstanceService } from '../services/item-instance-service';
 import { itemTemplateService } from '../services/item-template-service';
 import { mapService } from '../services/map-service';
+import { npcService } from '../services/npc-service';
 import { queueCraftService } from '../services/queue-craft-service';
 import { refiningService } from '../services/refining-service';
 import { skillService } from '../services/skill-service';
@@ -389,18 +391,20 @@ export const heroRouter = new Hono<Context>()
     },
   )
   .post(
-    '/:id/shop/buy',
+    '/:id/npc/:npcId/shop/:action',
     loggedIn,
     zValidator(
       'param',
       z.object({
-        id: z.string(),
+        id: z.string().uuid(),
+        npcId: z.string().uuid(),
+        action: z.enum(['buy', 'sell']),
       }),
     ),
     zValidator('json', buyItemsSchema),
     async (c) => {
       const userId = c.get('user')?.id as string;
-      const { id } = c.req.valid('param');
+      const { id, action, npcId } = c.req.valid('param');
       const { items } = c.req.valid('json');
       const hero = heroService.getHero(id);
       const backpack = itemContainerService.getBackpack(hero.id);
@@ -408,50 +412,40 @@ export const heroRouter = new Hono<Context>()
       verifyHeroOwnership({ heroUserId: hero.userId, userId, containerHeroId: backpack.ownerId, heroId: hero.id });
       const place = placeTemplate.find((p) => p.id === hero.location.placeId);
       if (!place) throw new HTTPException(409, { message: 'Hero not a place' });
-      if (!place.buildings.some((b) => b.key === 'MAGIC_SHOP')) {
-        throw new HTTPException(409, { message: 'this a not a shop' });
-      }
-
-      const { needCapacity, sumPriceGold } = items.reduce(
-        (acc, item) => {
-          const template = itemTemplateService.getAllItemsTemplateMapIds()[item.id];
-          const buyPrice = template.buyPrice ?? 0;
-          acc.sumPriceGold += item.quantity * buyPrice;
-          if (!template.stackable) {
-            acc.needCapacity += item.quantity;
-          } else {
-            acc.needCapacity += Math.ceil(item.quantity / (template.maxStack ?? 1));
-          }
-          return acc;
-        },
-        { sumPriceGold: 0, needCapacity: 0 },
-      );
-      heroService.checkFreeBackpackCapacity(hero.id, needCapacity);
-
-      heroService.assertHasEnoughGold(hero.id, sumPriceGold);
-
-      heroService.spendGold(hero.id, sumPriceGold);
-
-      const returnData = {
-        goldCoins: hero.goldCoins,
-        itemContainer: backpack,
+      const npc = npcService.getNpc(npcId);
+      const npcExistInPlace = place.npcs.some((n) => n.id === npc.id);
+      if (!npcExistInPlace) throw new HTTPException(409, { message: 'npc  not a place' });
+      let returnData = {
+        goldCoins: 0,
+        itemsDelta: [] as ItemsInstanceDeltaEvent[],
         messageData: [] as { name: string; quantity: number }[],
       };
-      for (const item of items) {
-        const template = itemTemplateService.getAllItemsTemplateMapIds()[item.id];
-        returnData.messageData.push({ name: template.name, quantity: item.quantity });
-        itemContainerService.createItem({
-          heroId: hero.id,
-          itemContainerId: backpack.id,
-          itemTemplateId: template.id,
-          quantity: item.quantity,
-          coreResourceId: undefined,
-          isAddPendingEvents: true,
-        });
+      switch (action) {
+        case 'buy': {
+          const { itemsDelta, messageData } = npcService.buyItems({
+            backpackId: backpack.id,
+            heroId: hero.id,
+            npcId: npc.id,
+            items,
+          });
+          returnData.itemsDelta = itemsDelta;
+          returnData.messageData = messageData;
+          break;
+        }
+        case 'sell':
+          const { itemsDelta, messageData } = npcService.sellItems({
+            backpackId: backpack.id,
+            heroId: hero.id,
+            npcId: npc.id,
+            items,
+          });
+          returnData.itemsDelta = itemsDelta;
+          returnData.messageData = messageData;
+          break;
       }
-
+      returnData.goldCoins = hero.goldCoins;
       return c.json<SuccessResponse<typeof returnData>>({
-        message: `You have successfully purchased the items.`,
+        message: `You have successfully ${action === 'buy' ? 'purchased' : 'sell'} the items.`,
         success: true,
         data: returnData,
       });
@@ -1227,7 +1221,7 @@ export const heroRouter = new Hono<Context>()
 
         if (!refineItem?.isCanRefine)
           throw new HTTPException(400, {
-            message: `${itemInstance.displayName ?? refineItem?.itemTemplate.name} cannot be refined`,
+            message: `${itemInstance.displayName ?? refineItem?.itemTemplate?.name} cannot be refined`,
             cause: { canShow: true },
           });
       }

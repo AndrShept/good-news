@@ -13,7 +13,6 @@ export const potionTemplate = [
     type: 'POTION',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.POTION,
-    buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
       buffTemplateId: buffTemplateMapByName['Effect of Might'].id,
@@ -27,7 +26,6 @@ export const potionTemplate = [
     type: 'POTION',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.POTION,
-    buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
       buffTemplateId: buffTemplateMapByName['Effect of Vitality'].id,
@@ -41,7 +39,6 @@ export const potionTemplate = [
     type: 'POTION',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.POTION,
-    buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
       buffTemplateId: buffTemplateMapByName['Effect of Arcane'].id,
@@ -55,7 +52,6 @@ export const potionTemplate = [
     type: 'POTION',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.POTION,
-    buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
       buffTemplateId: buffTemplateMapByName['Effect of Clarity'].id,
@@ -69,7 +65,6 @@ export const potionTemplate = [
     type: 'POTION',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.POTION,
-    buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
       buffTemplateId: buffTemplateMapByName['Effect of Agility'].id,
@@ -83,7 +78,6 @@ export const potionTemplate = [
     type: 'POTION',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.POTION,
-    buyPrice: 100,
     potionInfo: {
       type: 'BUFF',
       buffTemplateId: buffTemplateMapByName['Effect of Fortune'].id,
@@ -97,7 +91,6 @@ export const potionTemplate = [
     type: 'POTION',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.POTION,
-    buyPrice: 40,
     potionInfo: {
       type: 'RESTORE',
       restore: { health: 50 },
@@ -111,7 +104,6 @@ export const potionTemplate = [
     type: 'POTION',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.POTION,
-    buyPrice: 30,
     potionInfo: {
       type: 'RESTORE',
       restore: { mana: 70 },
@@ -125,7 +117,6 @@ export const potionTemplate = [
     type: 'POTION',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.POTION,
-    buyPrice: 55,
     potionInfo: {
       type: 'RESTORE',
       restore: { health: 35, mana: 40 },
@@ -139,7 +130,6 @@ export const potionTemplate = [
     type: 'POTION',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.POTION,
-    buyPrice: 70,
     potionInfo: {
       type: 'RESTORE',
       restore: { health: 100 },
@@ -153,7 +143,6 @@ export const potionTemplate = [
     type: 'POTION',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.POTION,
-    buyPrice: 55,
     potionInfo: {
       type: 'RESTORE',
       restore: { mana: 150 },
@@ -167,7 +156,6 @@ export const potionTemplate = [
     type: 'POTION',
     stackable: true,
     maxStack: DEFAULT_ITEM_STACK.POTION,
-    buyPrice: 85,
     potionInfo: {
       type: 'RESTORE',
       restore: { health: 70, mana: 90 },

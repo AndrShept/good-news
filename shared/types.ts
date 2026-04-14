@@ -331,9 +331,9 @@ export type NPCQuestTable = {
   npcId: string;
   questIds: string[];
 };
+export type ShopCartItem = { id: string; quantity: number; itemInstanceId?: string | undefined };
 
 export const buildingValues = [
-  'MAGIC_SHOP',
   'TEMPLE',
   'BANK',
   'BLACKSMITH',
@@ -469,7 +469,6 @@ export type ItemTemplate = {
   stackable: boolean;
   description?: string;
   maxStack?: number;
-  buyPrice?: number;
 
   equipInfo?: EquipInfo;
   resourceInfo?: ResourceInfo;
@@ -720,6 +719,7 @@ export const buyItemsSchema = z.object({
       z.object({
         id: z.string().uuid(),
         quantity: z.number().int().positive(),
+        itemInstanceId: z.string().uuid().optional(),
       }),
     )
     .refine((items) => new Set(items.map((i) => i.id)).size === items.length, { message: 'Duplicate item id' }),

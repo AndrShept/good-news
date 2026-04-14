@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import { ShopItems } from '@/features/shop/components/ShopItems';
 import { parentVariants } from '@/lib/config';
 import { NPC_SHOP_TABLE } from '@/shared/table/npc-shop-table';
 import {
@@ -47,14 +46,12 @@ export const SelectedPlaceEntitiesPage = ({ place }: Props) => {
 };
 
 const SelectPlaceBuilding = ({ selectedBuilding, place }: { selectedBuilding: Building; place: TPlace | null | undefined }) => {
-  const isMagicShop = selectedBuilding.key === 'MAGIC_SHOP';
   const isTemple = selectedBuilding.key === 'TEMPLE';
   const isBank = selectedBuilding.key === 'BANK';
   const isCraftBuilding = selectedBuilding.key ? craftBuildingValues.includes(selectedBuilding.key as CraftBuildingKey) : false;
   const isRefiningBuilding = selectedBuilding.key ? refiningBuildingValues.includes(selectedBuilding.key as RefiningBuildingKey) : false;
   return (
     <div className="mx-auto w-full max-w-2xl">
-      {isMagicShop && <ShopItems buildingType={selectedBuilding.key} />}
       {isTemple && <Temple />}
       {isBank && place && <Bank place={place} />}
       {isCraftBuilding && <CraftBuilding selectedBuilding={selectedBuilding} />}
@@ -69,13 +66,16 @@ const SelectPlaceNpc = ({ selectedNpc }: { selectedNpc: NPC }) => {
   const clearAllItems = useShopItemStore((state) => state.clearAllItems);
 
   useEffect(() => {
-    clearAllItems();
-    setNpcActiveTab(null);
-
     const idx = Math.floor(Math.random() * selectedNpc.greetings.length);
     setNpcMessage(selectedNpc.greetings[idx]);
     setNpcId(selectedNpc.id);
+    return () => {
+      setNpcActiveTab(null);
+    };
   }, [selectedNpc.id]);
+  useEffect(() => {
+    clearAllItems();
+  }, [clearAllItems, npcActiveTab]);
 
   return (
     <m.section variants={parentVariants} initial="hidden" animate="visible" className="mx-auto flex w-full max-w-2xl flex-col gap-1">

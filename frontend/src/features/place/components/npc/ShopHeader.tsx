@@ -21,7 +21,8 @@ export const ShopHeader = () => {
       <Button onClick={() => setNpcActiveTab(null)}> {'< back'}</Button>
       <div className="flex items-center text-xl">
         <GameIcon className="size-6" image={imageConfig.icon.ui.gold} />
-        <p className={cn(gold < totalPrice && 'text-red-500')}>{totalPrice}</p>
+        {npcActiveTab === 'BUY' && <p className={cn(gold < totalPrice && 'text-red-500')}>{totalPrice}</p>}
+        {npcActiveTab === 'SELL' && <p className={cn('text-emerald-400')}>{totalPrice}</p>}
       </div>
 
       <div className="flex gap-0.5">

@@ -121,7 +121,6 @@ export const imageConfig = {
       sawmill: '/sprites/icons/buildings/sawmill.png',
       loom: '/sprites/icons/buildings/loom.png',
 
-      'magic-shop': '/sprites/icons/buildings/magic-shop.png',
       temple: '/sprites/icons/buildings/temple.png',
     },
     entrance: {

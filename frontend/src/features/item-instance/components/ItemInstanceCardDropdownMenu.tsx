@@ -16,6 +16,7 @@ import { SplitItemInstanceQuantityPopover } from './SplitItemInstanceQuantityPop
 
 interface Props extends ItemInstance {
   itemTemplate: ItemTemplate;
+  onClose: () => void;
 }
 const buttonIconVariants: Record<Exclude<ItemTemplateType, 'MISC' | 'RESOURCES' | 'FOOD'>, ReactElement> = {
   WEAPON: <GameIcon className="size-5.5" image={imageConfig.icon.action.equip} />,
@@ -30,7 +31,7 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
   const itemConsumeMutation = useItemConsumeMutation();
   const itemEquipMutation = useItemEquipMutation();
   const sellItems = useShopItemStore((state) => state.items);
-  const isSellItem = sellItems.some((i) => i.instanceId === props.id);
+  const isSellItem = sellItems.some((i) => i.itemInstanceId === props.id);
   const isDisabled = itemConsumeMutation.isPending || itemEquipMutation.isPending || isSellItem;
   const setItemInstance = useSelectItemInstanceStore((state) => state.setItemInstance);
 
@@ -65,9 +66,10 @@ export const ItemInstanceCardDropdownMenu = ({ ...props }: Props) => {
       name: props.itemTemplate.name,
       price: item.price,
       quantity: props.quantity,
-      instanceId: props.id,
+      itemInstanceId: props.id,
       maxQuantity: props.quantity,
     });
+    props.onClose();
   };
   return (
     <>

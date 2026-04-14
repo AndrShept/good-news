@@ -45,25 +45,25 @@ export const NpcBuy = ({ sellItems, npc }: Props) => {
 
         <ul className="flex flex-1 flex-col gap-1">
           {sellItems?.map((i) => {
-            const item = itemsTemplateById[i.itemTemplateId];
+            const template = itemsTemplateById[i.itemTemplateId];
 
             return (
               <li
-                onClick={() => addShopItem({ id: item.id, name: item.name, image: item.image, quantity: 1, price: i.price })}
-                key={item.id}
+                onClick={() => addShopItem({ id: template.id, name: template.name, image: template.image, quantity: 1, price: i.price })}
+                key={template.id}
                 className={cn(
-                  'hover:border-border relative flex select-none items-center gap-1 rounded border border-transparent px-2 py-1 shadow-2xl hover:cursor-default',
+                  'relative flex select-none items-center gap-1 rounded-md border border-transparent px-1.5 py-0.5 shadow-2xl hover:cursor-default hover:bg-emerald-500/10',
                   {
-                    'border-orange-300/10': !!itemsMap[item.id],
+                    'border-emerald-500/10': !!itemsMap[template.id],
                   },
                 )}
               >
-                <GameItemImg tintColor={TINT_COLOR[item.key as ColoredResourceType]} className="size-10" image={item.image} />
+                <GameItemImg tintColor={TINT_COLOR[template.key as ColoredResourceType]} className="size-10" image={template.image} />
                 <div className="flex flex-col gap-0.5 truncate text-sm capitalize">
-                  <span className="truncate">{item.name}</span>
+                  <span className="truncate">{template.name}</span>
                   <div className="flex items-center gap-0.5">
                     <GameIcon className="size-5" image={imageConfig.icon.ui.gold} />
-                    <span>{item.buyPrice}</span>
+                    <span>{i.price}</span>
                   </div>
                 </div>
               </li>

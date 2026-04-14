@@ -6,17 +6,16 @@ interface ShopItemCard {
   image: string;
   price: number;
   quantity: number;
-  instanceId?: string;
+  itemInstanceId?: string;
   maxQuantity?: number;
 }
 
 interface UseShopItemStore {
   items: ShopItemCard[];
-  isOpen: boolean;
+
   getTotalPrice: () => number;
   getTotalQuantity: () => number;
-  toggleIsOpen: () => void;
-  onClose: () => void;
+
   clearAllItems: () => void;
   addShopItem: (newItem: ShopItemCard) => void;
   removeShopItemByInstanceId: (instanceId: string) => void;
@@ -26,16 +25,15 @@ interface UseShopItemStore {
 
 export const useShopItemStore = create<UseShopItemStore>((set, get) => ({
   items: [],
-  isOpen: false,
+
   totalPrice: 0,
   totalQuantity: 0,
-  onClose: () => set({ isOpen: false }),
-  toggleIsOpen: () => set((state) => ({ isOpen: !state.isOpen })),
+
   clearAllItems: () => set(() => ({ items: [] })),
   addShopItem: (newItem) =>
     set((state) => {
-      if (newItem.instanceId) {
-        const exists = state.items.some((i) => i.instanceId === newItem.instanceId);
+      if (newItem.itemInstanceId) {
+        const exists = state.items.some((i) => i.itemInstanceId === newItem.itemInstanceId);
         if (exists) return { items: state.items };
         return { items: [...state.items, newItem] };
       }
@@ -46,11 +44,12 @@ export const useShopItemStore = create<UseShopItemStore>((set, get) => ({
       }
       return { items: [...state.items, newItem] };
     }),
-  removeShopItemByInstanceId: (instanceId: string) => set((state) => ({ items: state.items.filter((i) => i.instanceId !== instanceId) })),
+  removeShopItemByInstanceId: (instanceId: string) =>
+    set((state) => ({ items: state.items.filter((i) => i.itemInstanceId !== instanceId) })),
   increment: (id: string) =>
     set((state) => ({
       items: state.items.map((i) => {
-        if (i.id === id && !i.instanceId) {
+        if (i.id === id && !i.itemInstanceId) {
           return { ...i, quantity: i.quantity + 1 };
         }
         return i;

@@ -29,10 +29,10 @@ export const ShopItemCart = ({ mode }: Props) => {
             className={cn('flex items-center justify-between gap-1', {
               'cursor-pointer rounded-md px-2 py-1 hover:bg-rose-500/10': mode === 'SELL',
             })}
-            key={item.instanceId ?? item.id}
+            key={item.itemInstanceId ?? item.id}
             onClick={() => {
-              if (!item.instanceId) return;
-              removeShopItemByInstanceId(item.instanceId);
+              if (!item.itemInstanceId) return;
+              removeShopItemByInstanceId(item.itemInstanceId);
             }}
           >
             <div className="flex items-center truncate">

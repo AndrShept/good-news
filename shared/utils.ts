@@ -221,22 +221,17 @@ type ItemRefineableForBuilding = {
 export const itemRefineableForBuilding = ({ coreResource, itemTemplateId, refiningBuildingKey }: ItemRefineableForBuilding) => {
   const itemTemplate = itemTemplateService.getTemplateByItemTemplateId(itemTemplateId);
 
-  switch (itemTemplate.type) {
-    case 'RESOURCES':
-      return { isCanRefine: refineItems[refiningBuildingKey].RESOURCES.includes(itemTemplate.key), itemTemplate };
-    case 'WEAPON': {
-      if (coreResource) {
-        return { isCanRefine: refineItems[refiningBuildingKey].WEAPON.includes(coreResource), itemTemplate };
-      }
-      break;
-    }
-    case 'ARMOR': {
-      if (coreResource) {
-        return { isCanRefine: refineItems[refiningBuildingKey].ARMOR.includes(coreResource), itemTemplate };
-      }
-      break;
-    }
-    default:
-      return { isCanRefine: false };
+  if (itemTemplate.type === 'RESOURCES') {
+    return { isCanRefine: refineItems[refiningBuildingKey].RESOURCES.includes(itemTemplate.key), itemTemplate };
   }
+
+  if (itemTemplate.type === 'WEAPON' && coreResource) {
+    return { isCanRefine: refineItems[refiningBuildingKey].WEAPON.includes(coreResource), itemTemplate };
+  }
+
+  if (itemTemplate.type === 'ARMOR' && coreResource) {
+    return { isCanRefine: refineItems[refiningBuildingKey].ARMOR.includes(coreResource), itemTemplate };
+  }
+
+  return { isCanRefine: false };
 };

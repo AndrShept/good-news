@@ -2,12 +2,7 @@ import { imageConfig } from '@/shared/config/image-config';
 import type { Building, BuildingKey } from '@/shared/types';
 
 export const buildingTemplate = [
-  {
-    id: '0198c15a-149a-7cb5-bbf2-bf8ddd2c9f98',
-    name: 'Magic Shop',
-    key: 'MAGIC_SHOP',
-    image: imageConfig.icon.building['magic-shop'],
-  },
+
   {
     id: '0198c1b2-a9ac-7005-bd8b-ab6014b86374',
     name: 'Temple',
