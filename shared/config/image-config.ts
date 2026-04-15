@@ -247,6 +247,7 @@ export const imageConfig = {
     brom: '/sprites/npc/brom.png',
     lyra: '/sprites/npc/lyra.png',
     maria: '/sprites/npc/maria.png',
+    deus: '/sprites/npc/deus.png',
   },
   equipments: {
     tools: {

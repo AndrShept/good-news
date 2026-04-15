@@ -20,7 +20,7 @@ export const GameItemImg = memo(({ image, tintColor, isPixelate = true, classNam
     <img
       {...props}
       src={image}
-      alt={image?.split('/').at(-1)}
+      alt={image}
       style={{
         imageRendering: isPixelate ? 'pixelated' : undefined,
         filter: tintColor

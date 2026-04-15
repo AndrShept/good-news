@@ -1,7 +1,7 @@
-import { NPCType, NpcTabType } from '@/shared/types';
+import { NPCTabType, NPCType } from '@/shared/types';
 import { create } from 'zustand';
 
-export const NPC_EMPTY_MESSAGES: Record<NPCType, Record<NpcTabType, string>> = {
+export const NPC_EMPTY_MESSAGES: Record<NPCType, Record<NPCTabType, string>> = {
   ALCHEMIST: {
     BUY: "My shelves are bare for now. Come back when I've restocked.",
     SELL: "I have no use for what you're carrying. Bring me herbs, mushrooms or flowers.",
@@ -27,16 +27,21 @@ export const NPC_EMPTY_MESSAGES: Record<NPCType, Record<NpcTabType, string>> = {
     SELL: "I don't need what you have. Bring me something I can work with.",
     QUEST: 'Nothing broken, nothing needed. Come back when that changes.',
   },
+  GM_TRADER: {
+    BUY: 'Sold out — good tools go fast. Check back tomorrow.',
+    SELL: "I don't need what you have. Bring me something I can work with.",
+    QUEST: 'Nothing broken, nothing needed. Come back when that changes.',
+  },
 };
 
 interface UseNpcStore {
   npcId: string;
   setNpcId: (id: string) => void;
-  npcActiveTab: NpcTabType | null;
-  setNpcActiveTab: (type: NpcTabType | null) => void;
+  npcActiveTab: NPCTabType | null;
+  setNpcActiveTab: (type: NPCTabType | null) => void;
   message: string;
   setNpcMessage: (msg: string) => void;
-  getEmptyMessage: (data: { npcType: NPCType; npcTab: NpcTabType }) => void;
+  getEmptyMessage: (data: { npcType: NPCType; npcTab: NPCTabType }) => void;
 }
 
 export const useNpcStore = create<UseNpcStore>((set) => ({

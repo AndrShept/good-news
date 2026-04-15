@@ -51,6 +51,13 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
     setIsOpen(false);
     props.setSelectItemOnContainer(null);
   }, []);
+  const onOpenChange = useCallback(
+    (open: boolean) => {
+      setIsOpen(open);
+      props.setSelectItemOnContainer(open ? props : null);
+    },
+    [],
+  );
   useDndMonitor({
     onDragStart() {
       onClose();
@@ -72,13 +79,7 @@ export const ItemInstanceCard = memo(function GameItemCard(props: Props) {
         style={style}
         className="size-full select-none"
       >
-        <Popover
-          open={isOpen}
-          onOpenChange={(open) => {
-            setIsOpen(open);
-            props.setSelectItemOnContainer(open ? props : null);
-          }}
-        >
+        <Popover open={isOpen} onOpenChange={onOpenChange}>
           <CustomTooltip>
             <PopoverTrigger className="size-full">
               <CustomTooltip.Trigger>

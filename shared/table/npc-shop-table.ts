@@ -1,3 +1,4 @@
+import { itemTemplateService } from '../../server/services/item-template-service';
 import { potionTemplateByKey } from '../templates/potion-template';
 import { resourceTemplateByKey } from '../templates/resource-template';
 import { toolTemplateByKey } from '../templates/tool-template';
@@ -26,6 +27,11 @@ export const NPC_SHOP_TABLE: Record<string, NPCShopTable> = {
       { itemTemplateId: toolTemplateByKey['Lumber-Axe'].id, price: 100 },
       { itemTemplateId: toolTemplateByKey.Fishing_Rod.id, price: 80 },
     ],
+    buys: [],
+  },
+  '019d9038-a421-77a1-884c-34a3b7f29cb9': {
+    // Deus Freemore
+    sells: itemTemplateService.getAllItemsTemplate().map((i) => ({ itemTemplateId: i.id, price: 1 })),
     buys: [],
   },
 };

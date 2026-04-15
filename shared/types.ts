@@ -297,16 +297,15 @@ export interface QueueCraft {
   status: (typeof queueCraftStatusEnum.enumValues)[number];
 }
 
-export const npcValues = ['ALCHEMIST', 'BLACKSMITH', 'TINKER', 'INSCRIBER', 'COOK'] as const;
+export const npcTypeValues = ['ALCHEMIST', 'BLACKSMITH', 'TINKER', 'INSCRIBER', 'COOK', 'GM_TRADER'] as const;
 export const npcTabValues = ['BUY', 'SELL', 'QUEST'] as const;
-export type NpcTabType = (typeof npcTabValues)[number];
-export type NPCType = (typeof npcValues)[number];
+export type NPCTabType = (typeof npcTabValues)[number];
+export type NPCType = (typeof npcTypeValues)[number];
 
 export type NPC = {
   id: string;
   image: string;
   name: string;
-  key: string;
   type: NPCType;
   greetings: string[];
 };

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-interface ShopItemCard {
+export interface ShopItemCard {
   id: string;
   name: string;
   image: string;

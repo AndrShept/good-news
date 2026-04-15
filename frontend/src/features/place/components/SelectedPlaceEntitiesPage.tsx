@@ -15,7 +15,7 @@ import { useNpcStore } from '@/store/useNpcStore';
 import { useSelectPlaceEntitiesStore } from '@/store/useSelectBuildingStore';
 import { useShopItemStore } from '@/store/useShopItemStore';
 import * as m from 'motion/react-m';
-import { useEffect } from 'react';
+import { startTransition, useEffect } from 'react';
 
 import { Bank } from './buildings/Bank';
 import { CraftBuilding } from './buildings/CraftBuilding';
@@ -64,7 +64,6 @@ const SelectPlaceNpc = ({ selectedNpc }: { selectedNpc: NPC }) => {
   const shop = NPC_SHOP_TABLE[selectedNpc.id];
   const { npcActiveTab, setNpcActiveTab, setNpcMessage, setNpcId } = useNpcStore();
   const clearAllItems = useShopItemStore((state) => state.clearAllItems);
-
   useEffect(() => {
     const idx = Math.floor(Math.random() * selectedNpc.greetings.length);
     setNpcMessage(selectedNpc.greetings[idx]);
@@ -87,13 +86,18 @@ const SelectPlaceNpc = ({ selectedNpc }: { selectedNpc: NPC }) => {
 
       {!npcActiveTab && (
         <div>
-          <NpcGreeting image={selectedNpc.image} name={selectedNpc.name} />
+          <NpcGreeting type={selectedNpc.type} image={selectedNpc.image} name={selectedNpc.name} />
           <ul className="ml-10 mt-5 flex w-fit flex-col gap-1">
             {npcTabValues.map((v, idx) => (
               <li key={v} className="flex items-center">
                 <span>{idx + 1}.</span>
                 <Button
-                  onClick={() => setNpcActiveTab(v)}
+                  onClick={() => {
+                    startTransition(() => setNpcActiveTab(v));
+                  }}
+                  // onClick={() => {
+                  //   setNpcActiveTab(v);
+                  // }}
                   variant="link"
                   className="text-muted-foreground hover:text-foreground justify-start text-xl capitalize"
                 >

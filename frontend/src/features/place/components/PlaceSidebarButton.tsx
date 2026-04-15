@@ -1,14 +1,14 @@
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { VariantProps } from 'class-variance-authority';
-import React, { ComponentProps, ReactNode } from 'react';
+import React, { ComponentProps, ReactNode, memo } from 'react';
 
 interface Props extends ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   children: ReactNode;
   matches: boolean;
 }
 
-export const PlaceSidebarButton = ({ className, matches, children, variant, size, ...props }: Props) => {
+export const PlaceSidebarButton = memo(function PlaceSidebarButton({ className, matches, children, variant, size, ...props }: Props) {
   return (
     <Button
       {...props}
@@ -22,4 +22,4 @@ export const PlaceSidebarButton = ({ className, matches, children, variant, size
       {children}
     </Button>
   );
-};
+});
