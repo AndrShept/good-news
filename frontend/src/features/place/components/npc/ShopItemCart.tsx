@@ -1,8 +1,10 @@
+import { GameIcon } from '@/components/GameIcon';
 import { GameItemImg } from '@/components/GameItemImg';
 import { Button } from '@/components/ui/button';
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { TINT_COLOR } from '@/lib/config';
 import { cn } from '@/lib/utils';
+import { imageConfig } from '@/shared/config/image-config';
 import { ColoredResourceType } from '@/shared/types';
 import { useShopItemStore } from '@/store/useShopItemStore';
 import { AnimatePresence } from 'motion/react';
@@ -42,12 +44,10 @@ export const ShopItemCart = ({ mode }: Props) => {
                   className="size-8"
                   image={item.image}
                 />
-                <span className="truncate">{item.name}</span>
+                <span className="truncate text-sm">{item.name}</span>
               </div>
             </div>
             <div className="flex gap-0.5">
-              <span className="text-muted-foreground md:ml-auto">{item.quantity * item.price}</span>
-
               {mode === 'BUY' && (
                 <>
                   {' '}
@@ -60,7 +60,9 @@ export const ShopItemCart = ({ mode }: Props) => {
                   </Button>
                 </>
               )}
-              {mode === 'SELL' && <span className="ml-1 text-yellow-300">x{item.quantity}</span>}
+              {mode === 'SELL' && <span className="ml-1 text-yellow-300 text-sm mr-0.5 leading-6">x{item.quantity}</span>}
+              <span className="md:ml-auto">{item.quantity * item.price}</span>
+              <GameIcon className="size-6" image={imageConfig.icon.ui.gold} />
             </div>
           </m.li>
         ))}

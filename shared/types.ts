@@ -257,14 +257,13 @@ export type TMap = {
 
 export type TPlace = {
   id: string;
-  // type: PlaceType;
   name: string;
   image: string;
   x: number;
   y: number;
   mapId: string;
-  buildings: Building[];
-  npcs: NPC[];
+  buildingIds: string[];
+  npcIds: string[];
   entrances: Entrance[];
   itemContainers: { id: string; name: string; color: string | null; type: ItemContainerType }[];
 };
@@ -721,5 +720,5 @@ export const buyItemsSchema = z.object({
         itemInstanceId: z.string().uuid().optional(),
       }),
     )
-    .refine((items) => new Set(items.map((i) => i.id)).size === items.length, { message: 'Duplicate item id' }),
+    // .refine((items) => new Set(items.map((i) => i.id)).size === items.length, { message: 'Duplicate item id' }),
 });

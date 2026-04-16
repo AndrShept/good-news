@@ -1,3 +1,4 @@
+import { buildingTemplateById } from '@/shared/templates/building-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import type { ItemInstance, ItemLocationType, ItemsInstanceDeltaEvent } from '@/shared/types';
 import { and, eq } from 'drizzle-orm';
@@ -55,8 +56,8 @@ export const itemContainerService = {
     if (!place) {
       throw new HTTPException(400, { message: 'place not found' });
     }
-
-    for (const building of place.buildings) {
+    const buildings = place.buildingIds.map((id) => buildingTemplateById[id]);
+    for (const building of buildings) {
       switch (building.key) {
         case 'BANK': {
           const container =
@@ -292,7 +293,6 @@ export const itemContainerService = {
 
     // 🧪 USE MODE — тільки один стек
     if (mode === 'use') {
-
       if (itemInstance.quantity < quantity) {
         throw new Error('Not enough items in this stack');
       }

@@ -413,7 +413,7 @@ export const heroRouter = new Hono<Context>()
       const place = placeTemplate.find((p) => p.id === hero.location.placeId);
       if (!place) throw new HTTPException(409, { message: 'Hero not a place' });
       const npc = npcService.getNpc(npcId);
-      const npcExistInPlace = place.npcs.some((n) => n.id === npc.id);
+      const npcExistInPlace = (place.npcIds as string[]).includes(npc.id)
       if (!npcExistInPlace) throw new HTTPException(409, { message: 'npc  not a place' });
       let returnData = {
         goldCoins: 0,

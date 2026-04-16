@@ -12,7 +12,7 @@ import {
   refiningBuildingValues,
 } from '@/shared/types';
 import { useNpcStore } from '@/store/useNpcStore';
-import { useSelectPlaceEntitiesStore } from '@/store/useSelectBuildingStore';
+import { useSelectPlaceEntitiesStore } from '@/store/useSelectPlaceEntitiesStore';
 import { useShopItemStore } from '@/store/useShopItemStore';
 import * as m from 'motion/react-m';
 import { startTransition, useEffect } from 'react';

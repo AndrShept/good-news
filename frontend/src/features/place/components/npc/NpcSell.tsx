@@ -31,16 +31,18 @@ export const NpcSell = ({ npc, buyItems }: Props) => {
   if (!newBackpack) return null;
   return (
     <section className="flex h-full gap-1">
-      <div className="flex min-w-[170px] flex-col gap-1.5 border-r px-2">
+      <div className="flex flex-1 flex-col gap-1.5 border-r px-2">
         <ShopAvatar image={npc.image} name={npc.name} />
 
         <ShopItemCart mode="SELL" />
       </div>
-      {newBackpack.itemsInstance?.length ? (
-        <ItemContainer {...newBackpack} capacity={newBackpack.itemsInstance.length} isShowContainerHeader={false} />
-      ) : (
-        <p className="text-muted-foreground text-center">nothing to sell</p>
-      )}
+      <div className="flex-1">
+        {newBackpack.itemsInstance?.length ? (
+          <ItemContainer {...newBackpack} capacity={newBackpack.itemsInstance.length} isShowContainerHeader={false} />
+        ) : (
+          <p className="text-muted-foreground text-center">nothing to sell</p>
+        )}
+      </div>
     </section>
   );
 };

@@ -1,5 +1,6 @@
 import { MAX_SKILL } from '@/shared/constants';
 import { socketEvents } from '@/shared/socket-events';
+import { buildingTemplateById } from '@/shared/templates/building-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
 import { resourceTemplateById } from '@/shared/templates/resource-template';
@@ -53,8 +54,8 @@ export const queueCraftService = {
     const place = placeTemplate.find((p) => p.id === hero.location.placeId);
 
     heroService.checkFreeBackpackCapacity(hero.id);
-
-    const validateRequiredBuilding = place?.buildings?.some((b) => b.key === recipe.requirement.buildingCraftLocation);
+    const buildings = place?.buildingIds.map((id) => buildingTemplateById[id]);
+    const validateRequiredBuilding = buildings?.some((b) => b.key === recipe.requirement.buildingCraftLocation);
 
     if (!validateRequiredBuilding) {
       throw new HTTPException(400, {

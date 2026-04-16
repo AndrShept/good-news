@@ -11,11 +11,11 @@ export const placeTemplate = [
     image: imageConfig.icon.place.solmer,
     x: 7,
     y: 7,
-    buildings: [...buildingTemplate],
     mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
-    npcs: [...npcTemplate],
+    buildingIds: buildingTemplate.map((b) => b.id),
+    npcIds: npcTemplate.map((npc) => npc.id),
     entrances: [],
-    itemContainers: []
+    itemContainers: [],
   },
   {
     id: '0199df1f-88e5-747c-b54b-afe86110b246',
@@ -24,8 +24,8 @@ export const placeTemplate = [
     x: 10,
     y: 10,
     mapId: '019a350c-5552-76dd-b6d5-181b473d3128',
-    buildings: [buildingTemplateByKey['FORGE'], buildingTemplateByKey['BANK']],
-    npcs: [],
+    buildingIds: [buildingTemplateByKey['FORGE'].id, buildingTemplateByKey['BANK'].id],
+    npcIds: [],
     entrances: [
       {
         id: '019c444d-e6e3-75ee-a4ba-81affd7689ab',
@@ -39,7 +39,7 @@ export const placeTemplate = [
         image: imageConfig.icon.entrance.mine,
       },
     ],
-    itemContainers: []
+    itemContainers: [],
   },
 ] as const satisfies TPlace[];
 

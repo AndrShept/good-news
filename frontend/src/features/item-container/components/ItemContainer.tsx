@@ -5,7 +5,7 @@ import { ItemInstanceCard } from '@/features/item-instance/components/ItemInstan
 import { cn } from '@/lib/utils';
 import { RefiningBuildingKey, TItemContainer, refiningBuildingValues } from '@/shared/types';
 import { itemRefineableForBuilding } from '@/shared/utils';
-import { useSelectPlaceEntitiesStore } from '@/store/useSelectBuildingStore';
+import { useSelectPlaceEntitiesStore } from '@/store/useSelectPlaceEntitiesStore';
 import { useSelectedItemId, useSetSelectedItem } from '@/store/useSelectItemInstanceStore';
 import { useShopItemStore } from '@/store/useShopItemStore';
 import { useDroppable } from '@dnd-kit/core';

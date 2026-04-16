@@ -19,7 +19,6 @@ export const buildingTemplate = [
     id: '019aa81a-8a32-73df-800a-fcc28ef44821',
     name: 'Blacksmith',
     key: 'BLACKSMITH',
-    // workingResourceCategory: 'INGOT',
     image: imageConfig.icon.building.blacksmith,
   },
 
@@ -64,7 +63,6 @@ export const buildingTemplate = [
     id: '019aa81b-95fa-773d-a54a-f1b57745444a',
     name: 'Forge',
     key: 'FORGE',
-    // workingResourceCategory: 'ORE',
     image: imageConfig.icon.building.forge,
   },
 ] as const satisfies Building[];
