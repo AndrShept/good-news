@@ -1,10 +1,10 @@
-import { HeroAvatar } from '@/components/HeroAvatar';
 import { Button } from '@/components/ui/button';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { PlusIcon } from 'lucide-react';
 
 import { useKickMemberMutation } from '../hooks/useKickMemberMutation';
 import { useLeaveMemberMutation } from '../hooks/useLeaveMemberMutation';
+import { GameAvatar } from '@/components/GameAvatar';
 
 interface Props {
   leaderId: string | undefined;
@@ -24,7 +24,7 @@ export const GroupMemberCard = ({ avatarImage, leaderId, id, groupId }: Props) =
     <article className="flex flex-col items-center gap-1">
       {id && (
         <article>
-          <HeroAvatar src={avatarImage ?? ''} />
+          <GameAvatar src={avatarImage ?? ''} />
         </article>
       )}
       {!id && (

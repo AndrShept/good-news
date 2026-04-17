@@ -413,7 +413,7 @@ export const heroRouter = new Hono<Context>()
       const place = placeTemplate.find((p) => p.id === hero.location.placeId);
       if (!place) throw new HTTPException(409, { message: 'Hero not a place' });
       const npc = npcService.getNpc(npcId);
-      const npcExistInPlace = (place.npcIds as string[]).includes(npc.id)
+      const npcExistInPlace = (place.npcIds as string[]).includes(npc.id);
       if (!npcExistInPlace) throw new HTTPException(409, { message: 'npc  not a place' });
       let returnData = {
         goldCoins: 0,
@@ -984,7 +984,7 @@ export const heroRouter = new Hono<Context>()
 
         mapService.despawnMapEntitiesInChunk({ entityId: hero.id, type: 'HERO', mapId: place.mapId, x: place.x, y: place.y });
         socketService.sendPlaceAddHero(hero.id, place.id);
-        socketService.sendToClientSysMessage(hero.id, { type: 'SUCCESS', text: `You have entered ${place.name}.` });
+        socketService.sendToClientSysMessage(hero.id, { color: 'GREY', text: `You have entered ${place.name}.` });
       }
 
       if (entranceId) {
@@ -1038,7 +1038,7 @@ export const heroRouter = new Hono<Context>()
             hero.location.y = entrance.targetY ?? 0;
             // socketService.sendMapRemoveHero(hero.id, map.id);
             socketService.sendPlaceAddHero(hero.id, entrance.targetPlaceId);
-            socketService.sendToClientSysMessage(hero.id, { type: 'SUCCESS', text: `You have entered ${place.name}.` });
+            socketService.sendToClientSysMessage(hero.id, { color: 'GREY', text: `You have entered ${place.name}.` });
           }
           if (entrance.targetMapId) {
             hero.location.mapId = entrance.targetMapId;

@@ -33,7 +33,7 @@ export const ShopAcceptButton = ({ items, iconImage, btnText }: Props) => {
       clearAllItems();
       setGameMessage({
         text: message,
-        type: 'WARNING',
+        color: 'YELLOW',
         data: data?.messageData,
       });
     },

@@ -8,7 +8,7 @@ import { memo, useEffect } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 
 import { useLeavePlace } from '../hooks/useLeavePlace';
-import { PlaceSidebarButton2 } from './PlaceSidebarButton2';
+import { PlaceSidebarButton } from './PlaceSidebarButton';
 
 interface Props {
   place: TPlace | undefined;
@@ -50,7 +50,7 @@ export const PlaceSidebar = memo(({ place, entrances }: Props) => {
     <aside className="top-18 sticky h-[calc(100vh-330px)] max-w-[200px] rounded p-1.5">
       <ScrollArea className="h-full">
         <ul className="flex flex-col gap-1">
-          <PlaceSidebarButton2
+          <PlaceSidebarButton
             isActive={!selectedPlaceEntities}
             isMobile={isMobile}
             disabled={isButtonDisabled}
@@ -60,7 +60,7 @@ export const PlaceSidebar = memo(({ place, entrances }: Props) => {
           />
           {place?.buildingIds.map((buildingId) => {
             return (
-              <PlaceSidebarButton2
+              <PlaceSidebarButton
                 key={buildingId}
                 isActive={buildingId === selectedPlaceEntities?.payload.id}
                 isMobile={isMobile}
@@ -72,7 +72,7 @@ export const PlaceSidebar = memo(({ place, entrances }: Props) => {
           })}
           {place?.npcIds.map((npcId) => {
             return (
-              <PlaceSidebarButton2
+              <PlaceSidebarButton
                 key={npcId}
                 isActive={npcId === selectedPlaceEntities?.payload.id}
                 isMobile={isMobile}
@@ -83,7 +83,7 @@ export const PlaceSidebar = memo(({ place, entrances }: Props) => {
             );
           })}
 
-          <PlaceSidebarButton2
+          <PlaceSidebarButton
             isActive={false}
             isMobile={isMobile}
             disabled={isButtonDisabled}

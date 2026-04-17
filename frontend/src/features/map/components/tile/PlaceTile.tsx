@@ -1,18 +1,14 @@
-import { Entrance } from '@/shared/types';
+import { TPlace } from '@/shared/types';
 import { memo } from 'react';
 
-import { TileImg } from './TileImg';
 
-interface Props {
+interface Props extends TPlace {
   TILE_SIZE: number;
-  x: number;
-  y: number;
-  image: string;
   offsetX: number;
   offsetY: number;
 }
 
-export const EntranceTile = memo(function HeroTile({ x, y, image, TILE_SIZE, offsetX, offsetY }: Props) {
+export const PlaceTile = memo(({ TILE_SIZE, image, x, y, offsetX, offsetY }: Props) => {
   const localX = x - offsetX;
   const localY = y - offsetY;
   return (

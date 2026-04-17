@@ -18,30 +18,24 @@ const avatarVariants = cva('relative rounded-full border', {
   },
 });
 
-interface HeroAvatarProps extends VariantProps<typeof avatarVariants>, ComponentProps<'article'> {
+interface Props extends VariantProps<typeof avatarVariants>, ComponentProps<'div'> {
   src: string;
   isSelected?: boolean;
   setAvatar?: (imgae: string) => void;
 }
 
-export const HeroAvatar = memo(({ src, isSelected = false, setAvatar, className, size, ...props }: HeroAvatarProps) => {
+export const GameAvatar = memo(({ src, isSelected = false, setAvatar, className, size, ...props }: Props) => {
   return (
-    <article
+    <div
+      draggable={false}
       onClick={() => setAvatar?.(src)}
-      className={cn('shrink-0 select-none', avatarVariants({ className, size }), {
+      className={cn('size-full shrink-0 select-none rounded-full object-cover', avatarVariants({ className, size }), {
         'border-primary opacity-100 ring-1 hover:opacity-100': isSelected,
       })}
-    >
-      <img
-        draggable={false}
-        className={cn(
-          'size-full rounded-full object-cover',
-
-          {},
-        )}
-        src={src}
-        alt="avatar-image"
-      />
-    </article>
+      style={{
+        backgroundImage: `url(${src})`,
+        backgroundSize: 'cover',
+      }}
+    />
   );
 });

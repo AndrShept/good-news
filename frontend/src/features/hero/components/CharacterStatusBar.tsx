@@ -1,5 +1,5 @@
-import { HeroAvatar } from '@/components/HeroAvatar';
-import { memo, useEffect } from 'react';
+import { GameAvatar } from '@/components/GameAvatar';
+import { memo } from 'react';
 
 import { BuffList } from './BuffList';
 import { FillBar } from './FillBar';
@@ -19,7 +19,7 @@ export const CharacterStatusBar = memo((props: Props) => {
   return (
     <div className="flex w-full items-center gap-2">
       <div>
-        <HeroAvatar src={props.avatarImage} />
+        <GameAvatar src={props.avatarImage} />
       </div>
       <div className="flex w-full flex-col gap-0.5">
         <div>

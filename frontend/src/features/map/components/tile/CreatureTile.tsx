@@ -19,7 +19,6 @@ export const CreatureTile = memo(function CreatureTile({ x, y, image, creatureCo
         position: 'absolute',
         width: TILE_SIZE,
         height: TILE_SIZE,
-        willChange: 'transform',
         transform: `translate(${localX * TILE_SIZE}px, ${localY * TILE_SIZE}px)`,
         backgroundSize: 'cover',
         backgroundImage: `url(${image})`,

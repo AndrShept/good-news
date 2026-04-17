@@ -34,7 +34,7 @@ export const Canvas = ({ grounds, MAP_WIDTH, TILE_SIZE, tileImage, ...props }: P
         ctx.drawImage(img, sx, sy, TILE_SIZE, TILE_SIZE, dx, dy, TILE_SIZE, TILE_SIZE);
       });
     };
-  }, [grounds, MAP_WIDTH, TILE_SIZE, tileImage]);
+  }, [grounds]);
 
   return <canvas ref={ref} {...props}></canvas>;
 };

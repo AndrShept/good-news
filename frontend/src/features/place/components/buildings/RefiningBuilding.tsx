@@ -6,13 +6,13 @@ import { getItemContainerOptions } from '@/features/item-container/api/get-item-
 import { ItemContainer } from '@/features/item-container/components/ItemContainer';
 import { ItemContainerSkeleton } from '@/features/item-container/components/ItemContainerSkeleton';
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
-import { ActionTimerPanel } from '@/features/map/components/ActionTimerPanel';
 import { imageConfig } from '@/shared/config/image-config';
 import { Building, RefiningBuildingKey, TPlace } from '@/shared/types';
 import { useQuery } from '@tanstack/react-query';
 
 import { useCancelRefiningMutation } from '../../hooks/useCancelRefiningMutation';
 import { useStartRefineMutation } from '../../hooks/useStartRefineMutation';
+import { ActionTimerPanel } from '@/components/ActionTimerPanel';
 
 interface Props {
   selectedBuilding: Building;
@@ -47,7 +47,7 @@ export const RefiningBuilding = ({ selectedBuilding, place }: Props) => {
       </div>
 
       {!!state && state !== 'IDLE' && !!refiningFinishAt && (
-        <ActionTimerPanel
+        <ActionTimerPanel 
           heroState={state}
           actionFinishAt={refiningFinishAt}
           cancelActionMutation={cancelRefiningMutation.mutate}

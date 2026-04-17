@@ -31,44 +31,51 @@ export const GameMessage = memo(() => {
     <section className="bg-background/80 backdrop-blur-xs h-[250px]">
       <ScrollArea className="h-full p-1">
         <ul ref={ref} className="flex flex-col pl-2 pt-1">
-          {gameMessages.map((message, idx) => (
-            <div
-              key={(message.createdAt?.toString() ?? '') + idx}
-              className={cn('inline-flex flex-wrap gap-1 text-sm text-green-400', {
-                'text-red-400': message.type === 'ERROR',
-                'text-green-400': message.type === 'SUCCESS',
-                'text-muted-foreground': message.type === 'INFO',
-                'text-yellow-300': message.type === 'WARNING',
-                'text-blue-400': message.type === 'SKILL_EXP',
-                'text-purple-500': message.type === 'LEVEL_EXP',
-              })}
-            >
-              <div className="space-x-1">
+          {gameMessages.map((message, idx) => {
+            const splitWords = message.text.split(' ');
+            return (
+              <div
+                key={(message.createdAt?.toString() ?? '') + idx}
+                className={cn('inline-flex flex-wrap gap-1 text-sm', {
+                  'text-muted-foreground': message.color === 'GREY',
+                  'text-yellow-300': message.color === 'YELLOW',
+                  'text-red-400': message.color === 'RED',
+                  'text-green-400': message.color === 'GREEN',
+                  'text-blue-400': message.color === 'BLUE',
+                  'text-purple-500': message.color === 'PURPLE',
+                  'text-foreground': message.color === 'FOREGROUND',
+                })}
+              >
                 <time className="text-foreground">{getTimeFns(message.createdAt!)} </time>
-                <span>{message.text}</span>
-                {!!message.expAmount && (
-                  <>
-                    <span >{message.expAmount}</span>
-                    <span className="text-violet-500">EXP</span>
-                  </>
+                {splitWords.map((word) => (
+                  <span
+                  
+                    key={word}
+                    className={cn('', {
+                      'text-foreground': word.startsWith('+') || (word.startsWith('[') && word.endsWith(']')),
+                      'text-yellow-300': word.startsWith('x'),
+                      'text-purple-500': word.toLowerCase() === 'exp',
+                    })}
+                  >
+                    {word}
+                  </span>
+                ))}
+                {!!message.data?.length && (
+                  <ul className="text-foreground inline-flex flex-wrap gap-0.5">
+                    [
+                    {message.data.map((m, idx) => (
+                      <li key={`${message.createdAt}-${m.name}-${idx}`}>
+                        <span className="">{m.name}</span>
+                        {!!m.quantity && <span className="ml-1 text-yellow-300">{`x${m.quantity}`}</span>}
+                        {!!m.quantity && (message.data?.length ?? 1) > 1 && <span className="mr-0.5">,</span>}
+                      </li>
+                    ))}
+                    ]
+                  </ul>
                 )}
               </div>
-
-              {!!message.data?.length && (
-                <ul className="text-foreground inline-flex flex-wrap gap-0.5">
-                  [
-                  {message.data.map((m, idx) => (
-                    <li key={`${message.createdAt}-${m.name}-${idx}`}>
-                      <span className="">{m.name}</span>
-                      {!!m.quantity && <span className="ml-1 text-yellow-300">{`x${m.quantity}`}</span>}
-                      {!!m.quantity && (message.data?.length ?? 1) > 1 && <span className="mr-0.5">,</span>}
-                    </li>
-                  ))}
-                  ]
-                </ul>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </ul>
       </ScrollArea>
     </section>

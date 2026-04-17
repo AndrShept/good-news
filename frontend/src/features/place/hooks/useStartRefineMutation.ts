@@ -27,7 +27,7 @@ export const useStartRefineMutation = () => {
     onSuccess: ({ message, data }) => {
       updateHero({ refiningFinishAt: data?.refiningFinishAt, state: data?.state });
       setGameMessage({
-        type: 'SUCCESS',
+        color: 'GREEN',
         text: message,
       });
     },

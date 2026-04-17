@@ -4,7 +4,7 @@ import type {
   MapChunkSpawnEntityData,
   MapChunkUpdateEntitiesData,
   PlaceUpdateEvent,
-  SkillExpUpEvent,
+  SkillExpGainEvent,
   UpdateItemDeltaEvent,
 } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
@@ -148,8 +148,8 @@ export const socketService = {
     io.to(heroId).emit(socketEvents.selfMessage(), msgData);
   },
   sendToClientExpResult({ heroId, data }: SendToClientExpResult) {
-    const socketData: SkillExpUpEvent = {
-      type: 'SKILL_EXP_UP',
+    const socketData: SkillExpGainEvent = {
+      type: 'SKILL_EXP_GAIN',
       heroId,
       payload: data,
     };

@@ -1,11 +1,10 @@
-import { HeroAvatar } from '@/components/HeroAvatar';
+import { GameAvatar } from '@/components/GameAvatar';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { cn } from '@/lib/utils';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { RefreshCcwIcon } from 'lucide-react';
-import React from 'react';
 
 import { getGroupAvailableHeroesOptions } from '../api/get-group-available-heroes';
 import { GroupAvailableHeroesListSkeleton } from './GroupAvailableHeroesListSkeleton';
@@ -34,7 +33,7 @@ export const GroupAvailableHeroesList = ({ isShow, searchTerm }: Props) => {
               page?.data.map((hero) => (
                 <article key={hero.id} className="hover:bg-accent/20 flex w-full items-center gap-1 rounded px-3 py-2">
                   <div className="flex gap-1">
-                    <HeroAvatar src={hero.avatarImage} />
+                    <GameAvatar src={hero.avatarImage} />
                     <div className="">
                       <p className="line-clamp-1">{hero.name} </p>
                       <p className="text-muted-foreground text-sm">level {hero.level}</p>

@@ -69,7 +69,7 @@ export const refineTick = (now: number) => {
 
       const refineExpResult = skillService.addExp(heroId, refineSkillKey, refineExpValue);
       const loreExpResult = skillService.addExp(heroId, loreSkillKey, loreExpValue);
-      socketService.sendToClientSysMessage(heroId, { text: result.message, type: result.success ? 'SUCCESS' : 'ERROR' });
+      socketService.sendToClientSysMessage(heroId, { text: result.message, color: result.success ? 'GREEN' : 'RED' });
       socketService.sendToClientItemsDelta(heroId, itemsDelta);
       socketService.sendToClientExpResult({
         heroId,

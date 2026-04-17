@@ -17,8 +17,7 @@ export const useGatherResourceMutation = () => {
 
     async onSuccess(data) {
       updateHero({ state: data.data?.state, gatheringFinishAt: data.data?.gatheringFinishAt });
-      setGameMessage({ type: 'SUCCESS', text: data.message });
-     
+      setGameMessage({ color: 'GREEN', text: data.message });
     },
   });
 };

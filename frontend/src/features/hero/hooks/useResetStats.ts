@@ -10,21 +10,19 @@ export const useResetStats = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: resetStats,
-    async onSuccess(data, variables, context) {
+    async onSuccess(data) {
       if (data.success) {
         queryClient.invalidateQueries({
           queryKey: getHeroOptions().queryKey,
         });
         setGameMessage({
-          success: data.success,
-          type: 'SUCCESS',
+          color: 'GREEN',
           text: data.message,
         });
       }
       if (!data.success) {
         setGameMessage({
-          success: data.success,
-          type: 'ERROR',
+          color: 'RED',
           text: data.message,
         });
       }

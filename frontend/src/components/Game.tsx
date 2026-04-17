@@ -1,11 +1,11 @@
 import { GroupInvitationModal } from '@/features/group/components/GroupInvitationModal';
 import { GameHeader } from '@/features/hero/components/GameHeader';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { ActionTimerPanel } from '@/features/map/components/ActionTimerPanel';
 import { MovingPanel } from '@/features/map/components/MovingPanel';
 import { useCancelGatheringMutation } from '@/features/map/hooks/useCancelGatheringMutation';
 import { Outlet } from '@tanstack/react-router';
 
+import { ActionTimerPanel } from './ActionTimerPanel';
 import { GameMessage } from './GameMessage';
 import { DndInventoryProvider } from './providers/DndInventoryProvider';
 
@@ -28,7 +28,7 @@ export const Game = () => {
               actionFinishAt={gatheringFinishAt}
               cancelActionMutation={cancelGatheringMutation.mutate}
               cancelIsPending={cancelGatheringMutation.isPending}
-              className="top-27  absolute left-1/2 z-50 -translate-x-1/2 sm:top-11"
+              className="top-27 absolute left-1/2 z-50 -translate-x-1/2 sm:top-11"
             />
           )}
 

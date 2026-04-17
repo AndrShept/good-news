@@ -1,4 +1,4 @@
-import { HeroAvatar } from '@/components/HeroAvatar';
+import { GameAvatar } from '@/components/GameAvatar';
 
 interface Props {
   image: string;
@@ -8,7 +8,7 @@ interface Props {
 export const ShopAvatar = ({ image, name }: Props) => {
   return (
     <div className="flex items-center gap-1 capitalize">
-      <HeroAvatar src={image} />
+      <GameAvatar src={image} />
       <p className="text-muted-foreground">{name}</p>
     </div>
   );

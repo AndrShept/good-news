@@ -27,7 +27,7 @@ export const useQueueCraftListener = () => {
           }
 
           setGameMessage({
-            type: data.payload.successCraft ? 'SUCCESS' : 'ERROR',
+            color: data.payload.successCraft ? 'GREEN' : 'RED',
             text: data.payload.message,
             data: [{ name: data.payload.itemName }],
           });
@@ -42,7 +42,7 @@ export const useQueueCraftListener = () => {
 
         case 'FAILED':
           removeQueueCraftItems(data.payload.queueItemCraftId);
-          setGameMessage({ type: 'ERROR', text: data.payload.message });
+          setGameMessage({ color: 'RED', text: data.payload.message });
       }
     };
     socket.on(socketEvents.queueCraft(), listener);
@@ -50,5 +50,16 @@ export const useQueueCraftListener = () => {
     return () => {
       socket.off(socketEvents.queueCraft(), listener);
     };
-  }, [addItemInstance, backpackId, heroId, removeItemInstance, removeQueueCraftItems, setGameMessage, socket, updateItemByDeltaEvents, updateItemInstance, updateQueueCraftItems]);
+  }, [
+    addItemInstance,
+    backpackId,
+    heroId,
+    removeItemInstance,
+    removeQueueCraftItems,
+    setGameMessage,
+    socket,
+    updateItemByDeltaEvents,
+    updateItemInstance,
+    updateQueueCraftItems,
+  ]);
 };

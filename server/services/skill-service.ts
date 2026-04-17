@@ -1,4 +1,3 @@
-import type { SkillExpUpEvent, SkillExpUpEventPayload } from '@/shared/socket-data-types';
 import { type LoreSkillKey, type SkillKey, skillTemplateById, skillTemplateByKey } from '@/shared/templates/skill-template';
 import type { RecipeTemplate, RefiningBuildingKey, ResourceCategoryType, SkillInstance } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
@@ -7,6 +6,7 @@ import { serverState } from '../game/state/server-state';
 import { skillExpConfig } from '../lib/config/skill-exp-config';
 import { deltaEventsService } from './delta-events-service';
 import { itemTemplateService } from './item-template-service';
+import type { SkillExpGainEventPayload } from '@/shared/socket-data-types';
 
 export const skillService = {
   getSkillBySkillTemplateId(heroId: string, skillTemplateId: string) {
@@ -44,10 +44,9 @@ export const skillService = {
     let expToLevel = this.getExpSkillToNextLevel(skillKey, skill.level);
     skill.currentExperience += amount;
 
-    const result: SkillExpUpEventPayload = {
-      message: `Your gain skill ${skillTemplate.name}`,
+    const result: SkillExpGainEventPayload = {
+      message: `You gained +${amount} ${skillTemplate.name} EXP `,
       isLevelUp: false,
-      expAmount: amount,
       skillInstanceId: skill.id,
       currentExperience: skill.currentExperience,
       expToLvl: expToLevel,
@@ -60,7 +59,7 @@ export const skillService = {
       skill.currentExperience -= expToLevel;
       expToLevel = this.getExpSkillToNextLevel(skillKey, skill.level);
       skill.expToLvl = expToLevel;
-      result.message = `Your skill in ${skillTemplate.name} has increased by ${increment.toFixed(1)}. It is now ${skill.level.toFixed(1)}  🔥`;
+      // result.message = `Your skill in ${skillTemplate.name} has increased by ${increment.toFixed(1)}. It is now ${skill.level.toFixed(1)}  🔥`;
       result.isLevelUp = true;
       result.currentExperience = skill.currentExperience;
       result.expToLvl = skill.expToLvl;

@@ -2,8 +2,8 @@ import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation } from '@tanstack/react-query';
 
-import { deleteContainerInstanceItem } from '../api/delete-container-instance-item';
 import { useItemContainerUpdate } from '../../item-container/hooks/useItemContainerUpdate';
+import { deleteContainerInstanceItem } from '../api/delete-container-instance-item';
 
 interface IDeleteContainerSlotItem {
   itemContainerId: string;
@@ -21,8 +21,7 @@ export const useDeleteContainerItem = () => {
     async onSuccess(data, { itemContainerId, itemInstanceId }) {
       removeItemInstance(itemContainerId, itemInstanceId);
       setGameMessage({
-        success: true,
-        type: 'SUCCESS',
+        color: 'GREEN',
         text: data.message,
         data: [{ name: data.data?.name ?? '', quantity: data.data?.quantity }],
       });

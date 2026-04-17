@@ -1,7 +1,6 @@
-import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
 import { useItemContainerUpdate } from '@/features/item-container/hooks/useItemContainerUpdate';
 import { useSetGameMessage } from '@/store/useGameMessages';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 import { itemEquip } from '../api/item-equip';
 import { useEquipmentsUpdate } from './useEquipmentsUpdate';
@@ -26,7 +25,7 @@ export const useItemEquipMutation = () => {
             switch (i.type) {
               case 'DELETE':
                 removeItemInstance(i.itemContainerId, i.itemInstanceId);
-                setGameMessage({ type: 'INFO', text: data.message, data: [{ name: i.itemName }] });
+                setGameMessage({ color: 'GREY', text: data.message, data: [{ name: i.itemName }] });
 
                 break;
               case 'CREATE':

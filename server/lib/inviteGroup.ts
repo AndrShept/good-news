@@ -112,7 +112,7 @@ export const inviteGroup = async (socket: Socket) => {
             message: `${invitedHero.name} has joined the group.`,
             groupId: fromHero.groupId ?? '',
             updateType: 'new-member',
-            messageType: 'SUCCESS',
+            messageColor: 'GREEN',
           };
           io.to(fromHero.groupId!).emit(socketEvents.groupUpdated(), messageData);
           return response({ success: true, message: `${invitedHero.name} has joined your group.` });

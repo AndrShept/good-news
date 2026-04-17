@@ -38,7 +38,7 @@ export const useGroupListener = () => {
 
       setGameMessage({
         text: data.message,
-        type: data.messageType ?? 'ERROR',
+        color: data.messageColor ?? 'RED',
       });
     };
     socket.on(socketEvents.groupUpdated(), groupUpdatedListener);
@@ -50,7 +50,7 @@ export const useGroupListener = () => {
     const groupSysMessagesListener = (data: SocketGroupResponse) => {
       setGameMessage({
         text: data.message,
-        type: data.messageType ?? 'SUCCESS',
+        color: data.messageColor ?? 'GREEN',
       });
     };
     socket.on(socketEvents.groupSysMessages(), groupSysMessagesListener);
@@ -65,7 +65,7 @@ export const useGroupListener = () => {
         if (cb.accept) {
           setGameMessage({
             text: `join group room ${groupId} `,
-            type: 'INFO',
+            color: 'YELLOW',
           });
         }
       });
@@ -76,7 +76,7 @@ export const useGroupListener = () => {
         if (cb.accept) {
           setGameMessage({
             text: `left group room ${prevGroupIdRef.current}`,
-            type: 'INFO',
+            color: 'GREY',
           });
         }
       });

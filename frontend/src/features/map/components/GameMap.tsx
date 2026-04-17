@@ -8,13 +8,14 @@ import { RefObject, memo, useEffect, useRef, useState } from 'react';
 import { useDragOnMap } from '../hooks/useDragOnMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
 import { Canvas } from './Canvas';
-import { CreatureTile } from './CreatureTile';
-import { EntranceTile } from './EntranceTile';
-import { HeroTile } from './HeroTile';
-import { MapTile } from './MapTile';
+import { LoadingMapSkeleton } from './LoadingMapSkeleton';
 import { MapTileList } from './MapTileList';
-import { MovablePathTile } from './MovablePathTile';
-import { PlaceTile } from './PlaceTile';
+import { CreatureTile } from './tile/CreatureTile';
+import { EntranceTile } from './tile/EntranceTile';
+import { HeroTile } from './tile/HeroTile';
+import { MapTile } from './tile/MapTile';
+import { MovablePathTile } from './tile/MovablePathTile';
+import { PlaceTile } from './tile/PlaceTile';
 
 interface Props {
   heroTargetX: number;
@@ -28,7 +29,6 @@ interface Props {
   height: number;
   width: number;
   image: string;
-  isLoading: boolean;
   layers: Layer[];
   containerRef: RefObject<HTMLDivElement | null>;
   callbackRef: (el: HTMLDivElement | null) => void;
@@ -52,7 +52,6 @@ export const GameMap = memo(
     mapCreatures,
     places,
     entrances,
-    isLoading,
     layers,
     heroTargetX,
     heroTargetY,
@@ -114,8 +113,6 @@ export const GameMap = memo(
 
     const CHUNK_SIZE = 10;
 
-    if (isLoading) return 'Loading Map...';
-
     return (
       <div
         ref={(el) => {
@@ -146,6 +143,7 @@ export const GameMap = memo(
           }}
         >
           <Canvas
+            key={image}
             grounds={groundLayer?.data ?? []}
             className="-z-1 absolute left-0 top-0 border border-red-400"
             width={MAP_WIDTH * TILE_SIZE}

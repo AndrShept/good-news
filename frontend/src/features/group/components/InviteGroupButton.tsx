@@ -1,4 +1,6 @@
+import { useSocket } from '@/components/providers/SocketProvider';
 import { BorderTrail } from '@/components/ui/border-trail';
+import { Button } from '@/components/ui/button';
 import { TextMorph } from '@/components/ui/text-morph';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
@@ -11,8 +13,6 @@ import React, { useState } from 'react';
 
 import { getGroupAvailableHeroesOptions } from '../api/get-group-available-heroes';
 import { getGroupMembersOptions } from '../api/get-group-members';
-import { Button } from '@/components/ui/button';
-import { useSocket } from '@/components/providers/SocketProvider';
 
 export const InviteGroupButton = ({ toHeroId, searchTerm }: { toHeroId: string; searchTerm: string }) => {
   const groupId = useHero((data) => data?.groupId ?? '');
@@ -25,7 +25,7 @@ export const InviteGroupButton = ({ toHeroId, searchTerm }: { toHeroId: string; 
     setIsLoading(true);
     const res = (await socket.emitWithAck(socketEvents.groupInvite(), { fromHeroId, toHeroId })) as SocketResponse;
     setIsLoading(false);
-    if (!res.success) setGameMessage({ text: res.message, type: 'ERROR' });
+    if (!res.success) setGameMessage({ text: res.message, color: 'RED' });
     if (res.success) {
       // setGameMessage({ text: res.message, type: 'success' });
       await queryClient.invalidateQueries({

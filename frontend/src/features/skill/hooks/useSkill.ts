@@ -14,7 +14,6 @@ export const useSkill = () => {
     () =>
       skills?.reduce(
         (acc, skill) => {
-          const template = skillTemplateById[skill.skillTemplateId];
           acc[skill.skillTemplateId] = skill;
           return acc;
         },

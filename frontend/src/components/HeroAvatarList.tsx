@@ -1,8 +1,8 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import React, { memo, useMemo, useState } from 'react';
+import React, { memo, useMemo } from 'react';
 
-import { HeroAvatar } from './HeroAvatar';
+import { GameAvatar } from './GameAvatar';
 
 interface Props {
   avatar: string;
@@ -19,7 +19,7 @@ export const HeroAvatarList = memo(({ avatar, setAvatar }: Props) => {
     <ScrollArea className="h-[200px] md:h-[400px]">
       <ul className="flex max-w-[300px] flex-wrap gap-2">
         {avatars.map((item) => (
-          <HeroAvatar
+          <GameAvatar
             key={item.src}
             setAvatar={setAvatar}
             src={item.src}

@@ -50,7 +50,7 @@ const queryClient = new QueryClient({
         if (error?.cause?.canShow) {
           setGameMessage({
             text: error.message,
-            type: 'ERROR',
+            color: 'RED',
           });
         } else {
           toastError();

@@ -1,6 +1,5 @@
 import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
 import { useItemContainerUpdate } from '@/features/item-container/hooks/useItemContainerUpdate';
-import { buffTemplate, buffTemplateMapIds } from '@/shared/templates/buff-template';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -16,7 +15,7 @@ export const useItemConsumeMutation = () => {
   const heroId = useHeroId();
   const backpackId = useGetBackpackId();
   const { updateHero } = useHeroUpdate();
-  const { removeItemInstance, updateItemInstance } = useItemContainerUpdate();
+  const {  updateItemByDeltaEvents } = useItemContainerUpdate();
   const { itemsTemplateById } = useGameData();
   return useMutation({
     mutationFn: ({ itemInstanceId }: { itemInstanceId: string; itemTemplateId: string }) => itemConsume({ heroId, itemInstanceId }),
@@ -27,16 +26,7 @@ export const useItemConsumeMutation = () => {
         ...data.data?.hero,
       });
       if (data.data?.itemsDelta) {
-        for (const i of data.data.itemsDelta) {
-          switch (i.type) {
-            case 'DELETE':
-              removeItemInstance(i.itemContainerId ?? '', i.itemInstanceId);
-              break;
-            case 'UPDATE':
-              updateItemInstance(i.itemContainerId ?? '', i.itemInstanceId, i.updateData);
-              break;
-          }
-        }
+        updateItemByDeltaEvents(data.data.itemsDelta);
       }
 
       switch (template.type) {
@@ -47,8 +37,7 @@ export const useItemConsumeMutation = () => {
             });
           }
           setGameMessage({
-            success: true,
-            type: 'INFO',
+            color: 'GREY',
             text: data.data?.message ?? '',
             data: [{ name: data.data?.name ?? '' }],
           });
@@ -62,10 +51,9 @@ export const useItemConsumeMutation = () => {
           }
 
           setGameMessage({
-            success: true,
-            type: 'INFO',
+            color: 'GREY',
             text: data.data?.message ?? '',
-            data: [{ name: data.data?.name ??'' }],
+            data: [{ name: data.data?.name ?? '' }],
           });
 
           break;

@@ -1,4 +1,4 @@
-import { HeroAvatar } from '@/components/HeroAvatar';
+import { GameAvatar } from '@/components/GameAvatar';
 import { TimerBar } from '@/components/TimerBar';
 import { Button } from '@/components/ui/button';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
@@ -20,8 +20,8 @@ export const GroupInvitationModal = () => {
       if (!oldData || !responseData.current?.groupId) return;
 
       return {
-      
-        ...oldData, groupId: responseData.current.groupId ,
+        ...oldData,
+        groupId: responseData.current.groupId,
       };
     });
     onClose();
@@ -62,7 +62,7 @@ export const GroupInvitationModal = () => {
       >
         <div className="flex gap-2">
           <div className="flex flex-col items-center gap-0.5">
-            <HeroAvatar src={responseData.current?.avatarImage ?? ''} />
+            <GameAvatar src={responseData.current?.avatarImage ?? ''} />
 
             <p className="text-[15px] text-green-500">level {responseData.current?.level}</p>
           </div>

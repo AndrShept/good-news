@@ -13,7 +13,7 @@ interface Props {
 }
 
 export const MapTileList = ({ grounds, MAP_WIDTH, TILE_SIZE, tileImage }: Props) => {
- const { app } = useApplication() // працює
+ const { app } = useApplication() 
   const [bakedTexture, setBakedTexture] = useState<RenderTexture | null>(null);
 
   useEffect(() => {

@@ -184,7 +184,7 @@ export const groupRouter = new Hono<Context>()
         message: `${member.name} has been kicked from the group.`,
         groupId: id,
         updateType: 'kick',
-        messageType: 'ERROR',
+        messageColor: 'RED',
         memberId: member.id,
       };
       await db
@@ -246,7 +246,7 @@ export const groupRouter = new Hono<Context>()
         message: `${member.name} has been leave from the group.`,
         groupId: id,
         updateType: 'leave',
-        messageType: 'ERROR',
+        messageColor: 'RED',
         memberId: member.id,
       };
       await db

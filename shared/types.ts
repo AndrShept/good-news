@@ -605,12 +605,13 @@ export type IPosition = {
 };
 
 export const gameSysMessageObj = {
-  info: 'INFO',
-  warning: 'WARNING',
-  error: 'ERROR',
-  success: 'SUCCESS',
-  skillExp: 'SKILL_EXP',
-  levelExp: 'LEVEL_EXP',
+  foreground: 'FOREGROUND',
+  grey: 'GREY',
+  yellow: 'YELLOW',
+  red: 'RED',
+  green: 'GREEN',
+  purple: 'PURPLE',
+  blue: 'BLUE',
 } as const;
 
 export const gameSysMessageValues = Object.values(gameSysMessageObj);
@@ -619,9 +620,7 @@ export type GameSysMessageType = (typeof gameSysMessageValues)[number];
 export interface GameSysMessage {
   text: string;
   data?: { name: string; quantity?: number }[];
-  expAmount?: number;
-  success?: boolean;
-  type: GameSysMessageType;
+  color: GameSysMessageType;
   createdAt?: number;
 }
 
@@ -712,13 +711,12 @@ export const changeStatSchema = statsSchema.extend({
 });
 
 export const buyItemsSchema = z.object({
-  items: z
-    .array(
-      z.object({
-        id: z.string().uuid(),
-        quantity: z.number().int().positive(),
-        itemInstanceId: z.string().uuid().optional(),
-      }),
-    )
-    // .refine((items) => new Set(items.map((i) => i.id)).size === items.length, { message: 'Duplicate item id' }),
+  items: z.array(
+    z.object({
+      id: z.string().uuid(),
+      quantity: z.number().int().positive(),
+      itemInstanceId: z.string().uuid().optional(),
+    }),
+  ),
+  // .refine((items) => new Set(items.map((i) => i.id)).size === items.length, { message: 'Duplicate item id' }),
 });

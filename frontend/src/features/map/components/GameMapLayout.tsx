@@ -1,4 +1,5 @@
 import { useHero } from '@/features/hero/hooks/useHero';
+import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { useEffect } from 'react';
 
 import { useCenter } from '../hooks/useCenter';
@@ -8,6 +9,7 @@ import { useScaleMap } from '../hooks/useScaleMap';
 import { EntitySidebar } from './EntitySidebar';
 import { GameMap } from './GameMap';
 import { HeroActionsBar } from './HeroActionsBar';
+import { LoadingMapSkeleton } from './LoadingMapSkeleton';
 
 export const GameMapLayout = () => {
   const hero = useHero((data) => ({
@@ -33,7 +35,7 @@ export const GameMapLayout = () => {
   const heroLocalY = heroWorldY - offsetY;
 
   const { scale, callbackRef, containerRef } = useScaleMap();
-
+  const clearMovementPathTiles = useMovementPathTileStore((state) => state.clearMovementPathTiles);
   const { onCenter } = useCenter({
     TILE_SIZE: map.data?.tileWidth,
     containerRef,
@@ -44,6 +46,10 @@ export const GameMapLayout = () => {
 
   useEffect(() => {
     onCenter({ behavior: 'instant' });
+
+    return () => {
+      clearMovementPathTiles();
+    };
   }, [hero.mapId]);
   useEffect(() => {
     onCenter({ behavior: 'smooth' });
@@ -68,30 +74,33 @@ export const GameMapLayout = () => {
         />
       </aside>
 
-      <GameMap
-        scale={scale}
-        containerRef={containerRef}
-        callbackRef={callbackRef}
-        width={map.data?.width ?? 0}
-        height={map.data?.height ?? 0}
-        layers={map.data?.layers ?? []}
-        image={map.data?.image ?? ''}
-        tileWidth={map.data?.tileWidth ?? 32}
-        isLoading={map.isLoading}
-        heroWorldX={heroWorldX}
-        heroWorldY={heroWorldY}
-        heroLocalX={heroLocalX}
-        heroLocalY={heroLocalY}
-        heroTargetX={hero.targetX}
-        heroTargetY={hero.targetY}
-        heroState={hero.state}
-        mapHeroes={mapEntities?.heroes ?? []}
-        mapCreatures={mapEntities?.creatures ?? []}
-        places={map.data?.places ?? []}
-        entrances={map.data?.entrances ?? []}
-        offsetX={offsetX}
-        offsetY={offsetY}
-      />
+      {map.isLoading ? (
+        <LoadingMapSkeleton />
+      ) : (
+        <GameMap
+          scale={scale}
+          containerRef={containerRef}
+          callbackRef={callbackRef}
+          width={map.data?.width ?? 0}
+          height={map.data?.height ?? 0}
+          layers={map.data?.layers ?? []}
+          image={map.data?.image ?? ''}
+          tileWidth={map.data?.tileWidth ?? 32}
+          heroWorldX={heroWorldX}
+          heroWorldY={heroWorldY}
+          heroLocalX={heroLocalX}
+          heroLocalY={heroLocalY}
+          heroTargetX={hero.targetX}
+          heroTargetY={hero.targetY}
+          heroState={hero.state}
+          mapHeroes={mapEntities?.heroes ?? []}
+          mapCreatures={mapEntities?.creatures ?? []}
+          places={map.data?.places ?? []}
+          entrances={map.data?.entrances ?? []}
+          offsetX={offsetX}
+          offsetY={offsetY}
+        />
+      )}
     </section>
   );
 };

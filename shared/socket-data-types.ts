@@ -19,7 +19,7 @@ export type SocketGroupResponse = {
   message: string;
   groupId?: string;
   memberId?: string;
-  messageType?: GameSysMessageType;
+  messageColor?: GameSysMessageType;
   updateType: 'leave' | 'kick' | 'remove' | 'new-member';
 };
 
@@ -93,7 +93,7 @@ export type QueueCraftItemSocketEvent =
 
 export type SelfHeroEvent =
   | RemoveBuffEvent
-  | SkillExpUpEvent
+  | SkillExpGainEvent
   | HeroUpdateEvent
   | FinishGatheringEvent
   | LoadMapChunkEntityEvent
@@ -147,15 +147,14 @@ export type FinishGatheringEvent = {
     equipmentDeltas?: ItemsInstanceDeltaEvent[];
   };
 };
-export type SkillExpUpEvent = {
-  type: 'SKILL_EXP_UP';
+export type SkillExpGainEvent = {
+  type: 'SKILL_EXP_GAIN';
   heroId: string;
-  payload: { isShowMessageOnlyLvlUp: boolean; expResult: SkillExpUpEventPayload }[];
+  payload: { isShowMessageOnlyLvlUp: boolean; expResult: SkillExpGainEventPayload }[];
 };
 
-export type SkillExpUpEventPayload = {
+export type SkillExpGainEventPayload = {
   message: string;
-  expAmount: number;
   isLevelUp: boolean;
   skillInstanceId: string;
   level: number;
