@@ -1,8 +1,8 @@
 import { cn, getModifiers } from '@/lib/utils';
-import { OmitModifier } from '@/shared/types';
+import { Modifier } from '@/shared/types';
 
 interface Props {
-  modifiersArgs: Array<Partial<OmitModifier> | undefined>;
+  modifiersArgs: Array<Partial<Modifier> | undefined>;
 }
 export const ModifierInfoCard = ({ modifiersArgs }: Props) => {
   const modifiers = getModifiers(...modifiersArgs);

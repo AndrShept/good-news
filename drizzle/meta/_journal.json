@@ -127,6 +127,13 @@
       "when": 1775767932767,
       "tag": "0017_lucky_shiva",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1776541804348,
+      "tag": "0018_new_karen_page",
+      "breakpoints": true
     }
   ]
 }

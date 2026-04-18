@@ -6,7 +6,7 @@ import { resourceTemplateById } from '@/shared/templates/resource-template';
 import type {
   ColoredResourceCategoryType,
   CoreResourceType,
-  OmitModifier,
+  Modifier,
   QueueCraftStatusType,
   RecipeTemplate,
   ResourceCategoryType,
@@ -17,12 +17,12 @@ import { HTTPException } from 'hono/http-exception';
 import { io } from '..';
 import { serverState } from '../game/state/server-state';
 import { resourceMetaConfig } from '../lib/config/resource-config';
+import { MAX_SKILL } from '../lib/config/server-constants';
 import { clamp } from '../lib/utils';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
 import { skillService } from './skill-service';
-import { MAX_SKILL } from '../lib/config/server-constants';
 
 interface GetCraftChance {
   craftSkillLevel: number;
@@ -165,17 +165,17 @@ export const queueCraftService = {
     console.log('CRAFT-CHANGE', chance);
     return clamp(chance, 3, 99); // ніколи не 100%
   },
-  calculateFinalCraftModifiers(heroId: string, coreResourceId: string, modifier: Partial<OmitModifier>) {
+  calculateFinalCraftModifiers(heroId: string, coreResourceId: string, modifier: Partial<Modifier>) {
     const loreSkillKey = skillService.getLoreSkillByItemTemplateId(coreResourceId);
     const loreSkillInstance = skillService.getSkillByKey(heroId, loreSkillKey);
 
     const skillFactor = loreSkillInstance.level / MAX_SKILL;
 
     const modifierWithLoreSkill = Object.entries(modifier).reduce((acc, [key, value]) => {
-      acc[key as keyof OmitModifier] = Math.floor(value * (0.5 + 0.5 * skillFactor));
+      acc[key as keyof Modifier] = Math.floor(value * (0.5 + 0.5 * skillFactor));
 
       return acc;
-    }, {} as OmitModifier);
+    }, {} as Modifier);
 
     return modifierWithLoreSkill;
   },

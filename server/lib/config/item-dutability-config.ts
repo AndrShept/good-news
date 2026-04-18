@@ -1,4 +1,4 @@
-import type { ArmorType, ClothType, IngotType, LeatherType, OmitModifier, ResourceType, WeaponHandType, WeaponType } from '@/shared/types';
+import type { ArmorType, ClothType, IngotType, LeatherType, ResourceType, WeaponHandType, WeaponType } from '@/shared/types';
 
 export interface ItemDurabilityConfig {
   WEAPON: Record<WeaponType, number>;

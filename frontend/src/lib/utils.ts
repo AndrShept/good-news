@@ -1,5 +1,4 @@
-
-import {  OmitModifier } from '@/shared/types';
+import { Modifier, modifierStringName } from '@/shared/types';
 import { type ClassValue, clsx } from 'clsx';
 import { format, intervalToDuration } from 'date-fns';
 import { hc } from 'hono/client';
@@ -53,41 +52,12 @@ export const toastError = (msg = 'Something went wrong') => {
   toast.error(msg);
 };
 
-
-
-export const modifierChangeName = (modifier: keyof OmitModifier) => {
-  const variants: Record<keyof OmitModifier, string> = {
-    minDamage: 'min damage',
-    maxDamage: 'max damage',
-    strength: 'strength',
-    dexterity: 'dexterity',
-    intelligence: 'intelligence',
-    constitution: 'constitution',
-    luck: 'luck',
-    wisdom: 'wisdom',
-    armor: 'armor',
-    evasion: 'evasion',
-    magicResistance: 'magic resistance',
-    healthRegen: 'health regen',
-    manaRegen: 'mana regen',
-    maxHealth: 'max health',
-    maxMana: 'max mana',
-    physDamage: 'phys damage',
-    physCritRating: 'phys crit rating',
-    physCritDamage: 'phys crit damage',
-    physHitRating: 'phys hit rating',
-    spellDamage: 'spell damage',
-    spellCritRating: 'spell crit rating',
-    spellCritDamage: 'spell crit power',
-    spellHitRating: 'spell hit rating',
-    spellPenetration: 'spell penetration',
-    physPenetration: 'phys penetration',
-  };
-  return variants[modifier];
+export const getModifierName = (modifier: keyof Modifier) => {
+  return modifierStringName[modifier];
 };
 
-export const getModifiers = (...args: Partial<OmitModifier | undefined>[]) => {
-  const baseModifier: Omit<OmitModifier, 'minDamage' | 'maxDamage'> = {
+export const getModifiers = (...args: Partial<Modifier | undefined>[]) => {
+  const baseModifier: Omit<Modifier, 'minDamage' | 'maxDamage'> = {
     spellDamage: 0,
     physDamage: 0,
     strength: 0,
@@ -115,12 +85,12 @@ export const getModifiers = (...args: Partial<OmitModifier | undefined>[]) => {
   for (const item of args) {
     for (const key in baseModifier) {
       if (!item) continue;
-      const typedKey = key as keyof Omit<OmitModifier, 'minDamage' | 'maxDamage'>;
+      const typedKey = key as keyof Omit<Modifier, 'minDamage' | 'maxDamage'>;
       baseModifier[typedKey] += item[typedKey] ?? 0;
     }
   }
 
-  return Object.entries(baseModifier).map(([key, value]) => ({ name: modifierChangeName(key as keyof OmitModifier), value }));
+  return Object.entries(baseModifier).map(([key, value]) => ({ name: getModifierName(key as keyof Modifier), value }));
 };
 
 export function capitalize(text: string | undefined) {

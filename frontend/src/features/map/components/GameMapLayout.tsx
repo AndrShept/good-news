@@ -1,6 +1,6 @@
 import { useHero } from '@/features/hero/hooks/useHero';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useCenter } from '../hooks/useCenter';
 import { useGameMap } from '../hooks/useGameMap';
@@ -44,16 +44,24 @@ export const GameMapLayout = () => {
     scale,
   });
 
-  useEffect(() => {
-    onCenter({ behavior: 'instant' });
+  const isFirstRender = useRef(true);
 
+  useEffect(() => {
+    if (isFirstRender.current && !!map.data?.layers) {
+      isFirstRender.current = false;
+      onCenter({ behavior: 'instant' });
+      return;
+    }
+
+    onCenter({ behavior: 'smooth' });
+  }, [map.data?.layers]);
+
+  useEffect(() => {
     return () => {
       clearMovementPathTiles();
     };
   }, [hero.mapId]);
-  useEffect(() => {
-    onCenter({ behavior: 'smooth' });
-  }, [map.data?.layers]);
+
   return (
     <section className="flex w-full flex-col gap-2 p-1 sm:flex-row">
       <aside className="flex w-full gap-2 sm:max-w-[150px] sm:flex-col">

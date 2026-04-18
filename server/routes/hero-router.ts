@@ -1,4 +1,4 @@
-
+import { BANK_CONTAINER_COST, BASE_STATS, MAX_QUEUE_CRAFT_ITEM, RESET_STATS_COST } from '@/shared/shared-constants';
 import type { HeroUpdateEvent, MapChunkUpdateEntitiesData } from '@/shared/socket-data-types';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
@@ -49,7 +49,6 @@ import {
   heroTable,
   itemContainerTable,
   itemInstanceTable,
-  modifierTable,
   resourceTypeEnum,
   skillInstanceTable,
   slotEnum,
@@ -57,6 +56,7 @@ import {
 } from '../db/schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
 import { type HeroRuntime, type TileState, serverState } from '../game/state/server-state';
+import { BASE_GATHERING_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/config/server-constants';
 import { heroOnline } from '../lib/heroOnline';
 import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
@@ -75,8 +75,6 @@ import { queueCraftService } from '../services/queue-craft-service';
 import { refiningService } from '../services/refining-service';
 import { skillService } from '../services/skill-service';
 import { socketService } from '../services/socket-service';
-import { BANK_CONTAINER_COST, BASE_STATS, MAX_QUEUE_CRAFT_ITEM, RESET_STATS_COST } from '@/shared/shared-constants';
-import { BASE_GATHERING_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/config/server-constants';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -91,7 +89,6 @@ export const heroRouter = new Hono<Context>()
         const hero = await db.query.heroTable.findFirst({
           where: eq(heroTable.userId, userId),
           with: {
-            modifier: true,
             group: true,
 
             itemContainers: { columns: { id: true, type: true, name: true }, where: eq(itemContainerTable.type, 'BACKPACK') },
@@ -243,12 +240,9 @@ export const heroRouter = new Hono<Context>()
             targetX: null,
             targetY: null,
           },
+          modifier: heroService.initModifier(),
         })
         .returning();
-      await tx.insert(modifierTable).values({
-        id: generateRandomUuid(),
-        heroId: newHero.id,
-      });
 
       await tx.insert(itemContainerTable).values({
         name: 'Main Backpack',
@@ -865,8 +859,6 @@ export const heroRouter = new Hono<Context>()
         completedAt: now + walkTime * (idx + 1),
         mapId: heroState.location.mapId!,
       }));
-
-     
 
       heroState.paths = walkPathWithTime;
       heroState.state = 'WALK';

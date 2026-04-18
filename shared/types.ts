@@ -12,7 +12,6 @@ import {
   itemContainerTable,
   itemContainerTypeEnum,
   itemLocationEnum,
-  modifierTable,
   stateTypeEnum,
 } from '../server/db/schema';
 import { userTable } from '../server/db/schema/auth-schema';
@@ -210,34 +209,63 @@ export type ColoredResourceType =
 
 export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
 export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number];
-export type  Modifier = {
-    strength: number;
-    dexterity: number;
-    intelligence: number;
-    wisdom: number;
-    constitution: number;
-    luck: number;
-    maxHealth: number;
-    maxMana: number;
-    maxDamage: number;
-    minDamage: number;
-    manaRegen: number;
-    healthRegen: number;
-    armor: number;
-    magicResistance: number;
-    evasion: number;
-    spellDamage: number;
-    spellCritDamage: number;
-    spellCritRating: number;
-    spellHitRating: number;
-    spellPenetration: number;
-    physDamage: number;
-    physCritDamage: number;
-    physCritRating: number;
-    physHitRating: number;
-    physPenetration: number;
-}
-export type Modifier = InferSelectModel<typeof modifierTable>;
+
+export const modifierStringName = {
+  strength: 'strength',
+  dexterity: 'dexterity',
+  intelligence: 'intelligence',
+  wisdom: 'wisdom',
+  constitution: 'constitution',
+  luck: 'luck',
+  maxHealth: 'max health',
+  maxMana: 'max mana',
+  minDamage: 'min damage',
+  maxDamage: 'max damage',
+  manaRegen: 'mana regen',
+  healthRegen: 'health regen',
+  armor: 'armor',
+  magicResistance: 'magic resistance',
+  evasion: 'evasion',
+  spellDamage: 'spell damage',
+  spellCritDamage: 'spell crit damage',
+  spellCritRating: 'spell crit rating',
+  spellHitRating: 'spell hit rating',
+  spellPenetration: 'spell penetration',
+  physDamage: 'phys damage',
+  physCritDamage: 'phys crit damage',
+  physCritRating: 'phys crit rating',
+  physHitRating: 'phys hit rating',
+  physPenetration: 'phys penetration',
+} as const satisfies Record<keyof Modifier, string>;
+// export const modifierValues =  Object.keys(modifierObj)
+
+export type Modifier = {
+  strength: number;
+  dexterity: number;
+  intelligence: number;
+  wisdom: number;
+  constitution: number;
+  luck: number;
+  maxHealth: number;
+  maxMana: number;
+  maxDamage: number;
+  minDamage: number;
+  manaRegen: number;
+  healthRegen: number;
+  armor: number;
+  magicResistance: number;
+  evasion: number;
+  spellDamage: number;
+  spellCritDamage: number;
+  spellCritRating: number;
+  spellHitRating: number;
+  spellPenetration: number;
+  physDamage: number;
+  physCritDamage: number;
+  physCritRating: number;
+  physHitRating: number;
+  physPenetration: number;
+};
 export type Group = InferSelectModel<typeof groupTable>;
 export type TLocation = {
   placeId: string | null;
@@ -402,8 +430,6 @@ export type LumberTileType = Extract<TileType, 'FOREST' | 'DARK_FOREST'>;
 export type FishingTileTpe = Extract<TileType, 'WATER' | 'DEEP_WATER'>;
 export type ForagingTileTpe = Extract<TileType, 'FOREST' | 'MEADOW' | 'PLAINS'>;
 
-export type OmitModifier = Omit<Modifier, 'id' | 'heroId'>;
-
 export type TItemContainer = typeof itemContainerTable.$inferSelect & {
   itemsInstance: ItemInstance[];
 };
@@ -498,7 +524,7 @@ export type ItemTemplate = {
   bookInfo?: BookInfo;
   potionInfo?: PotionInfo;
   toolInfo?: ToolInfo;
-  modifier?: Partial<OmitModifier>;
+  modifier?: Partial<Modifier>;
 };
 
 export type EffectSource = 'POTION' | 'BOOK' | 'FOOD' | 'SKILL' | 'ZONE' | 'EVENT';
@@ -511,7 +537,7 @@ export type BuffTemplate = {
   type: 'POSITIVE' | 'NEGATIVE';
   source: EffectSource;
   duration: number;
-  modifier: Partial<OmitModifier>;
+  modifier: Partial<Modifier>;
   description?: string;
   reward?: {
     skillKey: SkillKey;
@@ -579,7 +605,7 @@ export type CreatureTemplate = {
   currentMana: number;
   maxMana: number;
 
-  baseModifier: Partial<OmitModifier>;
+  baseModifier: Partial<Modifier>;
 };
 export type CreatureInstance = CreatureTemplate & {
   id: string;
@@ -690,20 +716,13 @@ export type ActiveSkillTraining = {
 };
 export type IHeroStatEnum = keyof IHeroStat;
 
-export const statsSchema = createSelectSchema(modifierTable, {
+export const statsSchema = z.object({
   strength: z.number().int().positive(),
   constitution: z.number().int().positive(),
   intelligence: z.number().int().positive(),
   dexterity: z.number().int().positive(),
   luck: z.number().int().positive(),
   wisdom: z.number().int().positive(),
-}).pick({
-  constitution: true,
-  dexterity: true,
-  wisdom: true,
-  luck: true,
-  intelligence: true,
-  strength: true,
 });
 export const createHeroSchema = createInsertSchema(heroTable, {
   name: z

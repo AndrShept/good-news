@@ -1,16 +1,6 @@
 import { mapTemplate } from '@/shared/templates/map-template';
 import { resourceTemplateById } from '@/shared/templates/resource-template';
-import type {
-  ClothType,
-  CoreResourceType,
-  IngotType,
-  LeatherType,
-  Modifier,
-  OmitModifier,
-  PlankType,
-  StateType,
-  TileType,
-} from '@/shared/types';
+import type { ClothType, CoreResourceType, IngotType, LeatherType, Modifier, PlankType, StateType, TileType } from '@/shared/types';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
 import { sql } from 'drizzle-orm';
@@ -18,6 +8,7 @@ import { HTTPException } from 'hono/http-exception';
 import nodemailer from 'nodemailer';
 import z from 'zod';
 
+import { heroService } from '../services/hero-service';
 import { itemTemplateService } from '../services/item-template-service';
 import { materialModifierConfig } from './config/material-modifier-config';
 
@@ -112,37 +103,11 @@ export const jobQueueId = {
 };
 
 export const sumAllModifier = <T extends Partial<Modifier> | null | undefined>(...args: T[]) => {
-  const result: OmitModifier = {
-    constitution: 0,
-    armor: 0,
-    dexterity: 0,
-    evasion: 0,
-    healthRegen: 0,
-    intelligence: 0,
-    wisdom: 0,
-    luck: 0,
-    magicResistance: 0,
-    manaRegen: 0,
-    maxDamage: 0,
-    maxHealth: 0,
-    maxMana: 0,
-    minDamage: 0,
-    physDamage: 0,
-    spellDamage: 0,
-    strength: 0,
-    spellCritDamage: 0,
-    spellCritRating: 0,
-    spellHitRating: 0,
-    spellPenetration: 0,
-    physCritDamage: 0,
-    physCritRating: 0,
-    physHitRating: 0,
-    physPenetration: 0,
-  };
+  const result = heroService.initModifier();
 
   for (const item of args) {
     for (const key in item) {
-      const typedKey = key as keyof OmitModifier;
+      const typedKey = key as keyof Modifier;
       if (typeof item[typedKey] === 'number') {
         result[typedKey] += item[typedKey];
       }
@@ -194,7 +159,7 @@ export const getDisplayName = (itemTemplateId: string, coreResourceId: string | 
   let displayName = '';
   if (coreResourceId) {
     const resource = resourceTemplateById[coreResourceId];
-     displayName = `${resource.name.split(' ')[0]} ${itemTemplate.name}`;
+    displayName = `${resource.name.split(' ')[0]} ${itemTemplate.name}`;
   } else {
     displayName = itemTemplate.name;
   }

@@ -4,7 +4,6 @@ export * from './comments-schema';
 export * from './posts-schema';
 export * from './upvotes-schema';
 export * from './hero-schema';
-export * from './modifier-schema';
 export * from './item-container-schema';
 export * from './item-instance-schema';
 export * from './buff-instance-schema';

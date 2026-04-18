@@ -1,4 +1,3 @@
-import type { OmitModifier } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
@@ -28,5 +27,4 @@ export const buffInstanceRelations = relations(buffInstanceTable, ({ one }) => (
     fields: [buffInstanceTable.ownerHeroId],
     references: [heroTable.id],
   }),
-
 }));

@@ -1,5 +1,5 @@
 import type { SkillKey } from '@/shared/templates/skill-template';
-import type { ActiveSkillTraining, IHeroStat, THeroRegen, TLocation } from '@/shared/types';
+import type { ActiveSkillTraining, IHeroStat, Modifier, THeroRegen, TLocation } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { boolean, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
@@ -7,7 +7,6 @@ import { userTable } from './auth-schema';
 import { buffInstanceTable } from './buff-instance-schema';
 import { groupTable } from './group-schema';
 import { itemContainerTable } from './item-container-schema';
-import { modifierTable } from './modifier-schema';
 
 const state: Extract<
   SkillKey,
@@ -44,9 +43,9 @@ export const heroTable = pgTable('hero', {
   maxHealth: integer().default(0).notNull(),
   maxMana: integer().default(0).notNull(),
   stat: jsonb('stat').$type<IHeroStat>().notNull(),
-  // regen: jsonb('regen').$type<THeroRegen>().notNull(),
-  activeSkillTraining: jsonb('activeSkillTraining ').$type<ActiveSkillTraining>(),
+  modifier: jsonb('modifier').$type<Modifier>().notNull(),
   location: jsonb('location ').$type<TLocation>().notNull(),
+  activeSkillTraining: jsonb('activeSkillTraining ').$type<ActiveSkillTraining>(),
 
   groupId: uuid().references(() => groupTable.id, {
     onDelete: 'set null',
@@ -66,7 +65,6 @@ export const heroTable = pgTable('hero', {
 });
 
 export const heroRelations = relations(heroTable, ({ one, many }) => ({
-  modifier: one(modifierTable),
   group: one(groupTable, {
     fields: [heroTable.groupId],
     references: [groupTable.id],

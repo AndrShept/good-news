@@ -1,5 +1,5 @@
 import { resourceTemplateById } from '@/shared/templates/resource-template';
-import type { CoreResourceType, ItemInstance, ItemLocationType, ItemsInstanceDeltaEvent, OmitModifier, WeaponType } from '@/shared/types';
+import type { CoreResourceType, ItemInstance, ItemLocationType, ItemsInstanceDeltaEvent, Modifier, WeaponType } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
@@ -34,7 +34,7 @@ export const itemInstanceService = {
   createItem({ heroId, itemContainerId, itemTemplateId, quantity, location, coreResourceId, isAddPendingEvents }: ICreateItem) {
     heroService.checkFreeBackpackCapacity(heroId);
     let coreResource: null | CoreResourceType = null;
-    let finalModifier: null | Partial<OmitModifier> = null;
+    let finalModifier: null | Partial<Modifier> = null;
     const craftItem = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
     let displayName = craftItem.name;
     if (coreResourceId) {

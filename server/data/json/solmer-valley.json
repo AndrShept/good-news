@@ -266,7 +266,153 @@
          "spacing":0,
          "tilecount":504,
          "tileheight":32,
-         "tilewidth":32
+         "tiles":[
+                {
+                 "id":171,
+                 "objectgroup":
+                    {
+                     "draworder":"index",
+                     "id":2,
+                     "name":"",
+                     "objects":[
+                            {
+                             "height":0,
+                             "id":1,
+                             "name":"",
+                             "polygon":[
+                                    {
+                                     "x":0,
+                                     "y":0
+                                    }, 
+                                    {
+                                     "x":13.3987263011493,
+                                     "y":7.63633701778786
+                                    }, 
+                                    {
+                                     "x":-5.57499450991875,
+                                     "y":1.45230949418051
+                                    }, 
+                                    {
+                                     "x":-7.16785008418125,
+                                     "y":9.65083083229632
+                                    }],
+                             "rotation":0,
+                             "type":"",
+                             "visible":true,
+                             "width":0,
+                             "x":8.01112656467316,
+                             "y":2.15503989459044
+                            }, 
+                            {
+                             "height":0,
+                             "id":2,
+                             "name":"",
+                             "polyline":[
+                                    {
+                                     "x":0,
+                                     "y":0
+                                    }, 
+                                    {
+                                     "x":12.461752433936,
+                                     "y":-5.94978405680404
+                                    }],
+                             "rotation":0,
+                             "type":"",
+                             "visible":true,
+                             "width":0,
+                             "x":7.77688309786985,
+                             "y":16.1159505160676
+                            }],
+                     "opacity":1,
+                     "type":"objectgroup",
+                     "visible":true,
+                     "x":0,
+                     "y":0
+                    }
+                }],
+         "tilewidth":32,
+         "wangsets":[
+                {
+                 "colors":[
+                        {
+                         "color":"#ff0000",
+                         "name":"",
+                         "probability":1,
+                         "tile":-1
+                        }],
+                 "name":"Unnamed Set",
+                 "tile":-1,
+                 "type":"mixed",
+                 "wangtiles":[
+                        {
+                         "tileid":51,
+                         "wangid":[0, 0, 0, 1, 0, 0, 0, 0]
+                        }, 
+                        {
+                         "tileid":52,
+                         "wangid":[0, 0, 0, 1, 1, 1, 0, 0]
+                        }, 
+                        {
+                         "tileid":90,
+                         "wangid":[1, 1, 1, 1, 0, 1, 1, 0]
+                        }, 
+                        {
+                         "tileid":91,
+                         "wangid":[0, 0, 1, 1, 1, 0, 0, 0]
+                        }, 
+                        {
+                         "tileid":92,
+                         "wangid":[1, 1, 1, 1, 1, 0, 1, 0]
+                        }, 
+                        {
+                         "tileid":93,
+                         "wangid":[1, 1, 1, 1, 1, 1, 1, 1]
+                        }, 
+                        {
+                         "tileid":94,
+                         "wangid":[0, 1, 1, 0, 1, 0, 0, 0]
+                        }, 
+                        {
+                         "tileid":127,
+                         "wangid":[1, 1, 1, 1, 0, 0, 0, 0]
+                        }, 
+                        {
+                         "tileid":128,
+                         "wangid":[1, 1, 0, 1, 1, 1, 0, 1]
+                        }, 
+                        {
+                         "tileid":129,
+                         "wangid":[1, 1, 1, 0, 1, 1, 0, 1]
+                        }, 
+                        {
+                         "tileid":130,
+                         "wangid":[0, 0, 1, 0, 0, 0, 1, 1]
+                        }, 
+                        {
+                         "tileid":131,
+                         "wangid":[0, 1, 1, 0, 0, 0, 1, 0]
+                        }, 
+                        {
+                         "tileid":132,
+                         "wangid":[1, 1, 1, 0, 0, 0, 1, 1]
+                        }, 
+                        {
+                         "tileid":133,
+                         "wangid":[1, 1, 1, 1, 1, 1, 1, 1]
+                        }, 
+                        {
+                         "tileid":134,
+                         "wangid":[0, 0, 0, 0, 0, 0, 1, 0]
+                        }, 
+                        {
+                         "tileid":135,
+                         "wangid":[0, 0, 0, 0, 0, 0, 0, 1]
+                        }, 
+                        {
+                         "tileid":136,
+                         "wangid":[1, 1, 1, 0, 0, 0, 0, 0]
+                        }]
+                }]
         }, 
         {
          "columns":17,

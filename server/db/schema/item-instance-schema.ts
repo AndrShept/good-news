@@ -1,4 +1,4 @@
-import type { ItemDurability, OmitModifier } from '@/shared/types';
+import type { ItemDurability, Modifier } from '@/shared/types';
 import { relations } from 'drizzle-orm';
 import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
@@ -187,7 +187,7 @@ export const itemInstanceTable = pgTable('item_instance', {
   itemTemplateId: uuid().notNull(),
   location: itemLocationEnum().notNull(),
   coreResource: coreResourceTypeEnum(),
-  modifier: jsonb('modifier').$type<Partial<OmitModifier>>(),
+  modifier: jsonb('modifier').$type<Partial<Modifier>>(),
   durability: jsonb('durability').$type<ItemDurability>(),
   slot: slotEnum(),
   marketPrice: integer(),

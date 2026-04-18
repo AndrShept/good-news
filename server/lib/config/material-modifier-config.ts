@@ -1,15 +1,15 @@
-import type { ArmorType, ClothType, IngotType, LeatherType, OmitModifier, PlankType, ResourceType, WeaponType } from '@/shared/types';
+import type { ArmorType, ClothType, IngotType, LeatherType, Modifier, PlankType, ResourceType, WeaponType } from '@/shared/types';
 
 export interface IMaterialModifierConfig {
-  WEAPON: Record<IngotType, Partial<OmitModifier>>;
-  SHIELD: Record<IngotType | PlankType, Partial<OmitModifier>>;
+  WEAPON: Record<IngotType, Partial<Modifier>>;
+  SHIELD: Record<IngotType | PlankType, Partial<Modifier>>;
   ARMOR: {
-    PLATE: Record<IngotType, Partial<OmitModifier>>;
-    MAIL: Record<IngotType, Partial<OmitModifier>>;
-    LEATHER: Record<LeatherType, Partial<OmitModifier>>;
-    CLOTH: Record<ClothType, Partial<OmitModifier>>;
+    PLATE: Record<IngotType, Partial<Modifier>>;
+    MAIL: Record<IngotType, Partial<Modifier>>;
+    LEATHER: Record<LeatherType, Partial<Modifier>>;
+    CLOTH: Record<ClothType, Partial<Modifier>>;
   };
-  STAFF: Record<PlankType, Partial<OmitModifier>>;
+  STAFF: Record<PlankType, Partial<Modifier>>;
 }
 
 export const materialModifierConfig: IMaterialModifierConfig = {
