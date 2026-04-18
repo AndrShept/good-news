@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import React, { ComponentProps, memo } from 'react';
+import React, { ComponentProps } from 'react';
 
 type Props = ComponentProps<'div'>;
 

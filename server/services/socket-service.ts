@@ -1,6 +1,7 @@
 import type {
   HeroUpdateEvent,
   MapChunkDespawnEntityData,
+  MapChunkEntitiesDataPartial,
   MapChunkSpawnEntityData,
   MapChunkUpdateEntitiesData,
   PlaceUpdateEvent,
@@ -77,6 +78,14 @@ export const socketService = {
       entityId: heroId,
       isFinishMove: true,
       data: { type: 'HERO', payload: { state: 'IDLE' } },
+    };
+
+    io.to(chunkId).emit(socketEvents.entityUpdate(), socketData);
+  },
+  sendMapUpdateEntity(entityId: string, chunkId: string, data: MapChunkEntitiesDataPartial) {
+    const socketData: MapChunkUpdateEntitiesData = {
+      entityId,
+      data,
     };
 
     io.to(chunkId).emit(socketEvents.entityUpdate(), socketData);

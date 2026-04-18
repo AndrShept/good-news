@@ -1,7 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { cn } from '@/lib/utils';
-import { memo } from 'react';
 
 interface Props {
   recipeIds: { recipeId: string }[] | undefined;
@@ -9,7 +8,7 @@ interface Props {
   selectedItemId: string | undefined;
 }
 
-export const CraftSidebar = memo(({ recipeIds, onSelect, selectedItemId }: Props) => {
+export const CraftSidebar = ({ recipeIds, onSelect, selectedItemId }: Props) => {
   const { recipeTemplateById, itemsTemplateById } = useGameData();
 
 
@@ -36,4 +35,4 @@ export const CraftSidebar = memo(({ recipeIds, onSelect, selectedItemId }: Props
       </ScrollArea>
     </aside>
   );
-});
+}

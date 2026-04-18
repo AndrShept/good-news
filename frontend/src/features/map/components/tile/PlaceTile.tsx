@@ -1,6 +1,4 @@
 import { TPlace } from '@/shared/types';
-import { memo } from 'react';
-
 
 interface Props extends TPlace {
   TILE_SIZE: number;
@@ -8,7 +6,7 @@ interface Props extends TPlace {
   offsetY: number;
 }
 
-export const PlaceTile = memo(({ TILE_SIZE, image, x, y, offsetX, offsetY }: Props) => {
+export const PlaceTile = ({ TILE_SIZE, image, x, y, offsetX, offsetY }: Props) => {
   const localX = x - offsetX;
   const localY = y - offsetY;
   return (
@@ -24,4 +22,4 @@ export const PlaceTile = memo(({ TILE_SIZE, image, x, y, offsetX, offsetY }: Pro
       className="drop-shadow-outline-sm"
     />
   );
-});
+}

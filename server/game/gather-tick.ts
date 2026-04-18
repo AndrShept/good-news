@@ -1,6 +1,6 @@
-
 import type { FinishGatheringEvent, HeroUpdateEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
+import type { ItemsInstanceDeltaEvent } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
@@ -13,7 +13,6 @@ import { progressionService } from '../services/progression-service';
 import { skillService } from '../services/skill-service';
 import { socketService } from '../services/socket-service';
 import { serverState } from './state/server-state';
-import type { ItemsInstanceDeltaEvent } from '@/shared/types';
 
 export const gatherTick = (now: number) => {
   for (const [heroId, hero] of serverState.hero.entries()) {
@@ -34,14 +33,6 @@ export const gatherTick = (now: number) => {
 
       hero.state = 'IDLE';
       hero.gatheringFinishAt = undefined;
-      if (hero.location.chunkId) {
-        const socketData: HeroUpdateEvent = {
-          type: 'UPDATE_HERO',
-          heroId: hero.id,
-          payload: { state: hero.state },
-        };
-        io.to(hero.location.mapId).emit(socketEvents.mapUpdate(), socketData);
-      }
 
       const { x, y } = tileState;
       const gatherResult = gatheringService.getGatherTableItem({
@@ -62,7 +53,7 @@ export const gatherTick = (now: number) => {
 
       const luck = hero.stat.luck;
       const loreSkillKey = skillService.getLoreSkillByItemTemplateId(itemTemplate.id);
-      const lorSkillInstance = skillService.getSkillByKey(heroId, loreSkillKey)
+      const lorSkillInstance = skillService.getSkillByKey(heroId, loreSkillKey);
       const backpack = itemContainerService.getBackpack(heroId);
 
       const quantity = gatheringService.getGatherRewardQuantity({
@@ -92,7 +83,6 @@ export const gatherTick = (now: number) => {
         loreSkillLevel: lorSkillInstance.level,
         requiredMinSkill: gatherResult.gatherItem.requiredMinSkill,
         success: gatherResult.success,
-       
       });
 
       const expGatherResult = skillService.addExp(heroId, gatherSkill, exp);
@@ -124,6 +114,15 @@ export const gatherTick = (now: number) => {
         },
       };
       io.to(heroId).emit(socketEvents.selfData(), socketData);
+
+      if (hero.location.chunkId) {
+        socketService.sendMapUpdateEntity(heroId, hero.location.chunkId, {
+          type: 'HERO',
+          payload: {
+            state: 'IDLE',
+          },
+        });
+      }
     }
   }
 };

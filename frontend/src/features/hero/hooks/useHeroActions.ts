@@ -1,15 +1,13 @@
-import { TMap } from '@/shared/types';
+import { GameMap } from '@/shared/types';
 import { useMemo } from 'react';
 
 interface Props {
   heroPosX: number;
   heroPosY: number;
-  map: TMap | undefined;
+  map: GameMap | undefined;
 }
 
 export const useHeroActions = ({ heroPosX, heroPosY, map }: Props) => {
-
-
   const placeTile = useMemo(() => {
     return map?.places?.find((place) => {
       return place.x === heroPosX && place.y === heroPosY;
@@ -21,12 +19,8 @@ export const useHeroActions = ({ heroPosX, heroPosY, map }: Props) => {
     });
   }, [heroPosX, heroPosY, map?.entrances]);
 
-
-
-
   return {
     placeTile,
     entranceTile,
-    
   };
 };

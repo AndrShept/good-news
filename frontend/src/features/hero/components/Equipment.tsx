@@ -4,7 +4,7 @@ import { BASE_EQUIPMENTS_IMAGE } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { EquipmentSlotType, ItemInstance } from '@/shared/types';
 import { useSelectItemInstanceStore } from '@/store/useSelectItemInstanceStore';
-import { memo, useMemo } from 'react';
+import {  useMemo } from 'react';
 
 import { useGameData } from '../hooks/useGameData';
 import { CharacterSprite } from './CharacterSprite';
@@ -14,7 +14,7 @@ interface Props {
   characterImage: string;
 }
 
-export const Equipments = memo(function Equipments({ equipments, characterImage }: Props) {
+export const Equipments =  ({ equipments, characterImage }: Props) =>  {
   const equipmentBySlot = useMemo(
     () =>
       equipments.reduce(
@@ -72,4 +72,4 @@ export const Equipments = memo(function Equipments({ equipments, characterImage 
       </ul>
     </div>
   );
-});
+}

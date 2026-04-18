@@ -1,12 +1,12 @@
 import { imageConfig } from '@/shared/config/image-config';
-import type { TMap } from '@/shared/types';
 
 import solverMine from '../../server/data/json/solmer-mine.json';
 import solverValley from '../../server/data/json/solmer-valley.json';
+import type { Layer, Tileset } from '../json-types';
+import type { GameMap } from '../types';
 import { placeTemplate, placeTemplateByName } from './place-template';
-import type { Layer } from '../json-types';
 
-export const mapTemplate: TMap[] = [
+export const mapTemplate: GameMap[] = [
   {
     id: '019a350c-5552-76dd-b6d5-181b473d3128',
     name: 'Solmere Valley',
@@ -16,8 +16,8 @@ export const mapTemplate: TMap[] = [
     width: solverValley.width,
     tileHeight: solverValley.tileheight,
     tileWidth: solverValley.tilewidth,
-    image: '/sprites/map/ground-tileset.png',
     layers: solverValley.layers as Layer[],
+    tileset: solverValley.tilesets as Tileset[],
     places: [placeTemplateByName['Solmer Town'], placeTemplateByName['Solmer Mine']],
     entrances: [],
   },
@@ -28,11 +28,11 @@ export const mapTemplate: TMap[] = [
     width: solverMine.width,
     tileHeight: solverMine.tileheight,
     tileWidth: solverMine.tilewidth,
-    image: imageConfig.bg.map.solmerMine,
     layers: solverMine.layers,
     offsetX: 0,
     offsetY: 0,
     places: [],
+    tileset: [],
     entrances: [
       {
         id: '019c444d-a69c-7512-bd7d-745f3048509e',

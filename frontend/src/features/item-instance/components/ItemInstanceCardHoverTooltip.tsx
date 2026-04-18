@@ -1,6 +1,5 @@
 import { cn } from '@/lib/utils';
 import { ItemInstance, ItemTemplate } from '@/shared/types';
-import { memo } from 'react';
 
 import { EquipInfo } from './EquipInfo';
 import { ModifierInfoCard } from './ModifierInfoCard';
@@ -9,7 +8,7 @@ import { PotionInfo } from './PotionInfo';
 type Props = ItemInstance & {
   itemTemplate: ItemTemplate;
 };
-export const ItemInstanceCardHoverTooltip = memo((props: Props) => {
+export const ItemInstanceCardHoverTooltip = (props: Props) => {
   return (
     <>
       <h3 className={cn('truncate text-base capitalize')}>{props.displayName ?? props.itemTemplate.name}</h3>
@@ -29,4 +28,4 @@ export const ItemInstanceCardHoverTooltip = memo((props: Props) => {
       <ModifierInfoCard modifiersArgs={[props.modifier ?? {}]} />
     </>
   );
-});
+}

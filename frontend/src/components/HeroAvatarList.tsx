@@ -1,6 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
-import React, { memo, useMemo } from 'react';
+
+import  {  useMemo } from 'react';
 
 import { GameAvatar } from './GameAvatar';
 
@@ -9,7 +9,7 @@ interface Props {
   setAvatar: (image: string) => void;
 }
 
-export const HeroAvatarList = memo(({ avatar, setAvatar }: Props) => {
+export const HeroAvatarList = ({ avatar, setAvatar }: Props) => {
   const avatars = useMemo(() => {
     return [...Array(48)].map((_, idx) => ({
       src: `/sprites/avatar/Icon${idx + 1}.png`,
@@ -30,4 +30,4 @@ export const HeroAvatarList = memo(({ avatar, setAvatar }: Props) => {
       </ul>
     </ScrollArea>
   );
-});
+}

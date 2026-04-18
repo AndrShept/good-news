@@ -23,7 +23,7 @@ interface Props {
   modifier?: Modifier;
 }
 
-export const Stats = memo(({ reset, setCurrentStats, currentStats, freePoints, setFreePoints, baseStats, modifier }: Props) => {
+export const Stats = ({ reset, setCurrentStats, currentStats, freePoints, setFreePoints, baseStats, modifier }: Props) => {
   const { initialStats, onDecrement, onIncrement } = useChangeHeroStats({
     baseStats,
     currentStats,
@@ -94,4 +94,4 @@ export const Stats = memo(({ reset, setCurrentStats, currentStats, freePoints, s
       </ul>
     </section>
   );
-});
+}

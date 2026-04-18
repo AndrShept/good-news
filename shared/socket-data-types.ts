@@ -1,4 +1,3 @@
-import type { itemInstanceService } from '../server/services/item-instance-service';
 import type {
   Corpse,
   EntityPayloadMap,
@@ -23,7 +22,7 @@ export type SocketGroupResponse = {
   updateType: 'leave' | 'kick' | 'remove' | 'new-member';
 };
 
-type MapChunkEntitiesDataPartial = {
+export type MapChunkEntitiesDataPartial = {
   [K in keyof EntityPayloadMap]: {
     type: K;
     payload: Partial<EntityPayloadMap[K]>;

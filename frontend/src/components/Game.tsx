@@ -3,6 +3,7 @@ import { GameHeader } from '@/features/hero/components/GameHeader';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { MovingPanel } from '@/features/map/components/MovingPanel';
 import { useCancelGatheringMutation } from '@/features/map/hooks/useCancelGatheringMutation';
+import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { Outlet } from '@tanstack/react-router';
 
 import { ActionTimerPanel } from './ActionTimerPanel';
@@ -15,13 +16,15 @@ export const Game = () => {
     gatheringFinishAt: data?.gatheringFinishAt,
   }));
   const cancelGatheringMutation = useCancelGatheringMutation();
+  const movementPathTiles = useMovementPathTileStore((state) => state.movementPathTiles);
+
   return (
     <>
       <DndInventoryProvider>
         <section className="mx-auto flex max-w-7xl flex-col">
           <GameHeader />
 
-          {state && <MovingPanel heroState={state} />}
+          {state && !!movementPathTiles.length && <MovingPanel heroState={state} movementPathTiles={movementPathTiles} />}
           {state && state !== 'IDLE' && !!gatheringFinishAt && (
             <ActionTimerPanel
               heroState={state}

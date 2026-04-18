@@ -7,7 +7,7 @@ import { GroupMemberCard } from './GroupMemberCard';
 import { GroupSkeleton } from './GroupSkeleton';
 import { RemoveGroupButton } from './RemoveGroupButton';
 
-export const GroupMembersList = memo(() => {
+export const GroupMembersList = () => {
   const { group, groupId } = useHero((data) => ({
     groupId: data?.groupId ?? '',
     group: data?.group,
@@ -35,4 +35,4 @@ export const GroupMembersList = memo(() => {
       <RemoveGroupButton groupId={groupId} />
     </section>
   );
-});
+}

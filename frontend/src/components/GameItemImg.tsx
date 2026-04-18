@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { ComponentProps, memo } from 'react';
+import { ComponentProps } from 'react';
 
 export interface TintColor {
   color: [number, number, number];
@@ -14,7 +14,7 @@ interface Props extends Omit<ComponentProps<'img'>, 'src'> {
   isPixelate?: boolean;
 }
 
-export const GameItemImg = memo(({ image, tintColor, isPixelate = true, className, ...props }: Props) => {
+export const GameItemImg = ({ image, tintColor, isPixelate = true, className, ...props }: Props) => {
   const filter = tintColor ? buildTintFilter(tintColor.color) : undefined;
   return (
     <img
@@ -30,7 +30,7 @@ export const GameItemImg = memo(({ image, tintColor, isPixelate = true, classNam
       className={cn('size-full select-none object-contain opacity-85 group-hover:opacity-100', className)}
     />
   );
-});
+}
 
 function buildTintFilter([r, g, b]: [number, number, number]): string {
   const rm = r / 255;

@@ -14,7 +14,6 @@ import {
 import { itemTemplateService } from '../server/services/item-template-service';
 import type { Layer } from './json-types';
 import { mapTemplate } from './templates/map-template';
-import { resourceTemplateById } from './templates/resource-template';
 import type { GatheringCategorySkillKey } from './templates/skill-template';
 import type {
   CoreResourceType,
@@ -161,7 +160,7 @@ export const getTilesAroundHero = (pos: IPosition, radius = 1) => {
   const tiles: IPosition[] = [];
   for (let dx = -radius; dx <= radius; dx++) {
     for (let dy = -radius; dy <= radius; dy++) {
-      if (dx === 0 && dy === 0) continue;
+      // if (dx === 0 && dy === 0) continue;
       tiles.push({ x: pos.x + dx, y: pos.y + dy });
     }
   }

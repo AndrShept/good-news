@@ -1,40 +1,96 @@
-import React, { ComponentProps, useEffect, useRef } from 'react';
+import { Layer, Tileset } from '@/shared/json-types';
+import { ComponentProps, memo, useCallback, useEffect, useMemo, useRef } from 'react';
 
 interface Props extends ComponentProps<'canvas'> {
-  grounds: number[];
+  layers: Layer[];
+  tileset: Tileset[];
   MAP_WIDTH: number;
   TILE_SIZE: number;
-  tileImage: string;
 }
 
-export const Canvas = ({ grounds, MAP_WIDTH, TILE_SIZE, tileImage, ...props }: Props) => {
-  const ref = useRef<HTMLCanvasElement | null>(null);
+function resolveTile(gid: number, tilesets: Tileset[]) {
+  const tileset = tilesets.find((t) => gid >= t.firstgid);
+  if (!tileset) return null;
+  return {
+    tileset,
+    localId: gid - tileset.firstgid,
+  };
+}
 
-  useEffect(() => {
-    const ctx = ref.current?.getContext('2d');
-    if (!ctx) return;
+export const Canvas = memo(({ layers, tileset, MAP_WIDTH, TILE_SIZE, ...props }: Props) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const imagesRef = useRef<Record<string, HTMLImageElement>>({});
 
-    const img = new Image();
-    img.src = tileImage;
-    
+  const sortedTilesets = useMemo(() => {
+    return [...tileset].sort((a, b) => b.firstgid - a.firstgid);
+  }, [tileset]);
 
-    img.onload = () => {
-      const tilesetWidth = img.width / TILE_SIZE;
+  const drawMap = useCallback(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!ctx || !canvas) return;
 
-      grounds.forEach((tileId, index) => {
-        const x = index % MAP_WIDTH;
-        const y = Math.floor(index / MAP_WIDTH);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        const dx = x * TILE_SIZE;
-        const dy = y * TILE_SIZE;
+       layers.forEach((layer) => {
+      layer.data?.forEach((gid, index) => {
+        if (gid === 0) return;
 
-        const sx = ((tileId - 1) % tilesetWidth) * TILE_SIZE;
-        const sy = Math.floor(tileId / tilesetWidth) * TILE_SIZE;
+        const resolved = resolveTile(gid, sortedTilesets);
+        if (!resolved) return;
+
+        const { tileset, localId } = resolved;
+        const img = imagesRef.current[tileset.image];
+        if (!img) return;
+
+        const columns = tileset.columns;
+        const sx = (localId % columns) * TILE_SIZE;
+        const sy = Math.floor(localId / columns) * TILE_SIZE;
+        const dx = (index % MAP_WIDTH) * TILE_SIZE;
+        const dy = Math.floor(index / MAP_WIDTH) * TILE_SIZE;
 
         ctx.drawImage(img, sx, sy, TILE_SIZE, TILE_SIZE, dx, dy, TILE_SIZE, TILE_SIZE);
       });
-    };
-  }, [grounds]);
+        });
+  }, [layers, sortedTilesets, TILE_SIZE, MAP_WIDTH]);
 
-  return <canvas ref={ref} {...props}></canvas>;
-};
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadImages = async () => {
+      await Promise.all(
+        sortedTilesets.map(
+          (ts) =>
+            new Promise<void>((resolve) => {
+              if (imagesRef.current[ts.image]) return resolve();
+
+              const img = new Image();
+              img.src = `/sprites/map/${ts.name}.png`;
+              img.onload = () => {
+                imagesRef.current[ts.image] = img;
+                resolve();
+              };
+              img.onerror = () => resolve();
+            }),
+        ),
+      );
+
+      if (!isMounted) return;
+      drawMap();
+    };
+
+    loadImages();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [sortedTilesets, drawMap]);
+
+  useEffect(() => {
+    if (Object.keys(imagesRef.current).length > 0) {
+      drawMap();
+    }
+  }, [drawMap]);
+
+  return <canvas ref={canvasRef} {...props} />;
+});

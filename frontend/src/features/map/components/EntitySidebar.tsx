@@ -1,7 +1,6 @@
 import { CounterBadge } from '@/components/CounterBadge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HeroSidebarItem, MapCorpse, MapCreature } from '@/shared/types';
-import { memo } from 'react';
 
 import { EntitySidebarCard } from './EntitySidebarCard';
 import { HeroSidebarListSkeleton } from './HeroSidebarListSkeleton';
@@ -15,7 +14,7 @@ interface Props {
   isLoading: boolean;
 }
 
-export const EntitySidebar = memo(({ heroes, corpses, creatures, mode, isLoading }: Props) => {
+export const EntitySidebar = ({ heroes, corpses, creatures, mode, isLoading }: Props) => {
   if (isLoading) return <HeroSidebarListSkeleton />;
   return (
     <aside className="hidden w-full max-w-[200px] select-text flex-col gap-1 sm:flex">
@@ -58,4 +57,4 @@ export const EntitySidebar = memo(({ heroes, corpses, creatures, mode, isLoading
       )}
     </aside>
   );
-});
+}

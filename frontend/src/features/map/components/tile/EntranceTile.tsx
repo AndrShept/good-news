@@ -1,5 +1,4 @@
-import { Entrance } from '@/shared/types';
-import { memo } from 'react';
+
 
 
 interface Props {
@@ -11,7 +10,7 @@ interface Props {
   offsetY: number;
 }
 
-export const EntranceTile = memo(function HeroTile({ x, y, image, TILE_SIZE, offsetX, offsetY }: Props) {
+export const EntranceTile =  ({ x, y, image, TILE_SIZE, offsetX, offsetY }: Props) =>{
   const localX = x - offsetX;
   const localY = y - offsetY;
   return (
@@ -27,4 +26,4 @@ export const EntranceTile = memo(function HeroTile({ x, y, image, TILE_SIZE, off
       className="drop-shadow-outline-sm"
     />
   );
-});
+}

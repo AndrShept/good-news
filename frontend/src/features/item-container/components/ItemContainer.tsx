@@ -9,7 +9,6 @@ import { useSelectPlaceEntitiesStore } from '@/store/useSelectPlaceEntitiesStore
 import { useSelectedItemId, useSetSelectedItem } from '@/store/useSelectItemInstanceStore';
 import { useShopItemStore } from '@/store/useShopItemStore';
 import { useDroppable } from '@dnd-kit/core';
-import { memo } from 'react';
 
 import { useCreateContainerItems } from '../hooks/useCreateContainerItems';
 import { ContainerCapacityInfo } from './ContainerCapacityInfo';
@@ -18,7 +17,7 @@ type Props = TItemContainer & {
   isShowContainerHeader?: boolean;
 };
 
-export const ItemContainer = memo(({ capacity, id, type, itemsInstance, name, isShowContainerHeader = true }: Props) => {
+export const ItemContainer = ({ capacity, id, type, itemsInstance, name, isShowContainerHeader = true }: Props) => {
   const { isOver, setNodeRef, active } = useDroppable({
     id,
     data: { to: { id, type } },
@@ -79,4 +78,4 @@ export const ItemContainer = memo(({ capacity, id, type, itemsInstance, name, is
       </ul>
     </section>
   );
-});
+}

@@ -1,3 +1,4 @@
+import { BackButton } from '@/components/BackButton';
 import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
 import { useHero } from '@/features/hero/hooks/useHero';
@@ -18,7 +19,7 @@ export const ShopHeader = () => {
 
   return (
     <section className="flex justify-between border-b p-2">
-      <Button onClick={() => setNpcActiveTab(null)}> {'< back'}</Button>
+      <BackButton onClick={() => setNpcActiveTab(null)} />
       <div className="flex items-center text-xl">
         <GameIcon className="size-6" image={imageConfig.icon.ui.gold} />
         {npcActiveTab === 'BUY' && <p className={cn(gold < totalPrice && 'text-red-500')}>{totalPrice}</p>}

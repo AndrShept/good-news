@@ -1,9 +1,8 @@
 import { MAP_CHUNK_SIZE } from '@/shared/constants';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
-import type {  SuccessResponse, TMap } from '@/shared/types';
+import type { GameMap, SuccessResponse } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
-import { and, asc, desc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
@@ -64,7 +63,7 @@ export const mapRouter = new Hono<Context>()
       copyMap.places = placesByChunkId.filter((p) => chunkAroundHero.includes(p.chunkId));
 
       copyMap.layers = copyMap.layers
-        .filter((l) => l.name === 'GROUND' || l.name === 'OBJECT' || l.name === 'WATER')
+        // .filter((l) => l.name === 'GROUND' || l.name === 'OBJECT' || l.name === 'WATER')
         .map((l) =>
           l.data
             ? {
@@ -86,7 +85,7 @@ export const mapRouter = new Hono<Context>()
       copyMap.offsetX = startX;
       copyMap.offsetY = startY;
 
-      return c.json<SuccessResponse<TMap>>({
+      return c.json<SuccessResponse<GameMap>>({
         message: 'map fetched!',
         success: true,
         data: copyMap,

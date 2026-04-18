@@ -2,10 +2,8 @@ import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
 import { useGatherResourceMutation } from '@/features/hero/hooks/useGatherResourceMutation';
 import { capitalize } from '@/lib/utils';
-
 import { imageConfig } from '@/shared/config/image-config';
-import { GatheringCategorySkillKey, SkillKey } from '@/shared/templates/skill-template';
-import { getHeroStateWithGatherSkillKey } from '@/shared/utils';
+import { GatheringCategorySkillKey } from '@/shared/templates/skill-template';
 
 interface Props {
   disabled: boolean;
@@ -15,11 +13,7 @@ interface Props {
 export const GatherSkillButton = ({ disabled, gatherSkill }: Props) => {
   const { mutate, isPending } = useGatherResourceMutation();
   return (
-    <Button
-      onClick={() => mutate({  gatherSkill })}
-      variant={'secondary'}
-      disabled={disabled || isPending || gatherSkill === 'SKINNING'}
-    >
+    <Button onClick={() => mutate({ gatherSkill })} variant={'secondary'} disabled={disabled || isPending || gatherSkill === 'SKINNING'}>
       <GameIcon className="size-6" image={imageConfig.icon.skill[gatherSkill]} />
       <p className="truncate">{capitalize(gatherSkill)}</p>
     </Button>

@@ -7,7 +7,7 @@ interface Props {
   type: 'health' | 'mana' | 'exp';
 }
 
-export const FillBar = memo(({ value, maxValue, type }: Props) => {
+export const FillBar = ({ value, maxValue, type }: Props) => {
   const lowPercentHealth = maxValue * 0.3;
 
   return (
@@ -28,4 +28,4 @@ export const FillBar = memo(({ value, maxValue, type }: Props) => {
       </div>
     </div>
   );
-});
+}

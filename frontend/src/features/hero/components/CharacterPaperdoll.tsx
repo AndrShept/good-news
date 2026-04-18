@@ -1,3 +1,4 @@
+import { BackButton } from '@/components/BackButton';
 import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
 import { HeroBackpack } from '@/features/item-container/components/HeroBackpack';
@@ -30,11 +31,8 @@ export const CharacterPaperdoll = () => {
   const { setUiType } = useHeroUIStore();
   return (
     <section className="mx-auto flex flex-col gap-1">
-      <Button variant="outline" onClick={() => setUiType(null)} className="m-auto w-fit mb-2">
-        <GameIcon className="size-4.5" image={imageConfig.icon.ui.back} />
-        Back
-      </Button>
-      <div className="flex gap-4">
+      <BackButton onClick={() => setUiType(null)} className="m-auto my-1" />
+      <div className="flex flex-1 gap-4">
         <Paperdoll {...hero} />
         <div className="h-fit max-w-fit flex-col gap-2 rounded text-sm md:flex">
           <CharacterStat freeStatPoints={hero.freeStatPoints} heroStat={hero.stat} modifier={hero.modifier} />

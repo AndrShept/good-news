@@ -48,10 +48,9 @@ import type {
   weaponTypeEnum,
 } from '../server/db/schema/item-instance-schema';
 import { postTable } from '../server/db/schema/posts-schema';
-import type { queueCraftItemTable, queueCraftStatusEnum } from '../server/db/schema/queue-craft-item-schema';
+import type { queueCraftStatusEnum } from '../server/db/schema/queue-craft-item-schema';
 import type { skillInstanceTable } from '../server/db/schema/skill-instance-schema';
-import type { HeroRuntime } from '../server/game/state/server-state';
-import type { Layer } from './json-types';
+import type { Layer, Tileset } from './json-types';
 import type { CreatureKey } from './templates/creature-template';
 import type { SkillKey, skillCategoryValues } from './templates/skill-template';
 
@@ -240,7 +239,7 @@ export type Entrance = {
   targetY?: number;
 };
 
-export type TMap = {
+export type GameMap = {
   id: string;
   width: number;
   height: number;
@@ -248,8 +247,8 @@ export type TMap = {
   tileWidth: number;
   offsetX: number;
   offsetY: number;
-  image: string;
   name: string;
+  tileset: Tileset[];
   layers: Layer[];
   places: TPlace[];
   entrances: Entrance[];

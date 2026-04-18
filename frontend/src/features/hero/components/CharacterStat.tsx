@@ -1,6 +1,6 @@
 import { useHero } from '@/features/hero/hooks/useHero';
 import { IHeroStat, Modifier } from '@/shared/types';
-import { memo, useEffect, useRef, useState } from 'react';
+import {  useEffect, useRef, useState } from 'react';
 
 import { Stats } from './Stats';
 
@@ -10,7 +10,7 @@ interface Props {
   heroStat: IHeroStat | undefined;
 }
 
-export const CharacterStat = memo(({ freeStatPoints, modifier, heroStat }: Props) => {
+export const CharacterStat = ({ freeStatPoints, modifier, heroStat }: Props) => {
   if (!modifier) throw new Error('modifier not found');
   if (!heroStat) throw new Error('stat not found');
   const initialHeroStats: IHeroStat = {
@@ -55,4 +55,4 @@ export const CharacterStat = memo(({ freeStatPoints, modifier, heroStat }: Props
       />
     </>
   );
-});
+}

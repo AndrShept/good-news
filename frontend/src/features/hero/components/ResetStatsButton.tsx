@@ -1,5 +1,4 @@
 import { ConfirmPopover } from '@/components/ConfirmPopover';
-import { GoldIcon } from '@/components/game-icons/GoldIcon';
 import { Button } from '@/components/ui/button';
 
 import { useResetStats } from '../hooks/useResetStats';
@@ -16,7 +15,7 @@ export const ResetStatsButton = () => {
   return (
     <ConfirmPopover onConfirm={onReset}>
       <ConfirmPopover.Trigger>
-        <Button disabled={isPending} className="mt-2 w-full" variant={'default'} size={'sm'}>
+        <Button disabled={isPending} className="mt-2 w-full" variant={'outline'} size={'sm'}>
           <GameIcon image={imageConfig.icon.ui.gold} className="ml-0.5 size-5" />Reset
         </Button>
       </ConfirmPopover.Trigger>

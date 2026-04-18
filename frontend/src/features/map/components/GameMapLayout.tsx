@@ -83,8 +83,6 @@ export const GameMapLayout = () => {
           callbackRef={callbackRef}
           width={map.data?.width ?? 0}
           height={map.data?.height ?? 0}
-          layers={map.data?.layers ?? []}
-          image={map.data?.image ?? ''}
           tileWidth={map.data?.tileWidth ?? 32}
           heroWorldX={heroWorldX}
           heroWorldY={heroWorldY}
@@ -93,6 +91,8 @@ export const GameMapLayout = () => {
           heroTargetX={hero.targetX}
           heroTargetY={hero.targetY}
           heroState={hero.state}
+          tileset={map.data?.tileset ?? []}
+          layers={map.data?.layers ?? []}
           mapHeroes={mapEntities?.heroes ?? []}
           mapCreatures={mapEntities?.creatures ?? []}
           places={map.data?.places ?? []}

@@ -1143,12 +1143,12 @@ export const heroRouter = new Hono<Context>()
       hero.gatheringFinishAt = gatheringTime;
 
       if (hero.location.chunkId) {
-        const socketData: HeroUpdateEvent = {
-          type: 'UPDATE_HERO',
-          heroId: hero.id,
-          payload: { state },
-        };
-        io.to(hero.location.chunkId).emit(socketEvents.mapUpdate(), socketData);
+        socketService.sendMapUpdateEntity(hero.id, hero.location.chunkId, {
+          type: 'HERO',
+          payload: {
+            state,
+          },
+        });
       }
       const returnData = {
         state: hero.state,
@@ -1176,6 +1176,15 @@ export const heroRouter = new Hono<Context>()
 
     hero.state = 'IDLE';
     hero.gatheringFinishAt = undefined;
+
+    if (hero.location.chunkId) {
+      socketService.sendMapUpdateEntity(hero.id, hero.location.chunkId, {
+        type: 'HERO',
+        payload: {
+          state: hero.state,
+        },
+      });
+    }
 
     return c.json<SuccessResponse>({
       message: `You cancel gathering.`,

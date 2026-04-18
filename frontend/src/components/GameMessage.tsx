@@ -37,20 +37,19 @@ export const GameMessage = memo(() => {
               <div
                 key={(message.createdAt?.toString() ?? '') + idx}
                 className={cn('inline-flex flex-wrap gap-1 text-sm', {
+                  'text-foreground': message.color === 'FOREGROUND',
                   'text-muted-foreground': message.color === 'GREY',
                   'text-yellow-300': message.color === 'YELLOW',
                   'text-red-400': message.color === 'RED',
                   'text-green-400': message.color === 'GREEN',
                   'text-blue-400': message.color === 'BLUE',
                   'text-purple-500': message.color === 'PURPLE',
-                  'text-foreground': message.color === 'FOREGROUND',
                 })}
               >
                 <time className="text-foreground">{getTimeFns(message.createdAt!)} </time>
-                {splitWords.map((word) => (
+                {splitWords.map((word, idx) => (
                   <span
-                  
-                    key={word}
+                    key={word + idx}
                     className={cn('', {
                       'text-foreground': word.startsWith('+') || (word.startsWith('[') && word.endsWith(']')),
                       'text-yellow-300': word.startsWith('x'),

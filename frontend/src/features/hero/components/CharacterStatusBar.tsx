@@ -1,5 +1,4 @@
 import { GameAvatar } from '@/components/GameAvatar';
-import { memo } from 'react';
 
 import { BuffList } from './BuffList';
 import { FillBar } from './FillBar';
@@ -15,7 +14,7 @@ interface Props {
   id: string;
 }
 
-export const CharacterStatusBar = memo((props: Props) => {
+export const CharacterStatusBar = (props: Props) => {
   return (
     <div className="flex w-full items-center gap-2">
       <div>
@@ -33,4 +32,4 @@ export const CharacterStatusBar = memo((props: Props) => {
       </div>
     </div>
   );
-});
+}

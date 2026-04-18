@@ -2,16 +2,16 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useHeroActions } from '@/features/hero/hooks/useHeroActions';
 import { GatheringCategorySkillKey } from '@/shared/templates/skill-template';
-import { StateType, TMap } from '@/shared/types';
+import { GameMap, StateType } from '@/shared/types';
 import { useIsMutating } from '@tanstack/react-query';
 import { BracketsIcon } from 'lucide-react';
-import { memo } from 'react';
+
 
 import { GatherSkillButton } from './GatherSkillButton';
 import { TravelButton } from './TravelButton';
 
 interface Props {
-  map: TMap | undefined;
+  map: GameMap | undefined;
   heroPosX: number;
   heroPosY: number;
   state: StateType;
@@ -21,7 +21,7 @@ interface Props {
 
 const gatherSkills: GatheringCategorySkillKey[] = ['FISHING', 'FORAGING', 'WOODCUTTING', 'MINING', 'SKINNING'];
 
-export const HeroActionsBar = memo(({ heroPosX, heroPosY, map, state, gatheringFinishAt, onCenter }: Props) => {
+export const HeroActionsBar = ({ heroPosX, heroPosY, map, state, gatheringFinishAt, onCenter }: Props) => {
   const mutationIsPending = !!useIsMutating();
   const { entranceTile, placeTile } = useHeroActions({
     heroPosX,
@@ -47,4 +47,4 @@ export const HeroActionsBar = memo(({ heroPosX, heroPosY, map, state, gatheringF
       {(entranceTile || placeTile) && <Separator className="hidden sm:block" />}
     </div>
   );
-});
+}

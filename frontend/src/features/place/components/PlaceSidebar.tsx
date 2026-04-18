@@ -4,7 +4,7 @@ import { imageConfig } from '@/shared/config/image-config';
 import { buildingTemplate } from '@/shared/templates/building-template';
 import { CraftBuildingKey, Entrance, RefiningBuildingKey, StateType, TPlace } from '@/shared/types';
 import { useSelectPlaceEntitiesStore } from '@/store/useSelectPlaceEntitiesStore';
-import { memo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 
 import { useLeavePlace } from '../hooks/useLeavePlace';
@@ -28,7 +28,7 @@ const stateToBuildingMap: Record<StateBuilding, CraftBuildingKey | RefiningBuild
   TANNING: 'TANNERY',
   WEAVING: 'LOOM',
 };
-export const PlaceSidebar = memo(({ place, entrances }: Props) => {
+export const PlaceSidebar = ({ place, entrances }: Props) => {
   const isMobile = useMediaQuery('(min-width: 768px)');
   const { mutate, isPending } = useLeavePlace();
   const { selectedPlaceEntities, setSelectedPlaceEntities } = useSelectPlaceEntitiesStore();
@@ -97,5 +97,5 @@ export const PlaceSidebar = memo(({ place, entrances }: Props) => {
         </ul>
       </ScrollArea>
     </aside>
-  );
-});
+  )
+}
