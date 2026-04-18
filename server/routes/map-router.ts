@@ -1,4 +1,3 @@
-import { MAP_CHUNK_SIZE } from '@/shared/constants';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import type { GameMap, SuccessResponse } from '@/shared/types';
@@ -12,6 +11,7 @@ import { serverState } from '../game/state/server-state';
 import { loggedIn } from '../middleware/loggedIn';
 import { heroService } from '../services/hero-service';
 import { mapService } from '../services/map-service';
+import { MAP_CHUNK_SIZE } from '../lib/config/server-constants';
 
 export const mapRouter = new Hono<Context>()
   .get(

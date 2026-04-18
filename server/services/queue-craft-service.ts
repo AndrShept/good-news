@@ -1,10 +1,8 @@
-import { MAX_SKILL } from '@/shared/constants';
 import { socketEvents } from '@/shared/socket-events';
 import { buildingTemplateById } from '@/shared/templates/building-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
 import { resourceTemplateById } from '@/shared/templates/resource-template';
-import type { SkillKey } from '@/shared/templates/skill-template';
 import type {
   ColoredResourceCategoryType,
   CoreResourceType,
@@ -24,6 +22,7 @@ import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
 import { skillService } from './skill-service';
+import { MAX_SKILL } from '../lib/config/server-constants';
 
 interface GetCraftChance {
   craftSkillLevel: number;

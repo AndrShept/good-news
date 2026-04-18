@@ -1,10 +1,10 @@
-import { SAVE_DB_INTERVAL } from '@/shared/constants';
 import { eq, inArray } from 'drizzle-orm';
 
 import { db } from '../db/db';
 import { itemInstanceTable } from '../db/schema';
 import { delay } from '../lib/utils';
 import { serverState } from './state/server-state';
+import { SAVE_DB_INTERVAL } from '../lib/config/server-constants';
 
 export async function saveItemsDb() {
   while (true) {

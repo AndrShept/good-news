@@ -1,5 +1,6 @@
-import { WORLD_SEED } from '@/shared/constants';
 
+
+import { WORLD_SEED } from '../lib/config/server-constants';
 import { gatheringService } from '../services/gathering-service';
 import { serverState } from './state/server-state';
 

@@ -14,7 +14,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { imageConfig } from '@/shared/config/image-config';
-import { BANK_CONTAINER_COST } from '@/shared/constants';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
@@ -47,7 +46,7 @@ export const CreateBankItemContainerModal = ({ placeName }: Props) => {
           </DialogDescription>
           <div className="mx-auto flex gap-1">
             <span className="text-center text-red-400">This will cost </span>
-            <span className="text-center">{BANK_CONTAINER_COST} </span>
+            <span className="text-center">{100} </span>
             <GameIcon image={imageConfig.icon.ui.prem} />
           </div>
         </DialogHeader>

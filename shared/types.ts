@@ -210,7 +210,33 @@ export type ColoredResourceType =
 
 export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
 export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number];
-
+export type  Modifier = {
+    strength: number;
+    dexterity: number;
+    intelligence: number;
+    wisdom: number;
+    constitution: number;
+    luck: number;
+    maxHealth: number;
+    maxMana: number;
+    maxDamage: number;
+    minDamage: number;
+    manaRegen: number;
+    healthRegen: number;
+    armor: number;
+    magicResistance: number;
+    evasion: number;
+    spellDamage: number;
+    spellCritDamage: number;
+    spellCritRating: number;
+    spellHitRating: number;
+    spellPenetration: number;
+    physDamage: number;
+    physCritDamage: number;
+    physCritRating: number;
+    physHitRating: number;
+    physPenetration: number;
+}
 export type Modifier = InferSelectModel<typeof modifierTable>;
 export type Group = InferSelectModel<typeof groupTable>;
 export type TLocation = {

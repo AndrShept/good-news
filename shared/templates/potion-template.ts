@@ -1,8 +1,8 @@
 import { imageConfig } from '@/shared/config/image-config';
-import { DEFAULT_ITEM_STACK } from '@/shared/constants';
 import type { ItemTemplate } from '@/shared/types';
 
 import { buffTemplateMapByName } from './buff-template';
+import { DEFAULT_ITEM_STACK } from '../shared-constants';
 
 export const potionTemplate = [
   {

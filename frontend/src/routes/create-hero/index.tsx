@@ -7,7 +7,7 @@ import { getUserQueryOptions } from '@/features/auth/api/get-user';
 import { getHeroOptions } from '@/features/hero/api/get-hero';
 import { Stats } from '@/features/hero/components/Stats';
 import { useCreateHero } from '@/features/hero/hooks/useCreateHero';
-import { BASE_FREE_POINTS, BASE_STATS } from '@/shared/constants';
+import { BASE_FREE_POINTS, BASE_STATS } from '@/shared/shared-constants';
 import { createHeroSchema } from '@/shared/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, createFileRoute, redirect, useNavigate } from '@tanstack/react-router';

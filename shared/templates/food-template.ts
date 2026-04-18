@@ -1,6 +1,6 @@
 import { imageConfig } from '@/shared/config/image-config';
-import { DEFAULT_ITEM_STACK } from '@/shared/constants';
 import type { FishType, ItemTemplate } from '@/shared/types';
+import { DEFAULT_ITEM_STACK } from '../shared-constants';
 
 const createFood = (id: string, key: FishType, image: string): ItemTemplate => ({
   id,

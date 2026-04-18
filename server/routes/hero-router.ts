@@ -1,15 +1,5 @@
-import {
-  BANK_CONTAINER_COST,
-  BASE_GATHERING_TIME,
-  BASE_STATS,
-  HP_MULTIPLIER_COST,
-  MANA_MULTIPLIER_INT,
-  MAX_QUEUE_CRAFT_ITEM,
-  RESET_STATS_COST,
-  WORLD_SEED,
-} from '@/shared/constants';
+
 import type { HeroUpdateEvent, MapChunkUpdateEntitiesData } from '@/shared/socket-data-types';
-import { NPC_SHOP_TABLE } from '@/shared/table/npc-shop-table';
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
 import { recipeTemplate, recipeTemplateById } from '@/shared/templates/recipe-template';
@@ -45,7 +35,6 @@ import {
 } from '@/shared/utils';
 import { zValidator } from '@hono/zod-validator';
 import { and, asc, desc, eq, lt, lte, ne, sql } from 'drizzle-orm';
-import { PgTimestampStringBuilder } from 'drizzle-orm/pg-core';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
@@ -68,12 +57,10 @@ import {
 } from '../db/schema';
 import { queueCraftItemTable } from '../db/schema/queue-craft-item-schema';
 import { type HeroRuntime, type TileState, serverState } from '../game/state/server-state';
-import { calculate } from '../lib/calculate';
 import { heroOnline } from '../lib/heroOnline';
 import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
-import { actionQueue } from '../queue/actionQueue';
 import { deltaEventsService } from '../services/delta-events-service';
 import { equipmentService } from '../services/equipment-service';
 import { gatheringService } from '../services/gathering-service';
@@ -88,6 +75,8 @@ import { queueCraftService } from '../services/queue-craft-service';
 import { refiningService } from '../services/refining-service';
 import { skillService } from '../services/skill-service';
 import { socketService } from '../services/socket-service';
+import { BANK_CONTAINER_COST, BASE_STATS, MAX_QUEUE_CRAFT_ITEM, RESET_STATS_COST } from '@/shared/shared-constants';
+import { BASE_GATHERING_TIME, HP_MULTIPLIER_COST, MANA_MULTIPLIER_INT } from '../lib/config/server-constants';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -869,7 +858,7 @@ export const heroRouter = new Hono<Context>()
         });
       }
 
-      const walkTime = calculate.walkTime(sumDex);
+      const walkTime = heroService.walkTime(sumDex);
       const now = Date.now();
       const walkPathWithTime: PathNode[] = paths.map((path, idx) => ({
         ...path,
@@ -877,10 +866,7 @@ export const heroRouter = new Hono<Context>()
         mapId: heroState.location.mapId!,
       }));
 
-      // const savePosQueue = serverState.pathPersistQueue.get(id);
-      // if (savePosQueue) {
-      //   serverState.pathPersistQueue.delete(id);
-      // }
+     
 
       heroState.paths = walkPathWithTime;
       heroState.state = 'WALK';

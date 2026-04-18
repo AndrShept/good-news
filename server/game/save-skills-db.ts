@@ -1,4 +1,3 @@
-import { SAVE_DB_INTERVAL } from '@/shared/constants';
 import { eq, inArray } from 'drizzle-orm';
 
 import { db } from '../db/db';

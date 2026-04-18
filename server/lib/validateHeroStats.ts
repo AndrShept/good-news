@@ -1,4 +1,4 @@
-import { BASE_FREE_POINTS, BASE_STATS } from '@/shared/constants';
+import { BASE_FREE_POINTS, BASE_STATS } from '@/shared/shared-constants';
 import type { IHeroStat } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 

@@ -1,6 +1,6 @@
 import { imageConfig } from '@/shared/config/image-config';
-import { DEFAULT_ITEM_STACK } from '@/shared/constants';
 import type { ItemTemplate, ResourceCategoryType, ResourceType } from '@/shared/types';
+import { DEFAULT_ITEM_STACK } from '../shared-constants';
 
 const createResource = (id: string, key: ResourceType, category: ResourceCategoryType, image: string): ItemTemplate => ({
   id,

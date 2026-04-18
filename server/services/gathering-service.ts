@@ -1,4 +1,3 @@
-import { TILE_BASE_RESPAWN_TIME, TILE_INITIAL_CHARGES, WORLD_SEED } from '@/shared/constants';
 import { type GatheringCategorySkillKey, skillTemplateByKey } from '@/shared/templates/skill-template';
 import { toolsTemplate } from '@/shared/templates/tool-template';
 import type { FishingTileTpe, ForagingTileTpe, IPosition, LumberTileType, MiningTileType, OmitTileType, TileType } from '@/shared/types';
@@ -21,6 +20,7 @@ import { equipmentService } from './equipment-service';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { skillService } from './skill-service';
+import { GATHER_TILE_BASE_RESPAWN_TIME, GATHER_TILE_INITIAL_CHARGES, WORLD_SEED } from '../lib/config/server-constants';
 
 interface GetOrCreateGatherTileState {
   gatherSkill: GatheringCategorySkillKey;
@@ -122,10 +122,10 @@ export const gatheringService = {
     }
   },
   setInitialCharges(x: number, y: number, seed: number) {
-    return TILE_INITIAL_CHARGES + (hash(x, y, seed) % 5); // 3–7 ударів
+    return GATHER_TILE_INITIAL_CHARGES + (hash(x, y, seed) % 5); // 3–7 ударів
   },
   setRespawnTileState() {
-    return Date.now() + TILE_BASE_RESPAWN_TIME;
+    return Date.now() + GATHER_TILE_BASE_RESPAWN_TIME;
   },
   setGatherTileOnMap(heroId: string, gatherSkill: GatheringCategorySkillKey) {
     const hero = heroService.getHero(heroId);

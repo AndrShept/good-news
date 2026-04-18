@@ -1,14 +1,14 @@
-import { MAP_CHUNK_SIZE } from '@/shared/constants';
-import { creatureTemplateById } from '@/shared/templates/creature-template';
+
 import type { Corpse, MapChunkEntitiesData, MapChunkEntitiesType, MapCorpse, MapCreature, MapHero } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { type HeroRuntime, serverState } from '../game/state/server-state';
-import { corpseService } from './corpese-service';
 import { creatureService } from './creature-service';
 import { heroService } from './hero-service';
 import { socketService } from './socket-service';
 import { spawnService } from './spawn-service';
+import { corpseService } from './corpse-service';
+import { MAP_CHUNK_SIZE } from '../lib/config/server-constants';
 
 interface GetChunkId {
   x: number;
