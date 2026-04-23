@@ -142,7 +142,7 @@ export const GameMap = memo(function GameMap({
       >
         <Canvas
           tileset={tileset}
-          layers={layers ?? []}
+          layers={layers.filter((l) => l.name !== 'ABOVE_PLAYER') ?? []}
           className="-z-1 absolute left-0 top-0 border border-red-400"
           width={MAP_WIDTH * TILE_SIZE}
           height={MAP_HEIGHT * TILE_SIZE}
@@ -203,6 +203,10 @@ export const GameMap = memo(function GameMap({
             offsetY={offsetY}
           />
         ))}
+        {movementPathTiles?.map((position) => (
+          <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
+        ))}
+
         {mapHeroes.map((hero) => {
           if (hero.id !== heroId && hero.x === heroWorldX && hero.y === heroWorldY) return;
           const heroCountInTile = mapHeroes.filter((h) => h.x === hero.x && h.y === hero.y).length;
@@ -218,10 +222,15 @@ export const GameMap = memo(function GameMap({
             />
           );
         })}
-        {movementPathTiles?.map((position) => (
-          <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
-        ))}
-
+        <Canvas
+          tileset={tileset}
+          layers={layers.filter((l) => l.name === 'ABOVE_PLAYER') ?? []}
+          className=" absolute left-0 top-0 border border-red-400"
+          width={MAP_WIDTH * TILE_SIZE}
+          height={MAP_HEIGHT * TILE_SIZE}
+          MAP_WIDTH={MAP_WIDTH}
+          TILE_SIZE={TILE_SIZE}
+        />
         {hoverIndexRef.current !== null && !isDragging && heroState === 'IDLE' && (
           <div
             ref={hoverRef}

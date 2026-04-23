@@ -32,6 +32,7 @@ export const skillKeyValues = [
   'FIBER_LORE',
   'CLOTH_LORE',
   'BONE_LORE',
+  'FISH_LORE',
 
   'REGENERATION',
   'MEDITATION',
@@ -56,6 +57,7 @@ export type LoreSkillKey = Extract<
   | 'FUR_LORE'
   | 'CURED_FUR_LORE'
   | 'BONE_LORE'
+  | 'FISH_LORE'
 >;
 
 export const gatheringSkillKeysValues = [
@@ -250,6 +252,13 @@ export const skillsTemplate = [
     image: imageConfig.icon.skill['BONE_LORE'],
     category: 'LORE',
     key: 'BONE_LORE',
+  },
+  {
+    id: '019dbbb9-1faa-7eac-b8c4-73c57a914b41',
+    name: 'Fish lore',
+    image: imageConfig.icon.skill['FISH_LORE'],
+    category: 'LORE',
+    key: 'FISH_LORE',
   },
 
   {

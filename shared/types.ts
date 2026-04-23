@@ -422,6 +422,7 @@ export const tileTypeValues = [
   'DARK_FOREST',
   'MEADOW',
   'PLAINS',
+  'ABOVE_PLAYER'
 ] as const;
 export type TileType = (typeof tileTypeValues)[number];
 export type OmitTileType = Exclude<TileType, 'OBJECT' | 'GROUND'>;

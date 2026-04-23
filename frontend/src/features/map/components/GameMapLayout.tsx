@@ -34,7 +34,7 @@ export const GameMapLayout = () => {
   const heroLocalX = heroWorldX - offsetX;
   const heroLocalY = heroWorldY - offsetY;
 
-  const { scale, callbackRef, containerRef } = useScaleMap();
+  const { scale, callbackRef, containerRef } = useScaleMap(map.data?.tileWidth ?? 0);
   const clearMovementPathTiles = useMovementPathTileStore((state) => state.clearMovementPathTiles);
   const { onCenter } = useCenter({
     TILE_SIZE: map.data?.tileWidth,
@@ -91,7 +91,7 @@ export const GameMapLayout = () => {
           callbackRef={callbackRef}
           width={map.data?.width ?? 0}
           height={map.data?.height ?? 0}
-          tileWidth={map.data?.tileWidth ?? 32}
+          tileWidth={map.data?.tileWidth ?? 0}
           heroWorldX={heroWorldX}
           heroWorldY={heroWorldY}
           heroLocalX={heroLocalX}

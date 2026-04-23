@@ -146,6 +146,19 @@ export const resourceTemplate = [
   createResource('019f1000-0000-7000-8000-000000000107', 'NIGHT_BLOOM', 'FLOWER', imageConfig.icon.RESOURCES.flowers.NIGHT_BLOOM),
   createResource('019f1000-0000-7000-8000-000000000108', 'FIRE_BLOSSOM', 'FLOWER', imageConfig.icon.RESOURCES.flowers.FIRE_BLOSSOM),
   createResource('019f1000-0000-7000-8000-000000000109', 'FROST_LILY', 'FLOWER', imageConfig.icon.RESOURCES.flowers.FROST_LILY),
+
+   // ===== FISH =====
+  createResource('019d73fa-54ab-7719-909f-4b927b8791b0', 'ANGLERFISH', 'FISH', imageConfig.icon.FOOD.fish.ANGLERFISH),
+  createResource('019d73fb-4b7d-7c10-b38b-4ca38f1d6792', 'CARP', 'FISH', imageConfig.icon.FOOD.fish.CARP),
+  createResource('019d73fb-8845-72fc-991d-df069155f0d3', 'CATFISH', 'FISH' ,imageConfig.icon.FOOD.fish.CATFISH),
+  createResource('019d73fb-d214-79fc-9d52-be014ebe64fe', 'JELLYFISH', 'FISH', imageConfig.icon.FOOD.fish.JELLYFISH),
+  createResource('019d73fc-1961-7d29-ab00-423bfdd21753', 'PERCH', 'FISH', imageConfig.icon.FOOD.fish.PERCH),
+  createResource('019d73fc-4cd8-7acf-94d7-aaf06477f4cb', 'PUFFERFISH', 'FISH' ,imageConfig.icon.FOOD.fish.PUFFERFISH),
+  createResource('019d73fc-cbc9-77f6-8ce5-89a47c24f094', 'SALMON', 'FISH', imageConfig.icon.FOOD.fish.SALMON),
+  createResource('019d73fd-0578-75b7-8144-42b85c5fd1f4', 'SHARK', 'FISH', imageConfig.icon.FOOD.fish.SHARK),
+  createResource('019d73fd-3a09-7503-9d7a-67ba4b0f9815', 'SMALL_FISH', 'FISH', imageConfig.icon.FOOD.fish.SMALL_FISH),
+  createResource('019d73fd-8b70-7b68-93d0-3556914b5c43', 'SQUID', 'FISH', imageConfig.icon.FOOD.fish.SQUID),
+  createResource('019d73fd-c841-76de-bc88-69dde97c2ac5', 'TUNA', 'FISH', imageConfig.icon.FOOD.fish.TUNA),
 ] as const satisfies ItemTemplate[];
 
 // const resourceKeys = resourceTemplate.map((r) => r.key);

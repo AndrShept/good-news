@@ -34,6 +34,7 @@ export const skillExpConfig = {
   MUSHROOM_LORE: { difficultyMultiplier: 0.6 },
   FUR_LORE: { difficultyMultiplier: 0.6 },
   CURED_FUR_LORE: { difficultyMultiplier: 0.6 },
+  FISH_LORE: { difficultyMultiplier: 0.6 },
 
   // Passive
   MEDITATION: { difficultyMultiplier: 0.7 },

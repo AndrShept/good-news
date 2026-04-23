@@ -14,7 +14,7 @@ export const useCenter = ({ heroPosX, heroPosY, containerRef, TILE_SIZE, scale }
       const container = containerRef.current;
       if (!container) return;
 
-      const tileSize = TILE_SIZE ?? 32;
+      const tileSize = TILE_SIZE ?? 0
 
       const heroPixelX = heroPosX * tileSize + tileSize / 2;
       const heroPixelY = heroPosY * tileSize + tileSize / 2;

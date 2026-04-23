@@ -40,6 +40,7 @@ export const resourceCategoryEnum = pgEnum('resource_category_enum', [
   'FUR',
   'CURED_FUR',
   'BONE',
+  'FISH'
 ]);
 
 export const oreValues = ['IRON_ORE', 'COPPER_ORE', 'SILVER_ORE', 'GOLD_ORE', 'MITHRIL_ORE', 'ADAMANTINE_ORE'] as const;
@@ -141,6 +142,7 @@ export const resourceTypeEnum = pgEnum('resource_type_enum', [
   ...herbValues,
   ...mushroomValues,
   ...boneValues,
+  ...fishValues,
 ]);
 export const coreResourceTypeEnum = pgEnum('core_resource_enum', [
   ...ingotValues,

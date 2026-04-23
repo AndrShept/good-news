@@ -103,6 +103,7 @@ export const imageConfig = {
       FIBER_LORE: '/sprites/icons/skills/fiber-lore.png',
       CLOTH_LORE: '/sprites/icons/skills/cloth-lore.png',
       BONE_LORE: '/sprites/icons/skills/bone-lore.png',
+      FISH_LORE: '/sprites/icons/skills/fish-lore.png',
       REGENERATION: '/sprites/icons/skills/regeneration.png',
       MEDITATION: '/sprites/icons/skills/meditation.png',
     } as Record<SkillKey, string>,

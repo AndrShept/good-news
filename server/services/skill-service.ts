@@ -1,3 +1,4 @@
+import type { SkillExpGainEventPayload } from '@/shared/socket-data-types';
 import { type LoreSkillKey, type SkillKey, skillTemplateById, skillTemplateByKey } from '@/shared/templates/skill-template';
 import type { RecipeTemplate, RefiningBuildingKey, ResourceCategoryType, SkillInstance } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
@@ -6,7 +7,6 @@ import { serverState } from '../game/state/server-state';
 import { skillExpConfig } from '../lib/config/skill-exp-config';
 import { deltaEventsService } from './delta-events-service';
 import { itemTemplateService } from './item-template-service';
-import type { SkillExpGainEventPayload } from '@/shared/socket-data-types';
 
 export const skillService = {
   getSkillBySkillTemplateId(heroId: string, skillTemplateId: string) {
@@ -84,7 +84,6 @@ export const skillService = {
   getLoreSkillByItemTemplateId(itemTemplateId: string) {
     const template = itemTemplateService.getAllItemsTemplateMapIds()[itemTemplateId];
     if (!template.resourceInfo) throw new HTTPException(400, { message: 'getLoreSkillByItemTemplateId template.resourceInfo not found ' });
-
     const loreSkillByResourceCategory: Record<ResourceCategoryType, LoreSkillKey> = {
       ORE: 'ORE_LORE',
       INGOT: 'METAL_LORE',
@@ -100,6 +99,7 @@ export const skillService = {
       FUR: 'FUR_LORE',
       CURED_FUR: 'CURED_FUR_LORE',
       BONE: 'ORE_LORE',
+      FISH: 'FISH_LORE',
     };
 
     return loreSkillByResourceCategory[template.resourceInfo.category];
