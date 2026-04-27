@@ -15,23 +15,24 @@ import { itemTemplateService } from '../server/services/item-template-service';
 import type { Layer } from './json-types';
 import { mapTemplate } from './templates/map-template';
 import type { GatheringCategorySkillKey } from './templates/skill-template';
-import type {
-  CoreResourceType,
-  CraftBuildingKey,
-  IPosition,
-  ItemInstance,
-  ItemTemplateType,
-  OmitTileType,
-  RefiningBuildingKey,
-  RefiningRecipe,
-  StateType,
+import {
+  type CoreResourceType,
+  type CraftBuildingKey,
+  type GatheringTileType,
+  type IPosition,
+  type ItemInstance,
+  type ItemTemplateType,
+  type RefiningBuildingKey,
+  type RefiningRecipe,
+  type StateType,
+  gatheringTileTypeValues,
 } from './types';
 
 function isBlocked(x: number, y: number, layers: Layer[], width: number): boolean {
   return layers.some((layer) => {
     const index = y * width + x;
 
-    if (layer.name === 'WATER' || layer.name === 'OBJECT') {
+    if (layer.name === 'COLLISION') {
       return layer.data?.[index] !== 0;
     }
 
@@ -170,7 +171,7 @@ interface GetMapLayerNameAtHeroPos {
   mapId: string | null;
   pos: IPosition;
   radius: number;
-  tilesType: OmitTileType[];
+  tilesType: GatheringTileType[];
 }
 
 export const getMapLayerNameAtHeroPos = ({ mapId, pos, radius, tilesType }: GetMapLayerNameAtHeroPos) => {
@@ -179,14 +180,13 @@ export const getMapLayerNameAtHeroPos = ({ mapId, pos, radius, tilesType }: GetM
 
   const around = getTilesAroundHero(pos, radius);
   const result = [];
-  for (const layer of map.layers) {
-    if (!around.length || layer.name === 'OBJECT' || layer.name === 'DECOR' || layer.name === 'GROUND') continue;
-
+  const gatheringLayers = map.layers.filter((l) => gatheringTileTypeValues.includes(l.name as GatheringTileType));
+  for (const layer of gatheringLayers) {
     for (const p of around) {
       const i = p.y * map.width + p.x;
-      if (layer.data?.[i] && tilesType.includes(layer.name as OmitTileType)) {
+      if (layer.data?.[i] && tilesType.includes(layer.name as GatheringTileType)) {
         result.push({
-          tileType: layer.name as OmitTileType,
+          tileType: layer.name as GatheringTileType,
           x: p.x,
           y: p.y,
         });

@@ -24,10 +24,9 @@ export const spawnService = {
     const map = mapTemplate.find((m) => m.id === spawn.mapId);
     if (!map) return;
     const index = y * map.width + x;
-    const groundTile = getTileExists(spawn.mapId, index, 'GROUND');
-    const waterTile = getTileExists(spawn.mapId, index, 'WATER');
-    const objectTile = getTileExists(spawn.mapId, index, 'OBJECT');
-    if (!groundTile || (groundTile && (objectTile || waterTile))) {
+    const collisionTile = getTileExists(spawn.mapId, index, 'COLLISION');
+
+    if (collisionTile) {
       this.getSpawnPosition(spawnId);
     } else {
       return {

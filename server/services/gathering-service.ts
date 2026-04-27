@@ -1,10 +1,10 @@
 import { type GatheringCategorySkillKey, skillTemplateByKey } from '@/shared/templates/skill-template';
-import { toolsTemplate } from '@/shared/templates/tool-template';
-import type { FishingTileTpe, ForagingTileTpe, IPosition, LumberTileType, MiningTileType, OmitTileType, TileType } from '@/shared/types';
+import type { FishingTileType, ForagingTileType, GatheringTileType, LumberTileType, MiningTileType, TerrainTileType } from '@/shared/types';
 import { getMapLayerNameAtHeroPos } from '@/shared/utils';
 import { HTTPException } from 'hono/http-exception';
 
 import { type TileState, serverState } from '../game/state/server-state';
+import { GATHER_TILE_BASE_RESPAWN_TIME, GATHER_TILE_INITIAL_CHARGES, WORLD_SEED } from '../lib/config/server-constants';
 import {
   FISHING_TABLE,
   FORAGING_TABLE,
@@ -13,14 +13,13 @@ import {
   MINING_TABLE,
   type MiningItemTable,
   WOODCUTTING_TABLE,
-  type WoodcuttingItemTable,
+  type WoodCuttingItemTable,
 } from '../lib/table/gathering-item-table';
 import { clamp, getRandomValue, hash } from '../lib/utils';
 import { equipmentService } from './equipment-service';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { skillService } from './skill-service';
-import { GATHER_TILE_BASE_RESPAWN_TIME, GATHER_TILE_INITIAL_CHARGES, WORLD_SEED } from '../lib/config/server-constants';
 
 interface GetOrCreateGatherTileState {
   gatherSkill: GatheringCategorySkillKey;
@@ -30,15 +29,15 @@ interface GetOrCreateGatherTileState {
 }
 interface GetGatherReward {
   heroId: string;
-  tileType: OmitTileType;
+  tileType: GatheringTileType;
   gatherSkill: GatheringCategorySkillKey;
   x: number;
   y: number;
 }
 
 interface GatheringTilesMap {
-  FISHING: FishingTileTpe[];
-  FORAGING: ForagingTileTpe[];
+  FISHING: FishingTileType[];
+  FORAGING: ForagingTileType[];
   WOODCUTTING: LumberTileType[];
   MINING: MiningTileType[];
   SKINNING: [];
@@ -67,10 +66,10 @@ export const gatheringService = {
 
   getTilesTypeByGatherSkill<K extends GatheringCategorySkillKey>(gatherSkill: K): GatheringTilesMap[K] {
     const tileTypeData: GatheringTilesMap = {
-      FISHING: ['DEEP_WATER', 'WATER'],
-      FORAGING: ['FOREST', 'MEADOW', 'PLAINS'],
-      WOODCUTTING: ['FOREST', 'DARK_FOREST'],
-      MINING: ['CAVE', 'STONE'],
+      FISHING: ['RIVER', 'LAKE', 'SEA'],
+      FORAGING: ['FOREST', 'DENSE_FOREST', 'MEADOW', 'PLAINS', 'SWAMP'],
+      WOODCUTTING: ['FOREST', 'DENSE_FOREST', 'ANCIENT_FOREST'],
+      MINING: ['ROCKY_FIELD', 'CAVE', 'MOUNTAIN'],
       SKINNING: [],
     };
 
@@ -144,7 +143,7 @@ export const gatheringService = {
     }
 
     let resultTileState: undefined | TileState = undefined;
-    let tileType: OmitTileType | null = null;
+    let tileType: GatheringTileType | null = null;
     for (const tile of tilesAroundHero) {
       const tileState = gatheringService.getOrCreateGatherTileState({ mapId: hero.location.mapId, x: tile.x, y: tile.y, gatherSkill });
       if (tileState && tileState.charges > 0) {
@@ -162,17 +161,17 @@ export const gatheringService = {
     }
   },
   getGatherTableItem({ gatherSkill, tileType, x, y, heroId }: GetGatherReward) {
-    let table: (MiningItemTable | WoodcuttingItemTable | FishingItemTable | ForagingItemTable)[] | null = null;
+    let table: (MiningItemTable | WoodCuttingItemTable | FishingItemTable | ForagingItemTable)[] | null = null;
     const skillInstance = skillService.getSkillByKey(heroId, gatherSkill);
     switch (gatherSkill) {
       case 'MINING':
         table = MINING_TABLE[tileType as MiningTileType];
         break;
       case 'FISHING':
-        table = FISHING_TABLE[tileType as FishingTileTpe];
+        table = FISHING_TABLE[tileType as FishingTileType];
         break;
       case 'FORAGING':
-        table = FORAGING_TABLE[tileType as ForagingTileTpe];
+        table = FORAGING_TABLE[tileType as ForagingTileType];
         break;
       case 'WOODCUTTING':
         table = WOODCUTTING_TABLE[tileType as LumberTileType];

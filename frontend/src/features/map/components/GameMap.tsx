@@ -172,6 +172,21 @@ export const GameMap = memo(function GameMap({
             );
           })} */}
 
+        {places.map((place) => (
+          <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
+        ))}
+        {entrances.map((entrance) => (
+          <EntranceTile
+            key={entrance.id}
+            x={entrance.x}
+            y={entrance.y}
+            image={entrance.image}
+            TILE_SIZE={TILE_SIZE}
+            offsetX={offsetX}
+            offsetY={offsetY}
+          />
+        ))}
+
         {mapCreatures.map((creature) => {
           const firstCreature = mapCreatures[0];
           if (firstCreature.id !== creature.id && firstCreature.x === creature.x && firstCreature.y === creature.y) return;
@@ -189,20 +204,7 @@ export const GameMap = memo(function GameMap({
             />
           );
         })}
-        {places.map((place) => (
-          <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
-        ))}
-        {entrances.map((entrance) => (
-          <EntranceTile
-            key={entrance.id}
-            x={entrance.x}
-            y={entrance.y}
-            image={entrance.image}
-            TILE_SIZE={TILE_SIZE}
-            offsetX={offsetX}
-            offsetY={offsetY}
-          />
-        ))}
+
         {movementPathTiles?.map((position) => (
           <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
         ))}
@@ -225,7 +227,7 @@ export const GameMap = memo(function GameMap({
         <Canvas
           tileset={tileset}
           layers={layers.filter((l) => l.name === 'ABOVE_PLAYER') ?? []}
-          className=" absolute left-0 top-0 border border-red-400"
+          className="absolute left-0 top-0 border border-red-400"
           width={MAP_WIDTH * TILE_SIZE}
           height={MAP_HEIGHT * TILE_SIZE}
           MAP_WIDTH={MAP_WIDTH}

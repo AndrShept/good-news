@@ -1,6 +1,6 @@
 import { mapTemplate } from '@/shared/templates/map-template';
 import { placeTemplate } from '@/shared/templates/place-template';
-import type { GameMap, SuccessResponse } from '@/shared/types';
+import { type GameMap, type SuccessResponse, type TerrainTileType, terrainTileTypeValues } from '@/shared/types';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -8,10 +8,10 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { serverState } from '../game/state/server-state';
+import { MAP_CHUNK_SIZE } from '../lib/config/server-constants';
 import { loggedIn } from '../middleware/loggedIn';
 import { heroService } from '../services/hero-service';
 import { mapService } from '../services/map-service';
-import { MAP_CHUNK_SIZE } from '../lib/config/server-constants';
 
 export const mapRouter = new Hono<Context>()
   .get(
@@ -63,7 +63,7 @@ export const mapRouter = new Hono<Context>()
       copyMap.places = placesByChunkId.filter((p) => chunkAroundHero.includes(p.chunkId));
 
       copyMap.layers = copyMap.layers
-        // .filter((l) => l.name === 'GROUND' || l.name === 'OBJECT' || l.name === 'WATER')
+        .filter((l) => terrainTileTypeValues.includes(l.name as TerrainTileType))
         .map((l) =>
           l.data
             ? {

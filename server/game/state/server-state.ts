@@ -4,10 +4,10 @@ import type {
   BuffTemplate,
   Corpse,
   CreatureInstance,
+  GatheringTileType,
   Hero,
   ItemInstance,
   MapHero,
-  OmitTileType,
   PathNode,
   QueueCraft,
   RefineOperation,
@@ -31,7 +31,7 @@ export type HeroRuntime = Hero & {
     x: number;
     y: number;
     gatherSkillUsed: GatheringCategorySkillKey;
-    tileType: OmitTileType;
+    tileType: GatheringTileType;
   };
 };
 

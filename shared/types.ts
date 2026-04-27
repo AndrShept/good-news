@@ -409,27 +409,34 @@ export type Building = {
 export type BuildingKey = (typeof buildingValues)[number];
 export type CraftBuildingKey = (typeof craftBuildingValues)[number];
 export type RefiningBuildingKey = (typeof refiningBuildingValues)[number];
-// export type SelectCoreResourceBuildingKey = Extract<CraftBuildingKey, 'TAILOR' | 'BLACKSMITH' | 'CARPENTRY'>;
 
-export const tileTypeValues = [
-  'OBJECT',
-  'GROUND',
-  'WATER',
-  'DEEP_WATER',
+export const gatheringTileTypeValues = [
+  'ROCKY_FIELD',
   'CAVE',
-  'STONE',
+  'MOUNTAIN',
   'FOREST',
-  'DARK_FOREST',
+  'DENSE_FOREST',
+  'ANCIENT_FOREST',
+  'RIVER',
+  'LAKE',
+  'SEA',
   'MEADOW',
   'PLAINS',
-  'ABOVE_PLAYER'
+  'SWAMP',
+  'FOREST',
+  'DENSE_FOREST',
 ] as const;
+export const terrainTileTypeValues = ['GROUND', 'OBJECT', 'DECOR', 'ABOVE_PLAYER', 'COLLISION'] as const;
+
+export const tileTypeValues = [...terrainTileTypeValues, ...gatheringTileTypeValues] as const;
+export type TerrainTileType = (typeof terrainTileTypeValues)[number];
+export type GatheringTileType = (typeof gatheringTileTypeValues)[number];
 export type TileType = (typeof tileTypeValues)[number];
-export type OmitTileType = Exclude<TileType, 'OBJECT' | 'GROUND'>;
-export type MiningTileType = Extract<TileType, 'CAVE' | 'STONE'>;
-export type LumberTileType = Extract<TileType, 'FOREST' | 'DARK_FOREST'>;
-export type FishingTileTpe = Extract<TileType, 'WATER' | 'DEEP_WATER'>;
-export type ForagingTileTpe = Extract<TileType, 'FOREST' | 'MEADOW' | 'PLAINS'>;
+
+export type MiningTileType = Extract<GatheringTileType, 'ROCKY_FIELD' | 'CAVE' | 'MOUNTAIN'>;
+export type LumberTileType = Extract<GatheringTileType, 'FOREST' | 'DENSE_FOREST' | 'ANCIENT_FOREST'>;
+export type FishingTileType = Extract<GatheringTileType, 'RIVER' | 'LAKE' | 'SEA'>;
+export type ForagingTileType = Extract<GatheringTileType, 'MEADOW' | 'PLAINS' | 'SWAMP' | 'FOREST' | 'DENSE_FOREST'>;
 
 export type TItemContainer = typeof itemContainerTable.$inferSelect & {
   itemsInstance: ItemInstance[];
