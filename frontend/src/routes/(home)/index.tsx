@@ -1,8 +1,10 @@
 import { RainbowButton } from '@/components/magicui/rainbow-button';
 import { SparklesText } from '@/components/magicui/sparkles-text';
 import { TextEffect } from '@/components/ui/text-effect';
+import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import * as m from 'motion/react-m';
+import { useEffect } from 'react';
 
 export const Route = createFileRoute('/(home)/')({
   component: RouteComponent,
@@ -10,7 +12,11 @@ export const Route = createFileRoute('/(home)/')({
 
 function RouteComponent() {
   const navigate = useNavigate();
-
+  const queryClient = useQueryClient();
+  useEffect(() => {
+  
+    queryClient.clear();
+  }, [queryClient]);
   return (
     <section className="flex-co flex flex-1">
       <m.div
@@ -34,7 +40,7 @@ function RouteComponent() {
           <RainbowButton onClick={() => navigate({ to: '/game' })} className="h-12 w-full">
             PLAY
           </RainbowButton>
-      
+
           {/* <RainbowButton variant={'outline'} className="w-full">
             REGISTER
           </RainbowButton> */}

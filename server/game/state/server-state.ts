@@ -12,6 +12,7 @@ import type {
   QueueCraft,
   RefineOperation,
   SkillInstance,
+  SpawnCreatureTileType,
   SpawnPoint,
   THeroRegen,
   TItemContainer,
@@ -33,6 +34,12 @@ export type HeroRuntime = Hero & {
     gatherSkillUsed: GatheringCategorySkillKey;
     tileType: GatheringTileType;
   };
+};
+
+export type SpawnZonesInfo = {
+  indexes: number[];
+  creatureAlive: number;
+  lastSpawnAt: number;
 };
 
 export type TileState = {
@@ -69,8 +76,17 @@ export const serverState = {
   skill: new Map<string, SkillInstance[]>(),
   buff: new Map<string, BuffInstance[]>(),
   user: new Map<string, string>(),
-  // pathPersistQueue: new Map<string, { x: number; y: number }>(),
-  mapChunks: new Map<string, { heroes: Set<string>; corpses: Set<string>; creatures: Set<string> }>(),
+
+  mapChunks: new Map<
+    string,
+    {
+      heroes: Set<string>;
+      corpses: Set<string>;
+      creatures: Set<string>;
+      spawnZones: Record<SpawnCreatureTileType, SpawnZonesInfo>;
+    }
+  >(),
+  mapChunkZoneLastSpawn: new Map<string, {}>(),
   spawnPoints: new Map<string, SpawnPoint>(),
   chunkSpawns: new Map<string, Set<string>>(),
   corpse: new Map<string, Corpse>(),

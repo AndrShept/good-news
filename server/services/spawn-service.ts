@@ -64,9 +64,9 @@ export const spawnService = {
           mapId: map.id,
           chunkId,
           creatureTemplateId: creatureTemplateByKey[creatureKey].id,
-          radius: SPAWN_CREATURE_TABLE[creatureKey].radius,
-          maxCreatures: SPAWN_CREATURE_TABLE[creatureKey].maxCreatures,
-          respawnTime: SPAWN_CREATURE_TABLE[creatureKey].respawnTime,
+          radius: SPAWN_CREATURE_TABLE[creatureKey]?.radius ?? 0,
+          maxCreatures: SPAWN_CREATURE_TABLE[creatureKey]?.maxCreatures ?? 0,
+          respawnTime: SPAWN_CREATURE_TABLE[creatureKey]?.respawnTime ?? 0,
           alive: 0,
           respawnAt: null,
         });

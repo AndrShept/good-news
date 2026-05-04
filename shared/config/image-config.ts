@@ -1,3 +1,4 @@
+import type { CreatureKey } from '../templates/creature-template';
 import type { SkillKey } from '../templates/skill-template';
 import type { ArmorType, FishType, IHeroStat, ResourceType, StateType, WeaponType } from '../types';
 
@@ -233,15 +234,24 @@ export const imageConfig = {
     },
   },
   creature: {
-    animal: {
-      pig: '/sprites/creatures/animals/pig.png',
-      sheep: '/sprites/creatures/animals/sheep.png',
-    },
-    beast: {
-      rat: '/sprites/creatures/beasts/rat.png',
-      bat: '/sprites/creatures/beasts/bat.png',
-    },
-  },
+    PIG: '/sprites/creatures/pig.png',
+    CHICKEN: '/sprites/creatures/chicken.png',
+    SHEEP: '/sprites/creatures/sheep.png',
+    RAT: '/sprites/creatures/rat.png',
+    BAT: '/sprites/creatures/bat.png',
+    BEAR: '/sprites/creatures/bear.png',
+    BOAR: '/sprites/creatures/boar.png',
+    BULL: '/sprites/creatures/bull.png',
+    BUTTERFLY: '/sprites/creatures/butterfly.png',
+    COW: '/sprites/creatures/cow.png',
+    DEER: '/sprites/creatures/deer.png',
+    FOX: '/sprites/creatures/fox.png',
+    LIZARD: '/sprites/creatures/lizard.png',
+    RABBIT: '/sprites/creatures/rabbit.png',
+    SCORPION: '/sprites/creatures/scorpion.png',
+    WILD_DOG: '/sprites/creatures/wild-dog.png',
+    WOLF: '/sprites/creatures/wolf.png',
+  } as Record<CreatureKey, string>,
   npc: {
     vex: '/sprites/npc/vex.png',
     aldric: '/sprites/npc/aldric.png',

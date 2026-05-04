@@ -172,9 +172,7 @@ export const GameMap = memo(function GameMap({
             );
           })} */}
 
-        {places.map((place) => (
-          <PlaceTile key={place.id} {...place} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
-        ))}
+
         {entrances.map((entrance) => (
           <EntranceTile
             key={entrance.id}

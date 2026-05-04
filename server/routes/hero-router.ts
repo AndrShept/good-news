@@ -1072,21 +1072,12 @@ export const heroRouter = new Hono<Context>()
       hero.location.y = place.y;
 
       socketService.sendPlaceRemoveHero(hero.id, place.id);
-      const socket = socketService.getSocket(hero.id);
-      const chunksIds = mapService.getAroundChunkIds({ x: hero.location.x, y: hero.location.y, mapId: hero.location.mapId });
-      for (const chunkId of chunksIds) {
-        socket.join(chunkId);
-      }
-
-      mapService.spawnMapEntitiesInChunk({
-        type: 'HERO',
-        entityId: hero.id,
+      mapService.spawnHeroInMap({
+        heroId: hero.id,
+        mapId: hero.location.mapId,
         x: hero.location.x,
         y: hero.location.y,
-        mapId: hero.location.mapId,
       });
-      socketService.sendMapChunkSpawnEntities({ chunkId, entityIds: [hero.id], type: 'HERO' });
-
       const returnData = hero.location;
 
       return c.json<SuccessResponse<typeof returnData>>({

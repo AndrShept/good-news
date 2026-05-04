@@ -128,9 +128,9 @@ io.on('connection', async (socket) => {
     if (hero.location.placeId) {
       socket.join(hero.location.placeId);
     }
-    if (hero.location.mapId) {
-      socket.join(hero.location.mapId);
-    }
+    // if (hero.location.mapId) {
+    //   socket.join(hero.location.mapId);
+    // }
     if (hero.location.chunkId) {
       const chunkIds = mapService.getAroundChunkIds({ x: hero.location.x, y: hero.location.y, mapId: hero.location.mapId! });
       for (const id of chunkIds) {
@@ -138,9 +138,7 @@ io.on('connection', async (socket) => {
       }
     }
   }
-  // inviteGroup(socket);
-  // joinRoom(socket);
-  // leaveRoom(socket);
+
 
   console.info('connected ' + username);
   socket.on('disconnect', async () => {
@@ -154,6 +152,6 @@ io.on('connection', async (socket) => {
 gameLoop();
 saveItemsDb();
 saveSkillsDb();
-spawnService.createSpawnPoints();
+// spawnService.createSpawnPoints();
 
 console.info('Server Running on port 🚀', process.env['PORT'] || 3000);

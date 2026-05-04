@@ -423,14 +423,26 @@ export const gatheringTileTypeValues = [
   'MEADOW',
   'PLAINS',
   'SWAMP',
+] as const;
+export const spawnCreatureTileTypeValues = [
+  'ROCKY_FIELD',
+  'CAVE',
+  'MOUNTAIN',
   'FOREST',
   'DENSE_FOREST',
+  'ANCIENT_FOREST',
+  'LAKE',
+  'MEADOW',
+  'PLAINS',
+  'SWAMP',
+  'FARM',
 ] as const;
 export const terrainTileTypeValues = ['GROUND', 'OBJECT', 'DECOR', 'ABOVE_PLAYER', 'COLLISION'] as const;
 
-export const tileTypeValues = [...terrainTileTypeValues, ...gatheringTileTypeValues] as const;
+export const tileTypeValues = [...new Set([...terrainTileTypeValues, ...gatheringTileTypeValues, ...spawnCreatureTileTypeValues])] as const;
 export type TerrainTileType = (typeof terrainTileTypeValues)[number];
 export type GatheringTileType = (typeof gatheringTileTypeValues)[number];
+export type SpawnCreatureTileType = (typeof spawnCreatureTileTypeValues)[number];
 export type TileType = (typeof tileTypeValues)[number];
 
 export type MiningTileType = Extract<GatheringTileType, 'ROCKY_FIELD' | 'CAVE' | 'MOUNTAIN'>;
@@ -608,6 +620,7 @@ export type CreatureTemplate = {
   key: CreatureKey;
   image: string;
   type: CreatureType;
+  isAggressive: boolean;
   currentHealth: number;
   maxHealth: number;
   currentMana: number;
