@@ -1,6 +1,6 @@
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { Layer, Tileset } from '@/shared/json-types';
-import { Entrance, MapCreature, MapHero, StateType, TPlace } from '@/shared/types';
+import { Entrance, MapCorpse, MapCreature, MapHero, StateType, TPlace } from '@/shared/types';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { Application } from '@pixi/react';
 import { RefObject, memo, useEffect, useRef, useState } from 'react';
@@ -8,7 +8,8 @@ import { RefObject, memo, useEffect, useRef, useState } from 'react';
 import { useDragOnMap } from '../hooks/useDragOnMap';
 import { useSetHoverIndex } from '../hooks/useSetHoverIndex';
 import { Canvas } from './Canvas';
-import { LoadingMapSkeleton } from './LoadingMapSkeleton';
+
+
 import { MapTileList } from './MapTileList';
 import { CreatureTile } from './tile/CreatureTile';
 import { EntranceTile } from './tile/EntranceTile';
@@ -21,8 +22,13 @@ interface Props {
   heroTargetX: number;
   heroTargetY: number;
   heroState: StateType;
-  mapHeroes: MapHero[];
-  mapCreatures: MapCreature[];
+  mapEntities:
+    | {
+        heroes: MapHero[];
+        corpses: MapCorpse[];
+        creatures: MapCreature[];
+      }
+    | undefined;
   places: TPlace[];
   entrances: Entrance[];
   tileset: Tileset[];
@@ -47,10 +53,9 @@ export const GameMap = memo(function GameMap({
   tileWidth,
   width,
   tileset,
-  mapHeroes,
-  mapCreatures,
   places,
   entrances,
+  mapEntities,
   layers,
   heroTargetX,
   heroTargetY,
@@ -70,6 +75,11 @@ export const GameMap = memo(function GameMap({
   const [isDragging, setIsDragging] = useState(false);
   const hoverRef = useRef<HTMLDivElement | null>(null);
   const heroId = useHeroId();
+  const allEntities = [
+    ...(mapEntities?.heroes ?? []).map((e) => ({ ...e, entityType: 'HERO' as const })),
+    ...(mapEntities?.creatures ?? []).map((e) => ({ ...e, entityType: 'CREATURE' as const })),
+    ...(mapEntities?.corpses ?? []).map((e) => ({ ...e, entityType: 'CORPSE' as const })),
+  ];
   const { handleMouseMove, hoverIndexRef, setStart, handleMouseLeave, handleTap } = useSetHoverIndex({
     containerRef,
     isDraggingRef,
@@ -171,57 +181,41 @@ export const GameMap = memo(function GameMap({
               />
             );
           })} */}
-
-
-        {entrances.map((entrance) => (
-          <EntranceTile
-            key={entrance.id}
-            x={entrance.x}
-            y={entrance.y}
-            image={entrance.image}
-            TILE_SIZE={TILE_SIZE}
-            offsetX={offsetX}
-            offsetY={offsetY}
-          />
-        ))}
-
-        {mapCreatures.map((creature) => {
-          const firstCreature = mapCreatures[0];
-          if (firstCreature.id !== creature.id && firstCreature.x === creature.x && firstCreature.y === creature.y) return;
-          if (mapHeroes.some((h) => h.x === creature.x && h.y === creature.y)) return;
-          const creatureCountInTile = mapCreatures.filter((c) => c.x === creature.x && c.y === creature.y).length;
-
-          return (
-            <CreatureTile
-              key={creature.id}
-              {...creature}
-              creatureCountInTile={creatureCountInTile}
-              TILE_SIZE={TILE_SIZE}
-              offsetX={offsetX}
-              offsetY={offsetY}
-            />
-          );
-        })}
-
         {movementPathTiles?.map((position) => (
           <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
         ))}
+        {allEntities.map((entity) => {
+          const entitiesOnSameTile = allEntities.filter((e) => e.x === entity.x && e.y === entity.y);
+          const countOnTile = entitiesOnSameTile.length;
 
-        {mapHeroes.map((hero) => {
-          if (hero.id !== heroId && hero.x === heroWorldX && hero.y === heroWorldY) return;
-          const heroCountInTile = mapHeroes.filter((h) => h.x === hero.x && h.y === hero.y).length;
-          const creatureCountInTile = mapCreatures.filter((c) => c.x === hero.x && c.y === hero.y).length;
-          return (
-            <HeroTile
-              key={hero.id}
-              {...hero}
-              heroCountInTile={heroCountInTile + creatureCountInTile}
-              TILE_SIZE={TILE_SIZE}
-              offsetX={offsetX}
-              offsetY={offsetY}
-            />
-          );
+          if (entity.entityType === 'CREATURE') {
+            // пропускаємо дублікати на тайлі
+            const firstOnTile = entitiesOnSameTile[0];
+            if (firstOnTile.id !== entity.id) return null;
+
+            return (
+              <CreatureTile
+                key={entity.id}
+                {...entity}
+                countOnTile={countOnTile}
+                TILE_SIZE={TILE_SIZE}
+                offsetX={offsetX}
+                offsetY={offsetY}
+              />
+            );
+          }
+
+          if (entity.entityType === 'HERO') {
+            return (
+              <HeroTile key={entity.id} {...entity} countOnTile={countOnTile} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
+            );
+          }
+
+          // if (entity.entityType === 'CORPSE') {
+          //   return <CorpseTile key={entity.id} {...entity} />;
+          // }
         })}
+     
         <Canvas
           tileset={tileset}
           layers={layers.filter((l) => l.name === 'ABOVE_PLAYER') ?? []}

@@ -8,10 +8,10 @@ interface Props extends MapHero {
   TILE_SIZE: number;
   offsetY: number;
   offsetX: number;
-  heroCountInTile: number;
+  countOnTile: number;
 }
 
-export const HeroTile = memo(function HeroTile({ x, y, heroCountInTile, characterImage, name, state, TILE_SIZE, offsetX, offsetY }: Props) {
+export const HeroTile = memo(function HeroTile({ x, y, countOnTile, characterImage, name, state, TILE_SIZE, offsetX, offsetY }: Props) {
   const localX = x - offsetX;
   const localY = y - offsetY;
   return (
@@ -27,12 +27,12 @@ export const HeroTile = memo(function HeroTile({ x, y, heroCountInTile, characte
         backgroundImage: `url(${characterImage})`,
       }}
     >
-      <div className="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center gap-0.5 text-[9px]">
+      <div className="absolute -top-2 left-1/2 flex -translate-x-1/2 items-center gap-0.5 text-[6px]">
         <GameIcon className="size-2" image={imageConfig.icon.state[state]} />
         <p>{name}</p>
 
-        {heroCountInTile > 1 && (
-          <p className="leading-3.5 size-3.5 rounded-full bg-teal-800 text-center text-[8px] text-white">{heroCountInTile}</p>
+        {countOnTile > 1 && (
+          <p className="leading-2 size-2 rounded-full bg-teal-800 text-center text-[5px] text-white">{countOnTile}</p>
         )}
       </div>
     </div>

@@ -101,8 +101,7 @@ export const GameMapLayout = () => {
           heroState={hero.state}
           tileset={map.data?.tileset ?? []}
           layers={map.data?.layers ?? []}
-          mapHeroes={mapEntities?.heroes ?? []}
-          mapCreatures={mapEntities?.creatures ?? []}
+          mapEntities={mapEntities}
           places={map.data?.places ?? []}
           entrances={map.data?.entrances ?? []}
           offsetX={offsetX}

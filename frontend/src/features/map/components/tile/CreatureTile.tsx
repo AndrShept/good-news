@@ -5,10 +5,10 @@ interface Props extends MapCreature {
   TILE_SIZE: number;
   offsetY: number;
   offsetX: number;
-  creatureCountInTile: number;
+  countOnTile: number;
 }
 
-export const CreatureTile = memo(function CreatureTile({ x, y, image, creatureCountInTile, name, TILE_SIZE, offsetX, offsetY }: Props) {
+export const CreatureTile = memo(function CreatureTile({ x, y, image, countOnTile, name, TILE_SIZE, offsetX, offsetY }: Props) {
   const localX = x - offsetX;
   const localY = y - offsetY;
 
@@ -24,13 +24,11 @@ export const CreatureTile = memo(function CreatureTile({ x, y, image, creatureCo
         backgroundImage: `url(${image})`,
       }}
     >
-      {creatureCountInTile > 1 && (
-        <div className="absolute -top-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-0.5 text-xs">
-          <p>{name}</p>
+      <div className="absolute -top-1.5 left-1/2 flex -translate-x-1/2 items-center gap-0.5 text-[6px]">
+        <p>{name}</p>
 
-          <p className="leading-3.5 size-3.5 rounded-full bg-teal-800   text-center text-[8px] text-white">{creatureCountInTile}</p>
-        </div>
-      )}
+        {countOnTile > 1 && <p className="leading-2 size-2 rounded-full bg-teal-800 text-center text-[5px] text-white">{countOnTile}</p>}
+      </div>
     </div>
   );
 });
