@@ -5,8 +5,8 @@ interface Props {
 }
 export const CharacterSprite = ({ src }: Props) => {
   return (
-    <div className="flex overflow-hidden">
-      <img className="scale-120 size-full object-contain" src={src} alt="hero-image" style={{ imageRendering: 'pixelated' }} />
+    <div className="my-auto flex h-40 overflow-hidden">
+      <img className="object-contain" src={src} alt="hero-image" style={{ imageRendering: 'pixelated' }} />
     </div>
   );
 };

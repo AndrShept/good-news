@@ -251,6 +251,12 @@ export const imageConfig = {
     SCORPION: '/sprites/creatures/scorpion.png',
     WILD_DOG: '/sprites/creatures/wild-dog.png',
     WOLF: '/sprites/creatures/wolf.png',
+    MOUNTAIN_GOAT: '/sprites/creatures/mountain-goat.png',
+    HARPY: '/sprites/creatures/harpy.png',
+    ROCK_TROLL: '/sprites/creatures/rock-troll.png',
+    SNAKE: '/sprites/creatures/snake.png',
+    SPIDER: '/sprites/creatures/spider.png',
+    GOBLIN_SCOUT: '/sprites/creatures/goblin-scout.png',
   } as Record<CreatureKey, string>,
   npc: {
     vex: '/sprites/npc/vex.png',

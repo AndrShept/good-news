@@ -601,18 +601,16 @@ export type Corpse = {
 export type MapCorpse = Pick<Corpse, 'image' | 'id' | 'name' | 'x' | 'y'>;
 
 export type CreatureType =
-  | 'HUMANOID'
-  | 'ANIMAL'
-  | 'BEAST'
-  | 'UNDEAD'
-  | 'DEMON'
-  | 'ELEMENTAL'
-  | 'CONSTRUCT'
-  | 'DRAGON'
-  | 'GIANT'
-  | 'SPIRIT'
-  | 'PLANT'
-  | 'ABERRATION';
+  | 'ANIMAL'      // farm, meadow — корова, кролик, олень
+  | 'BEAST'       // ліс, гори — вовк, ведмідь, кабан
+  | 'REPTILE'     // rocky field, swamp — ящірка, змія, скорпіон
+  | 'INSECT'      // meadow, forest — метелик, павук, жук
+  | 'HUMANOID'    // plains, rocky — гоблін, бандит
+  | 'GIANT'       // mountain, cave — troll, golem
+  | 'UNDEAD'      // swamp, cave — skeleton, zombie
+  | 'ELEMENTAL'   // mountain, cave — stone/fire elemental
+  | 'SPIRIT'      // ancient forest, swamp — лісовий дух
+  | 'PLANT';      // ancient forest — treant
 
 export type CreatureTemplate = {
   id: string;

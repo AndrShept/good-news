@@ -218,7 +218,7 @@ export const heroRouter = new Hono<Context>()
     }
 
     await db.transaction(async (tx) => {
-      const characterImage = '/sprites/new/newb-mage.webp';
+      const characterImage = '/sprites/new/swordsman.png';
       const [newHero] = await tx
         .insert(heroTable)
         .values({
