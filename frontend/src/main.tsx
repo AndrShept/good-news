@@ -10,6 +10,7 @@ import type { Socket } from 'socket.io-client';
 import { ErrorLoadingData } from './components/ErrorLoadingData.tsx';
 import { NotFound } from './components/NotFound.tsx';
 import { Spinner } from './components/Spinner.tsx';
+import { SocketProvider } from './components/providers/SocketProvider.tsx';
 import { ThemeProvider } from './components/providers/theme-provider.tsx';
 import './index.css';
 import { toastError } from './lib/utils.ts';
@@ -41,7 +42,6 @@ const queryClient = new QueryClient({
       staleTime: Infinity,
       placeholderData: keepPreviousData,
       refetchOnWindowFocus: false,
-      
     },
     mutations: {
       onError: (err) => {
@@ -62,8 +62,8 @@ const queryClient = new QueryClient({
 
 export const router = createRouter({
   routeTree,
-  defaultPreload: 'intent',
-  defaultPreloadStaleTime: 0,
+  // defaultPreload: 'intent',
+  // defaultPreloadStaleTime: Infinity,
   context: { queryClient, auth: undefined, socket: undefined, hero: undefined },
   scrollRestoration: true,
   defaultNotFoundComponent: NotFound,
@@ -82,8 +82,9 @@ createRoot(document.getElementById('root')!).render(
   <ThemeProvider defaultTheme="dark">
     <QueryClientProvider client={queryClient}>
       <LazyMotion features={domAnimation}>
-        <RouterProvider router={router} />
         {/* <TanStackRouterDevtools /> */}
+
+        <RouterProvider router={router} />
       </LazyMotion>
       <Toaster />
       <ReactQueryDevtools initialIsOpen={false} />

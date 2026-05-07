@@ -21,7 +21,7 @@ export const imageConfig = {
       chest: '/sprites/icons/ui/chest.png',
       chest2: '/sprites/icons/ui/chest2.png',
       chest3: '/sprites/icons/ui/chest3.png',
-      battle: '/sprites/icons/ui/battle.png',
+      attack: '/sprites/icons/ui/attack.png',
       book: '/sprites/icons/ui/book.png',
       defense: '/sprites/icons/ui/defense.png',
       'magic-resistance': '/sprites/icons/ui/defense.png',

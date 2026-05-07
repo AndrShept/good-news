@@ -30,9 +30,13 @@ export const GameHeader = memo(() => {
         </Link>
       </section>
       <section className="flex gap-0.5">
+        <Link to="/game/battle/$battleId" params={{ battleId: '2222' }}>
+          BATLE
+        </Link>
+        <Link to="/game">GAME</Link>
         <CharacterPaperdollButton type="CHARACTER" />
         <BackpackButton />
-      <SkillsPopover />
+        <SkillsPopover />
         <GroupMenuButton />
       </section>
       <section className="flex items-center gap-1 text-[15px]">

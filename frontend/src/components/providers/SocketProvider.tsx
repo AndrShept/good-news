@@ -20,32 +20,33 @@ export const useSocket = () => {
 
 export const SocketProvider = ({
   children,
-  user,
+  userId,
   heroId,
-}: PropsWithChildren<{ user: { id: string; username: string } | undefined; heroId?: string }>) => {
+  username,
+}: PropsWithChildren<{ userId: string | undefined; username: string | undefined; heroId?: string }>) => {
   const socket = useMemo(
     () =>
       io(URL, {
         transports: ['websocket'],
         withCredentials: true,
-        auth: user,
+        auth: { userId, username },
         query: { heroId },
         reconnection: true,
         autoConnect: true,
       }),
-    [heroId, user],
+    [heroId, userId, username],
   );
   const [isConnected, setIsConnected] = useState(socket.connected);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   useEffect(() => {
-    if (user) {
+    if (userId) {
       socket.connect();
     }
-     function onConnect() {
+    function onConnect() {
       setIsConnected(true);
     }
-     function onDisconnect() {
+    function onDisconnect() {
       setIsConnected(false);
       queryClient.clear();
       navigate({ to: '/' });
@@ -58,7 +59,7 @@ export const SocketProvider = ({
       socket.off('disconnect', onDisconnect);
       socket.disconnect();
     };
-  }, [heroId, navigate, queryClient, socket, user]);
+  }, [navigate, socket, userId]);
 
   return <SocketContext.Provider value={{ socket, isConnected }}>{children}</SocketContext.Provider>;
 };

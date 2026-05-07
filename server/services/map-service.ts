@@ -165,6 +165,11 @@ export const mapService = {
         creatureAlive: 0,
         lastSpawnAt: 0,
       },
+      RIVER: {
+        indexes: [],
+        creatureAlive: 0,
+        lastSpawnAt: 0
+      }
     };
     for (const spawnTileType of spawnCreatureTileTypeValues) {
       ((spawnZones[spawnTileType].creatureAlive = 0), (spawnZones[spawnTileType].lastSpawnAt = 0));

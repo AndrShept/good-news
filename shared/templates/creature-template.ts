@@ -26,6 +26,10 @@ export const creatureKeyValues = [
   'SNAKE',
   'SPIDER',
   'GOBLIN_SCOUT',
+  'CROW',
+  'FROG',
+  'DUCK',
+  'OTTER',
 ] as const;
 
 export type CreatureKey = (typeof creatureKeyValues)[number];

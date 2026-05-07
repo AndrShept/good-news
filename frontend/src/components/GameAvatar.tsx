@@ -34,6 +34,7 @@ export const GameAvatar = memo(({ src, isSelected = false, setAvatar, className,
       })}
       style={{
         backgroundImage: `url(${src})`,
+        imageRendering: 'pixelated',
         backgroundSize: 'cover',
       }}
     />

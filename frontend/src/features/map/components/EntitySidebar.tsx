@@ -17,10 +17,19 @@ interface Props {
 export const EntitySidebar = ({ heroes, corpses, creatures, mode, isLoading }: Props) => {
   if (isLoading) return <HeroSidebarListSkeleton />;
   return (
-    <aside className="hidden w-full max-w-[200px] select-text flex-col gap-1 sm:flex">
+    <aside className="hidden w-full max-w-[200px] select-text flex-col gap-1 p-1 sm:flex">
       {mode === 'PLACE' ? (
         heroes?.map((hero) => (
-          <EntitySidebarCard key={hero.id} avatarImage={hero.avatarImage} name={hero.name} state={hero.state} level={hero.level} />
+          <EntitySidebarCard
+            entityType="HERO"
+            mode="PLACE"
+            key={hero.id}
+            avatarImage={hero.avatarImage}
+            id={hero.id}
+            name={hero.name}
+            state={hero.state}
+            level={hero.level}
+          />
         ))
       ) : (
         <Tabs defaultValue="hero" className="w-full">
@@ -44,17 +53,44 @@ export const EntitySidebar = ({ heroes, corpses, creatures, mode, isLoading }: P
           </TabsList>
           <TabsContent value="hero">
             {heroes?.map((hero) => (
-              <EntitySidebarCard key={hero.id} avatarImage={hero.avatarImage} name={hero.name} state={hero.state} level={hero.level} />
+              <EntitySidebarCard
+                mode="MAP"
+                entityType="HERO"
+                key={hero.id}
+                id={hero.id}
+                avatarImage={hero.avatarImage}
+                name={hero.name}
+                state={hero.state}
+                level={hero.level}
+              />
             ))}
           </TabsContent>
           <TabsContent value="creature">
-            {creatures?.map((creature) => <EntitySidebarCard key={creature.id} avatarImage={creature.image} name={creature.name} />)}
+            {creatures?.map((creature) => (
+              <EntitySidebarCard
+                mode="MAP"
+                entityType="CREATURE"
+                key={creature.id}
+                id={creature.id}
+                avatarImage={creature.image}
+                name={creature.name}
+              />
+            ))}
           </TabsContent>
           <TabsContent value="corpse">
-            {corpses?.map((corpse) => <EntitySidebarCard key={corpse.id} avatarImage={corpse.image} name={corpse.name} />)}
+            {corpses?.map((corpse) => (
+              <EntitySidebarCard
+                mode="MAP"
+                entityType="CORPSE"
+                key={corpse.id}
+                id={corpse.id}
+                avatarImage={corpse.image}
+                name={corpse.name}
+              />
+            ))}
           </TabsContent>
         </Tabs>
       )}
     </aside>
   );
-}
+};

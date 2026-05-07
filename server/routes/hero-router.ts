@@ -75,6 +75,7 @@ import { queueCraftService } from '../services/queue-craft-service';
 import { refiningService } from '../services/refining-service';
 import { skillService } from '../services/skill-service';
 import { socketService } from '../services/socket-service';
+import { creatureService } from '../services/creature-service';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -1479,6 +1480,40 @@ export const heroRouter = new Hono<Context>()
       itemContainer.color = data.color ? data.color : null;
       if (data.name) {
         itemContainer.name = data.name;
+      }
+
+      return c.json<SuccessResponse>({
+        message: 'bank container changed!',
+        success: true,
+      });
+    },
+  )
+  .post(
+    '/:id/attack/:targetId',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string().uuid(), targetId: z.string().uuid() })),
+    zValidator('json', z.object({ targetType: z.enum(['HERO', 'CREATURE'] as const) })),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id, targetId } = c.req.valid('param');
+      const { targetType } = c.req.valid('json');
+      const hero = heroService.getHero(id);
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      if (id === targetId) throw new HTTPException(400, { message: 'You do not attacking yourself' });
+
+      if (targetType === 'HERO') {
+        const targetHero = heroService.getHero(targetId);
+        if(targetHero.state === 'BATTLE') {
+          throw new HTTPException(400, { message: 'target in battle', cause: {canShow: true} });
+        }
+      }
+      if (targetType === 'CREATURE') {
+        const targetHero = creatureService.getCreature(targetId)
+        if(targetHero.state === 'BATTLE') {
+          throw new HTTPException(400, { message: 'target in battle', cause: {canShow: true} });
+        }
       }
 
       return c.json<SuccessResponse>({

@@ -432,6 +432,7 @@ export const spawnCreatureTileTypeValues = [
   'DENSE_FOREST',
   'ANCIENT_FOREST',
   'LAKE',
+  'RIVER',
   'MEADOW',
   'PLAINS',
   'SWAMP',
@@ -601,16 +602,16 @@ export type Corpse = {
 export type MapCorpse = Pick<Corpse, 'image' | 'id' | 'name' | 'x' | 'y'>;
 
 export type CreatureType =
-  | 'ANIMAL'      // farm, meadow — корова, кролик, олень
-  | 'BEAST'       // ліс, гори — вовк, ведмідь, кабан
-  | 'REPTILE'     // rocky field, swamp — ящірка, змія, скорпіон
-  | 'INSECT'      // meadow, forest — метелик, павук, жук
-  | 'HUMANOID'    // plains, rocky — гоблін, бандит
-  | 'GIANT'       // mountain, cave — troll, golem
-  | 'UNDEAD'      // swamp, cave — skeleton, zombie
-  | 'ELEMENTAL'   // mountain, cave — stone/fire elemental
-  | 'SPIRIT'      // ancient forest, swamp — лісовий дух
-  | 'PLANT';      // ancient forest — treant
+  | 'ANIMAL' // farm, meadow — корова, кролик, олень
+  | 'BEAST' // ліс, гори — вовк, ведмідь, кабан
+  | 'REPTILE' // rocky field, swamp — ящірка, змія, скорпіон
+  | 'INSECT' // meadow, forest — метелик, павук, жук
+  | 'HUMANOID' // plains, rocky — гоблін, бандит
+  | 'GIANT' // mountain, cave — troll, golem
+  | 'UNDEAD' // swamp, cave — skeleton, zombie
+  | 'ELEMENTAL' // mountain, cave — stone/fire elemental
+  | 'SPIRIT' // ancient forest, swamp — лісовий дух
+  | 'PLANT'; // ancient forest — treant
 
 export type CreatureTemplate = {
   id: string;
@@ -631,9 +632,10 @@ export type CreatureInstance = CreatureTemplate & {
   x: number;
   y: number;
   mapId: string;
+  state: Extract<StateType, 'IDLE' | 'BATTLE' | 'WALK'>;
   creatureTemplateId: string;
 };
-export type MapCreature = Pick<CreatureInstance, 'image' | 'id' | 'name' | 'x' | 'y'>;
+export type MapCreature = Pick<CreatureInstance, 'image' | 'id' | 'name' | 'state' | 'x' | 'y'>;
 
 export type SpawnPoint = {
   id: string;
@@ -699,6 +701,68 @@ export type OmitDeepHero = {
   group?: Partial<ApiGetHeroResponse['group']>;
   regen?: Partial<ApiGetHeroResponse['regen']>;
 } & Omit<Partial<ApiGetHeroResponse>, 'location' | 'group' | 'regen'>;
+
+//BATTLE
+
+export type BattleSide = 'ATTACKER' | 'DEFENDER';
+export type BattleParticipantType = 'HERO' | 'CREATURE';
+export type BattleStatusType = 'IN_PROGRESS' | 'FINISHED';
+
+export type BodyZone = 'HEAD' | 'BODY' | 'LEGS' | 'LEFT_ARM' | 'RIGHT_ARM';
+
+// Тип дії
+export type BattleActionType = 'INSTANT' | 'NORMAL' | 'CAST';
+
+// Категорія дії
+export type BattleActionCategory =
+  | 'PHYSICAL_ATTACK' // удар зброєю по зонах
+  | 'ABILITY' // магія + фізичні абіліті + бафи на себе
+  | 'ITEM' // використати предмет
+  | 'FLEE';
+export type Battle = {
+  id: string;
+  status: BattleStatusType;
+  sides: {
+    attackers: BattleParticipant[];
+    defenders: BattleParticipant[];
+  };
+  currentRound: number;
+
+  roundDuration: number;
+  activeTarget: string;
+  pendingActions: Map<string, BattleAction>;
+  log: BattleLogEntry[];
+};
+
+export type BattleAction = {
+  participantId: string;
+  category: BattleActionCategory;
+  actionType: BattleActionType;
+  targetId?: string; // на кого
+  targetZone?: BodyZone; // куди б'ємо (тільки для PHYSICAL_ATTACK)
+  defendZone?: BodyZone; // що захищаємо
+  abilityId?: string; // який спел
+};
+
+export type BattleParticipant = {
+  participantId: string;
+  type: BattleParticipantType;
+  side: BattleSide;
+  isAlive: boolean;
+};
+
+export type BattleLogEntry = {
+  round: number;
+  participantId: string;
+  action: BattleAction;
+  result: {
+    damage?: number;
+    blocked?: boolean;
+    critical?: boolean;
+    missed?: boolean;
+    zone?: BodyZone;
+  };
+};
 
 //API RESPONSE
 export type ApiGetHeroResponse = NonNullable<InferResponseType<(typeof client.hero)['$get']>['data']>;

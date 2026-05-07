@@ -27,6 +27,7 @@ export const creatureService = {
       id: creature.id,
       image: creature.image,
       name: creature.name,
+      state: creature.state,
       x: creature.x,
       y: creature.y,
     };
@@ -40,6 +41,7 @@ export const creatureService = {
       mapId,
       x,
       y,
+      state: 'IDLE',
       ...template,
     };
     serverState.creature.set(newCreature.id, newCreature);

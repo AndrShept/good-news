@@ -37,7 +37,7 @@ export const heroTable = pgTable('hero', {
   maxQueueCraftCount: integer().default(4).notNull(),
   state: stateTypeEnum().default('IDLE').notNull(),
   freeStatPoints: integer().default(10).notNull(),
-
+  battleId: uuid(),
   currentHealth: integer().default(100).notNull(),
   currentMana: integer().default(100).notNull(),
   maxHealth: integer().default(0).notNull(),

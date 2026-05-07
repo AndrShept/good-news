@@ -1,5 +1,6 @@
 import type { GatheringCategorySkillKey } from '@/shared/templates/skill-template';
 import type {
+  Battle,
   BuffInstance,
   BuffTemplate,
   Corpse,
@@ -86,15 +87,15 @@ export const serverState = {
       spawnZones: Record<SpawnCreatureTileType, SpawnZonesInfo>;
     }
   >(),
-  mapChunkZoneLastSpawn: new Map<string, {}>(),
   spawnPoints: new Map<string, SpawnPoint>(),
   chunkSpawns: new Map<string, Set<string>>(),
   corpse: new Map<string, Corpse>(),
   creature: new Map<string, CreatureInstance>(),
   queueCraft: new Map<string, QueueCraft[]>(),
+  queueRefine: new Map<string, RefineOperation[]>(),
   socket: new Map<string, Socket>(),
   worldResourceTiles: new Map<string, Map<string, TileState>>(),
-  queueRefine: new Map<string, RefineOperation[]>(),
+  battle: new Map<string , Battle>(),
   itemInstancePendingDeltaEvents: new Set<ItemInstancePendingDeltaEvents>(),
   skillInstancePendingDeltaEvents: new Set<SkillInstancePendingDeltaEvents>(),
 };
