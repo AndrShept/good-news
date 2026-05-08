@@ -722,16 +722,11 @@ export type BattleActionCategory =
 export type Battle = {
   id: string;
   status: BattleStatusType;
-  sides: {
-    attackers: BattleParticipant[];
-    defenders: BattleParticipant[];
-  };
   currentRound: number;
-
   roundDuration: number;
-  activeTarget: string;
-  pendingActions: Map<string, BattleAction>;
+  pendingActions: BattleAction[];
   log: BattleLogEntry[];
+  participants: BattleParticipant[];
 };
 
 export type BattleAction = {
@@ -744,8 +739,11 @@ export type BattleAction = {
   abilityId?: string; // який спел
 };
 
-export type BattleParticipant = {
-  participantId: string;
+export type BattleParticipant = Pick<
+  Hero,
+  'id' | 'name' | 'currentHealth' | 'maxHealth' | 'currentMana' | 'maxMana' | 'level' | 'avatarImage' | 'characterImage'
+> & {
+  modifier: Modifier;
   type: BattleParticipantType;
   side: BattleSide;
   isAlive: boolean;

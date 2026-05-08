@@ -33,8 +33,7 @@ export const Route = createFileRoute('/game')({
     if (auth && !hero) {
       throw redirect({ to: '/create-hero' });
     }
-
-    if (hero?.battleId) {
+    if (hero?.battleId && !location.pathname.includes('/battle/')) {
       throw redirect({ to: '/game/battle/$battleId', params: { battleId: hero.battleId } });
     }
     return {
@@ -42,6 +41,7 @@ export const Route = createFileRoute('/game')({
       hero,
     };
   },
+  
 });
 
 function GameRouteComponent() {

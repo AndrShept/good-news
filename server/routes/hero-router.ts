@@ -61,6 +61,8 @@ import { heroOnline } from '../lib/heroOnline';
 import { generateRandomUuid, verifyHeroOwnership } from '../lib/utils';
 import { validateHeroStats } from '../lib/validateHeroStats';
 import { loggedIn } from '../middleware/loggedIn';
+import { battleService } from '../services/battle-service';
+import { creatureService } from '../services/creature-service';
 import { deltaEventsService } from '../services/delta-events-service';
 import { equipmentService } from '../services/equipment-service';
 import { gatheringService } from '../services/gathering-service';
@@ -75,7 +77,6 @@ import { queueCraftService } from '../services/queue-craft-service';
 import { refiningService } from '../services/refining-service';
 import { skillService } from '../services/skill-service';
 import { socketService } from '../services/socket-service';
-import { creatureService } from '../services/creature-service';
 
 export const heroRouter = new Hono<Context>()
   .get(
@@ -1488,6 +1489,28 @@ export const heroRouter = new Hono<Context>()
       });
     },
   )
+  .get(
+    '/:id/battles/:battleId',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string().uuid(), battleId: z.string().uuid() })),
+    async (c) => {
+      const userId = c.get('user')?.id;
+      const { id, battleId } = c.req.valid('param');
+      const hero = heroService.getHero(id);
+
+      const battle = battleService.getBattle(battleId);
+      console.log(battle);
+      if (!battle.participants.some((p) => p.id === hero.id)) {
+        throw new HTTPException(400, { message: 'You not a participant this battle' });
+      }
+
+      return c.json<SuccessResponse<typeof battle>>({
+        message: 'battle fetched!',
+        success: true,
+        data: battle,
+      });
+    },
+  )
   .post(
     '/:id/attack/:targetId',
     loggedIn,
@@ -1503,22 +1526,24 @@ export const heroRouter = new Hono<Context>()
 
       if (id === targetId) throw new HTTPException(400, { message: 'You do not attacking yourself' });
 
-      if (targetType === 'HERO') {
-        const targetHero = heroService.getHero(targetId);
-        if(targetHero.state === 'BATTLE') {
-          throw new HTTPException(400, { message: 'target in battle', cause: {canShow: true} });
-        }
-      }
-      if (targetType === 'CREATURE') {
-        const targetHero = creatureService.getCreature(targetId)
-        if(targetHero.state === 'BATTLE') {
-          throw new HTTPException(400, { message: 'target in battle', cause: {canShow: true} });
-        }
-      }
+      battleService.attackTarget([
+        {
+          participantId: id,
+          side: 'ATTACKER',
+          type: 'HERO',
+        },
+        {
+          participantId: targetId,
+          side: 'DEFENDER',
+          type: targetType,
+        },
+      ]);
 
-      return c.json<SuccessResponse>({
-        message: 'bank container changed!',
+      const returnData = { state: hero.state, battleId: hero.battleId };
+      return c.json<SuccessResponse<typeof returnData>>({
+        message: 'You start the battle',
         success: true,
+        data: returnData,
       });
     },
   );

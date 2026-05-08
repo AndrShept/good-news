@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/game/battle')({
+export const Route = createFileRoute('/game/battle/')({
   component: RouteComponent,
   // beforeLoad: ({ context }) => {
   //   if (context.hero?.battleId) {

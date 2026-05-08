@@ -21,7 +21,7 @@ import { Route as homeIndexImport } from './routes/(home)/index'
 import { Route as AuthSignUpImport } from './routes/auth/sign-up'
 import { Route as AuthSignInImport } from './routes/auth/sign-in'
 import { Route as AuthConfirmEmailImport } from './routes/auth/confirm-email'
-import { Route as GameBattleRouteImport } from './routes/game/battle/route'
+import { Route as GameBattleIndexImport } from './routes/game/battle/index'
 import { Route as homePostIndexImport } from './routes/(home)/post/index'
 import { Route as GameBattleBattleIdImport } from './routes/game/battle/$battleId'
 import { Route as homePostPostIdImport } from './routes/(home)/post/$postId'
@@ -87,9 +87,9 @@ const AuthConfirmEmailRoute = AuthConfirmEmailImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any)
 
-const GameBattleRouteRoute = GameBattleRouteImport.update({
-  id: '/battle',
-  path: '/battle',
+const GameBattleIndexRoute = GameBattleIndexImport.update({
+  id: '/battle/',
+  path: '/battle/',
   getParentRoute: () => GameRouteRoute,
 } as any)
 
@@ -100,9 +100,9 @@ const homePostIndexRoute = homePostIndexImport.update({
 } as any)
 
 const GameBattleBattleIdRoute = GameBattleBattleIdImport.update({
-  id: '/$battleId',
-  path: '/$battleId',
-  getParentRoute: () => GameBattleRouteRoute,
+  id: '/battle/$battleId',
+  path: '/battle/$battleId',
+  getParentRoute: () => GameRouteRoute,
 } as any)
 
 const homePostPostIdRoute = homePostPostIdImport.update({
@@ -135,13 +135,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/game'
       preLoaderRoute: typeof GameRouteImport
       parentRoute: typeof rootRoute
-    }
-    '/game/battle': {
-      id: '/game/battle'
-      path: '/battle'
-      fullPath: '/game/battle'
-      preLoaderRoute: typeof GameBattleRouteImport
-      parentRoute: typeof GameRouteImport
     }
     '/auth/confirm-email': {
       id: '/auth/confirm-email'
@@ -201,10 +194,10 @@ declare module '@tanstack/react-router' {
     }
     '/game/battle/$battleId': {
       id: '/game/battle/$battleId'
-      path: '/$battleId'
+      path: '/battle/$battleId'
       fullPath: '/game/battle/$battleId'
       preLoaderRoute: typeof GameBattleBattleIdImport
-      parentRoute: typeof GameBattleRouteImport
+      parentRoute: typeof GameRouteImport
     }
     '/(home)/post/': {
       id: '/(home)/post/'
@@ -212,6 +205,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/post'
       preLoaderRoute: typeof homePostIndexImport
       parentRoute: typeof homeRouteImport
+    }
+    '/game/battle/': {
+      id: '/game/battle/'
+      path: '/battle'
+      fullPath: '/game/battle'
+      preLoaderRoute: typeof GameBattleIndexImport
+      parentRoute: typeof GameRouteImport
     }
   }
 }
@@ -252,26 +252,16 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
 
-interface GameBattleRouteRouteChildren {
-  GameBattleBattleIdRoute: typeof GameBattleBattleIdRoute
-}
-
-const GameBattleRouteRouteChildren: GameBattleRouteRouteChildren = {
-  GameBattleBattleIdRoute: GameBattleBattleIdRoute,
-}
-
-const GameBattleRouteRouteWithChildren = GameBattleRouteRoute._addFileChildren(
-  GameBattleRouteRouteChildren,
-)
-
 interface GameRouteRouteChildren {
-  GameBattleRouteRoute: typeof GameBattleRouteRouteWithChildren
   GameIndexRoute: typeof GameIndexRoute
+  GameBattleBattleIdRoute: typeof GameBattleBattleIdRoute
+  GameBattleIndexRoute: typeof GameBattleIndexRoute
 }
 
 const GameRouteRouteChildren: GameRouteRouteChildren = {
-  GameBattleRouteRoute: GameBattleRouteRouteWithChildren,
   GameIndexRoute: GameIndexRoute,
+  GameBattleBattleIdRoute: GameBattleBattleIdRoute,
+  GameBattleIndexRoute: GameBattleIndexRoute,
 }
 
 const GameRouteRouteWithChildren = GameRouteRoute._addFileChildren(
@@ -282,7 +272,6 @@ export interface FileRoutesByFullPath {
   '/': typeof homeIndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/game': typeof GameRouteRouteWithChildren
-  '/game/battle': typeof GameBattleRouteRouteWithChildren
   '/auth/confirm-email': typeof AuthConfirmEmailRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -292,10 +281,10 @@ export interface FileRoutesByFullPath {
   '/post/$postId': typeof homePostPostIdRoute
   '/game/battle/$battleId': typeof GameBattleBattleIdRoute
   '/post': typeof homePostIndexRoute
+  '/game/battle': typeof GameBattleIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/game/battle': typeof GameBattleRouteRouteWithChildren
   '/auth/confirm-email': typeof AuthConfirmEmailRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -306,6 +295,7 @@ export interface FileRoutesByTo {
   '/post/$postId': typeof homePostPostIdRoute
   '/game/battle/$battleId': typeof GameBattleBattleIdRoute
   '/post': typeof homePostIndexRoute
+  '/game/battle': typeof GameBattleIndexRoute
 }
 
 export interface FileRoutesById {
@@ -313,7 +303,6 @@ export interface FileRoutesById {
   '/(home)': typeof homeRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
   '/game': typeof GameRouteRouteWithChildren
-  '/game/battle': typeof GameBattleRouteRouteWithChildren
   '/auth/confirm-email': typeof AuthConfirmEmailRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -324,6 +313,7 @@ export interface FileRoutesById {
   '/(home)/post/$postId': typeof homePostPostIdRoute
   '/game/battle/$battleId': typeof GameBattleBattleIdRoute
   '/(home)/post/': typeof homePostIndexRoute
+  '/game/battle/': typeof GameBattleIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -332,7 +322,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/game'
-    | '/game/battle'
     | '/auth/confirm-email'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -342,9 +331,9 @@ export interface FileRouteTypes {
     | '/post/$postId'
     | '/game/battle/$battleId'
     | '/post'
+    | '/game/battle'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/game/battle'
     | '/auth/confirm-email'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -355,12 +344,12 @@ export interface FileRouteTypes {
     | '/post/$postId'
     | '/game/battle/$battleId'
     | '/post'
+    | '/game/battle'
   id:
     | '__root__'
     | '/(home)'
     | '/auth'
     | '/game'
-    | '/game/battle'
     | '/auth/confirm-email'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -371,6 +360,7 @@ export interface FileRouteTypes {
     | '/(home)/post/$postId'
     | '/game/battle/$battleId'
     | '/(home)/post/'
+    | '/game/battle/'
   fileRoutesById: FileRoutesById
 }
 
@@ -424,15 +414,9 @@ export const routeTree = rootRoute
     "/game": {
       "filePath": "game/route.tsx",
       "children": [
-        "/game/battle",
-        "/game/"
-      ]
-    },
-    "/game/battle": {
-      "filePath": "game/battle/route.tsx",
-      "parent": "/game",
-      "children": [
-        "/game/battle/$battleId"
+        "/game/",
+        "/game/battle/$battleId",
+        "/game/battle/"
       ]
     },
     "/auth/confirm-email": {
@@ -468,11 +452,15 @@ export const routeTree = rootRoute
     },
     "/game/battle/$battleId": {
       "filePath": "game/battle/$battleId.tsx",
-      "parent": "/game/battle"
+      "parent": "/game"
     },
     "/(home)/post/": {
       "filePath": "(home)/post/index.tsx",
       "parent": "/(home)"
+    },
+    "/game/battle/": {
+      "filePath": "game/battle/index.tsx",
+      "parent": "/game"
     }
   }
 }
