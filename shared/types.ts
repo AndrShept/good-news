@@ -618,6 +618,7 @@ export type CreatureTemplate = {
   name: string;
   key: CreatureKey;
   image: string;
+  scale: number;
   type: CreatureType;
   isAggressive: boolean;
   currentHealth: number;
@@ -635,7 +636,7 @@ export type CreatureInstance = CreatureTemplate & {
   state: Extract<StateType, 'IDLE' | 'BATTLE' | 'WALK'>;
   creatureTemplateId: string;
 };
-export type MapCreature = Pick<CreatureInstance, 'image' | 'id' | 'name' | 'state' | 'x' | 'y'>;
+export type MapCreature = Pick<CreatureInstance, 'image' | 'scale' | 'id' | 'name' | 'state' | 'x' | 'y'>;
 
 export type SpawnPoint = {
   id: string;
@@ -741,8 +742,9 @@ export type BattleAction = {
 
 export type BattleParticipant = Pick<
   Hero,
-  'id' | 'name' | 'currentHealth' | 'maxHealth' | 'currentMana' | 'maxMana' | 'level' | 'avatarImage' | 'characterImage'
+  'id' | 'name' | 'currentHealth' | 'maxHealth' | 'currentMana' | 'maxMana' | 'level' | 'avatarImage' | 'characterImage' | 'equipments'
 > & {
+  scale?: number;
   modifier: Modifier;
   type: BattleParticipantType;
   side: BattleSide;

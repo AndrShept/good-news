@@ -115,12 +115,13 @@ export const heroRouter = new Hono<Context>()
         serverState.user.set(userId, hero.id);
         serverState.skill.set(hero.id, skills);
         serverState.buff.set(hero.id, buffs);
-        serverState.queueCraft.set(hero.id, []);
 
         serverState.hero.set(hero.id, {
           ...hero,
           equipments: equipments ?? [],
           buffs: [],
+          queueCraft: [],
+          queueRefine: [],
           location: { ...hero.location, targetX: null, targetY: null },
           regen: {
             healthAcc: 0,
@@ -1207,11 +1208,11 @@ export const heroRouter = new Hono<Context>()
       }
 
       refiningService.createQueue(hero.id, refineBuildingKey, refineContainer.itemsInstance);
-      console.log(serverState.queueRefine);
-      const refiningQueues = refiningService.getQueueRefine(hero.id);
+      console.log(hero.queueRefine);
+    
 
       const state = getStateWithRefiningBuildingKey(refineBuildingKey);
-      const lastItem = refiningQueues.at(-1);
+      const lastItem = hero.queueRefine.at(-1);
 
       if (!lastItem) {
         throw new HTTPException(400, { message: 'Not enough items or no refineable items found', cause: { canShow: true } });
@@ -1245,7 +1246,7 @@ export const heroRouter = new Hono<Context>()
 
     hero.state = 'IDLE';
     hero.refiningFinishAt = undefined;
-    serverState.queueRefine.clear();
+    hero.queueRefine = [];
     socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, 'IDLE');
 
     return c.json<SuccessResponse>({
@@ -1270,12 +1271,12 @@ export const heroRouter = new Hono<Context>()
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      const queueCraftItems = queueCraftService.getQueueCraft(hero.id);
+      
 
       return c.json<SuccessResponse<QueueCraft[]>>({
         message: 'queue fetched',
         success: true,
-        data: queueCraftItems,
+        data: hero.queueCraft,
       });
     },
   )
@@ -1297,17 +1298,17 @@ export const heroRouter = new Hono<Context>()
       const { recipeId, coreResourceId } = c.req.valid('json');
       const hero = heroService.getHero(id);
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-      const queueCraft = queueCraftService.getQueueCraft(hero.id);
+      
 
       const recipe = recipeTemplateById[recipeId];
-      const last = queueCraft.at(-1);
+      const last = hero.queueCraft.at(-1);
       if (last && last.craftBuildingType !== recipe.requirement.buildingCraftLocation) {
         throw new HTTPException(400, {
           message: 'You must work only one building',
           cause: { canShow: true },
         });
       }
-      if (queueCraft.length >= MAX_QUEUE_CRAFT_ITEM) {
+      if (hero.queueCraft.length >= MAX_QUEUE_CRAFT_ITEM) {
         throw new HTTPException(400, {
           message: `You cannot queue more than ${MAX_QUEUE_CRAFT_ITEM} craft items.`,
           cause: { canShow: true },
@@ -1317,8 +1318,8 @@ export const heroRouter = new Hono<Context>()
       queueCraftService.canStartCraft(hero.id, coreResourceId, recipeId);
       const now = Date.now();
       const isCore = recipe.requirement.materials.some((m) => m.role === 'CORE');
-      if (!queueCraft.length) {
-        queueCraft.push({
+      if (!hero.queueCraft.length) {
+        hero.queueCraft.push({
           id: generateRandomUuid(),
           recipeId,
           coreResourceId: isCore ? coreResourceId : undefined,
@@ -1330,8 +1331,8 @@ export const heroRouter = new Hono<Context>()
         hero.state = stateData;
         socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, stateData);
       } else {
-        const last = queueCraft.at(-1)?.expiresAt;
-        queueCraft.push({
+        const last = hero.queueCraft.at(-1)?.expiresAt;
+        hero.queueCraft.push({
           id: generateRandomUuid(),
           recipeId,
           coreResourceId: isCore ? coreResourceId : undefined,
@@ -1344,7 +1345,7 @@ export const heroRouter = new Hono<Context>()
       return c.json<SuccessResponse<QueueCraft[]>>({
         message: 'craft item add to queue',
         success: true,
-        data: queueCraft,
+        data: hero.queueCraft,
       });
     },
   )
@@ -1359,16 +1360,16 @@ export const heroRouter = new Hono<Context>()
       const hero = heroService.getHero(id);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-      const queueCraft = queueCraftService.getQueueCraft(hero.id);
-      const findIndex = queueCraft.findIndex((q) => q.id === queueCraftItemId);
+   
+      const findIndex = hero.queueCraft.findIndex((q) => q.id === queueCraftItemId);
 
       if (findIndex === -1) throw new HTTPException(404, { message: 'queueCraft findIndex not found' });
-      const [deletedItem] = queueCraft.splice(findIndex, 1);
-      const next = queueCraft.at(0);
+      const [deletedItem] = hero.queueCraft.splice(findIndex, 1);
+      const next = hero.queueCraft.at(0);
       const now = Date.now();
       if (deletedItem.status === 'PROGRESS') {
         let acc = 0;
-        for (const queue of queueCraft) {
+        for (const queue of hero.queueCraft) {
           acc += recipeTemplateById[queue.recipeId].timeMs;
           queue.expiresAt = now + acc;
         }
@@ -1377,7 +1378,7 @@ export const heroRouter = new Hono<Context>()
         }
       } else {
         let acc = 0;
-        for (const queue of queueCraft) {
+        for (const queue of hero.queueCraft) {
           if (queue.status === 'PROGRESS') {
             acc = queue.expiresAt - now;
             continue;
@@ -1386,7 +1387,7 @@ export const heroRouter = new Hono<Context>()
           queue.expiresAt = now + acc;
         }
       }
-      if (!queueCraft.length) {
+      if (!hero.queueCraft.length) {
         socketService.sendToPlaceUpdateState(hero.id, hero.location.placeId, 'IDLE');
         hero.state = 'IDLE';
       }

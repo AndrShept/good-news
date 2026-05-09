@@ -1,5 +1,7 @@
 import { Spinner } from '@/components/Spinner';
 import { getBattleOptions } from '@/features/battle/api/get-battle';
+import { BattleParticipantCard } from '@/features/battle/components/BattleParticipantCard';
+import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/game/battle/$battleId')({
@@ -21,5 +23,21 @@ export const Route = createFileRoute('/game/battle/$battleId')({
 
 function RouteComponent() {
   const battle = Route.useLoaderData();
-  return <div>Hello "/game/battle/$battleId"! </div>;
+  const heroId = useHeroId();
+  const selfParticipant = battle?.participants.find((p) => p.id === heroId);
+  const opponentParticipant = battle?.participants.find((p) => p.id !== heroId);
+  const attackers = battle?.participants.filter((p) => p.side === 'ATTACKER');
+  const defenders = battle?.participants.filter((p) => p.side === 'DEFENDER');
+  if (!selfParticipant || !opponentParticipant) return;
+  return (
+    <div className="mx-auto flex h-fit w-full max-w-5xl justify-between p-2">
+      <BattleParticipantCard {...selfParticipant} />
+      <div className="text-muted-foreground mt-auto flex gap-2">
+        <ul>{attackers?.map((a) => <li>{a.name}</li>)}</ul>
+        <p className="text-red-500">vs</p>
+        <ul>{defenders?.map((a) => <li>{a.name}</li>)}</ul>
+      </div>
+      <BattleParticipantCard {...opponentParticipant} />
+    </div>
+  );
 }

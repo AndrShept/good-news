@@ -20,11 +20,11 @@ export const MovablePathTile = memo(function MovablePathTile({ x, y, TILE_SIZE, 
           transform: `translate(${localX * TILE_SIZE}px, ${localY * TILE_SIZE}px)`,
           width: TILE_SIZE,
           height: TILE_SIZE,
-          backgroundImage: `url(/sprites/icons/ui/move-arrow.png)`,
-          backgroundSize: 'cover',
+          // backgroundImage: `url(/sprites/icons/ui/move-arrow.png)`,
+          // backgroundSize: 'cover',
         }}
       >
-        {/* <X className="drop-shadow-outline stroke-amber-300" /> */}
+        <X className="drop-shadow-outline size-3.5 stroke-yellow-300" />
       </div>
     </>
   );

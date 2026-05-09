@@ -37,16 +37,6 @@ interface CalculateCraftTime {
 }
 
 export const queueCraftService = {
-  getQueueCraft(heroId: string) {
-    const queueCraft = serverState.queueCraft.get(heroId);
-    if (!queueCraft) {
-      throw new HTTPException(400, {
-        message: 'queue craft not found',
-      });
-    }
-    return queueCraft;
-  },
-
   canStartCraft(heroId: string, coreResourceId: string | undefined, recipeId: string) {
     const hero = heroService.getHero(heroId);
     const recipe = recipeTemplateById[recipeId];
@@ -122,9 +112,9 @@ export const queueCraftService = {
     return resultDelta;
   },
   updateStatus(heroId: string, queueCraftId: string, status: QueueCraftStatusType) {
-    const queuesCrafts = serverState.queueCraft.get(heroId);
-    if (!queuesCrafts) return;
-    const queue = queuesCrafts.find((q) => q.id === queueCraftId);
+    const hero = heroService.getHero(heroId);
+
+    const queue = hero.queueCraft.find((q) => q.id === queueCraftId);
     if (!queue) return;
     queue.status = status;
   },

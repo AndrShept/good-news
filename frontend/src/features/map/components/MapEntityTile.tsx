@@ -19,7 +19,7 @@ export const MapEntityTile = memo(function MapEntityTile(props: Props) {
   const image = props.entityType === 'HERO' ? props.characterImage : props.image;
   return (
     <div
-      className="drop-shadow-outline-sm relative"
+      className="drop-shadow-outline relative"
       style={{
         position: 'absolute',
         width: props.TILE_SIZE,
@@ -27,7 +27,9 @@ export const MapEntityTile = memo(function MapEntityTile(props: Props) {
         willChange: 'transform',
         imageRendering: 'pixelated',
         transform: `translate(${localX * props.TILE_SIZE}px, ${localY * props.TILE_SIZE}px)`,
-        backgroundSize: 'cover',
+        backgroundSize: props.entityType === 'CREATURE' ? `${100 * props.scale}%` : '100%',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
         backgroundImage: `url(${image})`,
       }}
     >

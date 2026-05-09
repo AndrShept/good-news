@@ -27,6 +27,7 @@ export const creatureService = {
       id: creature.id,
       image: creature.image,
       name: creature.name,
+      scale: creature.scale,
       state: creature.state,
       x: creature.x,
       y: creature.y,

@@ -87,10 +87,7 @@ export const moveTick = (now: number) => {
     }
 
     if (!paths.length && lastStep) {
-      // serverState.pathPersistQueue.set(heroId, {
-      //   x: lastStep.x,
-      //   y: lastStep.y,
-      // });
+ 
       hero.location.targetX = null;
       hero.location.targetY = null;
       hero.state = 'IDLE';

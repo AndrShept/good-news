@@ -163,9 +163,6 @@ export const GameMap = memo(function GameMap({
             <MapTileList grounds={groundLayer?.data ?? []} MAP_WIDTH={MAP_WIDTH} TILE_SIZE={TILE_SIZE} tileImage={image} />
           </Application> */}
 
-        {movementPathTiles?.map((position) => (
-          <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
-        ))}
         {allEntities.map((entity) => {
           const entitiesOnSameTile = allEntities.filter((e) => e.x === entity.x && e.y === entity.y);
           const countOnTile = entitiesOnSameTile.length;
@@ -185,7 +182,9 @@ export const GameMap = memo(function GameMap({
             />
           );
         })}
-
+        {movementPathTiles?.map((position) => (
+          <MovablePathTile key={`${position.x}${position.y}`} {...position} TILE_SIZE={TILE_SIZE} offsetX={offsetX} offsetY={offsetY} />
+        ))}
         <Canvas
           tileset={tileset}
           layers={layers.filter((l) => l.name === 'ABOVE_PLAYER') ?? []}

@@ -72,13 +72,14 @@ export const battleService = {
           id: hero.id,
           name: hero.name,
           avatarImage: hero.avatarImage,
-          characterImage: hero.avatarImage,
+          characterImage: hero.characterImage,
           currentHealth: hero.currentHealth,
           currentMana: hero.currentMana,
           maxHealth: hero.maxHealth,
           maxMana: hero.maxMana,
           level: hero.level,
           modifier: hero.modifier,
+          equipments: hero.equipments,
           isAlive: true,
           side,
           type,
@@ -97,9 +98,11 @@ export const battleService = {
           maxMana: creature.maxMana,
           level: 1,
           modifier: creature.baseModifier as Modifier,
+          equipments: [],
           isAlive: true,
           side,
           type,
+          scale: creature.scale,
         };
         return creatureParticipant;
     }

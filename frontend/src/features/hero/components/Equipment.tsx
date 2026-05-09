@@ -4,7 +4,7 @@ import { BASE_EQUIPMENTS_IMAGE } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { EquipmentSlotType, ItemInstance } from '@/shared/types';
 import { useSelectItemInstanceStore } from '@/store/useSelectItemInstanceStore';
-import {  useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { useGameData } from '../hooks/useGameData';
 import { CharacterSprite } from './CharacterSprite';
@@ -12,9 +12,10 @@ import { CharacterSprite } from './CharacterSprite';
 interface Props {
   equipments: ItemInstance[];
   characterImage: string;
+  scale?: number;
 }
 
-export const Equipments =  ({ equipments, characterImage }: Props) =>  {
+export const Equipments = ({ equipments, characterImage, scale }: Props) => {
   const equipmentBySlot = useMemo(
     () =>
       equipments.reduce(
@@ -30,7 +31,7 @@ export const Equipments =  ({ equipments, characterImage }: Props) =>  {
   const { itemsTemplateById } = useGameData();
   const { itemInstance, setItemInstance } = useSelectItemInstanceStore();
   return (
-    <div className="mx-auto flex">
+    <div className="mx-auto flex h-fit">
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(0, 5).map((equipment) => (
           <li className="flex size-12 items-center justify-center border" key={equipment.id}>
@@ -47,7 +48,7 @@ export const Equipments =  ({ equipments, characterImage }: Props) =>  {
           </li>
         ))}
       </ul>
-      <CharacterSprite src={characterImage} />
+      <CharacterSprite scale={scale} src={characterImage} />
       <ul className="flex flex-col gap-0.5">
         {BASE_EQUIPMENTS_IMAGE.slice(5, 10).map((equipment) => (
           <li className="flex size-12 items-center justify-center border" key={equipment.id}>
@@ -60,7 +61,7 @@ export const Equipments =  ({ equipments, characterImage }: Props) =>  {
               />
             ) : (
               <GameItemImg
-              tintColor={null}
+                tintColor={null}
                 className={cn('size-10 opacity-20 grayscale', {
                   'size-8': equipment.slot === 'RING_LEFT' || equipment.slot === 'RING_RIGHT' || equipment.slot === 'AMULET',
                 })}
@@ -72,4 +73,4 @@ export const Equipments =  ({ equipments, characterImage }: Props) =>  {
       </ul>
     </div>
   );
-}
+};

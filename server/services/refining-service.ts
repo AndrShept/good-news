@@ -6,6 +6,7 @@ import { HTTPException } from 'hono/http-exception';
 import { serverState } from '../game/state/server-state';
 import { refiningRecipeByInput, refiningRecipeByOutput } from '../lib/table/refining-table';
 import { clamp } from '../lib/utils';
+import { heroService } from './hero-service';
 import { itemTemplateService } from './item-template-service';
 import { skillService } from './skill-service';
 
@@ -28,16 +29,11 @@ interface GetRefineOutputQuantity {
 }
 
 export const refiningService = {
-  getQueueRefine(heroId: string) {
-    const queueRefine = serverState.queueRefine.get(heroId);
-    if (!queueRefine) throw new HTTPException(400, { message: 'queueRefine not found' });
-    return queueRefine;
-  },
   createQueue(heroId: string, refineBuildingKey: RefiningBuildingKey, itemInstances: ItemInstance[]) {
     const refiningData: RefineOperation[] = [];
     const refineSkillKey = skillService.getRefiningSkillByBuilding(refineBuildingKey);
     const refineSkillInstance = skillService.getSkillByKey(heroId, refineSkillKey);
-
+    const hero = heroService.getHero(heroId);
     let itemIndex = 0;
     for (const itemInstance of itemInstances) {
       const itemTemplate = itemInstance.coreResource
@@ -137,7 +133,8 @@ export const refiningService = {
           break;
       }
     }
-    serverState.queueRefine.set(heroId, refiningData);
+
+    hero.queueRefine = refiningData;
   },
 
   getRefineChance({ input, refineSkillLevel, loreSkillLevel }: GetRefineChance): number {

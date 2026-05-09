@@ -4,26 +4,28 @@ import { BuffList } from './BuffList';
 import { FillBar } from './FillBar';
 
 interface Props {
-  avatarImage: string;
+  avatarImage?: string;
   currentHealth: number;
   maxHealth: number;
   currentMana: number;
   maxMana: number;
   name: string;
-  level: number;
+  level?: number;
   id: string;
 }
 
 export const CharacterStatusBar = (props: Props) => {
   return (
     <div className="flex w-full items-center gap-2">
-      <div>
-        <GameAvatar src={props.avatarImage} />
-      </div>
+      {props.avatarImage && (
+        <div>
+          <GameAvatar src={props.avatarImage} />
+        </div>
+      )}
       <div className="flex w-full flex-col gap-0.5">
         <div>
           <span className="mr-1">{props.name}</span>
-          <span className="text-muted-foreground">lvl:{props.level}</span>
+          {props.level && <span className="text-muted-foreground">lvl:{props.level}</span>}
         </div>
 
         <FillBar value={props.currentHealth} type="health" maxValue={props.maxHealth} />
@@ -32,4 +34,4 @@ export const CharacterStatusBar = (props: Props) => {
       </div>
     </div>
   );
-}
+};

@@ -24,6 +24,8 @@ import type { itemInstanceTable, skillInstanceTable } from '../../db/schema';
 
 export type HeroRuntime = Hero & {
   paths?: PathNode[];
+  queueCraft: QueueCraft[];
+  queueRefine: RefineOperation[];
   offlineTimer?: number;
   gatheringFinishAt?: number;
   refiningFinishAt?: number;
@@ -91,11 +93,10 @@ export const serverState = {
   chunkSpawns: new Map<string, Set<string>>(),
   corpse: new Map<string, Corpse>(),
   creature: new Map<string, CreatureInstance>(),
-  queueCraft: new Map<string, QueueCraft[]>(),
-  queueRefine: new Map<string, RefineOperation[]>(),
+
   socket: new Map<string, Socket>(),
   worldResourceTiles: new Map<string, Map<string, TileState>>(),
-  battle: new Map<string , Battle>(),
+  battle: new Map<string, Battle>(),
   itemInstancePendingDeltaEvents: new Set<ItemInstancePendingDeltaEvents>(),
   skillInstancePendingDeltaEvents: new Set<SkillInstancePendingDeltaEvents>(),
 };

@@ -13,10 +13,10 @@ export const recipeTemplate = [
     timeMs: 5_000,
     requirement: {
       materials: [
-        { amount: 9, role: 'CORE', categories: ['INGOT'] },
+        { amount: 5, role: 'CORE', categories: ['INGOT'] },
         { role: 'FIXED', amount: 1, templateId: resourceTemplateByKey.REGULAR_LEATHER.id },
       ],
-      skills: [{ skillTemplateId: skillTemplateByKey.BLACKSMITHING.id, level: 1 }],
+      skills: [{ skillTemplateId: skillTemplateByKey.BLACKSMITHING.id, level: 0 }],
       buildingCraftLocation: 'BLACKSMITH',
     },
   },
