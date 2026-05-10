@@ -705,11 +705,20 @@ export type OmitDeepHero = {
 
 //BATTLE
 
+export const battleZoneValues = ['HEAD', 'CHEST', 'HANDS', 'FEET'] as const;
+export const battleShieldZoneValues = [
+  ['HEAD', 'CHEST'],
+  ['CHEST', 'HANDS'],
+  ['HANDS', 'FEET'],
+  ['FEET', 'HEAD'],
+] as const;
+
 export type BattleSide = 'ATTACKER' | 'DEFENDER';
 export type BattleParticipantType = 'HERO' | 'CREATURE';
 export type BattleStatusType = 'IN_PROGRESS' | 'FINISHED';
 
-export type BodyZone = 'HEAD' | 'BODY' | 'LEGS' | 'LEFT_ARM' | 'RIGHT_ARM';
+export type BattleZoneType = (typeof battleZoneValues)[number];
+export type BattleShieldZoneType = (typeof battleShieldZoneValues)[number];
 
 // Тип дії
 export type BattleActionType = 'INSTANT' | 'NORMAL' | 'CAST';
@@ -734,9 +743,9 @@ export type BattleAction = {
   participantId: string;
   category: BattleActionCategory;
   actionType: BattleActionType;
-  targetId?: string; // на кого
-  targetZone?: BodyZone; // куди б'ємо (тільки для PHYSICAL_ATTACK)
-  defendZone?: BodyZone; // що захищаємо
+  targetId?: string;
+  targetZone?: BattleZoneType; // куди б'ємо (тільки для PHYSICAL_ATTACK)
+  defendZone?: BattleZoneType | BattleShieldZoneType; // що захищаємо
   abilityId?: string; // який спел
 };
 
@@ -760,7 +769,7 @@ export type BattleLogEntry = {
     blocked?: boolean;
     critical?: boolean;
     missed?: boolean;
-    zone?: BodyZone;
+    zone?: BattleZoneType | BattleShieldZoneType;
   };
 };
 

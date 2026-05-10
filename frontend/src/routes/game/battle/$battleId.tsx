@@ -1,6 +1,9 @@
 import { Spinner } from '@/components/Spinner';
 import { getBattleOptions } from '@/features/battle/api/get-battle';
 import { BattleParticipantCard } from '@/features/battle/components/BattleParticipantCard';
+import { BattleParticipantList } from '@/features/battle/components/BattleParticipantList';
+import { ZoneSelector } from '@/features/battle/components/ZoneSelector';
+import { useBattle } from '@/features/battle/hooks/useBattle';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { createFileRoute } from '@tanstack/react-router';
 
@@ -24,18 +27,17 @@ export const Route = createFileRoute('/game/battle/$battleId')({
 function RouteComponent() {
   const battle = Route.useLoaderData();
   const heroId = useHeroId();
-  const selfParticipant = battle?.participants.find((p) => p.id === heroId);
   const opponentParticipant = battle?.participants.find((p) => p.id !== heroId);
   const attackers = battle?.participants.filter((p) => p.side === 'ATTACKER');
   const defenders = battle?.participants.filter((p) => p.side === 'DEFENDER');
+  const { isEquipLeftWeapon, isEquipRightHand, isEquipShield, selfParticipant } = useBattle();
   if (!selfParticipant || !opponentParticipant) return;
   return (
     <div className="mx-auto flex h-fit w-full max-w-5xl justify-between p-2">
       <BattleParticipantCard {...selfParticipant} />
-      <div className="text-muted-foreground mt-auto flex gap-2">
-        <ul>{attackers?.map((a) => <li>{a.name}</li>)}</ul>
-        <p className="text-red-500">vs</p>
-        <ul>{defenders?.map((a) => <li>{a.name}</li>)}</ul>
+      <div className="flex flex-col gap-1">
+        <ZoneSelector isEquipLeftWeapon={isEquipLeftWeapon && isEquipRightHand} isEquipShield={isEquipShield} />
+        <BattleParticipantList attackers={attackers} defenders={defenders} />
       </div>
       <BattleParticipantCard {...opponentParticipant} />
     </div>
