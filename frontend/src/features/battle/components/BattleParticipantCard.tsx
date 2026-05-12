@@ -1,7 +1,6 @@
 import { CharacterStatusBar } from '@/features/hero/components/CharacterStatusBar';
 import { Equipments } from '@/features/hero/components/Equipment';
 import { BattleParticipant } from '@/shared/types';
-import React from 'react';
 
 type Props = BattleParticipant;
 
@@ -19,6 +18,7 @@ export const BattleParticipantCard = (props: Props) => {
         maxHealth={props.maxHealth}
         maxMana={props.maxMana}
         level={level}
+        buffs={props.buffs}
       />
       <Equipments scale={props.scale} characterImage={props.characterImage} equipments={props.equipments} />
     </div>

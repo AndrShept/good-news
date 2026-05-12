@@ -1,7 +1,6 @@
 import { performance } from 'node:perf_hooks';
 
 import { heroTickService } from '../services/hero-tick-service';
-import { buffTick } from './buff-tick';
 
 import { resourceRespawnTick } from './resource-respawn-tick';
 import { spawnCreatureTick } from './spawn-creature-tick';
@@ -28,7 +27,7 @@ export const gameLoop = () => {
     // regenTick(lastTick, TICK_RATE)
     heroTickService.heroTick(lastTick, TICK_RATE);
 
-    buffTick(lastTick);
+    // buffTick(lastTick);
     resourceRespawnTick(lastTick);
     spawnCreatureTick(lastTick);
 

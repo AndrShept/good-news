@@ -10,12 +10,12 @@ export const useBattle = () => {
   const { itemsTemplateById } = useGameData();
   const selfParticipant = battle?.participants.find((p) => p.id === hero.id);
 
-  const isEquipLeftWeapon =
+  const isEquipLeftHandWeapon =
     selfParticipant?.equipments.some((e) => {
       const template = itemsTemplateById[e.itemTemplateId];
       return e.slot === 'LEFT_HAND' && template.type !== 'SHIELD';
     }) ?? false;
-  const isEquipRightHand = selfParticipant?.equipments.some((e) => e.slot === 'RIGHT_HAND') ?? false;
+  const isEquipRightHandWeapon = selfParticipant?.equipments.some((e) => e.slot === 'RIGHT_HAND') ?? false;
   const isEquipShield =
     selfParticipant?.equipments.some((e) => {
       const template = itemsTemplateById[e.itemTemplateId];
@@ -24,8 +24,8 @@ export const useBattle = () => {
 
   return {
     battle,
-    isEquipLeftWeapon,
-    isEquipRightHand,
+    isEquipLeftHandWeapon,
+    isEquipRightHandWeapon,
     isEquipShield,
     selfParticipant,
   };

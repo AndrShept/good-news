@@ -1,8 +1,5 @@
 import { BackButton } from '@/components/BackButton';
-import { GameIcon } from '@/components/GameIcon';
-import { Button } from '@/components/ui/button';
 import { HeroBackpack } from '@/features/item-container/components/HeroBackpack';
-import { imageConfig } from '@/shared/config/image-config';
 import { useHeroUIStore } from '@/store/useHeroUIStore';
 import { useMediaQuery } from 'usehooks-ts';
 
@@ -26,6 +23,7 @@ export const CharacterPaperdoll = () => {
     level: data?.level ?? 0,
     modifier: data?.modifier,
     equipments: data?.equipments ?? [],
+    buffs: data?.buffs ?? [],
   }));
   const isMobile = useMediaQuery('(max-width: 768px)');
   const { setUiType } = useHeroUIStore();

@@ -57,9 +57,13 @@ export const SocketProvider = ({
     return () => {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
-      socket.disconnect();
     };
-  }, [navigate, socket, userId]);
+  }, [navigate, queryClient, socket, userId]);
+  useEffect(() => {
+    return () => {
+      socket.disconnect(); 
+    };
+  }, [socket]); 
 
   return <SocketContext.Provider value={{ socket, isConnected }}>{children}</SocketContext.Provider>;
 };

@@ -1,4 +1,4 @@
-import { ApiGetHeroResponse, OmitDeepHero } from '@/shared/types';
+import { ApiGetHeroResponse, BuffInstance, OmitDeepHero } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
@@ -25,5 +25,33 @@ export const useHeroUpdate = () => {
     });
   }, []);
 
-  return { updateHero };
+  const addBuff = (newBuff: BuffInstance) => {
+    queryClient.setQueryData<ApiGetHeroResponse>(getHeroOptions().queryKey, (oldData) => {
+      if (!oldData) return;
+      return {
+        ...oldData,
+        buffs: [...oldData.buffs, newBuff],
+      };
+    });
+  };
+  const removeBuff = (buffId: string) => {
+    queryClient.setQueryData<ApiGetHeroResponse>(getHeroOptions().queryKey, (oldData) => {
+      if (!oldData) return;
+      return {
+        ...oldData,
+        buffs: oldData.buffs.filter((b) => b.id !== buffId),
+      };
+    });
+  };
+  const updateBuff = (buffId: string, updateData: Partial<BuffInstance>) => {
+    queryClient.setQueryData<ApiGetHeroResponse>(getHeroOptions().queryKey, (oldData) => {
+      if (!oldData) return;
+      return {
+        ...oldData,
+        buffs: oldData.buffs.map((b) => (b.id === buffId ? { ...b, ...updateData } : b)),
+      };
+    });
+  };
+
+  return { updateHero, addBuff, removeBuff, updateBuff };
 };

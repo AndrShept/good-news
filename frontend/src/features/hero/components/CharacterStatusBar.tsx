@@ -1,4 +1,5 @@
 import { GameAvatar } from '@/components/GameAvatar';
+import { BuffInstance } from '@/shared/types';
 
 import { BuffList } from './BuffList';
 import { FillBar } from './FillBar';
@@ -12,6 +13,7 @@ interface Props {
   name: string;
   level?: number;
   id: string;
+  buffs: BuffInstance[];
 }
 
 export const CharacterStatusBar = (props: Props) => {
@@ -30,7 +32,7 @@ export const CharacterStatusBar = (props: Props) => {
 
         <FillBar value={props.currentHealth} type="health" maxValue={props.maxHealth} />
         <FillBar value={props.currentMana} type="mana" maxValue={props.maxMana} />
-        <BuffList id={props.id} />
+        <BuffList buffs={props.buffs} />
       </div>
     </div>
   );

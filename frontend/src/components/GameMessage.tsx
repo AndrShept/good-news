@@ -1,5 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGroupListener } from '@/features/group/hooks/useGroupListener';
+import { useBuffListener } from '@/features/hero/hooks/useBuffListener';
 import { useHeroListener } from '@/features/hero/hooks/useHeroListener';
 import { useRegeneration } from '@/features/hero/hooks/useRegeneration';
 import { useSelfMessage } from '@/features/hero/hooks/useSelfMessage';
@@ -13,6 +14,7 @@ import { memo, useEffect, useRef } from 'react';
 export const GameMessage = memo(() => {
   const gameMessages = useGameMessages((state) => state.gameMessages);
   const ref = useRef<null | HTMLUListElement>(null);
+  useBuffListener();
   useGroupListener();
   useMapListener();
   usePlaceListener();

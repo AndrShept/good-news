@@ -751,7 +751,17 @@ export type BattleAction = {
 
 export type BattleParticipant = Pick<
   Hero,
-  'id' | 'name' | 'currentHealth' | 'maxHealth' | 'currentMana' | 'maxMana' | 'level' | 'avatarImage' | 'characterImage' | 'equipments'
+  | 'id'
+  | 'name'
+  | 'currentHealth'
+  | 'maxHealth'
+  | 'currentMana'
+  | 'maxMana'
+  | 'level'
+  | 'avatarImage'
+  | 'characterImage'
+  | 'equipments'
+  | 'buffs'
 > & {
   scale?: number;
   modifier: Modifier;

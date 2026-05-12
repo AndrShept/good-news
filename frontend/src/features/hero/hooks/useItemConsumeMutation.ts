@@ -3,7 +3,6 @@ import { useItemContainerUpdate } from '@/features/item-container/hooks/useItemC
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { getBuffOptions } from '../api/get-buff';
 import { itemConsume } from '../api/item-consume';
 import { useGameData } from './useGameData';
 import { useHeroId } from './useHeroId';
@@ -14,14 +13,15 @@ export const useItemConsumeMutation = () => {
   const queryClient = useQueryClient();
   const heroId = useHeroId();
   const backpackId = useGetBackpackId();
-  const { updateHero } = useHeroUpdate();
-  const {  updateItemByDeltaEvents } = useItemContainerUpdate();
+  const { updateHero, addBuff } = useHeroUpdate();
+  const { updateItemByDeltaEvents } = useItemContainerUpdate();
   const { itemsTemplateById } = useGameData();
   return useMutation({
     mutationFn: ({ itemInstanceId }: { itemInstanceId: string; itemTemplateId: string }) => itemConsume({ heroId, itemInstanceId }),
 
     async onSuccess(data, { itemTemplateId }) {
       const template = itemsTemplateById[itemTemplateId];
+      console.log(data);
       updateHero({
         ...data.data?.hero,
       });
@@ -31,11 +31,9 @@ export const useItemConsumeMutation = () => {
 
       switch (template.type) {
         case 'POTION': {
-          if (template.potionInfo?.type === 'BUFF') {
-            queryClient.invalidateQueries({
-              queryKey: getBuffOptions(heroId).queryKey,
-            });
-          }
+          // if (template.potionInfo?.type === 'BUFF') {
+          //     addBuff()
+          // }
           setGameMessage({
             color: 'GREY',
             text: data.data?.message ?? '',
@@ -44,11 +42,9 @@ export const useItemConsumeMutation = () => {
           break;
         }
         case 'SKILL_BOOK': {
-          if (template.bookInfo?.kind === 'TRAIN_BUFF') {
-            queryClient.invalidateQueries({
-              queryKey: getBuffOptions(heroId).queryKey,
-            });
-          }
+          // if (template.bookInfo?.kind === 'TRAIN_BUFF') {
+
+          // }
 
           setGameMessage({
             color: 'GREY',

@@ -56,11 +56,10 @@ export const heroService = {
 
   getHeroStatsWithModifiers(heroId: string) {
     const hero = this.getHero(heroId);
-    const buffs = serverState.buff.get(heroId) ?? [];
 
     // const itemsMapIds = itemTemplateService.getAllItemsTemplateMapIds();
     const modifiers = [
-      ...buffs.map((b) => buffTemplateMapIds[b.buffTemplateId].modifier),
+      ...hero.buffs.map((b) => buffTemplateMapIds[b.buffTemplateId].modifier),
       // ...(hero.equipments ?? []).map((e) => itemsMapIds[e.itemTemplateId].modifier),
       ...(hero.equipments ?? []).map((e) => e.modifier),
     ];

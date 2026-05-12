@@ -1,10 +1,9 @@
-
+import { BuffInstance, ItemInstance } from '@/shared/types';
 import { memo } from 'react';
 
 import { CharacterStatusBar } from './CharacterStatusBar';
 import { Equipments } from './Equipment';
 import { FillBar } from './FillBar';
-import { ItemInstance } from '@/shared/types';
 
 interface Props {
   avatarImage: string;
@@ -17,21 +16,11 @@ interface Props {
   level: number;
   id: string;
   equipments: ItemInstance[];
+  buffs: BuffInstance[];
 }
 
 export const Paperdoll = memo(
-  ({
-    avatarImage,
-    characterImage,
-    equipments,
-    currentHealth,
-    id,
-    level,
-    currentMana,
-    maxHealth,
-    maxMana,
-    name,
-  }: Props) => {
+  ({ avatarImage, characterImage, equipments, currentHealth, id, level, currentMana, maxHealth, maxMana, name, buffs }: Props) => {
     return (
       <section className="flex h-fit w-[300px] shrink-0 flex-col gap-6 p-3">
         <CharacterStatusBar
@@ -43,6 +32,7 @@ export const Paperdoll = memo(
           name={name}
           level={level}
           id={id}
+          buffs={buffs}
         />
 
         <Equipments characterImage={characterImage} equipments={equipments} />

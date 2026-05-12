@@ -1,4 +1,5 @@
 import type {
+  BuffInstance,
   Corpse,
   EntityPayloadMap,
   GameSysMessageType,
@@ -91,7 +92,6 @@ export type QueueCraftItemSocketEvent =
     };
 
 export type SelfHeroEvent =
-  | RemoveBuffEvent
   | SkillExpGainEvent
   | HeroUpdateEvent
   | FinishGatheringEvent
@@ -129,13 +129,6 @@ export type HeroUpdateEvent = {
   payload: Partial<OmitDeepHero>;
 };
 
-export type RemoveBuffEvent = {
-  type: 'REMOVE_BUFF';
-  payload: {
-    buffInstanceId: string;
-    hero?: Pick<Hero, 'currentHealth' | 'maxHealth' | 'currentMana' | 'maxMana' | 'modifier'>;
-  };
-};
 export type FinishGatheringEvent = {
   type: 'FINISH_GATHERING';
   payload: {
@@ -159,4 +152,16 @@ export type SkillExpGainEventPayload = {
   level: number;
   currentExperience: number;
   expToLvl: number;
+};
+
+export type BuffRemoveData = {
+  buffInstanceId: string;
+  hero?: Pick<Hero, 'currentHealth' | 'maxHealth' | 'currentMana' | 'maxMana' | 'modifier'>;
+};
+export type BuffAddData = {
+  newBuff: BuffInstance;
+};
+export type BuffUpdateData = {
+  buffInstanceId: string;
+  updateData: Partial<BuffInstance>;
 };

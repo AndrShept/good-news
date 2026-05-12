@@ -1,5 +1,4 @@
 import { useSocket } from '@/components/providers/SocketProvider';
-import { useGetBackpackId } from '@/features/item-container/hooks/useGetBackpackId';
 import { useItemContainerUpdate } from '@/features/item-container/hooks/useItemContainerUpdate';
 import { useMapChunkEntitiesUpdate } from '@/features/map/hooks/useMapChunkEntitiesUpdate';
 import { useSkill } from '@/features/skill/hooks/useSkill';
@@ -11,7 +10,6 @@ import { MapChunkEntitiesData } from '@/shared/types';
 import { useSetGameMessage } from '@/store/useGameMessages';
 import { useEffect } from 'react';
 
-import { useBuff } from './useBuff';
 import { useEquipmentsUpdate } from './useEquipmentsUpdate';
 import { useHero } from './useHero';
 import { useHeroId } from './useHeroId';
@@ -19,14 +17,12 @@ import { useHeroUpdate } from './useHeroUpdate';
 
 export const useHeroListener = () => {
   const { socket } = useSocket();
-  const { removeBuff } = useBuff();
   const { updateHero } = useHeroUpdate();
   const { updateSkill } = useSkillUpdate();
   const { addItemInstance, updateItemInstance, updateItemByDeltaEvents } = useItemContainerUpdate();
   const { updateEquip, removeEquip } = useEquipmentsUpdate();
   const mapId = useHero((data) => data?.location.mapId ?? '');
   const { removeChunkEntities, addChunkEntities } = useMapChunkEntitiesUpdate(mapId);
-  const backpackId = useGetBackpackId();
   const heroId = useHeroId();
   const setGameMessage = useSetGameMessage();
   const { skills } = useSkill();
@@ -34,10 +30,7 @@ export const useHeroListener = () => {
   useEffect(() => {
     const listener = async (data: SelfHeroEvent) => {
       switch (data.type) {
-        case 'REMOVE_BUFF':
-          updateHero({ ...data.payload.hero });
-          removeBuff(data.payload.buffInstanceId);
-          break;
+
         case 'SKILL_EXP_GAIN':
           for (const updateData of data.payload) {
             updateSkill(updateData.expResult.skillInstanceId, {
@@ -133,19 +126,5 @@ export const useHeroListener = () => {
     return () => {
       socket.off(socketEvents.selfData(), listener);
     };
-  }, [
-    addChunkEntities,
-    addItemInstance,
-    heroId,
-    removeBuff,
-    removeChunkEntities,
-    removeEquip,
-    setGameMessage,
-    socket,
-    updateEquip,
-    updateHero,
-    updateItemByDeltaEvents,
-    updateItemInstance,
-    updateSkill,
-  ]);
+  }, [addChunkEntities, addItemInstance, heroId, removeChunkEntities, removeEquip, setGameMessage, skills, socket, updateEquip, updateHero, updateItemByDeltaEvents, updateItemInstance, updateSkill]);
 };

@@ -77,7 +77,6 @@ export const serverState = {
   hero: new Map<string, HeroRuntime>(),
   container: new Map<string, TItemContainer>(),
   skill: new Map<string, SkillInstance[]>(),
-  buff: new Map<string, BuffInstance[]>(),
   user: new Map<string, string>(),
 
   mapChunks: new Map<

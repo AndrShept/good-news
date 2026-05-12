@@ -25,18 +25,21 @@ export const Route = createFileRoute('/game/battle/$battleId')({
 });
 
 function RouteComponent() {
-  const battle = Route.useLoaderData();
   const heroId = useHeroId();
+  const { battle, isEquipLeftHandWeapon, isEquipRightHandWeapon, isEquipShield, selfParticipant } = useBattle();
   const opponentParticipant = battle?.participants.find((p) => p.id !== heroId);
   const attackers = battle?.participants.filter((p) => p.side === 'ATTACKER');
   const defenders = battle?.participants.filter((p) => p.side === 'DEFENDER');
-  const { isEquipLeftWeapon, isEquipRightHand, isEquipShield, selfParticipant } = useBattle();
   if (!selfParticipant || !opponentParticipant) return;
   return (
     <div className="mx-auto flex h-fit w-full max-w-5xl justify-between p-2">
       <BattleParticipantCard {...selfParticipant} />
       <div className="flex flex-col gap-1">
-        <ZoneSelector isEquipLeftWeapon={isEquipLeftWeapon && isEquipRightHand} isEquipShield={isEquipShield} />
+        <ZoneSelector
+          isEquipLeftHandWeapon={isEquipLeftHandWeapon}
+          isEquipRightHandWeapon={isEquipRightHandWeapon}
+          isEquipShield={isEquipShield}
+        />
         <BattleParticipantList attackers={attackers} defenders={defenders} />
       </div>
       <BattleParticipantCard {...opponentParticipant} />

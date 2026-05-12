@@ -114,12 +114,11 @@ export const heroRouter = new Hono<Context>()
         });
         serverState.user.set(userId, hero.id);
         serverState.skill.set(hero.id, skills);
-        serverState.buff.set(hero.id, buffs);
 
         serverState.hero.set(hero.id, {
           ...hero,
           equipments: equipments ?? [],
-          buffs: [],
+          buffs,
           queueCraft: [],
           queueRefine: [],
           location: { ...hero.location, targetX: null, targetY: null },
@@ -797,28 +796,6 @@ export const heroRouter = new Hono<Context>()
       });
     },
   )
-  .get('/:id/buffs', loggedIn, zValidator('param', z.object({ id: z.string() })), async (c) => {
-    const userId = c.get('user')?.id;
-    const { id } = c.req.valid('param');
-    const hero = heroService.getHero(id);
-    verifyHeroOwnership({ heroUserId: hero.userId, userId });
-
-    let buffs = serverState.buff.get(hero.id);
-    if (!buffs) {
-      console.log('FETCH BUFFS!!!!!');
-      const buffsDb = await db.query.buffInstanceTable.findMany({
-        where: eq(buffInstanceTable.ownerHeroId, hero.id),
-      });
-      buffs = buffsDb;
-      serverState.buff.set(hero.id, buffsDb);
-    }
-
-    return c.json<SuccessResponse<typeof buffs>>({
-      message: 'buffs fetched!',
-      success: true,
-      data: buffs,
-    });
-  })
 
   .post(
     '/:id/action/walk-map',
@@ -1209,7 +1186,6 @@ export const heroRouter = new Hono<Context>()
 
       refiningService.createQueue(hero.id, refineBuildingKey, refineContainer.itemsInstance);
       console.log(hero.queueRefine);
-    
 
       const state = getStateWithRefiningBuildingKey(refineBuildingKey);
       const lastItem = hero.queueRefine.at(-1);
@@ -1271,8 +1247,6 @@ export const heroRouter = new Hono<Context>()
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
-      
-
       return c.json<SuccessResponse<QueueCraft[]>>({
         message: 'queue fetched',
         success: true,
@@ -1298,7 +1272,6 @@ export const heroRouter = new Hono<Context>()
       const { recipeId, coreResourceId } = c.req.valid('json');
       const hero = heroService.getHero(id);
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-      
 
       const recipe = recipeTemplateById[recipeId];
       const last = hero.queueCraft.at(-1);
@@ -1360,7 +1333,7 @@ export const heroRouter = new Hono<Context>()
       const hero = heroService.getHero(id);
 
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
-   
+
       const findIndex = hero.queueCraft.findIndex((q) => q.id === queueCraftItemId);
 
       if (findIndex === -1) throw new HTTPException(404, { message: 'queueCraft findIndex not found' });

@@ -1,4 +1,5 @@
 import type {
+  BuffRemoveData,
   FinishGatheringEvent,
   HeroUpdateEvent,
   LoadMapChunkEntityEvent,
@@ -6,6 +7,7 @@ import type {
   RemoveMapChunkEntityEvent,
 } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
+import { buffTemplateMapIds } from '@/shared/templates/buff-template';
 import { recipeTemplateById } from '@/shared/templates/recipe-template';
 import { skillTemplateById } from '@/shared/templates/skill-template';
 import type { ItemsInstanceDeltaEvent, PathNode } from '@/shared/types';
@@ -36,6 +38,7 @@ export const heroTickService = {
       this.refineTick(heroId, now);
       this.queueCraftTick(heroId, now);
       this.heroOffline(heroId, now);
+      this.buffTick(heroId, now);
       //   this.regenTick(heroId, now, TICK_RATE);
     }
   },
@@ -470,6 +473,40 @@ export const heroTickService = {
     if (hero.offlineTimer && hero.offlineTimer <= now) {
       heroOffline(hero.id, hero.userId);
       console.log(` heroOffline ${hero.name}`);
+    }
+  },
+  buffTick(heroId: string, now: number) {
+    const hero = heroService.getHero(heroId);
+    for (let i = hero.buffs.length - 1; i >= 0; i--) {
+      const buff = hero.buffs[i];
+      if (buff.expiresAt <= now) {
+        hero.buffs.splice(i, 1);
+
+        heroService.updateModifier(heroId);
+        const buffTemplate = buffTemplateMapIds[buff.buffTemplateId];
+        const socketData: BuffRemoveData = {
+        buffInstanceId: buff.id,
+          hero: {
+            currentHealth: hero.currentHealth,
+            currentMana: hero.currentMana,
+            maxHealth: hero.maxHealth,
+            maxMana: hero.maxMana,
+            modifier: hero.modifier,
+          },
+        };
+        switch (buffTemplate.source) {
+          case 'BOOK': {
+            if (!buffTemplate.reward) continue;
+            socketData.hero = undefined;
+            const skillInstance = skillService.getSkillByKey(heroId, buffTemplate.reward.skillKey);
+            const amount = progressionService.calculateBookExp(skillInstance.level, buffTemplate.duration);
+            const expResult = skillService.addExp(heroId, buffTemplate.reward.skillKey, amount);
+            socketService.sendToClientExpResult({ heroId, data: [{ isShowMessageOnlyLvlUp: false, expResult }] });
+            break;
+          }
+        }
+        io.to(heroId).emit(socketEvents.buffRemove(), socketData);
+      }
     }
   },
 };
