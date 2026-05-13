@@ -43,6 +43,7 @@ export const imageConfig = {
       sell: '/sprites/icons/ui/sell.png',
       character: '/sprites/icons/ui/character.png',
       refine: '/sprites/icons/ui/refine.png',
+      clock: '/sprites/icons/ui/clock.png',
     },
     action: {
       close: '/sprites/icons/action/close.png',

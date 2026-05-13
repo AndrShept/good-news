@@ -33,8 +33,8 @@ export const buffInstanceService = {
         //   updateData: { expiresAt: findBuff.expiresAt },
         // };
         // io.to(heroId).emit(socketEvents.buffUpdate(), socketData);
+        return findBuff;
       }
-      return findBuff;
     }
     hero.buffs.push(newBuff);
     heroService.updateModifier(heroId);

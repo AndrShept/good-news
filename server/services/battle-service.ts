@@ -19,15 +19,20 @@ export const battleService = {
     if (!battle) throw new HTTPException(400, { message: 'Battle not found' });
     return battle;
   },
+  getParticipant(battle: Battle, participantId: string) {
+    const participant = battle.participants.find((p) => p.id === participantId);
+    if (!participant) throw new HTTPException(400, { message: 'participant not found' });
+    return participant;
+  },
   getRoundDuration() {
-    return 30;
+    return Date.now() + 90_000;
   },
 
   initBattle() {
     const id = generateRandomUuid();
     const newBattle: Battle = {
       id,
-      roundDuration: this.getRoundDuration(),
+      roundEndsAt: this.getRoundDuration(),
       currentRound: 1,
       status: 'IN_PROGRESS',
       log: [],
@@ -38,7 +43,7 @@ export const battleService = {
 
     return newBattle;
   },
-  attackTarget(partData: GetParticipantData[]) {
+  startBattle(partData: GetParticipantData[]) {
     const newBattle = battleService.initBattle();
     for (const participantInfo of partData) {
       const participant = battleService.getParticipantData({
@@ -47,6 +52,9 @@ export const battleService = {
         type: participantInfo.type,
       });
       this.addParticipantInBattle(newBattle.id, participant);
+    }
+    for (const participantInfo of partData) {
+      this.setNextTargetParticipant(newBattle, participantInfo.participantId);
     }
   },
   addParticipantInBattle(battleId: string, participant: BattleParticipant) {
@@ -82,6 +90,7 @@ export const battleService = {
           equipments: hero.equipments,
           buffs: hero.buffs,
           isAlive: true,
+          targetId: null,
           side,
           type,
         };
@@ -102,11 +111,22 @@ export const battleService = {
           equipments: [],
           buffs: [],
           isAlive: true,
+          targetId: null,
           side,
           type,
           scale: creature.scale,
         };
         return creatureParticipant;
     }
+  },
+  setNextTargetParticipant(battle: Battle, participantId: string) {
+    const participant = battle.participants.find((p) => p.id === participantId);
+    if (!participant) return;
+    const enemies = battle.participants.filter((p) => p.side !== participant.side && p.isAlive);
+
+    const random = Math.floor(Math.random() * enemies.length);
+
+    const targetId = enemies[random].id;
+    participant.targetId = targetId;
   },
 };

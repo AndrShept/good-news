@@ -733,7 +733,7 @@ export type Battle = {
   id: string;
   status: BattleStatusType;
   currentRound: number;
-  roundDuration: number;
+  roundEndsAt: number;
   pendingActions: BattleAction[];
   log: BattleLogEntry[];
   participants: BattleParticipant[];
@@ -743,9 +743,9 @@ export type BattleAction = {
   participantId: string;
   category: BattleActionCategory;
   actionType: BattleActionType;
-  targetId?: string;
-  targetZone?: BattleZoneType; // куди б'ємо (тільки для PHYSICAL_ATTACK)
-  defendZone?: BattleZoneType | BattleShieldZoneType; // що захищаємо
+  targetId: string;
+  attackingZone?: z.infer<typeof selectedAttackingZoneSchema>;
+  defenseZone?: BattleZoneType | BattleShieldZoneType;
   abilityId?: string; // який спел
 };
 
@@ -768,6 +768,7 @@ export type BattleParticipant = Pick<
   type: BattleParticipantType;
   side: BattleSide;
   isAlive: boolean;
+  targetId: string | null;
 };
 
 export type BattleLogEntry = {
@@ -865,4 +866,27 @@ export const buyItemsSchema = z.object({
     }),
   ),
   // .refine((items) => new Set(items.map((i) => i.id)).size === items.length, { message: 'Duplicate item id' }),
+});
+
+const battleZoneSchema = z.enum(battleZoneValues);
+
+const battleShieldZoneSchema = z.union(
+  battleShieldZoneValues.map((pair) => z.tuple([z.literal(pair[0]), z.literal(pair[1])])) as unknown as [
+    z.ZodTypeAny,
+    z.ZodTypeAny,
+    ...z.ZodTypeAny[],
+  ],
+);
+
+const selectedAttackingZoneSchema = z.object({
+  LEFT_HAND: battleZoneSchema.nullable(),
+  RIGHT_HAND: battleZoneSchema.nullable(),
+});
+
+const selectedDefenseZoneSchema = z.union([battleZoneSchema, battleShieldZoneSchema]);
+
+export const endTurnSchema = z.object({
+  attackingZone: selectedAttackingZoneSchema,
+  defenseZone: selectedDefenseZoneSchema,
+  targetId: z.string().uuid(),
 });

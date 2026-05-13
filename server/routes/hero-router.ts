@@ -21,6 +21,7 @@ import {
   buildingValues,
   buyItemsSchema,
   createHeroSchema,
+  endTurnSchema,
   refiningBuildingValues,
   statsSchema,
 } from '@/shared/types';
@@ -67,7 +68,7 @@ import { deltaEventsService } from '../services/delta-events-service';
 import { equipmentService } from '../services/equipment-service';
 import { gatheringService } from '../services/gathering-service';
 import { heroService } from '../services/hero-service';
-import { itemConsumeService } from '../services/item-consume-service';
+import { type ConsumeItemResult, itemConsumeService } from '../services/item-consume-service';
 import { itemContainerService } from '../services/item-container-service';
 import { itemInstanceService } from '../services/item-instance-service';
 import { itemTemplateService } from '../services/item-template-service';
@@ -549,7 +550,12 @@ export const heroRouter = new Hono<Context>()
 
       const template = itemTemplateService.getAllItemsTemplateMapIds();
 
-      let result: ReturnType<typeof itemConsumeService.drink> | undefined | null = null;
+      let result: (ConsumeItemResult & { itemsDelta: ItemsInstanceDeltaEvent[] }) | undefined = {
+        buff: null,
+        message: null,
+        name: null,
+        itemsDelta: [],
+      };
 
       const itemInstance = itemInstanceService.getItemInstance(backpack.id, itemInstanceId);
       switch (template[itemInstance.itemTemplateId].type) {
@@ -1500,7 +1506,7 @@ export const heroRouter = new Hono<Context>()
 
       if (id === targetId) throw new HTTPException(400, { message: 'You do not attacking yourself' });
 
-      battleService.attackTarget([
+      battleService.startBattle([
         {
           participantId: id,
           side: 'ATTACKER',
@@ -1512,6 +1518,48 @@ export const heroRouter = new Hono<Context>()
           type: targetType,
         },
       ]);
+
+      const returnData = { state: hero.state, battleId: hero.battleId };
+      return c.json<SuccessResponse<typeof returnData>>({
+        message: 'You start the battle',
+        success: true,
+        data: returnData,
+      });
+    },
+  )
+  .post(
+    '/:id/battle/turn',
+    loggedIn,
+    zValidator('param', z.object({ id: z.string().uuid() })),
+    zValidator('json', endTurnSchema),
+
+    async (c) => {
+      const user = c.get('user');
+      const { id } = c.req.valid('param');
+      const { attackingZone, defenseZone, targetId } = c.req.valid('json');
+      const hero = heroService.getHero(id);
+
+      verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
+
+      if (id === targetId) throw new HTTPException(400, { message: 'Cannot attack yourself' });
+      if (!hero.battleId) throw new HTTPException(400, { message: 'Hero is not in battle' });
+
+      const battle = battleService.getBattle(hero.battleId);
+      const selfParticipant = battleService.getParticipant(battle, id);
+      const targetParticipant = battleService.getParticipant(battle, targetId);
+
+      if (battle.status !== 'IN_PROGRESS') throw new HTTPException(400, { message: 'Battle is already finished' });
+      if (!selfParticipant.isAlive) throw new HTTPException(400, { message: 'You are dead' });
+      if (!targetParticipant.isAlive) throw new HTTPException(400, { message: 'Target is already dead' });
+
+      battle.pendingActions.push({
+        actionType: 'NORMAL',
+        category: 'PHYSICAL_ATTACK',
+        participantId: selfParticipant.id,
+        targetId: targetParticipant.id,
+        attackingZone,
+        defenseZone,
+      });
 
       const returnData = { state: hero.state, battleId: hero.battleId };
       return c.json<SuccessResponse<typeof returnData>>({

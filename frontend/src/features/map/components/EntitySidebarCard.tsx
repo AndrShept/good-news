@@ -2,6 +2,7 @@ import { GameAvatar } from '@/components/GameAvatar';
 import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
 import { useAttackTarget } from '@/features/battle/hooks/useAttackTarget';
+import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { imageConfig } from '@/shared/config/image-config';
 import { MapChunkEntitiesType, StateType } from '@/shared/types';
 import { memo } from 'react';
@@ -17,7 +18,8 @@ interface Props {
 }
 
 export const EntitySidebarCard = memo(function EntitySidebarCard({ id, name, avatarImage, level, state, entityType, mode }: Props) {
-  const isCanAttack = mode === 'MAP' && entityType !== 'CORPSE';
+  const heroId = useHeroId();
+  const isCanAttack = mode === 'MAP' && entityType !== 'CORPSE' && heroId !== id;
   const { mutate, isPending } = useAttackTarget();
   return (
     <li className="mt-0.5 flex items-center gap-1.5 rounded-md px-2 py-1 duration-100 duration-75 hover:ring">

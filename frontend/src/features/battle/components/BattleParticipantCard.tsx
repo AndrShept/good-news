@@ -1,10 +1,11 @@
 import { CharacterStatusBar } from '@/features/hero/components/CharacterStatusBar';
 import { Equipments } from '@/features/hero/components/Equipment';
 import { BattleParticipant } from '@/shared/types';
+import { memo } from 'react';
 
 type Props = BattleParticipant;
 
-export const BattleParticipantCard = (props: Props) => {
+export const BattleParticipantCard = memo((props: Props) => {
   const avatarImage = props.type === 'HERO' ? props.avatarImage : undefined;
   const level = props.type === 'HERO' ? props.level : undefined;
   return (
@@ -23,4 +24,4 @@ export const BattleParticipantCard = (props: Props) => {
       <Equipments scale={props.scale} characterImage={props.characterImage} equipments={props.equipments} />
     </div>
   );
-};
+});

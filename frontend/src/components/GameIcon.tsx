@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import  { ComponentProps } from 'react';
+import { ComponentProps } from 'react';
 
 interface Props extends ComponentProps<'div'> {
   image: string | undefined;
@@ -23,4 +23,4 @@ export const GameIcon = ({ image, isPixelate = true, className }: Props) => {
       /> */}
     </div>
   );
-}
+};

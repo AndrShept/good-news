@@ -10,46 +10,44 @@ import { useHeroUpdate } from './useHeroUpdate';
 
 export const useItemConsumeMutation = () => {
   const setGameMessage = useSetGameMessage();
-  const queryClient = useQueryClient();
   const heroId = useHeroId();
-  const backpackId = useGetBackpackId();
   const { updateHero, addBuff } = useHeroUpdate();
   const { updateItemByDeltaEvents } = useItemContainerUpdate();
   const { itemsTemplateById } = useGameData();
   return useMutation({
     mutationFn: ({ itemInstanceId }: { itemInstanceId: string; itemTemplateId: string }) => itemConsume({ heroId, itemInstanceId }),
 
-    async onSuccess(data, { itemTemplateId }) {
+    async onSuccess({ data }, { itemTemplateId }) {
+      if (!data) return;
       const template = itemsTemplateById[itemTemplateId];
-      console.log(data);
       updateHero({
-        ...data.data?.hero,
+        ...data.hero,
       });
-      if (data.data?.itemsDelta) {
-        updateItemByDeltaEvents(data.data.itemsDelta);
+      if (data.itemsDelta) {
+        updateItemByDeltaEvents(data.itemsDelta);
       }
 
       switch (template.type) {
         case 'POTION': {
-          // if (template.potionInfo?.type === 'BUFF') {
-          //     addBuff()
-          // }
+          if (template.potionInfo?.type === 'BUFF' && data.buff) {
+            addBuff(data.buff);
+          }
           setGameMessage({
             color: 'GREY',
-            text: data.data?.message ?? '',
-            data: [{ name: data.data?.name ?? '' }],
+            text: data.message ?? '',
+            data: [{ name: data.name ?? '' }],
           });
           break;
         }
         case 'SKILL_BOOK': {
-          // if (template.bookInfo?.kind === 'TRAIN_BUFF') {
-
-          // }
+          if (template.bookInfo?.kind === 'TRAIN_BUFF' && data.buff) {
+            addBuff(data.buff);
+          }
 
           setGameMessage({
             color: 'GREY',
-            text: data.data?.message ?? '',
-            data: [{ name: data.data?.name ?? '' }],
+            text: data.message ?? '',
+            data: [{ name: data.name ?? '' }],
           });
 
           break;

@@ -28,9 +28,11 @@ export const useHeroUpdate = () => {
   const addBuff = (newBuff: BuffInstance) => {
     queryClient.setQueryData<ApiGetHeroResponse>(getHeroOptions().queryKey, (oldData) => {
       if (!oldData) return;
+      const filtered = oldData.buffs.filter((buff) => buff.id !== newBuff.id);
+
       return {
         ...oldData,
-        buffs: [...oldData.buffs, newBuff],
+        buffs: [...filtered, newBuff],
       };
     });
   };

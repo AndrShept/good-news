@@ -78,6 +78,10 @@ export const serverState = {
   container: new Map<string, TItemContainer>(),
   skill: new Map<string, SkillInstance[]>(),
   user: new Map<string, string>(),
+  socket: new Map<string, Socket>(),
+
+  corpse: new Map<string, Corpse>(),
+  creature: new Map<string, CreatureInstance>(),
 
   mapChunks: new Map<
     string,
@@ -88,12 +92,10 @@ export const serverState = {
       spawnZones: Record<SpawnCreatureTileType, SpawnZonesInfo>;
     }
   >(),
+
   spawnPoints: new Map<string, SpawnPoint>(),
   chunkSpawns: new Map<string, Set<string>>(),
-  corpse: new Map<string, Corpse>(),
-  creature: new Map<string, CreatureInstance>(),
 
-  socket: new Map<string, Socket>(),
   worldResourceTiles: new Map<string, Map<string, TileState>>(),
   battle: new Map<string, Battle>(),
   itemInstancePendingDeltaEvents: new Set<ItemInstancePendingDeltaEvents>(),
