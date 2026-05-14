@@ -1553,6 +1553,7 @@ export const heroRouter = new Hono<Context>()
       if (!targetParticipant.isAlive) throw new HTTPException(400, { message: 'Target is already dead' });
 
       battle.pendingActions.push({
+        id: generateRandomUuid(),
         actionType: 'NORMAL',
         category: 'PHYSICAL_ATTACK',
         participantId: selfParticipant.id,
@@ -1560,6 +1561,9 @@ export const heroRouter = new Hono<Context>()
         attackingZone,
         defenseZone,
       });
+      if (targetParticipant.type === 'CREATURE') {
+        battleService.createCreatureActionPending(battle, targetParticipant, selfParticipant.id);
+      }
 
       const returnData = { state: hero.state, battleId: hero.battleId };
       return c.json<SuccessResponse<typeof returnData>>({

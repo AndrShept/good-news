@@ -1,4 +1,5 @@
 import type {
+  BattleParticipant,
   BuffInstance,
   Corpse,
   EntityPayloadMap,
@@ -164,4 +165,8 @@ export type BuffAddData = {
 export type BuffUpdateData = {
   buffInstanceId: string;
   updateData: Partial<BuffInstance>;
+};
+
+export type BattleUpdateData = {
+  participants: Partial<BattleParticipant>[];
 };

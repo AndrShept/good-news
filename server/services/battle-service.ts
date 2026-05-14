@@ -1,6 +1,10 @@
-import type { Battle, BattleParticipant, BattleParticipantType, BattleSide, Modifier } from '@/shared/types';
+import type { BattleUpdateData } from '@/shared/socket-data-types';
+import { socketEvents } from '@/shared/socket-events';
+import type { Battle, BattleAction, BattleParticipant, BattleParticipantType, BattleSide, Modifier } from '@/shared/types';
+import { getAttackingRandomZone, getDefenseRandomZone } from '@/shared/utils';
 import { HTTPException } from 'hono/http-exception';
 
+import { io } from '..';
 import { serverState } from '../game/state/server-state';
 import { generateRandomUuid } from '../lib/utils';
 import { creatureService } from './creature-service';
@@ -128,5 +132,42 @@ export const battleService = {
 
     const targetId = enemies[random].id;
     participant.targetId = targetId;
+  },
+  createCreatureActionPending(battle: Battle, creatureParticipant: BattleParticipant, targetId: string) {
+    const attackingZone = getAttackingRandomZone({ isEquipLeftHandWeapon: false, isEquipRightHandWeapon: true });
+    const defenseZone = getDefenseRandomZone(false);
+    battle.pendingActions.push({
+      id: generateRandomUuid(),
+      attackingZone,
+      defenseZone,
+      actionType: 'NORMAL',
+      participantId: creatureParticipant.id,
+      targetId,
+      category: 'PHYSICAL_ATTACK',
+    });
+  },
+  removeActionPending(actionsPending: BattleAction[], actionId: string) {
+    const index = actionsPending.findIndex((a) => a.id === actionId);
+
+    if (index === -1) {
+      throw new HTTPException(400, { message: 'actionsPending index not found' });
+    }
+    actionsPending.splice(index, 1);
+  },
+  resolveActionPair(battle: Battle, firstAction: BattleAction, secondAction: BattleAction) {
+    const firstParticipant = this.getParticipant(battle, firstAction.participantId);
+    const secondParticipant = this.getParticipant(battle, secondAction.participantId);
+
+    const socketData: BattleUpdateData = {
+      participants: [
+        { id: firstParticipant.id, currentHealth: 50 },
+        { id: secondParticipant.id, currentHealth: 10 },
+      ],
+    };
+    io.to(battle.id).emit(socketEvents.battleUpdate(), socketData);
+
+    for (const action of [firstAction, secondAction]) {
+      this.removeActionPending(battle.pendingActions, action.id);
+    }
   },
 };

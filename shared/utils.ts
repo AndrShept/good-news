@@ -24,7 +24,11 @@ import {
   type ItemTemplateType,
   type RefiningBuildingKey,
   type RefiningRecipe,
+  type SelectedAttackingZone,
+  type SelectedDefenseZone,
   type StateType,
+  battleShieldZoneValues,
+  battleZoneValues,
   gatheringTileTypeValues,
 } from './types';
 
@@ -233,4 +237,24 @@ export const itemRefineableForBuilding = ({ coreResource, itemTemplateId, refini
   }
 
   return { isCanRefine: false };
+};
+
+export const getAttackingRandomZone = ({
+  isEquipLeftHandWeapon,
+  isEquipRightHandWeapon,
+}: {
+  isEquipRightHandWeapon: boolean;
+  isEquipLeftHandWeapon: boolean;
+}): SelectedAttackingZone => {
+  const randomLeft = Math.floor(Math.random() * battleZoneValues.length);
+  const randomRight = Math.floor(Math.random() * battleZoneValues.length);
+  return {
+    LEFT_HAND: isEquipLeftHandWeapon ? battleZoneValues[randomLeft] : null,
+    RIGHT_HAND: isEquipRightHandWeapon ? battleZoneValues[randomRight] : null,
+  };
+};
+export const getDefenseRandomZone = (isEquipShield: boolean): SelectedDefenseZone => {
+  const randomIndex = Math.floor(Math.random() * battleZoneValues.length);
+  const zone = isEquipShield ? battleShieldZoneValues[randomIndex] : battleZoneValues[randomIndex];
+  return zone as SelectedDefenseZone;
 };

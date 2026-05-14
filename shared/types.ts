@@ -713,6 +713,9 @@ export const battleShieldZoneValues = [
   ['FEET', 'HEAD'],
 ] as const;
 
+export type SelectedAttackingZone = z.infer<typeof selectedAttackingZoneSchema>;
+export type SelectedDefenseZone = z.infer<typeof selectedDefenseZoneSchema>;
+
 export type BattleSide = 'ATTACKER' | 'DEFENDER';
 export type BattleParticipantType = 'HERO' | 'CREATURE';
 export type BattleStatusType = 'IN_PROGRESS' | 'FINISHED';
@@ -721,7 +724,7 @@ export type BattleZoneType = (typeof battleZoneValues)[number];
 export type BattleShieldZoneType = (typeof battleShieldZoneValues)[number];
 
 // Тип дії
-export type BattleActionType = 'INSTANT' | 'NORMAL' | 'CAST';
+export type BattleActionType = 'INSTANT' | 'NORMAL';
 
 // Категорія дії
 export type BattleActionCategory =
@@ -740,13 +743,14 @@ export type Battle = {
 };
 
 export type BattleAction = {
+  id: string;
   participantId: string;
   category: BattleActionCategory;
   actionType: BattleActionType;
   targetId: string;
-  attackingZone?: z.infer<typeof selectedAttackingZoneSchema>;
-  defenseZone?: BattleZoneType | BattleShieldZoneType;
-  abilityId?: string; // який спел
+  attackingZone?: SelectedAttackingZone;
+  defenseZone?: SelectedDefenseZone;
+  abilityId?: string;
 };
 
 export type BattleParticipant = Pick<
@@ -774,13 +778,13 @@ export type BattleParticipant = Pick<
 export type BattleLogEntry = {
   round: number;
   participantId: string;
+  targetId: string;
   action: BattleAction;
   result: {
     damage?: number;
     blocked?: boolean;
     critical?: boolean;
     missed?: boolean;
-    zone?: BattleZoneType | BattleShieldZoneType;
   };
 };
 
@@ -870,13 +874,12 @@ export const buyItemsSchema = z.object({
 
 const battleZoneSchema = z.enum(battleZoneValues);
 
-const battleShieldZoneSchema = z.union(
-  battleShieldZoneValues.map((pair) => z.tuple([z.literal(pair[0]), z.literal(pair[1])])) as unknown as [
-    z.ZodTypeAny,
-    z.ZodTypeAny,
-    ...z.ZodTypeAny[],
-  ],
-);
+const battleShieldZoneSchema = z.union([
+  z.tuple([z.literal('HEAD'), z.literal('CHEST')]),
+  z.tuple([z.literal('CHEST'), z.literal('HANDS')]),
+  z.tuple([z.literal('HANDS'), z.literal('FEET')]),
+  z.tuple([z.literal('FEET'), z.literal('HEAD')]),
+]);
 
 const selectedAttackingZoneSchema = z.object({
   LEFT_HAND: battleZoneSchema.nullable(),

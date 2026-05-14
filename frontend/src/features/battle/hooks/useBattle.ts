@@ -23,7 +23,7 @@ export const useBattle = () => {
     }) ?? false;
 
   return {
-    battle: battle!,
+    battle,
     isEquipLeftHandWeapon,
     isEquipRightHandWeapon,
     isEquipShield,

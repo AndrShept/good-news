@@ -2,13 +2,9 @@ import { Spinner } from '@/components/Spinner';
 import { getBattleOptions } from '@/features/battle/api/get-battle';
 import { BattleParticipantCard } from '@/features/battle/components/BattleParticipantCard';
 import { BattleParticipantList } from '@/features/battle/components/BattleParticipantList';
-import { TurnButton } from '@/features/battle/components/TurnButton';
 import { ZoneSelector } from '@/features/battle/components/ZoneSelector';
 import { useBattle } from '@/features/battle/hooks/useBattle';
-import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { BattleShieldZoneType, BattleZoneType, EquipmentSlotType } from '@/shared/types';
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
 
 export const Route = createFileRoute('/game/battle/$battleId')({
   component: RouteComponent,
@@ -34,7 +30,7 @@ function RouteComponent() {
   const attackers = battle?.participants.filter((p) => p.side === 'ATTACKER');
   const defenders = battle?.participants.filter((p) => p.side === 'DEFENDER');
 
-  if (!selfParticipant || !targetParticipant) return;
+  if (!selfParticipant || !targetParticipant || !battle) return;
   return (
     <section className="mx-auto flex w-full max-w-5xl flex-col items-center p-2">
       <div className="flex w-full justify-between gap-1">

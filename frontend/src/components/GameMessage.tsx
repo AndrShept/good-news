@@ -1,4 +1,5 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useBattleListener } from '@/features/battle/hooks/useBattleListener';
 import { useGroupListener } from '@/features/group/hooks/useGroupListener';
 import { useBuffListener } from '@/features/hero/hooks/useBuffListener';
 import { useHeroListener } from '@/features/hero/hooks/useHeroListener';
@@ -22,6 +23,7 @@ export const GameMessage = memo(() => {
   useSelfMessage();
   useHeroListener();
   useQueueCraftListener();
+  useBattleListener()
 
   useEffect(() => {
     ref.current?.lastElementChild?.scrollIntoView({

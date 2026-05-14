@@ -26,10 +26,10 @@ export const gameLoop = () => {
     // refineTick(lastTick);
     // regenTick(lastTick, TICK_RATE)
     heroTickService.heroTick(lastTick, TICK_RATE);
-    battleTick(lastTick);
     // buffTick(lastTick);
     resourceRespawnTick(lastTick);
     spawnCreatureTick(lastTick);
+    battleTick(lastTick);
 
     lastTick += TICK_RATE;
     ticks++;

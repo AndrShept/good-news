@@ -18,4 +18,5 @@ export const socketEvents = {
   buffAdd: () => 'BUFF:ADD',
   buffRemove: () => 'BUFF:REMOVE',
   buffUpdate: () => 'BUFF:UPDATE',
+  battleUpdate: () => 'BATTLE:UPDATE',
 };

@@ -33,17 +33,19 @@ import { skillService } from './skill-service';
 export const heroTickService = {
   heroTick(now: number, TICK_RATE: number) {
     for (const heroId of serverState.hero.keys()) {
-      this.moveTick(heroId, now);
-      this.gatherTick(heroId, now);
-      this.refineTick(heroId, now);
-      this.queueCraftTick(heroId, now);
-      this.heroOffline(heroId, now);
-      this.buffTick(heroId, now);
+      const hero = serverState.hero.get(heroId);
+      if (!hero) continue;
+      this.moveTick(hero, now);
+      this.gatherTick(hero, now);
+      this.refineTick(hero, now);
+      this.queueCraftTick(hero, now);
+      this.heroOffline(hero, now);
+      this.buffTick(hero, now);
       //   this.regenTick(heroId, now, TICK_RATE);
     }
   },
-  moveTick(heroId: string, now: number) {
-    const hero = heroService.getHero(heroId);
+  moveTick(hero: HeroRuntime, now: number) {
+    const heroId = hero.id;
     if (!hero.paths?.length) return;
     const nextPath = hero.paths[0];
     let lastStep: PathNode | null = null;
@@ -121,8 +123,8 @@ export const heroTickService = {
       socketService.sendMapChunkMoveFinish(heroId, hero.location.chunkId!);
     }
   },
-  gatherTick(heroId: string, now: number) {
-    const hero = heroService.getHero(heroId);
+  gatherTick(hero: HeroRuntime, now: number) {
+    const heroId = hero.id;
     if (!hero.gatheringFinishAt) return;
     if (now >= hero.gatheringFinishAt) {
       if (!hero.location.mapId || !hero.selectedGatherTile) return;
@@ -232,8 +234,8 @@ export const heroTickService = {
       }
     }
   },
-  refineTick(heroId: string, now: number) {
-    const hero = heroService.getHero(heroId);
+  refineTick(hero: HeroRuntime, now: number) {
+    const heroId = hero.id;
     const first = hero.queueRefine[0];
     if (!first) return;
     const backpack = itemContainerService.getBackpack(heroId);
@@ -307,8 +309,8 @@ export const heroTickService = {
       }
     }
   },
-  queueCraftTick(heroId: string, now: number) {
-    const hero = heroService.getHero(heroId);
+  queueCraftTick(hero: HeroRuntime, now: number) {
+    const heroId = hero.id;
     const first = hero.queueCraft.at(0);
     if (!first) return;
     if (first.expiresAt <= now) {
@@ -422,8 +424,8 @@ export const heroTickService = {
       }
     }
   },
-  regenTick(heroId: string, now: number, TICK_RATE: number) {
-    const hero = heroService.getHero(heroId);
+  regenTick(hero: HeroRuntime, now: number, TICK_RATE: number) {
+    const heroId = hero.id;
     let lastUpdate = now - TICK_RATE;
     const delta = now - lastUpdate;
     if (delta <= 0 || hero.state === 'BATTLE') return;
@@ -468,15 +470,14 @@ export const heroTickService = {
     console.log('MANA ACC', hero.regen.manaAcc);
     console.log('delta', delta);
   },
-  heroOffline(heroId: string, now: number) {
-    const hero = heroService.getHero(heroId);
+  heroOffline(hero: HeroRuntime, now: number) {
     if (hero.offlineTimer && hero.offlineTimer <= now) {
       heroOffline(hero.id, hero.userId);
       console.log(` heroOffline ${hero.name}`);
     }
   },
-  buffTick(heroId: string, now: number) {
-    const hero = heroService.getHero(heroId);
+  buffTick(hero: HeroRuntime, now: number) {
+    const heroId = hero.id;
     for (let i = hero.buffs.length - 1; i >= 0; i--) {
       const buff = hero.buffs[i];
       if (buff.expiresAt <= now) {
@@ -485,7 +486,7 @@ export const heroTickService = {
         heroService.updateModifier(heroId);
         const buffTemplate = buffTemplateMapIds[buff.buffTemplateId];
         const socketData: BuffRemoveData = {
-        buffInstanceId: buff.id,
+          buffInstanceId: buff.id,
           hero: {
             currentHealth: hero.currentHealth,
             currentMana: hero.currentMana,

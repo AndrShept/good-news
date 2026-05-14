@@ -1,8 +1,8 @@
 import { GameIcon } from '@/components/GameIcon';
 import { Input } from '@/components/ui/input';
 import { imageConfig } from '@/shared/config/image-config';
-import { BattleShieldZoneType, BattleZoneType, EquipmentSlotType, battleShieldZoneValues, battleZoneValues } from '@/shared/types';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { SelectedAttackingZone, SelectedDefenseZone, battleShieldZoneValues, battleZoneValues } from '@/shared/types';
+import { useState } from 'react';
 
 import { BattleTimer } from './BattleTimer';
 import { TurnButton } from './TurnButton';
@@ -25,13 +25,11 @@ export const ZoneSelector = ({
   roundEndsAt,
 }: Props) => {
   const defenseZoneValues = isEquipShield ? battleShieldZoneValues : battleZoneValues;
-  const [selectedAttackingZone, setSelectedAttackingZone] = useState<
-    Record<Extract<EquipmentSlotType, 'LEFT_HAND' | 'RIGHT_HAND'>, BattleZoneType | null>
-  >({
+  const [selectedAttackingZone, setSelectedAttackingZone] = useState<SelectedAttackingZone>({
     LEFT_HAND: isEquipLeftHandWeapon ? 'CHEST' : null,
     RIGHT_HAND: isEquipRightHandWeapon ? 'CHEST' : null,
   });
-  const [selectedDefenseZone, setSelectedDefenseZone] = useState<BattleZoneType | BattleShieldZoneType>('CHEST');
+  const [selectedDefenseZone, setSelectedDefenseZone] = useState<SelectedDefenseZone>('CHEST');
   return (
     <section className="mx-auto flex h-full flex-col justify-between gap-2">
       <div className="flex flex-col gap-2 text-nowrap md:flex-row">
@@ -72,10 +70,10 @@ export const ZoneSelector = ({
                 name="defense"
                 type="radio"
                 checked={selectedDefenseZone === zone}
-                onChange={() => setSelectedDefenseZone(zone)}
+                onChange={() => setSelectedDefenseZone(zone as SelectedDefenseZone)}
               />
 
-              <p onClick={() => setSelectedDefenseZone(zone)} className="text-sm lowercase">
+              <p onClick={() => setSelectedDefenseZone(zone as SelectedDefenseZone)} className="text-sm lowercase">
                 block {zone}
               </p>
             </li>

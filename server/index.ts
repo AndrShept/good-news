@@ -113,7 +113,6 @@ export const io = new Server(httpServer, {
   transports: ['websocket'],
 });
 
-
 io.on('connection', async (socket) => {
   const { username } = socket.handshake.auth as { username: string; id: string };
   const { heroId } = socket.handshake.query as { heroId: string };
@@ -128,9 +127,9 @@ io.on('connection', async (socket) => {
     if (hero.location.placeId) {
       socket.join(hero.location.placeId);
     }
-    // if (hero.location.mapId) {
-    //   socket.join(hero.location.mapId);
-    // }
+    if (hero.battleId) {
+      socket.join(hero.battleId);
+    }
     if (hero.location.chunkId) {
       const chunkIds = mapService.getAroundChunkIds({ x: hero.location.x, y: hero.location.y, mapId: hero.location.mapId! });
       for (const id of chunkIds) {
@@ -138,7 +137,6 @@ io.on('connection', async (socket) => {
       }
     }
   }
-
 
   console.info('connected ' + username);
   socket.on('disconnect', async () => {
