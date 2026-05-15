@@ -2,7 +2,7 @@ import { battleService } from '../services/battle-service';
 import { serverState } from './state/server-state';
 
 export const battleTick = (now: number) => {
-  for (const [battleId, battle] of serverState.battle.entries()) {
+  for (const battle of serverState.battle.values()) {
     for (const action of battle.pendingActions) {
       const findResolveActionOpponent = battle.pendingActions.find(
         (a) =>

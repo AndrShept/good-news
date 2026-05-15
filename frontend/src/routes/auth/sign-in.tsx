@@ -4,7 +4,9 @@ import { Input } from '@/components/ui/input';
 import { signIn } from '@/features/auth/api/sign-in';
 import { loginSchema } from '@/shared/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { Link, createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
+import { LockIcon, UserIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -15,8 +17,9 @@ export const Route = createFileRoute('/auth/sign-in')({
   },
 });
 
-function SignIn() {
+export function SignIn() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -39,24 +42,24 @@ function SignIn() {
       });
     }
     if (res.success) {
-      navigate({ to: '/' });
+      queryClient.invalidateQueries({ queryKey: ['user'] });
     }
   };
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-[320px] flex-col gap-4 md:w-[380px]">
-        <h1 className=" scroll-m-20 border-b pb-2 text-center text-3xl font-semibold tracking-tight">Sign In</h1>
-        <p className="mb-4"> Enter your details to login an account</p>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full max-w-xs flex-col gap-2.5">
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel >Email</FormLabel>
               <FormControl>
-                <Input disabled={isLoading} className="placeholder:text-sm" {...field} />
+                <div className="relative">
+                  <UserIcon className="text-muted-foreground absolute left-2.5 top-2.5 size-4" />
+                  <Input placeholder="email" disabled={isLoading} className="pl-7.5 placeholder:text-sm" {...field} />
+                </div>
               </FormControl>
-              {/* <FormDescription>This is your public display name.</FormDescription> */}
+
               <FormMessage />
             </FormItem>
           )}
@@ -66,11 +69,13 @@ function SignIn() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input disabled={isLoading} type="password" className="placeholder:text-sm" {...field} />
+                <div className="relative">
+                  <LockIcon className="text-muted-foreground absolute left-2.5 top-2.5 size-4" />
+                  <Input placeholder="password" disabled={isLoading} className="pl-7.5 placeholder:text-sm" {...field} />
+                </div>
               </FormControl>
-              {/* <FormDescription>This is your public display name.</FormDescription> */}
+
               <FormMessage />
             </FormItem>
           )}
@@ -79,11 +84,11 @@ function SignIn() {
         {form.formState.errors.root && <p className="text-sm text-red-500">{form.formState.errors.root.message}</p>}
 
         <Button disabled={isLoading} variant={'default'} type="submit">
-          Sign in ✨
+          Login ✨
         </Button>
         <div className="mx-auto flex items-center gap-1">
-          <p className="text-muted-foreground"> Already have an account? </p>
-          <Link disabled={isLoading} className="text-blue-500 hover:underline" to={'/auth/sign-up'}>
+          <p className="text-sm"> Already have an account? </p>
+          <Link disabled={isLoading} className="text-primary hover:underline" to={'/auth/sign-up'}>
             register
           </Link>
         </div>

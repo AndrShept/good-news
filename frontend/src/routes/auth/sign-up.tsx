@@ -42,14 +42,14 @@ function SignUp() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-[320px] flex-col gap-4 md:w-[380px]">
-        <h1 className=" scroll-m-20 border-b pb-2 text-center text-3xl font-semibold tracking-tight">Sign Up</h1>
+        <h1 className="scroll-m-20 border-b pb-2 text-center text-3xl font-semibold tracking-tight">Sign Up</h1>
         <p className="mb-4"> Enter your details to create an account</p>
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel >Email*</FormLabel>
+              <FormLabel>Email*</FormLabel>
               <FormControl>
                 <Input disabled={isLoading} className="placeholder:text-sm" {...field} />
               </FormControl>
@@ -102,12 +102,12 @@ function SignUp() {
         />
         {form.formState.errors.root && <p className="text-sm text-red-500">{form.formState.errors.root.message}</p>}
         <Button className="mt-4" disabled={isLoading} variant={'default'} type="submit">
-          Sign Up 🔥
+          Register 🔥
           <p>{isLoading && <Spinner className="ml-1" size={'sm'} />}</p>
         </Button>
         <div className="mx-auto flex items-center gap-1">
           <p className="text-muted-foreground"> Already have an account? </p>
-          <Link disabled={isLoading} className="text-blue-400 hover:underline" to={'/auth/sign-in'}>
+          <Link disabled={isLoading} className="text-primary hover:underline" to={'/'}>
             login
           </Link>
         </div>

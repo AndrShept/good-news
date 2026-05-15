@@ -173,8 +173,8 @@ export const GameMap = memo(function GameMap({
 
           return (
             <MapEntityTile
-              key={entity.id}
               {...entity}
+              key={entity.id}
               countOnTile={countOnTile}
               TILE_SIZE={TILE_SIZE}
               offsetX={offsetX}

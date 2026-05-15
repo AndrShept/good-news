@@ -21,11 +21,11 @@ export const Header = memo(() => {
   const user = useAuth();
 
   return (
-    <header className="bg-background/50 sticky top-0 z-50 flex h-14 border-b p-3 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 flex h-14 border-b p-3 backdrop-blur-sm">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between">
         <div></div>
         <section className="flex items-center gap-2">
-          <ul className="text-muted-foreground flex gap-0.5">
+          {/* <ul className="text-muted-foreground flex gap-0.5">
             {navLinks.map((item) => (
               <Link
                 className={buttonVariants({
@@ -42,7 +42,7 @@ export const Header = memo(() => {
                 <p className="mr-auto">{item.name}</p>
               </Link>
             ))}
-          </ul>
+          </ul> */}
           {user && (
             <div className="flex items-center gap-2">
               <LogOutButton />
@@ -53,22 +53,6 @@ export const Header = memo(() => {
             </div>
           )}
           {!user && <Link to={'/auth/sign-in'}>login</Link>}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button className=" md:hidden" size={'icon'} variant={'outline'}>
-                <MenuIcon />
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="w-70">
-              <SheetHeader>
-                <SheetTitle>GoodNews ✨</SheetTitle>
-                <SheetDescription className="sr-only">Navigation</SheetDescription>
-              </SheetHeader>
-              <div className="flex flex-col gap-2 overflow-y-auto p-2 pr-0">
-                <NavBar />
-              </div>
-            </SheetContent>
-          </Sheet>
         </section>
       </div>
     </header>
