@@ -3,6 +3,7 @@ import { UserAvatar } from '@/components/UserAvatar';
 import { RainbowButton } from '@/components/magicui/rainbow-button';
 import { SparklesText } from '@/components/magicui/sparkles-text';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { liteAnimate } from '@/lib/config';
 import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import * as m from 'motion/react-m';
@@ -25,7 +26,7 @@ function RouteComponent() {
     });
   }, [queryClient]);
   return (
-    <section className="flex h-full flex-1 flex-col items-center justify-between">
+    <m.div variants={liteAnimate} initial="initial" animate="animate" className="flex h-full flex-1 flex-col items-center justify-between">
       <img src="/main-logo.png" className="mx-auto w-full max-w-xl" style={{ imageRendering: 'pixelated' }} />
       {!auth && <SignIn />}
       {!!auth && (
@@ -37,12 +38,12 @@ function RouteComponent() {
             <UserAvatar url={auth.image} />
             <LogOutButton />
           </div>
-          <RainbowButton onClick={() => navigate({ to: '/game' })} className="h-12 w-full">
+          <RainbowButton variant={'default'} onClick={() => navigate({ to: '/game' })} className="h-12 w-full">
             PLAY
           </RainbowButton>
         </div>
       )}
       <div></div>
-    </section>
+    </m.div>
   );
 }

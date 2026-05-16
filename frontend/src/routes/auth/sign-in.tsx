@@ -18,7 +18,6 @@ export const Route = createFileRoute('/auth/sign-in')({
 });
 
 export function SignIn() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -83,7 +82,7 @@ export function SignIn() {
 
         {form.formState.errors.root && <p className="text-sm text-red-500">{form.formState.errors.root.message}</p>}
 
-        <Button disabled={isLoading} variant={'default'} type="submit">
+        <Button className="mt-4" disabled={isLoading} variant={'default'} type="submit">
           Login ✨
         </Button>
         <div className="mx-auto flex items-center gap-1">

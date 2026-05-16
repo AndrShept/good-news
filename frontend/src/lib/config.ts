@@ -10,6 +10,10 @@ export const childrenVariants = {
   hidden: { opacity: 0, y: 0 },
   visible: { opacity: 1, y: 2 },
 };
+export const liteAnimate = {
+  initial: { opacity: 0, y: -10 },
+  animate: { opacity: 1, y: 0 },
+};
 
 export const rarityConfig = {
   COMMON: {

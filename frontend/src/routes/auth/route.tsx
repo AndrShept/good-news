@@ -1,8 +1,14 @@
 import { Background } from '@/components/Background';
-import { Outlet, createFileRoute } from '@tanstack/react-router';
+import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/auth')({
   component: RouteComponent,
+
+  beforeLoad: ({ location }) => {
+    if (!location.pathname.includes('/auth')) {
+      throw redirect({ to: '/auth/sign-up' });
+    }
+  },
 });
 
 function RouteComponent() {

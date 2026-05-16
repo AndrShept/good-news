@@ -1,12 +1,26 @@
 import type { BattleUpdateData } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
-import type { Battle, BattleAction, BattleParticipant, BattleParticipantType, BattleSide, Modifier } from '@/shared/types';
+import type {
+  Battle,
+  BattleAction,
+  BattleParticipant,
+  BattleParticipantType,
+  BattleSide,
+  DamageType,
+  EquipmentSlotType,
+  HandResult,
+  ItemInstance,
+  Modifier,
+  SelectedAttackingZone,
+  SelectedDefenseZone,
+} from '@/shared/types';
 import { getAttackingRandomZone, getDefenseRandomZone } from '@/shared/utils';
 import { HTTPException } from 'hono/http-exception';
 
 import { io } from '..';
 import { serverState } from '../game/state/server-state';
 import { generateRandomUuid } from '../lib/utils';
+import { battleCalculateService } from './battle-calculate-service';
 import { creatureService } from './creature-service';
 import { heroService } from './hero-service';
 import { socketService } from './socket-service';
@@ -16,6 +30,28 @@ interface GetParticipantData {
   type: BattleParticipantType;
   side: BattleSide;
 }
+
+interface CheckHitParams {
+  attackZone: SelectedAttackingZone;
+  defendZone: SelectedDefenseZone;
+  attackerModifier: Modifier;
+  defenderModifier: Modifier;
+  damageType: DamageType;
+}
+
+type CheckHitResult = {
+  LEFT_HAND: HandResult;
+  RIGHT_HAND: HandResult;
+};
+
+type CalculateDamageParams = {
+  hand: 'LEFT_HAND' | 'RIGHT_HAND';
+  hitResult: HandResult;
+  attackerModifier: Modifier;
+  defenderModifier: Modifier;
+  weapon?: ItemInstance;
+  abilityId?: string; // якщо магія
+};
 
 export const battleService = {
   getBattle(battleId: string) {
@@ -158,6 +194,35 @@ export const battleService = {
     const firstParticipant = this.getParticipant(battle, firstAction.participantId);
     const secondParticipant = this.getParticipant(battle, secondAction.participantId);
 
+    const firstHitResult = this.checkHitResult({
+      attackZone: firstAction.attackingZone,
+      defendZone: secondAction.defenseZone,
+      attackerModifier: firstParticipant.modifier,
+      defenderModifier: secondParticipant.modifier,
+      damageType: 'PHYSICAL',
+    });
+    const secondHitResult = this.checkHitResult({
+      attackZone: secondAction.attackingZone,
+      defendZone: firstAction.defenseZone,
+      attackerModifier: secondParticipant.modifier,
+      defenderModifier: firstParticipant.modifier,
+      damageType: 'PHYSICAL',
+    });
+
+    const firstIsCriticalHit = battleCalculateService.isCriticalHit(firstParticipant.modifier, secondParticipant.modifier, 'PHYSICAL');
+    const secondaryIsCriticalHit = battleCalculateService.isCriticalHit(secondParticipant.modifier, firstParticipant.modifier, 'PHYSICAL');
+
+    const firstGiveDamage = battleCalculateService.calculatePhysicalDamage(
+      firstParticipant.modifier,
+      secondParticipant.modifier,
+      firstIsCriticalHit,
+    );
+    const secondaryGiveDamage = battleCalculateService.calculatePhysicalDamage(
+      secondParticipant.modifier,
+      firstParticipant.modifier,
+      secondaryIsCriticalHit,
+    );
+
     const socketData: BattleUpdateData = {
       participants: [
         { id: firstParticipant.id, currentHealth: 50 },
@@ -169,5 +234,20 @@ export const battleService = {
     for (const action of [firstAction, secondAction]) {
       this.removeActionPending(battle.pendingActions, action.id);
     }
+  },
+  checkHitResult({ attackZone, defendZone, attackerModifier, defenderModifier, damageType }: CheckHitParams): CheckHitResult {
+    const isDodged = battleCalculateService.isDodged({ attackerModifier, defenderModifier, damageType });
+
+    if (isDodged) {
+      return {
+        LEFT_HAND: attackZone?.LEFT_HAND ? 'MISSED' : null,
+        RIGHT_HAND: attackZone?.RIGHT_HAND ? 'MISSED' : null,
+      };
+    }
+
+    return {
+      LEFT_HAND: attackZone?.LEFT_HAND ? battleCalculateService.checkZoneBlocked(attackZone.LEFT_HAND, defendZone) : null,
+      RIGHT_HAND: attackZone.RIGHT_HAND ? battleCalculateService.checkZoneBlocked(attackZone.RIGHT_HAND, defendZone) : null,
+    };
   },
 };

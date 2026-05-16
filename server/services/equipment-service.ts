@@ -1,6 +1,6 @@
 import { type GatheringCategorySkillKey, skillTemplateByKey } from '@/shared/templates/skill-template';
 import { toolsTemplate } from '@/shared/templates/tool-template';
-import type { EquipmentSlotType, ItemInstance, ItemsInstanceDeltaEvent, ItemTemplate } from '@/shared/types';
+import type { EquipmentSlotType, ItemInstance, ItemTemplate, ItemsInstanceDeltaEvent } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { deltaEventsService } from './delta-events-service';
@@ -72,6 +72,12 @@ export const equipmentService = {
     if (!equippedItemInstance) throw new HTTPException(404, { message: 'equippedItemInstance not found' });
     return equippedItemInstance;
   },
+  getEquipBySlot(heroId: string, slot: EquipmentSlotType) {
+    const hero = heroService.getHero(heroId);
+    const equippedItemInstance = hero.equipments.find((e) => e.slot === slot);
+
+    return equippedItemInstance;
+  },
   equipItem(heroId: string, itemInstanceId: string) {
     const hero = heroService.getHero(heroId);
     const backpack = itemContainerService.getBackpack(hero.id);
@@ -99,7 +105,11 @@ export const equipmentService = {
       itemName: itemInstance.displayName ?? template.name,
     });
     resultDeltas.push({ type: 'CREATE', item: itemInstance });
-    deltaEventsService.itemInstance.update(itemInstanceId, { itemContainerId: null, location: 'EQUIPMENT', slot: equipData.slot as EquipmentSlotType });
+    deltaEventsService.itemInstance.update(itemInstanceId, {
+      itemContainerId: null,
+      location: 'EQUIPMENT',
+      slot: equipData.slot as EquipmentSlotType,
+    });
 
     return resultDeltas;
   },

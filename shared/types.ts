@@ -719,12 +719,14 @@ export type SelectedDefenseZone = z.infer<typeof selectedDefenseZoneSchema>;
 export type BattleSide = 'ATTACKER' | 'DEFENDER';
 export type BattleParticipantType = 'HERO' | 'CREATURE';
 export type BattleStatusType = 'IN_PROGRESS' | 'FINISHED';
+export type DamageType = 'MAGIC' | 'PHYSICAL';
 
 export type BattleZoneType = (typeof battleZoneValues)[number];
 export type BattleShieldZoneType = (typeof battleShieldZoneValues)[number];
 
 // Тип дії
 export type BattleActionType = 'INSTANT' | 'NORMAL';
+export type HandResult = 'HIT' | 'BLOCKED' | 'MISSED' | null;
 
 // Категорія дії
 export type BattleActionCategory =
@@ -748,8 +750,8 @@ export type BattleAction = {
   category: BattleActionCategory;
   actionType: BattleActionType;
   targetId: string;
-  attackingZone?: SelectedAttackingZone;
-  defenseZone?: SelectedDefenseZone;
+  attackingZone: SelectedAttackingZone;
+  defenseZone: SelectedDefenseZone;
   abilityId?: string;
 };
 
