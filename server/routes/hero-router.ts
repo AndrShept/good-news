@@ -32,6 +32,7 @@ import {
   getStateWithCraftBuildingType,
   getStateWithRefiningBuildingKey,
   getTilesAroundHero,
+  initModifier,
   itemRefineableForBuilding,
 } from '@/shared/utils';
 import { zValidator } from '@hono/zod-validator';
@@ -243,7 +244,7 @@ export const heroRouter = new Hono<Context>()
             targetX: null,
             targetY: null,
           },
-          modifier: heroService.initModifier(),
+          modifier: initModifier(),
         })
         .returning();
 

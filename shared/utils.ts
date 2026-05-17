@@ -22,6 +22,7 @@ import {
   type IPosition,
   type ItemInstance,
   type ItemTemplateType,
+  type Modifier,
   type RefiningBuildingKey,
   type RefiningRecipe,
   type SelectedAttackingZone,
@@ -257,4 +258,35 @@ export const getDefenseRandomZone = (isEquipShield: boolean): SelectedDefenseZon
   const randomIndex = Math.floor(Math.random() * battleZoneValues.length);
   const zone = isEquipShield ? battleShieldZoneValues[randomIndex] : battleZoneValues[randomIndex];
   return zone as SelectedDefenseZone;
+};
+
+export const initModifier = (updateModifier?: Partial<Modifier>) => {
+  const modifier: Modifier = {
+    strength: 0,
+    dexterity: 0,
+    intelligence: 0,
+    wisdom: 0,
+    constitution: 0,
+    luck: 0,
+    maxHealth: 0,
+    maxMana: 0,
+    maxDamage: 0,
+    minDamage: 0,
+    manaRegen: 0,
+    healthRegen: 0,
+    armor: 0,
+    magicResistance: 0,
+    evasion: 0,
+    spellDamage: 0,
+    spellCritDamage: 0,
+    spellCritRating: 0,
+    spellHitRating: 0,
+    spellPenetration: 0,
+    physDamage: 0,
+    physCritDamage: 0,
+    physCritRating: 0,
+    physHitRating: 0,
+    physPenetration: 0,
+  };
+  return { ...modifier, ...updateModifier };
 };

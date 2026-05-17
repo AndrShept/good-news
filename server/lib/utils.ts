@@ -1,6 +1,7 @@
 import { mapTemplate } from '@/shared/templates/map-template';
 import { resourceTemplateById } from '@/shared/templates/resource-template';
 import type { ClothType, CoreResourceType, IngotType, LeatherType, Modifier, PlankType, StateType, TileType } from '@/shared/types';
+import { initModifier } from '@/shared/utils';
 import { render } from '@react-email/components';
 import { intervalToDuration } from 'date-fns';
 import { sql } from 'drizzle-orm';
@@ -103,7 +104,7 @@ export const jobQueueId = {
 };
 
 export const sumAllModifier = <T extends Partial<Modifier> | null | undefined>(...args: T[]) => {
-  const result = heroService.initModifier();
+  const result = initModifier();
 
   for (const item of args) {
     for (const key in item) {

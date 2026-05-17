@@ -22,9 +22,9 @@ export const battleCalculateService = {
   },
   isCriticalHit(attackerModifier: Modifier, defenderModifier: Modifier, damageType: DamageType) {
     if (damageType === 'PHYSICAL') {
-      // strength * 0.1% + dexterity * 0.15% + physCritRating * 0.1%
+      // strength * 0.15% + dexterity * 0.10% + physCritRating * 0.1%
       const critChance = clamp(
-        5 + attackerModifier.strength * 0.1 + attackerModifier.dexterity * 0.15 + attackerModifier.physCritRating * 0.1,
+        5 + attackerModifier.strength * 0.15 + attackerModifier.dexterity * 0.1 + attackerModifier.physCritRating * 0.1,
         5,
         50,
       );
@@ -43,16 +43,24 @@ export const battleCalculateService = {
 
     return Math.random() * 100 < critChance - critReduction;
   },
-  checkZoneBlocked(attackZone: BattleZoneType, defendZone: SelectedDefenseZone): HandResult {
+  isZoneBlocked(attackZone: BattleZoneType, defendZone: SelectedDefenseZone) {
+    if (!attackZone) return false;
     if (Array.isArray(defendZone)) {
-      return (defendZone as BattleZoneType[]).includes(attackZone) ? 'BLOCKED' : 'HIT';
+      return (defendZone as BattleZoneType[]).includes(attackZone);
     }
-    return attackZone === defendZone ? 'BLOCKED' : 'HIT';
+    return attackZone === defendZone;
   },
   calculatePhysicalDamage(attackerModifier: Modifier, defenderModifier: Modifier, isCritical: boolean) {
     // базовий дамаг між min і max
-    const baseDamage = attackerModifier.minDamage + Math.random() * (attackerModifier.maxDamage - attackerModifier.minDamage);
+    let baseDamage = 0;
 
+    if (!attackerModifier.maxDamage) {
+      // нема зброї — рукопашний бій
+      const wrestlingBase = 2 + Math.floor(attackerModifier.strength * 0.15);
+      baseDamage = wrestlingBase + Math.random() * wrestlingBase;
+    } else {
+      baseDamage = attackerModifier.minDamage + Math.random() * (attackerModifier.maxDamage - attackerModifier.minDamage);
+    }
     // physDamage додає % до базового дамагу
     const withPhysDamage = baseDamage * (1 + attackerModifier.physDamage / 100);
 

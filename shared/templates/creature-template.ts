@@ -1,6 +1,7 @@
 import type { CreatureTemplate } from '@/shared/types';
 
 import { imageConfig } from '../config/image-config';
+import { initModifier } from '../utils';
 
 export const creatureKeyValues = [
   'PIG',
@@ -48,7 +49,7 @@ export const creatureTemplate = [
     maxHealth: 100,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 5,
       dexterity: 3,
       constitution: 10,
@@ -60,7 +61,7 @@ export const creatureTemplate = [
       evasion: 2,
       physCritRating: 2,
       physHitRating: 60,
-    },
+    }),
   },
   {
     id: '019defd0-2c13-76b6-8f9f-cc8da838661f',
@@ -74,7 +75,7 @@ export const creatureTemplate = [
     maxHealth: 30,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 1,
       dexterity: 8,
       constitution: 3,
@@ -84,13 +85,13 @@ export const creatureTemplate = [
       maxDamage: 2,
       evasion: 8,
       physHitRating: 50,
-    },
+    }),
   },
   {
     id: '019cf870-846f-7a9f-beee-ee2628d7f053',
     type: 'ANIMAL',
     name: 'sheep',
-     scale: 1,
+    scale: 1,
     key: 'SHEEP',
     image: imageConfig.creature.SHEEP,
     isAggressive: false,
@@ -98,7 +99,7 @@ export const creatureTemplate = [
     maxHealth: 70,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 4,
       dexterity: 7,
       constitution: 7,
@@ -110,13 +111,13 @@ export const creatureTemplate = [
       evasion: 5,
       physCritRating: 1,
       physHitRating: 55,
-    },
+    }),
   },
   {
     id: '019cf871-0001-7000-b000-000000000001',
     type: 'ANIMAL',
     name: 'cow',
-     scale: 1,
+    scale: 1,
     key: 'COW',
     image: imageConfig.creature.COW,
     isAggressive: false,
@@ -124,7 +125,7 @@ export const creatureTemplate = [
     maxHealth: 150,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 8,
       dexterity: 2,
       constitution: 15,
@@ -136,13 +137,13 @@ export const creatureTemplate = [
       evasion: 1,
       physCritRating: 2,
       physHitRating: 55,
-    },
+    }),
   },
   {
     id: '019cf871-0001-7000-b000-000000000002',
     type: 'ANIMAL',
     name: 'bull',
-     scale: 1,
+    scale: 1,
     key: 'BULL',
     image: imageConfig.creature.BULL,
     isAggressive: true,
@@ -150,7 +151,7 @@ export const creatureTemplate = [
     maxHealth: 200,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 18,
       dexterity: 5,
       constitution: 20,
@@ -164,7 +165,7 @@ export const creatureTemplate = [
       physCritRating: 5,
       physHitRating: 65,
       physPenetration: 2,
-    },
+    }),
   },
 
   // MEADOW / PLAINS
@@ -172,7 +173,7 @@ export const creatureTemplate = [
     id: '019cf871-0001-7000-b000-000000000003',
     type: 'ANIMAL',
     name: 'rabbit',
-     scale: 0.6,
+    scale: 0.6,
     key: 'RABBIT',
     image: imageConfig.creature.RABBIT,
     isAggressive: false,
@@ -180,7 +181,7 @@ export const creatureTemplate = [
     maxHealth: 30,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 2,
       dexterity: 18,
       constitution: 3,
@@ -190,13 +191,13 @@ export const creatureTemplate = [
       maxDamage: 2,
       evasion: 15,
       physHitRating: 45,
-    },
+    }),
   },
   {
     id: '019cf871-0001-7000-b000-000000000004',
     type: 'ANIMAL',
     name: 'deer',
-     scale: 1,
+    scale: 1,
     key: 'DEER',
     image: imageConfig.creature.DEER,
     isAggressive: false,
@@ -204,7 +205,7 @@ export const creatureTemplate = [
     maxHealth: 80,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 6,
       dexterity: 15,
       constitution: 8,
@@ -216,13 +217,13 @@ export const creatureTemplate = [
       evasion: 12,
       physCritRating: 2,
       physHitRating: 55,
-    },
+    }),
   },
   {
     id: '019cf871-0001-7000-b000-000000000005',
     type: 'INSECT',
     name: 'butterfly',
-     scale: 1,
+    scale: 1,
     key: 'BUTTERFLY',
     image: imageConfig.creature.BUTTERFLY,
     isAggressive: false,
@@ -230,7 +231,7 @@ export const creatureTemplate = [
     maxHealth: 10,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       dexterity: 20,
       luck: 8,
       maxHealth: 10,
@@ -238,21 +239,21 @@ export const creatureTemplate = [
       maxDamage: 1,
       evasion: 20,
       physHitRating: 30,
-    },
+    }),
   },
   {
     id: '019cf871-0001-7000-b000-000000000006',
     type: 'BEAST',
     name: 'wild_dog',
     key: 'WILD_DOG',
-     scale: 1,
+    scale: 1,
     image: imageConfig.creature.WILD_DOG,
     isAggressive: true,
     currentHealth: 90,
     maxHealth: 90,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 12,
       dexterity: 14,
       constitution: 9,
@@ -266,7 +267,7 @@ export const creatureTemplate = [
       physCritRating: 5,
       physHitRating: 70,
       physPenetration: 1,
-    },
+    }),
   },
 
   // ROCKY_FIELD
@@ -275,14 +276,14 @@ export const creatureTemplate = [
     type: 'REPTILE',
     name: 'lizard',
     key: 'LIZARD',
-     scale: 1,
+    scale: 1,
     image: imageConfig.creature.LIZARD,
     isAggressive: false,
     currentHealth: 60,
     maxHealth: 60,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 8,
       dexterity: 12,
       constitution: 6,
@@ -296,21 +297,21 @@ export const creatureTemplate = [
       physCritRating: 3,
       physHitRating: 65,
       physPenetration: 1,
-    },
+    }),
   },
   {
     id: '019cf871-0001-7000-b000-000000000008',
     type: 'INSECT',
     name: 'scorpion',
     key: 'SCORPION',
-     scale: 1,
+    scale: 1,
     image: imageConfig.creature.SCORPION,
     isAggressive: true,
     currentHealth: 80,
     maxHealth: 80,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 14,
       dexterity: 10,
       constitution: 8,
@@ -325,21 +326,21 @@ export const creatureTemplate = [
       physCritRating: 5,
       physHitRating: 65,
       physPenetration: 2,
-    },
+    }),
   },
   {
     id: '019cf871-0002-7000-b000-000000000005',
     type: 'REPTILE',
     name: 'snake',
     key: 'SNAKE',
-     scale: 0.8,
+    scale: 0.8,
     image: imageConfig.creature.SNAKE,
     isAggressive: true,
     currentHealth: 70,
     maxHealth: 70,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 10,
       dexterity: 16,
       constitution: 7,
@@ -354,21 +355,21 @@ export const creatureTemplate = [
       physCritRating: 8,
       physHitRating: 70,
       physPenetration: 2,
-    },
+    }),
   },
   {
     id: '019cf871-0002-7000-b000-000000000006',
     type: 'INSECT',
     name: 'spider',
     key: 'SPIDER',
-     scale: 1,
+    scale: 1,
     image: imageConfig.creature.SPIDER,
     isAggressive: true,
     currentHealth: 60,
     maxHealth: 60,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 8,
       dexterity: 18,
       constitution: 6,
@@ -383,21 +384,21 @@ export const creatureTemplate = [
       physCritRating: 6,
       physHitRating: 68,
       physPenetration: 1,
-    },
+    }),
   },
   {
     id: '019cf871-0002-7000-b000-000000000007',
     type: 'HUMANOID',
     name: 'goblin_scout',
     key: 'GOBLIN_SCOUT',
-     scale: 1,
+    scale: 1,
     image: imageConfig.creature.GOBLIN_SCOUT,
     isAggressive: true,
     currentHealth: 100,
     maxHealth: 100,
     currentMana: 20,
     maxMana: 20,
-    baseModifier: {
+    modifier: initModifier({
       strength: 12,
       dexterity: 15,
       intelligence: 6,
@@ -415,7 +416,7 @@ export const creatureTemplate = [
       physCritRating: 6,
       physHitRating: 72,
       physPenetration: 2,
-    },
+    }),
   },
 
   // FOREST / DENSE_FOREST
@@ -424,14 +425,14 @@ export const creatureTemplate = [
     type: 'BEAST',
     name: 'boar',
     key: 'BOAR',
-     scale: 1,
+    scale: 1,
     image: imageConfig.creature.BOAR,
     isAggressive: false,
     currentHealth: 120,
     maxHealth: 120,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 14,
       dexterity: 8,
       constitution: 12,
@@ -445,21 +446,21 @@ export const creatureTemplate = [
       physCritRating: 4,
       physHitRating: 65,
       physPenetration: 2,
-    },
+    }),
   },
   {
     id: '019cf871-0001-7000-b000-000000000010',
     type: 'BEAST',
     name: 'fox',
     key: 'FOX',
-     scale: 1,
+    scale: 1,
     image: imageConfig.creature.FOX,
     isAggressive: false,
     currentHealth: 70,
     maxHealth: 70,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 8,
       dexterity: 16,
       constitution: 7,
@@ -472,21 +473,21 @@ export const creatureTemplate = [
       physCritDamage: 8,
       physCritRating: 4,
       physHitRating: 68,
-    },
+    }),
   },
   {
     id: '019cf871-0001-7000-b000-000000000011',
     type: 'BEAST',
     name: 'wolf',
     key: 'WOLF',
-     scale: 1,
+    scale: 1,
     image: imageConfig.creature.WOLF,
     isAggressive: true,
     currentHealth: 140,
     maxHealth: 140,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 16,
       dexterity: 14,
       constitution: 14,
@@ -500,21 +501,21 @@ export const creatureTemplate = [
       physCritRating: 8,
       physHitRating: 75,
       physPenetration: 3,
-    },
+    }),
   },
   {
     id: '019d062f-79e2-7054-b6e9-c823838415c9',
     type: 'BEAST',
     name: 'rat',
     key: 'RAT',
-     scale: 0.7,
+    scale: 0.7,
     image: imageConfig.creature.RAT,
     isAggressive: true,
     currentHealth: 50,
     maxHealth: 50,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 6,
       dexterity: 14,
       constitution: 5,
@@ -526,21 +527,21 @@ export const creatureTemplate = [
       physCritDamage: 8,
       physCritRating: 4,
       physHitRating: 65,
-    },
+    }),
   },
   {
     id: '019cf871-0001-7000-b000-000000000012',
     type: 'BEAST',
     name: 'bear',
     key: 'BEAR',
-     scale: 1,
+    scale: 1,
     image: imageConfig.creature.BEAR,
     isAggressive: true,
     currentHealth: 250,
     maxHealth: 250,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 22,
       dexterity: 6,
       constitution: 25,
@@ -555,7 +556,7 @@ export const creatureTemplate = [
       physCritRating: 6,
       physHitRating: 68,
       physPenetration: 5,
-    },
+    }),
   },
 
   // CAVE
@@ -564,14 +565,14 @@ export const creatureTemplate = [
     type: 'BEAST',
     name: 'bat',
     key: 'BAT',
-     scale: 0.9,
+    scale: 0.9,
     image: imageConfig.creature.BAT,
     isAggressive: true,
     currentHealth: 40,
     maxHealth: 40,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 6,
       dexterity: 20,
       constitution: 4,
@@ -582,7 +583,7 @@ export const creatureTemplate = [
       evasion: 18,
       physCritRating: 5,
       physHitRating: 70,
-    },
+    }),
   },
 
   // MOUNTAIN
@@ -591,14 +592,14 @@ export const creatureTemplate = [
     type: 'ANIMAL',
     name: 'mountain_goat',
     key: 'MOUNTAIN_GOAT',
-     scale: 1,
+    scale: 1,
     image: imageConfig.creature.MOUNTAIN_GOAT,
     isAggressive: false,
     currentHealth: 90,
     maxHealth: 90,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 10,
       dexterity: 12,
       constitution: 10,
@@ -611,21 +612,21 @@ export const creatureTemplate = [
       physCritRating: 3,
       physHitRating: 62,
       physPenetration: 1,
-    },
+    }),
   },
   {
     id: '019cf871-0002-7000-b000-000000000002',
     type: 'BEAST',
     name: 'harpy',
     key: 'HARPY',
-     scale: 1,
+    scale: 1,
     image: imageConfig.creature.HARPY,
     isAggressive: true,
     currentHealth: 160,
     maxHealth: 160,
     currentMana: 30,
     maxMana: 30,
-    baseModifier: {
+    modifier: initModifier({
       strength: 16,
       dexterity: 18,
       intelligence: 8,
@@ -648,21 +649,21 @@ export const creatureTemplate = [
       physCritRating: 8,
       physHitRating: 75,
       physPenetration: 3,
-    },
+    }),
   },
   {
     id: '019cf871-0002-7000-b000-000000000003',
     type: 'GIANT',
     name: 'rock_troll',
     key: 'ROCK_TROLL',
-     scale: 1,
+    scale: 1,
     image: imageConfig.creature.ROCK_TROLL,
     isAggressive: true,
     currentHealth: 300,
     maxHealth: 300,
     currentMana: 0,
     maxMana: 0,
-    baseModifier: {
+    modifier: initModifier({
       strength: 24,
       dexterity: 4,
       constitution: 28,
@@ -677,7 +678,7 @@ export const creatureTemplate = [
       physCritRating: 5,
       physHitRating: 60,
       physPenetration: 8,
-    },
+    }),
   },
 ] as const satisfies CreatureTemplate[];
 

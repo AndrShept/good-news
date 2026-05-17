@@ -6,6 +6,7 @@ import type {
   BattleParticipant,
   BattleParticipantType,
   BattleSide,
+  BattleZoneType,
   DamageType,
   EquipmentSlotType,
   HandResult,
@@ -39,9 +40,9 @@ interface CheckHitParams {
   damageType: DamageType;
 }
 
-type CheckHitResult = {
-  LEFT_HAND: HandResult;
-  RIGHT_HAND: HandResult;
+type HitResult = {
+  LEFT_HAND: { hit: BattleZoneType | null; handResult: HandResult | null; giveDamage: number };
+  RIGHT_HAND: { hit: BattleZoneType | null; handResult: HandResult | null; giveDamage: number };
 };
 
 type CalculateDamageParams = {
@@ -51,6 +52,14 @@ type CalculateDamageParams = {
   defenderModifier: Modifier;
   weapon?: ItemInstance;
   abilityId?: string; // якщо магія
+};
+type ResolvePhysAttackParam = {
+  hitResult: HitResult;
+  attackerModifier: Modifier;
+  defenderModifier: Modifier;
+  isCritical: boolean;
+  attackZone: SelectedAttackingZone;
+  defendZone: SelectedDefenseZone;
 };
 
 export const battleService = {
@@ -147,7 +156,7 @@ export const battleService = {
           maxHealth: creature.maxHealth,
           maxMana: creature.maxMana,
           level: 1,
-          modifier: creature.baseModifier as Modifier,
+          modifier: creature.modifier,
           equipments: [],
           buffs: [],
           isAlive: true,
@@ -209,20 +218,9 @@ export const battleService = {
       damageType: 'PHYSICAL',
     });
 
-    const firstIsCriticalHit = battleCalculateService.isCriticalHit(firstParticipant.modifier, secondParticipant.modifier, 'PHYSICAL');
-    const secondaryIsCriticalHit = battleCalculateService.isCriticalHit(secondParticipant.modifier, firstParticipant.modifier, 'PHYSICAL');
 
-    const firstGiveDamage = battleCalculateService.calculatePhysicalDamage(
-      firstParticipant.modifier,
-      secondParticipant.modifier,
-      firstIsCriticalHit,
-    );
-    const secondaryGiveDamage = battleCalculateService.calculatePhysicalDamage(
-      secondParticipant.modifier,
-      firstParticipant.modifier,
-      secondaryIsCriticalHit,
-    );
 
+    
     const socketData: BattleUpdateData = {
       participants: [
         { id: firstParticipant.id, currentHealth: 50 },
@@ -235,19 +233,57 @@ export const battleService = {
       this.removeActionPending(battle.pendingActions, action.id);
     }
   },
-  checkHitResult({ attackZone, defendZone, attackerModifier, defenderModifier, damageType }: CheckHitParams): CheckHitResult {
-    const isDodged = battleCalculateService.isDodged({ attackerModifier, defenderModifier, damageType });
+  checkHitResult({ attackZone, defendZone, attackerModifier, defenderModifier, damageType }: CheckHitParams): HitResult {
+    const hitResult: HitResult = {
+      LEFT_HAND: { hit: null, handResult: null, giveDamage: 0 },
+      RIGHT_HAND: { hit: null, handResult: null, giveDamage: 0 },
+    };
 
-    if (isDodged) {
-      return {
-        LEFT_HAND: attackZone?.LEFT_HAND ? 'MISSED' : null,
-        RIGHT_HAND: attackZone?.RIGHT_HAND ? 'MISSED' : null,
-      };
+    for (const hand of Object.keys(hitResult) as (keyof HitResult)[]) {
+      const zone = attackZone[hand];
+      if (!zone) continue;
+
+      hitResult[hand].hit = zone;
+
+      const isDodged = battleCalculateService.isDodged({ attackerModifier, defenderModifier, damageType });
+      if (isDodged) {
+        hitResult[hand].handResult = 'MISSED';
+        continue;
+      }
+
+      const isBlocked = battleCalculateService.isZoneBlocked(zone, defendZone);
+      if (isBlocked) {
+        hitResult[hand].handResult = 'BLOCKED';
+        continue;
+      }
+
+      const isCritical = battleCalculateService.isCriticalHit(attackerModifier, defenderModifier, damageType);
+      hitResult[hand].handResult = 'HIT';
+      hitResult[hand].giveDamage = battleCalculateService.calculatePhysicalDamage(attackerModifier, defenderModifier, isCritical);
     }
 
-    return {
-      LEFT_HAND: attackZone?.LEFT_HAND ? battleCalculateService.checkZoneBlocked(attackZone.LEFT_HAND, defendZone) : null,
-      RIGHT_HAND: attackZone.RIGHT_HAND ? battleCalculateService.checkZoneBlocked(attackZone.RIGHT_HAND, defendZone) : null,
+    return hitResult;
+  },
+  resolvePhysAttack({ hitResult, attackerModifier, defenderModifier, isCritical }: ResolvePhysAttackParam) {
+    const resolveAttackResult: Record<keyof SelectedAttackingZone, 'BLOCKED' | 'MISSED' | number | null> = {
+      LEFT_HAND: null,
+      RIGHT_HAND: null,
     };
+    for (const [hand, handResult] of Object.entries(hitResult)) {
+      switch (handResult) {
+        case 'BLOCKED':
+          resolveAttackResult[hand as keyof SelectedAttackingZone] = 'BLOCKED';
+          continue;
+
+        case 'MISSED':
+          resolveAttackResult[hand as keyof SelectedAttackingZone] = 'MISSED';
+          continue;
+        case 'HIT':
+          const giveDamage = battleCalculateService.calculatePhysicalDamage(attackerModifier, defenderModifier, isCritical);
+          resolveAttackResult[hand as keyof SelectedAttackingZone] = giveDamage;
+
+          continue;
+      }
+    }
   },
 };

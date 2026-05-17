@@ -137,34 +137,5 @@ export const heroService = {
     const time = BASE_MANA_REGEN_TIME - wisdom * 30;
     return Math.max(1000, time);
   },
-  initModifier() {
-    const modifier: Modifier = {
-      strength: 0,
-      dexterity: 0,
-      intelligence: 0,
-      wisdom: 0,
-      constitution: 0,
-      luck: 0,
-      maxHealth: 0,
-      maxMana: 0,
-      maxDamage: 0,
-      minDamage: 0,
-      manaRegen: 0,
-      healthRegen: 0,
-      armor: 0,
-      magicResistance: 0,
-      evasion: 0,
-      spellDamage: 0,
-      spellCritDamage: 0,
-      spellCritRating: 0,
-      spellHitRating: 0,
-      spellPenetration: 0,
-      physDamage: 0,
-      physCritDamage: 0,
-      physCritRating: 0,
-      physHitRating: 0,
-      physPenetration: 0,
-    };
-    return modifier;
-  },
+  
 };

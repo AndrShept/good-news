@@ -626,7 +626,7 @@ export type CreatureTemplate = {
   currentMana: number;
   maxMana: number;
 
-  baseModifier: Partial<Modifier>;
+  modifier: Modifier
 };
 export type CreatureInstance = CreatureTemplate & {
   id: string;
@@ -779,15 +779,18 @@ export type BattleParticipant = Pick<
 
 export type BattleLogEntry = {
   round: number;
-  participantId: string;
-  targetId: string;
-  action: BattleAction;
-  result: {
+  attackerId: string;
+  defenderId: string;
+  abilityId?: string;
+  isDodged: boolean;
+  attacks?: {
+    hand: 'LEFT_HAND' | 'RIGHT_HAND';
+    result: 'HIT' | 'BLOCKED' | 'MISSED';
     damage?: number;
-    blocked?: boolean;
-    critical?: boolean;
-    missed?: boolean;
-  };
+    isCritical?: boolean;
+    attackZone?: BattleZoneType;
+    blockedZone?: BattleZoneType | BattleShieldZoneType; 
+  }[];
 };
 
 //API RESPONSE
