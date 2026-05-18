@@ -626,7 +626,7 @@ export type CreatureTemplate = {
   currentMana: number;
   maxMana: number;
 
-  modifier: Modifier
+  modifier: Modifier;
 };
 export type CreatureInstance = CreatureTemplate & {
   id: string;
@@ -690,12 +690,21 @@ export const gameSysMessageObj = {
 export const gameSysMessageValues = Object.values(gameSysMessageObj);
 
 export type GameSysMessageType = (typeof gameSysMessageValues)[number];
+
 export interface GameSysMessage {
   text: string;
   data?: { name: string; quantity?: number }[];
   color: GameSysMessageType;
   createdAt?: number;
+  
 }
+export type BattleLogMessage = {
+  text: string;
+  attackerId: string;
+  defenderId: string;
+  createdAt?: number;
+  
+};
 
 export type OmitDeepHero = {
   location?: Partial<ApiGetHeroResponse['location']>;
@@ -740,7 +749,7 @@ export type Battle = {
   currentRound: number;
   roundEndsAt: number;
   pendingActions: BattleAction[];
-  log: BattleLogEntry[];
+  log: string[];
   participants: BattleParticipant[];
 };
 
@@ -789,7 +798,7 @@ export type BattleLogEntry = {
     damage?: number;
     isCritical?: boolean;
     attackZone?: BattleZoneType;
-    blockedZone?: BattleZoneType | BattleShieldZoneType; 
+    blockedZone?: BattleZoneType | BattleShieldZoneType;
   }[];
 };
 

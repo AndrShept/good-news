@@ -26,10 +26,17 @@ export const useBattleUpdate = () => {
       return { ...oldData, participants: oldData.participants.map((p) => (p.id === participantId ? { ...p, ...updateData } : p)) };
     });
   };
+  const addLog = (newLogs: string[]) => {
+    queryClient.setQueryData(getBattleOptions(hero.id, hero.battleId).queryKey, (oldData) => {
+      if (!oldData) return;
+      return { ...oldData, log: [...oldData.log, ...newLogs] };
+    });
+  };
 
   return {
     updateBattle,
     addParticipant,
     updateParticipant,
+    addLog,
   };
 };

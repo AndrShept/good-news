@@ -169,4 +169,5 @@ export type BuffUpdateData = {
 
 export type BattleUpdateData = {
   participants: Partial<BattleParticipant>[];
+  log: string[];
 };

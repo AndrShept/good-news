@@ -23,7 +23,7 @@ export const GameMessage = memo(() => {
   useSelfMessage();
   useHeroListener();
   useQueueCraftListener();
-  useBattleListener()
+  useBattleListener();
 
   useEffect(() => {
     ref.current?.lastElementChild?.scrollIntoView({

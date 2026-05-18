@@ -40,27 +40,33 @@ interface CheckHitParams {
   damageType: DamageType;
 }
 
-type HitResult = {
-  LEFT_HAND: { hit: BattleZoneType | null; handResult: HandResult | null; giveDamage: number };
-  RIGHT_HAND: { hit: BattleZoneType | null; handResult: HandResult | null; giveDamage: number };
-};
+interface HitResult {
+  LEFT_HAND: { hit: BattleZoneType | null; handResult: HandResult | null; giveDamage: number; isCriticalDamage: boolean };
+  RIGHT_HAND: { hit: BattleZoneType | null; handResult: HandResult | null; giveDamage: number; isCriticalDamage: boolean };
+}
 
-type CalculateDamageParams = {
+interface CalculateDamageParams {
   hand: 'LEFT_HAND' | 'RIGHT_HAND';
   hitResult: HandResult;
   attackerModifier: Modifier;
   defenderModifier: Modifier;
   weapon?: ItemInstance;
   abilityId?: string; // якщо магія
-};
-type ResolvePhysAttackParam = {
+}
+interface ResolvePhysAttackParam {
   hitResult: HitResult;
   attackerModifier: Modifier;
   defenderModifier: Modifier;
   isCritical: boolean;
   attackZone: SelectedAttackingZone;
   defendZone: SelectedDefenseZone;
-};
+}
+interface GetBattleLogParam {
+  hitResult: HitResult;
+  attacker: BattleParticipant;
+  defender: BattleParticipant;
+  defendZone: SelectedDefenseZone;
+}
 
 export const battleService = {
   getBattle(battleId: string) {
@@ -76,7 +82,32 @@ export const battleService = {
   getRoundDuration() {
     return Date.now() + 90_000;
   },
+  getBattleLog({ attacker, defender, defendZone, hitResult }: GetBattleLogParam) {
+    const log: string[] = [];
+    const defenseLabel = Array.isArray(defendZone) ? defendZone.join('/') : defendZone;
 
+    for (const hand of Object.keys(hitResult) as (keyof HitResult)[]) {
+      const { hit, handResult, giveDamage, isCriticalDamage } = hitResult[hand];
+      if (!hit) continue;
+
+      const handLabel = hand === 'LEFT_HAND' ? 'left hand' : 'right hand';
+
+      switch (handResult) {
+        case 'MISSED':
+          log.push(`${attacker.name} [${handLabel} → ${hit}] vs ${defender.name} [${defenseLabel}] — $miss dodged`);
+          break;
+        case 'BLOCKED':
+          log.push(`${attacker.name} [${handLabel} → ${hit}] vs ${defender.name} [${defenseLabel}] — $block blocked`);
+          break;
+        case 'HIT':
+          const critLabel = isCriticalDamage ? '$crit' : '';
+          log.push(`${attacker.name} [${handLabel} → ${hit}] vs ${defender.name} [${defenseLabel}] — ${critLabel} ${giveDamage} damage`);
+          break;
+      }
+    }
+
+    return log;
+  },
   initBattle() {
     const id = generateRandomUuid();
     const newBattle: Battle = {
@@ -218,14 +249,31 @@ export const battleService = {
       damageType: 'PHYSICAL',
     });
 
+    const firstBattleLog = battleService.getBattleLog({
+      attacker: firstParticipant,
+      defender: secondParticipant,
+      defendZone: secondAction.defenseZone,
+      hitResult: firstHitResult,
+    });
+    const secondBattleLog = battleService.getBattleLog({
+      attacker: secondParticipant,
+      defender: firstParticipant,
+      defendZone: firstAction.defenseZone,
+      hitResult: secondHitResult,
+    });
 
-
-    
     const socketData: BattleUpdateData = {
       participants: [
-        { id: firstParticipant.id, currentHealth: 50 },
-        { id: secondParticipant.id, currentHealth: 10 },
+        {
+          id: firstParticipant.id,
+          currentHealth: firstParticipant.currentHealth - (secondHitResult.LEFT_HAND.giveDamage + secondHitResult.RIGHT_HAND.giveDamage),
+        },
+        {
+          id: secondParticipant.id,
+          currentHealth: secondParticipant.currentHealth - (firstHitResult.LEFT_HAND.giveDamage + firstHitResult.RIGHT_HAND.giveDamage),
+        },
       ],
+      log: [...firstBattleLog, ...secondBattleLog],
     };
     io.to(battle.id).emit(socketEvents.battleUpdate(), socketData);
 
@@ -233,10 +281,11 @@ export const battleService = {
       this.removeActionPending(battle.pendingActions, action.id);
     }
   },
+
   checkHitResult({ attackZone, defendZone, attackerModifier, defenderModifier, damageType }: CheckHitParams): HitResult {
     const hitResult: HitResult = {
-      LEFT_HAND: { hit: null, handResult: null, giveDamage: 0 },
-      RIGHT_HAND: { hit: null, handResult: null, giveDamage: 0 },
+      LEFT_HAND: { hit: null, handResult: null, giveDamage: 0, isCriticalDamage: false },
+      RIGHT_HAND: { hit: null, handResult: null, giveDamage: 0, isCriticalDamage: false },
     };
 
     for (const hand of Object.keys(hitResult) as (keyof HitResult)[]) {
@@ -264,26 +313,26 @@ export const battleService = {
 
     return hitResult;
   },
-  resolvePhysAttack({ hitResult, attackerModifier, defenderModifier, isCritical }: ResolvePhysAttackParam) {
-    const resolveAttackResult: Record<keyof SelectedAttackingZone, 'BLOCKED' | 'MISSED' | number | null> = {
-      LEFT_HAND: null,
-      RIGHT_HAND: null,
-    };
-    for (const [hand, handResult] of Object.entries(hitResult)) {
-      switch (handResult) {
-        case 'BLOCKED':
-          resolveAttackResult[hand as keyof SelectedAttackingZone] = 'BLOCKED';
-          continue;
+  // resolvePhysAttack({ hitResult, attackerModifier, defenderModifier, isCritical }: ResolvePhysAttackParam) {
+  //   const resolveAttackResult: Record<keyof SelectedAttackingZone, 'BLOCKED' | 'MISSED' | number | null> = {
+  //     LEFT_HAND: null,
+  //     RIGHT_HAND: null,
+  //   };
+  //   for (const [hand, handResult] of Object.entries(hitResult)) {
+  //     switch (handResult) {
+  //       case 'BLOCKED':
+  //         resolveAttackResult[hand as keyof SelectedAttackingZone] = 'BLOCKED';
+  //         continue;
 
-        case 'MISSED':
-          resolveAttackResult[hand as keyof SelectedAttackingZone] = 'MISSED';
-          continue;
-        case 'HIT':
-          const giveDamage = battleCalculateService.calculatePhysicalDamage(attackerModifier, defenderModifier, isCritical);
-          resolveAttackResult[hand as keyof SelectedAttackingZone] = giveDamage;
+  //       case 'MISSED':
+  //         resolveAttackResult[hand as keyof SelectedAttackingZone] = 'MISSED';
+  //         continue;
+  //       case 'HIT':
+  //         const giveDamage = battleCalculateService.calculatePhysicalDamage(attackerModifier, defenderModifier, isCritical);
+  //         resolveAttackResult[hand as keyof SelectedAttackingZone] = giveDamage;
 
-          continue;
-      }
-    }
-  },
+  //         continue;
+  //     }
+  //   }
+  // },
 };
