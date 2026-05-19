@@ -1,33 +1,33 @@
 import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
 import { imageConfig } from '@/shared/config/image-config';
-import { HeroUIType, useHeroUIStore } from '@/store/useHeroUIStore';
-
-import { useHero } from '../hooks/useHero';
+import { HeaderUIType, useGameUIStore } from '@/store/useGameUIStore';
 import { startTransition } from 'react';
 
+import { useHero } from '../hooks/useHero';
+
 type Props = {
-  type: HeroUIType;
+  type: HeaderUIType;
 };
 
 export const CharacterPaperdollButton = (props: Props) => {
-  const icon: Record<HeroUIType, string> = {
+  const icon: Record<HeaderUIType, string> = {
     CHARACTER: imageConfig.icon.ui.character,
   };
-  const { setUiType, uiType } = useHeroUIStore();
+  const { headerUIType, setHeaderUIType } = useGameUIStore();
   const state = useHero((data) => data?.state);
   return (
     <Button
       onClick={() => {
         startTransition(() => {
-          setUiType(props.type);
+          setHeaderUIType(props.type);
         });
       }}
       size="icon-lg"
       disabled={state !== 'IDLE'}
-      variant={uiType === props.type ? 'secondary' : 'outline'}
+      variant={headerUIType === props.type ? 'secondary' : 'outline'}
     >
-      <GameIcon className='size-6' image={icon[props.type]} />
+      <GameIcon className="size-6" image={icon[props.type]} />
     </Button>
   );
 };

@@ -32,11 +32,11 @@ export const SocketProvider = ({
         auth: { userId, username },
         query: { heroId },
         reconnection: true,
-        autoConnect: true,
+        autoConnect: false,
       }),
     [heroId, userId, username],
   );
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [isConnected, setIsConnected] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   useEffect(() => {
@@ -57,13 +57,10 @@ export const SocketProvider = ({
     return () => {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
+      socket.disconnect();
+
     };
-  }, [navigate, queryClient, socket, userId]);
-  useEffect(() => {
-    return () => {
-      socket.disconnect(); 
-    };
-  }, [socket]); 
+  }, [socket, userId]);
 
   return <SocketContext.Provider value={{ socket, isConnected }}>{children}</SocketContext.Provider>;
 };

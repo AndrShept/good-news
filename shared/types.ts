@@ -696,14 +696,26 @@ export interface GameSysMessage {
   data?: { name: string; quantity?: number }[];
   color: GameSysMessageType;
   createdAt?: number;
-  
 }
-export type BattleLogMessage = {
-  text: string;
+
+export interface HitResult {
+  LEFT_HAND: { hit: BattleZoneType | null; handResult: HandResult | null; giveDamage: number; isCriticalDamage: boolean };
+  RIGHT_HAND: { hit: BattleZoneType | null; handResult: HandResult | null; giveDamage: number; isCriticalDamage: boolean };
+}
+export type BattleLog = {
+  id: string;
   attackerId: string;
+  attackerName: string;
   defenderId: string;
-  createdAt?: number;
-  
+  defenderName: string;
+  defendZone: SelectedDefenseZone;
+  giveDamage: number;
+  attackingZone: BattleZoneType | null;
+  hand: keyof HitResult;
+  isMissed: boolean;
+  isCriticalDamage: boolean;
+  isBlocking: boolean;
+  createdAt: number;
 };
 
 export type OmitDeepHero = {
@@ -749,7 +761,7 @@ export type Battle = {
   currentRound: number;
   roundEndsAt: number;
   pendingActions: BattleAction[];
-  log: string[];
+  logs: BattleLog[];
   participants: BattleParticipant[];
 };
 
@@ -784,22 +796,6 @@ export type BattleParticipant = Pick<
   side: BattleSide;
   isAlive: boolean;
   targetId: string | null;
-};
-
-export type BattleLogEntry = {
-  round: number;
-  attackerId: string;
-  defenderId: string;
-  abilityId?: string;
-  isDodged: boolean;
-  attacks?: {
-    hand: 'LEFT_HAND' | 'RIGHT_HAND';
-    result: 'HIT' | 'BLOCKED' | 'MISSED';
-    damage?: number;
-    isCritical?: boolean;
-    attackZone?: BattleZoneType;
-    blockedZone?: BattleZoneType | BattleShieldZoneType;
-  }[];
 };
 
 //API RESPONSE

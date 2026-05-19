@@ -16,5 +16,17 @@ export const battleTick = (now: number) => {
         battleService.resolveActionPair(battle, action, findResolveActionOpponent);
       }
     }
+    for (const participant of battle.participants) {
+      if (participant.currentHealth <= 0) {
+        participant.isAlive = false;
+        const aliveAttackers = battle.participants.filter((p) => p.side === 'ATTACKER' && p.isAlive);
+        const aliveDefenders = battle.participants.filter((p) => p.side === 'DEFENDER' && p.isAlive);
+
+        if (!aliveAttackers.length || !aliveDefenders.length) {
+          battle.status = 'FINISHED';
+          console.log("  battle.status = 'FINISHED'");
+        }
+      }
+    }
   }
 };

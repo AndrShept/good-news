@@ -1,12 +1,12 @@
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 
 import { getBattleOptions } from '../api/get-battle';
 
 export const useBattle = () => {
   const hero = useHero((data) => ({ id: data?.id ?? '', battleId: data?.battleId ?? '' }));
-  const { data: battle } = useSuspenseQuery(getBattleOptions(hero.id, hero.battleId));
+  const { data: battle } = useQuery(getBattleOptions(hero.id, hero.battleId));
   const { itemsTemplateById } = useGameData();
   const selfParticipant = battle?.participants.find((p) => p.id === hero.id);
 

@@ -1,4 +1,5 @@
 import type {
+  BattleLog,
   BattleParticipant,
   BuffInstance,
   Corpse,
@@ -169,5 +170,5 @@ export type BuffUpdateData = {
 
 export type BattleUpdateData = {
   participants: Partial<BattleParticipant>[];
-  log: string[];
+  logs: BattleLog[];
 };

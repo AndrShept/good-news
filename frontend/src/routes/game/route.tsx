@@ -1,5 +1,5 @@
 import { ActionTimerPanel } from '@/components/ActionTimerPanel';
-import { GameMessage } from '@/components/GameMessage';
+import { GameConsole } from '@/components/GameConsole';
 import { DndInventoryProvider } from '@/components/providers/DndInventoryProvider';
 import { SocketProvider } from '@/components/providers/SocketProvider';
 import { getUserQueryOptions } from '@/features/auth/api/get-user';
@@ -12,6 +12,7 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { MovingPanel } from '@/features/map/components/MovingPanel';
 import { useCancelGatheringMutation } from '@/features/map/hooks/useCancelGatheringMutation';
+import { useGameUIStore } from '@/store/useGameUIStore';
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { useNavigate } from '@tanstack/react-router';
 import { createFileRoute, redirect } from '@tanstack/react-router';
@@ -30,18 +31,16 @@ export const Route = createFileRoute('/game')({
     // if (!auth) {
     //   throw redirect({ to: '/auth/sign-in' });
     // }
-    if ( !hero) {
+    if (!hero) {
       throw redirect({ to: '/create-hero' });
     }
     if (hero?.battleId && !location.pathname.includes('/battle/')) {
       throw redirect({ to: '/game/battle/$battleId', params: { battleId: hero.battleId } });
     }
     return {
-     
       hero,
     };
   },
-  
 });
 
 function GameRouteComponent() {
@@ -82,7 +81,7 @@ function GameRouteComponent() {
           </div>
 
           <div className="sticky bottom-0 z-10">
-            <GameMessage />
+            <GameConsole />
           </div>
         </section>
       </DndInventoryProvider>

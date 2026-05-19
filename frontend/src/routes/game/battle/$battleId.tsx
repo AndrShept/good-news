@@ -4,7 +4,10 @@ import { BattleParticipantCard } from '@/features/battle/components/BattlePartic
 import { BattleParticipantList } from '@/features/battle/components/BattleParticipantList';
 import { ZoneSelector } from '@/features/battle/components/ZoneSelector';
 import { useBattle } from '@/features/battle/hooks/useBattle';
-import { createFileRoute } from '@tanstack/react-router';
+import { useHero } from '@/features/hero/hooks/useHero';
+import { useGameUIStore } from '@/store/useGameUIStore';
+import { createFileRoute, redirect } from '@tanstack/react-router';
+import { useEffect } from 'react';
 
 export const Route = createFileRoute('/game/battle/$battleId')({
   component: RouteComponent,
@@ -19,18 +22,28 @@ export const Route = createFileRoute('/game/battle/$battleId')({
   loader: async ({ params, context }) => {
     const heroId = context?.hero?.id ?? '';
     const data = await context.queryClient.ensureQueryData(getBattleOptions(heroId, params.battleId));
+    if (!data) throw redirect({ to: '/game' });
+    useGameUIStore.getState().setConsoleActiveTab('LOG');
     return data;
   },
 });
 
 function RouteComponent() {
   const { battle, isEquipLeftHandWeapon, isEquipRightHandWeapon, isEquipShield, selfParticipant } = useBattle();
-
+  const battleId = useHero((state) => state?.battleId ?? '');
   const targetParticipant = battle?.participants.find((p) => p.id === selfParticipant?.targetId);
   const attackers = battle?.participants.filter((p) => p.side === 'ATTACKER');
   const defenders = battle?.participants.filter((p) => p.side === 'DEFENDER');
+  const setConsoleActiveTab = useGameUIStore((state) => state.setConsoleActiveTab);
 
+  useEffect(() => {
+
+    return () => {
+      setConsoleActiveTab('CHAT');
+    };
+  }, []);
   if (!selfParticipant || !targetParticipant || !battle) return;
+
   return (
     <section className="mx-auto flex w-full max-w-5xl flex-col items-center p-2">
       <div className="flex w-full justify-between gap-1">

@@ -1,6 +1,6 @@
 import { BackButton } from '@/components/BackButton';
 import { HeroBackpack } from '@/features/item-container/components/HeroBackpack';
-import { useHeroUIStore } from '@/store/useHeroUIStore';
+import { useGameUIStore } from '@/store/useGameUIStore';
 import { useMediaQuery } from 'usehooks-ts';
 
 import { useHero } from '../hooks/useHero';
@@ -26,10 +26,10 @@ export const CharacterPaperdoll = () => {
     buffs: data?.buffs ?? [],
   }));
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const { setUiType } = useHeroUIStore();
+  const setHeaderUIType = useGameUIStore((state) => state.setHeaderUIType);
   return (
     <section className="mx-auto flex flex-col gap-1">
-      <BackButton onClick={() => setUiType(null)} className="m-auto my-1" />
+      <BackButton onClick={() => setHeaderUIType(null)} className="m-auto my-1" />
       <div className="flex flex-1 gap-4">
         <Paperdoll {...hero} />
         <div className="h-fit max-w-fit flex-col gap-2 rounded text-sm md:flex">

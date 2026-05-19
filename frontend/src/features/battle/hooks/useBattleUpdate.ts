@@ -1,5 +1,5 @@
 import { useHero } from '@/features/hero/hooks/useHero';
-import { Battle, BattleParticipant } from '@/shared/types';
+import { Battle, BattleLog, BattleParticipant } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { getBattleOptions } from '../api/get-battle';
@@ -26,10 +26,10 @@ export const useBattleUpdate = () => {
       return { ...oldData, participants: oldData.participants.map((p) => (p.id === participantId ? { ...p, ...updateData } : p)) };
     });
   };
-  const addLog = (newLogs: string[]) => {
+  const addLog = (log: BattleLog) => {
     queryClient.setQueryData(getBattleOptions(hero.id, hero.battleId).queryKey, (oldData) => {
       if (!oldData) return;
-      return { ...oldData, log: [...oldData.log, ...newLogs] };
+      return { ...oldData, logs: [...oldData.logs, log] };
     });
   };
 
