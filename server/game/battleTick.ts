@@ -12,7 +12,7 @@ export const battleTick = (now: number) => {
           a.actionType === 'NORMAL',
       );
       if (findResolveActionOpponent) {
-        console.log('findResolveActionOpponent');
+      
         battleService.resolveActionPair(battle, action, findResolveActionOpponent);
       }
     }

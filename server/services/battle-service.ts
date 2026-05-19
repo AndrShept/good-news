@@ -1,4 +1,4 @@
-import type { BattleUpdateData } from '@/shared/socket-data-types';
+import type { BattleSocketEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import type {
   Battle,
@@ -184,10 +184,13 @@ export const battleService = {
     const participant = battle.participants.find((p) => p.id === participantId);
     if (!participant) return;
     const enemies = battle.participants.filter((p) => p.side !== participant.side && p.isAlive);
+    const validTargets = enemies.filter((e) =>
+      battle.pendingActions.some((a) => a.targetId !== e.id && a.participantId === participant.id),
+    );
 
     const random = Math.floor(Math.random() * enemies.length);
 
-    const targetId = enemies[random].id;
+    const targetId = validTargets.length ? validTargets[random].id : enemies[random].id;
     participant.targetId = targetId;
   },
   createCreatureActionPending(battle: Battle, creatureParticipant: BattleParticipant, targetId: string) {
@@ -251,8 +254,9 @@ export const battleService = {
     this.updateParticipant(firstParticipant, { currentHealth: firstCurrentHealth });
     this.updateParticipant(secondParticipant, { currentHealth: secondCurrentHealth });
 
-    const socketData: BattleUpdateData = {
-      participants: [
+    socketService.sendToClientBattleUpdate(battle.id, {
+      type: 'PARTICIPANT_UPDATE',
+      payload: [
         {
           id: firstParticipant.id,
           currentHealth: firstCurrentHealth,
@@ -262,13 +266,12 @@ export const battleService = {
           currentHealth: secondCurrentHealth,
         },
       ],
-      logs: [...firstBattleLog, ...secondBattleLog],
-    };
-    io.to(battle.id).emit(socketEvents.battleUpdate(), socketData);
-
+    });
+    socketService.sendToClientBattleUpdate(battle.id, { type: 'LOG_ADD', payload: [...firstBattleLog, ...secondBattleLog] });
     for (const action of [firstAction, secondAction]) {
       this.removeActionPending(battle.pendingActions, action.id);
     }
+    socketService.sendToClientBattleUpdate(battle.id, { type: 'ACTIONS_REMOVE', payload: [firstAction.id, secondAction.id] });
   },
 
   checkHitResult({ attackZone, defendZone, attackerModifier, defenderModifier, damageType }: CheckHitParams): HitResult {
@@ -303,8 +306,6 @@ export const battleService = {
     return hitResult;
   },
   updateParticipant(participant: BattleParticipant, updateData: Partial<BattleParticipant>) {
-     Object.assign(participant, updateData);
-
-   
+    Object.assign(participant, updateData);
   },
 };

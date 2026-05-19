@@ -1,4 +1,5 @@
 import type {
+  BattleSocketEvent,
   HeroUpdateEvent,
   MapChunkDespawnEntityData,
   MapChunkEntitiesDataPartial,
@@ -178,5 +179,8 @@ export const socketService = {
       payload: { itemsDelta },
     };
     io.to(heroId).emit(socketEvents.selfData(), socketData);
+  },
+  sendToClientBattleUpdate(battleId: string, data: BattleSocketEvent) {
+    io.to(battleId).emit(socketEvents.battleUpdate(), data);
   },
 };

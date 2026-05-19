@@ -84,7 +84,6 @@ export const creatureTemplate = [
       minDamage: 1,
       maxDamage: 2,
       evasion: 8,
-      physHitRating: 50,
     }),
   },
   {

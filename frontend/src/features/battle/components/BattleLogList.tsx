@@ -37,7 +37,7 @@ export const BattleLogList = () => {
               <span className="font-medium">{log.defenderName}</span>
               <span className="bg-secondary rounded px-1 py-px text-[11px]">{defZone}</span>
 
-              {log.isMissed && <span className="bg-muted rounded px-1.5 py-px text-[11px] font-medium">dodged</span>}
+              {log.isMissed && <span className="rounded bg-green-700 px-1.5 py-px text-[11px] font-medium text-green-200">dodged</span>}
               {log.isBlocking && <span className="rounded bg-blue-700 px-1.5 py-px text-[11px] font-medium text-blue-200">blocked</span>}
               {!log.isMissed && !log.isBlocking && (
                 <>

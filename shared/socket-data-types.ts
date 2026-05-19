@@ -1,4 +1,6 @@
 import type {
+  Battle,
+  BattleAction,
   BattleLog,
   BattleParticipant,
   BuffInstance,
@@ -168,7 +170,10 @@ export type BuffUpdateData = {
   updateData: Partial<BuffInstance>;
 };
 
-export type BattleUpdateData = {
-  participants: Partial<BattleParticipant>[];
-  logs: BattleLog[];
-};
+export type BattleSocketEvent =
+  | { type: 'PARTICIPANT_ADD'; payload: BattleParticipant}
+  | { type: 'PARTICIPANT_UPDATE'; payload: Partial<BattleParticipant>[] }
+  | { type: 'LOG_ADD'; payload: BattleLog[] }
+  | { type: 'ACTIONS_ADD'; payload: BattleAction }
+  | { type: 'ACTIONS_REMOVE'; payload: string[] }
+  | { type: 'BATTLE_UPDATE'; payload: Partial<Battle> };
