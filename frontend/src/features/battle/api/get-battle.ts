@@ -15,4 +15,5 @@ export const getBattleOptions = (heroId: string, battleId: string) =>
   queryOptions({
     queryKey: ['battle', battleId],
     queryFn: () => getBattle(heroId, battleId),
+    enabled : !!battleId
   });

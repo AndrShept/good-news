@@ -1,5 +1,6 @@
 import { GameAvatar } from '@/components/GameAvatar';
-import { BuffInstance } from '@/shared/types';
+import { BattleParticipantModifierInfo } from '@/features/battle/components/BattleParticipantModifierInfo';
+import { BuffInstance, Modifier } from '@/shared/types';
 
 import { BuffList } from './BuffList';
 import { FillBar } from './FillBar';
@@ -14,6 +15,7 @@ interface Props {
   level?: number;
   id: string;
   buffs: BuffInstance[];
+  modifier?: Modifier;
 }
 
 export const CharacterStatusBar = (props: Props) => {
@@ -25,9 +27,10 @@ export const CharacterStatusBar = (props: Props) => {
         </div>
       )}
       <div className="flex w-full flex-col gap-0.5">
-        <div>
+        <div className="flex gap-1">
           <span className="mr-1">{props.name}</span>
           {props.level && <span className="text-muted-foreground">lvl:{props.level}</span>}
+          {props.modifier && <BattleParticipantModifierInfo modifier={props.modifier} />}
         </div>
 
         <FillBar value={props.currentHealth} type="health" maxValue={props.maxHealth} />

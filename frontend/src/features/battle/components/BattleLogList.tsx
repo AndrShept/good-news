@@ -1,58 +1,55 @@
+import { GameIcon } from '@/components/GameIcon';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { cn, getTimeFns } from '@/lib/utils';
-import React, { useEffect, useRef } from 'react';
+import { getTimeFns } from '@/lib/utils';
+import { imageConfig } from '@/shared/config/image-config';
+import { BattleLog, HandResult } from '@/shared/types';
+import { useEffect, useRef } from 'react';
 
 import { useBattle } from '../hooks/useBattle';
+import { BattleLogIcon } from './BattleLogIcon';
 
 export const BattleLogList = () => {
   const { battle } = useBattle();
-  const ref = useRef<null | HTMLUListElement>(null);
+  const ref = useRef<HTMLUListElement>(null);
   const heroId = useHeroId();
-  useEffect(() => {
-    ref.current?.lastElementChild?.scrollIntoView({
-      block: 'nearest',
-    });
-  }, [battle?.logs]);
-  return (
-    <ul ref={ref} className="flex flex-col pl-1 pt-1">
-      {battle?.logs.map((log) => {
-        const isAttacker = log.attackerId === heroId;
-        const isDefender = log.defenderId === heroId;
-        const defZone = Array.isArray(log.defendZone) ? log.defendZone.join('/') : log.defendZone;
-        return (
-          <div
-            key={log.id}
-            className={cn('flex w-fit items-start gap-1.5 rounded-md border-l-2 px-2 py-1 text-[13px]', {
-              'border-emerald-500 bg-emerald-500/10': isAttacker,
-              'border-orange-500 bg-orange-500/10': isDefender,
-              'border-transparent': !isAttacker && !isDefender,
-            })}
-          >
-            <time className="text-muted-foreground min-w-[42px] pt-px text-[11px]">[{getTimeFns(log.createdAt)}]</time>
-            <div className="flex flex-wrap items-center gap-1">
-              <span className="font-medium">{log.attackerName}</span>
-              <span className="text-muted-foreground text-[11px]">[{log.hand === 'LEFT_HAND' ? 'L' : 'R'}]</span>
-              <span className="bg-secondary rounded px-1 py-px text-[11px]">{log.attackingZone ?? '—'}</span>
-              <span className="text-muted-foreground">→</span>
-              <span className="font-medium">{log.defenderName}</span>
-              <span className="bg-secondary rounded px-1 py-px text-[11px]">{defZone}</span>
 
-              {log.isMissed && <span className="rounded bg-green-700 px-1.5 py-px text-[11px] font-medium text-green-200">dodged</span>}
-              {log.isBlocking && <span className="rounded bg-blue-700 px-1.5 py-px text-[11px] font-medium text-blue-200">blocked</span>}
-              {!log.isMissed && !log.isBlocking && (
-                <>
-                  {log.isCriticalDamage ? (
-                    <span className="rounded bg-amber-100 px-1.5 py-px text-[11px] font-medium text-amber-700">crit</span>
-                  ) : (
-                    <span className="rounded bg-amber-800 px-1.5 py-px text-[11px] font-medium text-amber-200">hit</span>
-                  )}
-                  <span className={cn('font-medium', log.isCriticalDamage ? 'text-red-600' : 'text-amber-200')}>−{log.giveDamage}</span>
-                </>
-              )}
-            </div>
-          </div>
-        );
-      })}
+  useEffect(() => {
+    ref.current?.lastElementChild?.scrollIntoView({ block: 'nearest' });
+  }, [battle?.logs]);
+
+  return (
+    <ul ref={ref} className="flex flex-col gap-1 font-mono text-[13px]">
+      {battle?.logs.map((log) => <BattleLogCard key={log.id} log={log} heroId={heroId} />)}
     </ul>
+  );
+};
+
+const BattleLogCard = ({ log, heroId }: { log: BattleLog; heroId: string }) => {
+  const defZone = Array.isArray(log.defendZone) ? log.defendZone.join('/') : log.defendZone;
+  const hand = log.hand === 'LEFT_HAND' ? 'L' : 'R';
+  const isHero = log.attackerId === heroId;
+
+  return (
+    <li className="inline-flex flex-wrap items-center gap-1 leading-relaxed text-[#8b949e]">
+      <span className="text-zinc-600">[{getTimeFns(log.createdAt)}] </span>
+      <span className={isHero ? 'text-blue-300' : 'text-orange-400'}>{log.attackerName}</span>
+      <span> [{hand} → </span>
+      <span className="text-emerald-300">{log.attackingZone ?? '—'}</span>
+      <span>] vs </span>
+      <span className={!isHero ? 'text-blue-300' : 'text-orange-400'}>{log.defenderName}</span>
+      <span> [{defZone}] — </span>
+      {log.isMissed && <BattleLogIcon image={imageConfig.icon.ui.battle.miss} label="MISS" className="text-yellow-300" />}
+      {log.isBlocking && <BattleLogIcon className="text-blue-400" image={imageConfig.icon.ui.battle.block} label="BLOCK" />}
+      {!log.isMissed && !log.isBlocking && (
+        <>
+          {log.isCriticalDamage ? (
+            <BattleLogIcon className="text-red-500" image={imageConfig.icon.ui.battle.phys_crit} label="CRIT" />
+          ) : (
+            <BattleLogIcon className="text-green-500" image={imageConfig.icon.ui.battle.hit} label="HIT" />
+          )}
+          <span className="ml-1 text-sm text-orange-100">-{log.giveDamage}</span>
+        </>
+      )}
+    </li>
   );
 };

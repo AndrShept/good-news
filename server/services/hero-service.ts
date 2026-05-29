@@ -10,9 +10,9 @@ import {
   HP_MULTIPLIER_COST,
   MANA_MULTIPLIER_INT,
 } from '../lib/config/server-constants';
-import { sumAllModifier } from '../lib/utils';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
+import { sumAllModifier } from '@/shared/utils';
 
 export const heroService = {
   getHero(heroId: string) {

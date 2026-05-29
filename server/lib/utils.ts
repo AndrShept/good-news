@@ -3,13 +3,13 @@ import { resourceTemplateById } from '@/shared/templates/resource-template';
 import type { ClothType, CoreResourceType, IngotType, LeatherType, Modifier, PlankType, StateType, TileType } from '@/shared/types';
 import { initModifier } from '@/shared/utils';
 import { render } from '@react-email/components';
-import { intervalToDuration } from 'date-fns';
+
 import { sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import nodemailer from 'nodemailer';
 import z from 'zod';
 
-import { heroService } from '../services/hero-service';
+
 import { itemTemplateService } from '../services/item-template-service';
 import { materialModifierConfig } from './config/material-modifier-config';
 
@@ -103,19 +103,7 @@ export const jobQueueId = {
   offline: (heroId: string) => `offline-${heroId}`,
 };
 
-export const sumAllModifier = <T extends Partial<Modifier> | null | undefined>(...args: T[]) => {
-  const result = initModifier();
 
-  for (const item of args) {
-    for (const key in item) {
-      const typedKey = key as keyof Modifier;
-      if (typeof item[typedKey] === 'number') {
-        result[typedKey] += item[typedKey];
-      }
-    }
-  }
-  return result;
-};
 
 export const delay = (time: number) => {
   return new Promise((resolve) => setTimeout(resolve, time));

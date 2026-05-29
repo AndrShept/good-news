@@ -290,3 +290,21 @@ export const initModifier = (updateModifier?: Partial<Modifier>) => {
   };
   return { ...modifier, ...updateModifier };
 };
+
+export const sumAllModifier = <T extends Partial<Modifier> | null | undefined>(...args: T[]) => {
+  const result = initModifier();
+
+  for (const item of args) {
+    for (const key in item) {
+      const typedKey = key as keyof Modifier;
+      if (typeof item[typedKey] === 'number') {
+        result[typedKey] += item[typedKey];
+      }
+    }
+  }
+  return result;
+};
+
+export const getNonZeroModifiers = (modifier: Modifier) => {
+  return Object.fromEntries(Object.entries(modifier).filter(([key, value]) => !!value));
+};

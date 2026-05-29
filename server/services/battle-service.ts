@@ -20,7 +20,6 @@ import type {
 import { getAttackingRandomZone, getDefenseRandomZone } from '@/shared/utils';
 import { HTTPException } from 'hono/http-exception';
 
-import { io } from '..';
 import { serverState } from '../game/state/server-state';
 import { generateRandomUuid } from '../lib/utils';
 import { battleCalculateService } from './battle-calculate-service';
@@ -148,6 +147,7 @@ export const battleService = {
           maxMana: hero.maxMana,
           level: hero.level,
           modifier: hero.modifier,
+          stat: hero.stat,
           equipments: hero.equipments,
           buffs: hero.buffs,
           isAlive: true,

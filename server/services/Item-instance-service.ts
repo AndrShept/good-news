@@ -4,13 +4,14 @@ import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
 import { itemDurabilityConfig } from '../lib/config/item-dutability-config';
-import { generateRandomUuid, getDisplayName, getModifierByResourceKey, sumAllModifier } from '../lib/utils';
+import { generateRandomUuid, getDisplayName, getModifierByResourceKey } from '../lib/utils';
 import { deltaEventsService } from './delta-events-service';
 import { equipmentService } from './equipment-service';
 import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
 import { queueCraftService } from './queue-craft-service';
+import { sumAllModifier } from '@/shared/utils';
 
 interface ICreateItem {
   itemTemplateId: string;

@@ -44,6 +44,15 @@ export const imageConfig = {
       character: '/sprites/icons/ui/character.png',
       refine: '/sprites/icons/ui/refine.png',
       clock: '/sprites/icons/ui/clock.png',
+      info: '/sprites/icons/ui/info.png',
+      battle: {
+        dead: '/sprites/icons/ui/battle/dead.png',
+        phys_crit: '/sprites/icons/ui/battle/phys_crit.png',
+        magic_crit: '/sprites/icons/ui/battle/magic_crit.png',
+        miss: '/sprites/icons/ui/battle/hit.png',
+        block: '/sprites/icons/ui/battle/block.png',
+        hit: '/sprites/icons/ui/battle/hit.png',
+      },
     },
     action: {
       close: '/sprites/icons/action/close.png',

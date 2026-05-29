@@ -210,33 +210,6 @@ export type ColoredResourceType =
 export type QueueCraftStatusType = (typeof queueCraftStatusEnum.enumValues)[number];
 export type ItemContainerType = (typeof itemContainerTypeEnum.enumValues)[number];
 
-export const modifierStringName = {
-  strength: 'strength',
-  dexterity: 'dexterity',
-  intelligence: 'intelligence',
-  wisdom: 'wisdom',
-  constitution: 'constitution',
-  luck: 'luck',
-  maxHealth: 'max health',
-  maxMana: 'max mana',
-  minDamage: 'min damage',
-  maxDamage: 'max damage',
-  manaRegen: 'mana regen',
-  healthRegen: 'health regen',
-  armor: 'armor',
-  magicResistance: 'magic resistance',
-  evasion: 'evasion',
-  spellDamage: 'spell damage',
-  spellCritDamage: 'spell crit damage',
-  spellCritRating: 'spell crit rating',
-  spellHitRating: 'spell hit rating',
-  spellPenetration: 'spell penetration',
-  physDamage: 'phys damage',
-  physCritDamage: 'phys crit damage',
-  physCritRating: 'phys crit rating',
-  physHitRating: 'phys hit rating',
-  physPenetration: 'phys penetration',
-} as const satisfies Record<keyof Modifier, string>;
 // export const modifierValues =  Object.keys(modifierObj)
 
 export type Modifier = {
@@ -266,6 +239,7 @@ export type Modifier = {
   physHitRating: number;
   physPenetration: number;
 };
+
 export type Group = InferSelectModel<typeof groupTable>;
 export type TLocation = {
   placeId: string | null;
@@ -791,6 +765,7 @@ export type BattleParticipant = Pick<
   | 'buffs'
 > & {
   scale?: number;
+  stat?: IHeroStat;
   modifier: Modifier;
   type: BattleParticipantType;
   side: BattleSide;

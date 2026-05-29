@@ -1,4 +1,4 @@
-import { Modifier, modifierStringName } from '@/shared/types';
+import { Modifier } from '@/shared/types';
 import { type ClassValue, clsx } from 'clsx';
 import { format, intervalToDuration } from 'date-fns';
 import { hc } from 'hono/client';
@@ -51,6 +51,34 @@ export const formatDurationFromSeconds = (seconds: number) => {
 export const toastError = (msg = 'Something went wrong') => {
   toast.error(msg);
 };
+
+export const modifierStringName = {
+  strength: 'strength',
+  dexterity: 'dexterity',
+  intelligence: 'intelligence',
+  wisdom: 'wisdom',
+  constitution: 'constitution',
+  luck: 'luck',
+  maxHealth: 'max health',
+  maxMana: 'max mana',
+  minDamage: 'min damage',
+  maxDamage: 'max damage',
+  manaRegen: 'mana regen',
+  healthRegen: 'health regen',
+  armor: 'armor',
+  magicResistance: 'magic resistance',
+  evasion: 'evasion',
+  spellDamage: 'spell damage',
+  spellCritDamage: 'spell crit damage',
+  spellCritRating: 'spell crit rating',
+  spellHitRating: 'spell hit rating',
+  spellPenetration: 'spell penetration',
+  physDamage: 'phys damage',
+  physCritDamage: 'phys crit damage',
+  physCritRating: 'phys crit rating',
+  physHitRating: 'phys hit rating',
+  physPenetration: 'phys penetration',
+} as const satisfies Record<keyof Modifier, string>;
 
 export const getModifierName = (modifier: keyof Modifier) => {
   return modifierStringName[modifier];

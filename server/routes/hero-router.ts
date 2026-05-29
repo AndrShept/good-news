@@ -29,6 +29,7 @@ import {
   buildPathWithObstacles,
   getHeroStateWithGatherSkillKey,
   getMapLayerNameAtHeroPos,
+  getNonZeroModifiers,
   getStateWithCraftBuildingType,
   getStateWithRefiningBuildingKey,
   getTilesAroundHero,
@@ -139,6 +140,7 @@ export const heroRouter = new Hono<Context>()
       verifyHeroOwnership({ heroUserId: stateHero?.userId, userId });
       stateHero.offlineTimer = undefined;
       const { paths, offlineTimer, selectedGatherTile, ...returnData } = stateHero;
+     
 
       return c.json<SuccessResponse<typeof returnData>>({
         success: true,
