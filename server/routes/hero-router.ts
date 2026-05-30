@@ -7,6 +7,7 @@ import { resourceTemplateById } from '@/shared/templates/resource-template';
 import { gatheringSkillKeysValues, skillsTemplate } from '@/shared/templates/skill-template';
 import { toolTemplateByKey } from '@/shared/templates/tool-template';
 import {
+  type BattleDto,
   type ErrorResponse,
   type Hero,
   type ItemInstance,
@@ -29,7 +30,6 @@ import {
   buildPathWithObstacles,
   getHeroStateWithGatherSkillKey,
   getMapLayerNameAtHeroPos,
-  getNonZeroModifiers,
   getStateWithCraftBuildingType,
   getStateWithRefiningBuildingKey,
   getTilesAroundHero,
@@ -43,6 +43,7 @@ import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 
 import { io } from '..';
+import { getModifiers } from '../../frontend/src/lib/utils';
 import { socketEvents } from '../../shared/socket-events';
 import type { Context } from '../context';
 import { db } from '../db/db';
@@ -140,7 +141,6 @@ export const heroRouter = new Hono<Context>()
       verifyHeroOwnership({ heroUserId: stateHero?.userId, userId });
       stateHero.offlineTimer = undefined;
       const { paths, offlineTimer, selectedGatherTile, ...returnData } = stateHero;
-     
 
       return c.json<SuccessResponse<typeof returnData>>({
         success: true,
@@ -1482,15 +1482,21 @@ export const heroRouter = new Hono<Context>()
       const hero = heroService.getHero(id);
 
       const battle = battleService.getBattle(battleId);
-      console.log(battle);
       if (!battle.participants.some((p) => p.id === hero.id)) {
         throw new HTTPException(400, { message: 'You not a participant this battle' });
       }
+      const copyBattle: BattleDto = {
+        ...battle,
+        participants: battle.participants.map((p) => {
+          const modifier = Object.fromEntries(getModifiers(p.modifier).map((m) => [m.key, m.value]));
+          return { ...p, modifier };
+        }),
+      };
 
-      return c.json<SuccessResponse<typeof battle>>({
+      return c.json<SuccessResponse<typeof copyBattle>>({
         message: 'battle fetched!',
         success: true,
-        data: battle,
+        data: copyBattle,
       });
     },
   )

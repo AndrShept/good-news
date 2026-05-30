@@ -738,6 +738,15 @@ export type Battle = {
   logs: BattleLog[];
   participants: BattleParticipant[];
 };
+export type BattleDto = {
+  id: string;
+  status: BattleStatusType;
+  currentRound: number;
+  roundEndsAt: number;
+  pendingActions: BattleAction[];
+  logs: BattleLog[];
+  participants: BattleParticipantDto[];
+};
 
 export type BattleAction = {
   id: string;
@@ -749,7 +758,7 @@ export type BattleAction = {
   defenseZone: SelectedDefenseZone;
   abilityId?: string;
 };
-
+export type BattleParticipantDto = Omit<BattleParticipant, 'modifier'> & { modifier: Partial<Modifier> };
 export type BattleParticipant = Pick<
   Hero,
   | 'id'
@@ -787,14 +796,7 @@ export type ApiGetCraftItemsResponse = InferResponseType<(typeof client.craft.it
 // export type ApiGetCraftItemResponse = InferResponseType<(typeof client)['craft']['items'][':buildingType']['$get']>['data'];
 export type ApiGetShopItemTemplateResponse = InferResponseType<(typeof client)['shop'][':buildingType']['$get']>['data'];
 
-export type IHeroStat = {
-  strength: number;
-  dexterity: number;
-  intelligence: number;
-  wisdom: number;
-  constitution: number;
-  luck: number;
-};
+export type IHeroStat = Pick<Modifier, 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'constitution' | 'luck'>;
 export type THeroRegen = {
   healthAcc: number;
   manaAcc: number;

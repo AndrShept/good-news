@@ -2,6 +2,7 @@ import { GameAvatar } from '@/components/GameAvatar';
 import { BattleParticipantModifierInfo } from '@/features/battle/components/BattleParticipantModifierInfo';
 import { BuffInstance, Modifier } from '@/shared/types';
 
+import { useHeroId } from '../hooks/useHeroId';
 import { BuffList } from './BuffList';
 import { FillBar } from './FillBar';
 
@@ -19,6 +20,8 @@ interface Props {
 }
 
 export const CharacterStatusBar = (props: Props) => {
+  const heroId = useHeroId();
+  const isSelfHero = heroId === props.id;
   return (
     <div className="flex w-full items-center gap-2">
       {props.avatarImage && (
@@ -30,7 +33,7 @@ export const CharacterStatusBar = (props: Props) => {
         <div className="flex gap-1">
           <span className="mr-1">{props.name}</span>
           {props.level && <span className="text-muted-foreground">lvl:{props.level}</span>}
-          {props.modifier && <BattleParticipantModifierInfo modifier={props.modifier} />}
+          {props.modifier  && <BattleParticipantModifierInfo modifier={props.modifier} />}
         </div>
 
         <FillBar value={props.currentHealth} type="health" maxValue={props.maxHealth} />

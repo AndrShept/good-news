@@ -27,7 +27,7 @@ export const PotionInfo = ({ potionInfo }: Props) => {
         </div>
       )}
 
-      {potionInfo.buffTemplateId && <ModifierInfoCard modifiersArgs={[buffTemplateById[potionInfo.buffTemplateId].modifier]} />}
+      {potionInfo.buffTemplateId && <ModifierInfoCard modifiers={[buffTemplateById[potionInfo.buffTemplateId].modifier]} />}
     </>
   );
 };

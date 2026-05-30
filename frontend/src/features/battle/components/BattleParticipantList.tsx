@@ -1,8 +1,8 @@
-import { BattleParticipant } from '@/shared/types';
+import { BattleParticipant, BattleParticipantDto } from '@/shared/types';
 
 interface Props {
-  attackers: BattleParticipant[] | undefined;
-  defenders: BattleParticipant[] | undefined;
+  attackers: BattleParticipantDto[] | undefined;
+  defenders: BattleParticipantDto[] | undefined;
 }
 
 export const BattleParticipantList = ({ attackers, defenders }: Props) => {

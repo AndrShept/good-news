@@ -25,7 +25,7 @@ export const ItemInstanceCardHoverTooltip = (props: Props) => {
       {props.itemTemplate.description && <p className="text-muted-foreground text-wrap text-center">{props.itemTemplate.description}</p>}
       <EquipInfo minDamage={props.modifier?.minDamage} maxDamage={props.modifier?.maxDamage} equipInfo={props.itemTemplate.equipInfo} />
       {!!props.itemTemplate.potionInfo && <PotionInfo potionInfo={props.itemTemplate.potionInfo} />}
-      <ModifierInfoCard modifiersArgs={[props.modifier ?? {}]} />
+      <ModifierInfoCard modifiers={[props.modifier ?? {}]} />
     </>
   );
-}
+};

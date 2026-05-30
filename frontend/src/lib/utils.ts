@@ -52,39 +52,46 @@ export const toastError = (msg = 'Something went wrong') => {
   toast.error(msg);
 };
 
-export const modifierStringName = {
-  strength: 'strength',
-  dexterity: 'dexterity',
-  intelligence: 'intelligence',
-  wisdom: 'wisdom',
-  constitution: 'constitution',
-  luck: 'luck',
-  maxHealth: 'max health',
-  maxMana: 'max mana',
-  minDamage: 'min damage',
-  maxDamage: 'max damage',
-  manaRegen: 'mana regen',
-  healthRegen: 'health regen',
-  armor: 'armor',
-  magicResistance: 'magic resistance',
-  evasion: 'evasion',
-  spellDamage: 'spell damage',
-  spellCritDamage: 'spell crit damage',
-  spellCritRating: 'spell crit rating',
-  spellHitRating: 'spell hit rating',
-  spellPenetration: 'spell penetration',
-  physDamage: 'phys damage',
-  physCritDamage: 'phys crit damage',
-  physCritRating: 'phys crit rating',
-  physHitRating: 'phys hit rating',
-  physPenetration: 'phys penetration',
-} as const satisfies Record<keyof Modifier, string>;
+const modifierNameSortNumber = {
+  strength: { name: 'strength', sortNumber: 1 },
+  dexterity: { name: 'dexterity', sortNumber: 2 },
+  intelligence: { name: 'intelligence', sortNumber: 3 },
+  wisdom: { name: 'wisdom', sortNumber: 4 },
+  constitution: { name: 'constitution', sortNumber: 5 },
+  luck: { name: 'luck', sortNumber: 6 },
+
+  armor: { name: 'armor', sortNumber: 7 },
+  evasion: { name: 'evasion', sortNumber: 8 },
+  magicResistance: { name: 'magic resistance', sortNumber: 9 },
+
+  maxHealth: { name: 'max health', sortNumber: 10 },
+  maxMana: { name: 'max mana', sortNumber: 11 },
+  minDamage: { name: 'min damage', sortNumber: 12 },
+  maxDamage: { name: 'max damage', sortNumber: 13 },
+  manaRegen: { name: 'mana regen', sortNumber: 14 },
+  healthRegen: { name: 'health regen', sortNumber: 15 },
+
+  spellDamage: { name: 'spell damage', sortNumber: 16 },
+  spellCritDamage: { name: 'spell crit damage', sortNumber: 17 },
+  spellCritRating: { name: 'spell crit rating', sortNumber: 18 },
+  spellHitRating: { name: 'spell hit rating', sortNumber: 19 },
+  spellPenetration: { name: 'spell penetration', sortNumber: 20 },
+
+  physDamage: { name: 'phys damage', sortNumber: 21 },
+  physCritDamage: { name: 'phys crit damage', sortNumber: 22 },
+  physCritRating: { name: 'phys crit rating', sortNumber: 23 },
+  physHitRating: { name: 'phys hit rating', sortNumber: 24 },
+  physPenetration: { name: 'phys penetration', sortNumber: 25 },
+} as const satisfies Record<keyof Modifier, { name: string; sortNumber: number }>;
 
 export const getModifierName = (modifier: keyof Modifier) => {
-  return modifierStringName[modifier];
+  return modifierNameSortNumber[modifier].name;
+};
+export const getModifierSortNumber = (modifier: keyof Modifier) => {
+  return modifierNameSortNumber[modifier].sortNumber;
 };
 
-export const getModifiers = (...args: Partial<Modifier | undefined>[]) => {
+export const getModifiers = (modifier: Partial<Modifier | undefined>, option?: Partial<Record<keyof Modifier, boolean>>) => {
   const baseModifier: Omit<Modifier, 'minDamage' | 'maxDamage'> = {
     spellDamage: 0,
     physDamage: 0,
@@ -110,15 +117,26 @@ export const getModifiers = (...args: Partial<Modifier | undefined>[]) => {
     physHitRating: 0,
     physPenetration: 0,
   };
-  for (const item of args) {
-    for (const key in baseModifier) {
-      if (!item) continue;
-      const typedKey = key as keyof Omit<Modifier, 'minDamage' | 'maxDamage'>;
-      baseModifier[typedKey] += item[typedKey] ?? 0;
-    }
+
+  for (const key in baseModifier) {
+    if (!modifier) continue;
+    const typedKey = key as keyof Omit<Modifier, 'minDamage' | 'maxDamage'>;
+    baseModifier[typedKey] += modifier[typedKey] ?? 0;
   }
 
-  return Object.entries(baseModifier).map(([key, value]) => ({ name: getModifierName(key as keyof Modifier), value }));
+  const modifiers = Object.entries(baseModifier).map(([key, value]) => ({
+    name: getModifierName(key as keyof Modifier),
+    value,
+    key,
+    sortNumber: getModifierSortNumber(key as keyof Modifier),
+  }));
+  const options = option
+    ? Object.entries(option)
+        .filter(([key, value]) => value)
+        .map(([key, value]) => key)
+    : [];
+  const filteredModifiers = modifiers.filter((m) => options.includes(m.key));
+  return option ? filteredModifiers : modifiers;
 };
 
 export function capitalize(text: string | undefined) {

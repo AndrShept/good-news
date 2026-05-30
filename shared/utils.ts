@@ -304,7 +304,3 @@ export const sumAllModifier = <T extends Partial<Modifier> | null | undefined>(.
   }
   return result;
 };
-
-export const getNonZeroModifiers = (modifier: Modifier) => {
-  return Object.fromEntries(Object.entries(modifier).filter(([key, value]) => !!value));
-};
