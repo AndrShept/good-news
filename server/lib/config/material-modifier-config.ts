@@ -65,7 +65,7 @@ export const materialModifierConfig: IMaterialModifierConfig = {
 
     GOLD_INGOT: {
       magicResistance: 25,
-      maxMana: 40,
+      bonusMaxMana: 40,
     },
 
     MITHRIL_INGOT: {
@@ -76,7 +76,7 @@ export const materialModifierConfig: IMaterialModifierConfig = {
 
     ADAMANTINE_INGOT: {
       armor: 50,
-      maxHealth: 80,
+      bonusMaxHealth: 80,
       magicResistance: 30,
     },
     REGULAR_PLANK: {
@@ -85,13 +85,13 @@ export const materialModifierConfig: IMaterialModifierConfig = {
 
     PINE_PLANK: {
       armor: 6,
-      maxMana: 30,
+      bonusMaxMana: 30,
       manaRegen: 5,
     },
 
     OAK_PLANK: {
       armor: 10,
-      maxHealth: 20,
+      bonusMaxHealth: 20,
     },
 
     ASH_PLANK: {
@@ -106,7 +106,7 @@ export const materialModifierConfig: IMaterialModifierConfig = {
 
     MAHOGANY_PLANK: {
       magicResistance: 15,
-      maxMana: 50,
+      bonusMaxMana: 50,
     },
 
     EBONY_PLANK: {
@@ -114,7 +114,7 @@ export const materialModifierConfig: IMaterialModifierConfig = {
     },
 
     BLOOD_PLANK: {
-      maxHealth: 30,
+      bonusMaxHealth: 30,
       healthRegen: 10,
     },
 
@@ -131,7 +131,7 @@ export const materialModifierConfig: IMaterialModifierConfig = {
 
       COPPER_INGOT: {
         armor: 20,
-        maxHealth: 20,
+        bonusMaxHealth: 20,
       },
 
       SILVER_INGOT: {
@@ -142,12 +142,12 @@ export const materialModifierConfig: IMaterialModifierConfig = {
       GOLD_INGOT: {
         armor: 18,
         magicResistance: 30,
-        maxMana: 30,
+        bonusMaxMana: 30,
       },
 
       MITHRIL_INGOT: {
         armor: 25,
-        maxHealth: 40,
+        bonusMaxHealth: 40,
         magicResistance: 20,
         manaRegen: -5,
         dexterity: -5,
@@ -155,7 +155,7 @@ export const materialModifierConfig: IMaterialModifierConfig = {
 
       ADAMANTINE_INGOT: {
         armor: 40,
-        maxHealth: 80,
+        bonusMaxHealth: 80,
         magicResistance: 30,
         manaRegen: -10,
         dexterity: -10,
@@ -193,7 +193,7 @@ export const materialModifierConfig: IMaterialModifierConfig = {
         armor: 25,
         physHitRating: 25,
         physCritRating: 20,
-        maxHealth: 20,
+        bonusMaxHealth: 20,
       },
     },
     LEATHER: {
@@ -231,7 +231,7 @@ export const materialModifierConfig: IMaterialModifierConfig = {
     },
     CLOTH: {
       REGULAR_CLOTH: {
-        maxMana: 40,
+        bonusMaxMana: 40,
         manaRegen: 5,
       },
     },
@@ -249,7 +249,7 @@ export const materialModifierConfig: IMaterialModifierConfig = {
 
     OAK_PLANK: {
       spellDamage: 6,
-      maxHealth: 20,
+      bonusMaxHealth: 20,
     },
 
     ASH_PLANK: {
@@ -262,7 +262,7 @@ export const materialModifierConfig: IMaterialModifierConfig = {
     },
 
     MAHOGANY_PLANK: {
-      maxMana: 50,
+      bonusMaxMana: 50,
       manaRegen: 10,
     },
 

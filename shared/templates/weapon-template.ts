@@ -8,14 +8,11 @@ export const weaponTemplate = [
     image: '/sprites/equipments/swords/Icon1.jpg',
     type: 'WEAPON',
     stackable: false,
+    minDamage: 10,
+    maxDamage: 17,
     equipInfo: {
       weaponHand: 'ONE_HANDED',
       weaponType: 'SWORD',
-    },
-
-    modifier: {
-      minDamage: 10,
-      maxDamage: 17,
     },
   },
 ] as const satisfies ItemTemplate[];

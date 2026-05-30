@@ -1,11 +1,29 @@
-import type { BattleZoneType, DamageType, HandResult, Modifier, SelectedAttackingZone, SelectedDefenseZone } from '@/shared/types';
+import type {
+  BattleZoneType,
+  DamageType,
+  HandResult,
+  HitResult,
+  ItemInstance,
+  Modifier,
+  SelectedAttackingZone,
+  SelectedDefenseZone,
+} from '@/shared/types';
 
 import { clamp } from '../lib/utils';
+import { itemTemplateService } from './item-template-service';
 
 interface IsDodgedParam {
   attackerModifier: Modifier;
   defenderModifier: Modifier;
   damageType: DamageType;
+}
+
+interface CalculatePhysicalDamageParam {
+  attackerModifier: Modifier;
+  defenderModifier: Modifier;
+  isCritical: boolean;
+  equipments: ItemInstance[];
+  hitHand: keyof HitResult;
 }
 
 export const battleCalculateService = {
@@ -50,17 +68,24 @@ export const battleCalculateService = {
     }
     return attackZone === defendZone;
   },
-  calculatePhysicalDamage(attackerModifier: Modifier, defenderModifier: Modifier, isCritical: boolean) {
-    // базовий дамаг між min і max
+  calculatePhysicalDamage({ attackerModifier, defenderModifier, isCritical, equipments, hitHand }: CalculatePhysicalDamageParam) {
     let baseDamage = 0;
+    const equipWeapon = equipments.find((e) => e.slot === hitHand);
 
-    if (!attackerModifier.maxDamage) {
-      // нема зброї — рукопашний бій
-      const wrestlingBase = 2 + Math.floor(attackerModifier.strength * 0.15);
-      baseDamage = wrestlingBase + Math.random() * wrestlingBase;
-    } else {
-      baseDamage = attackerModifier.minDamage + Math.random() * (attackerModifier.maxDamage - attackerModifier.minDamage);
+    if (equipWeapon) {
+      const weaponTemplate = itemTemplateService.getTemplateByItemTemplateId(equipWeapon.itemTemplateId);
+      const weaponBase =
+        (weaponTemplate.minDamage ?? 0) + Math.random() * ((weaponTemplate.maxDamage ?? 0) - (weaponTemplate.minDamage ?? 0));
+    
+      baseDamage = weaponBase + Math.floor(attackerModifier.strength * 0.15);
     }
+
+    if (!equipWeapon) {
+      // нема зброї — рукопашний бій
+      const wrestlingBase = 2 + Math.floor(attackerModifier.strength * 0.18);
+      baseDamage = wrestlingBase + Math.random() * wrestlingBase;
+    }
+
     // physDamage додає % до базового дамагу
     const withPhysDamage = baseDamage * (1 + attackerModifier.physDamage / 100);
 

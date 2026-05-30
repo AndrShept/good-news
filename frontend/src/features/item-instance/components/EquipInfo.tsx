@@ -3,8 +3,8 @@ import React from 'react';
 
 interface Props {
   equipInfo: TEquipInfo | undefined;
-  minDamage: number | undefined;
-  maxDamage: number | undefined;
+  minDamage: number | null;
+  maxDamage: number | null;
 }
 export const EquipInfo = ({ equipInfo, maxDamage, minDamage }: Props) => {
   return (

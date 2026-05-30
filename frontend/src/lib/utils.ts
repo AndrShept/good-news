@@ -64,10 +64,9 @@ const modifierNameSortNumber = {
   evasion: { name: 'evasion', sortNumber: 8 },
   magicResistance: { name: 'magic resistance', sortNumber: 9 },
 
-  maxHealth: { name: 'max health', sortNumber: 10 },
-  maxMana: { name: 'max mana', sortNumber: 11 },
-  minDamage: { name: 'min damage', sortNumber: 12 },
-  maxDamage: { name: 'max damage', sortNumber: 13 },
+  bonusMaxHealth: { name: 'max health', sortNumber: 10 },
+  bonusMaxMana: { name: 'max mana', sortNumber: 11 },
+
   manaRegen: { name: 'mana regen', sortNumber: 14 },
   healthRegen: { name: 'health regen', sortNumber: 15 },
 
@@ -92,7 +91,7 @@ export const getModifierSortNumber = (modifier: keyof Modifier) => {
 };
 
 export const getModifiers = (modifier: Partial<Modifier | undefined>, option?: Partial<Record<keyof Modifier, boolean>>) => {
-  const baseModifier: Omit<Modifier, 'minDamage' | 'maxDamage'> = {
+  const baseModifier: Modifier = {
     spellDamage: 0,
     physDamage: 0,
     strength: 0,
@@ -101,8 +100,8 @@ export const getModifiers = (modifier: Partial<Modifier | undefined>, option?: P
     intelligence: 0,
     constitution: 0,
     luck: 0,
-    maxHealth: 0,
-    maxMana: 0,
+    bonusMaxHealth: 0,
+    bonusMaxMana: 0,
     manaRegen: 0,
     healthRegen: 0,
     armor: 0,

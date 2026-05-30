@@ -15,6 +15,7 @@ export const TurnButton = ({ selectedAttackingZone, selectedDefenseZone, targetI
   const heroId = useHeroId();
   return (
     <Button
+      className="w-1/2"
       disabled={isPending}
       onClick={() => {
         mutate({ attackingZone: selectedAttackingZone, defenseZone: selectedDefenseZone, heroId, targetId });

@@ -40,7 +40,7 @@ export const resourceCategoryEnum = pgEnum('resource_category_enum', [
   'FUR',
   'CURED_FUR',
   'BONE',
-  'FISH'
+  'FISH',
 ]);
 
 export const oreValues = ['IRON_ORE', 'COPPER_ORE', 'SILVER_ORE', 'GOLD_ORE', 'MITHRIL_ORE', 'ADAMANTINE_ORE'] as const;
@@ -189,6 +189,8 @@ export const itemInstanceTable = pgTable('item_instance', {
   itemTemplateId: uuid().notNull(),
   location: itemLocationEnum().notNull(),
   coreResource: coreResourceTypeEnum(),
+  minDamage: integer(),
+  maxDamage: integer(),
   modifier: jsonb('modifier').$type<Partial<Modifier>>(),
   durability: jsonb('durability').$type<ItemDurability>(),
   slot: slotEnum(),

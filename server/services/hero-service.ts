@@ -84,8 +84,8 @@ export const heroService = {
     const hero = this.getHero(heroId);
     const { sumModifier, sumStatAndModifier } = this.getHeroStatsWithModifiers(heroId);
     const { maxHealth, maxMana } = this.calculateMaxValues({
-      bonusMaxHealth: sumStatAndModifier.maxHealth,
-      bonusMaxMana: sumStatAndModifier.maxMana,
+      bonusMaxHealth: sumStatAndModifier.bonusMaxHealth,
+      bonusMaxMana: sumStatAndModifier.bonusMaxMana,
       constitution: sumStatAndModifier.constitution,
       wisdom: sumStatAndModifier.wisdom,
     });

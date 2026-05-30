@@ -3,7 +3,7 @@ import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { getTimeFns } from '@/lib/utils';
 import { imageConfig } from '@/shared/config/image-config';
 import { BattleLog, HandResult } from '@/shared/types';
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 
 import { useBattle } from '../hooks/useBattle';
 import { BattleLogIcon } from './BattleLogIcon';
@@ -24,7 +24,7 @@ export const BattleLogList = () => {
   );
 };
 
-const BattleLogCard = ({ log, heroId }: { log: BattleLog; heroId: string }) => {
+const BattleLogCard = memo(({ log, heroId }: { log: BattleLog; heroId: string }) => {
   const defZone = Array.isArray(log.defendZone) ? log.defendZone.join('/') : log.defendZone;
   const hand = log.hand === 'LEFT_HAND' ? 'L' : 'R';
   const isHero = log.attackerId === heroId;
@@ -52,4 +52,4 @@ const BattleLogCard = ({ log, heroId }: { log: BattleLog; heroId: string }) => {
       )}
     </li>
   );
-};
+});

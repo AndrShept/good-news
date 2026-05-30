@@ -30,9 +30,7 @@ export const CharacterModifier = memo((props: Props) => {
       <Separator />
       <div className="text-muted-foreground">
         <p className="mb-1 text-amber-300">PHYS</p>
-        <p>
-          <span>damage:</span> {props.minDamage} - {props.maxDamage}
-        </p>
+ 
         <p>
           <span>phys damage:</span> {props.physDamage}
         </p>

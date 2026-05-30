@@ -219,20 +219,23 @@ export type Modifier = {
   wisdom: number;
   constitution: number;
   luck: number;
-  maxHealth: number;
-  maxMana: number;
-  maxDamage: number;
-  minDamage: number;
+
+  bonusMaxHealth: number;
+  bonusMaxMana: number;
+
   manaRegen: number;
   healthRegen: number;
+
   armor: number;
   magicResistance: number;
   evasion: number;
+
   spellDamage: number;
   spellCritDamage: number;
   spellCritRating: number;
   spellHitRating: number;
   spellPenetration: number;
+
   physDamage: number;
   physCritDamage: number;
   physCritRating: number;
@@ -513,7 +516,8 @@ export type ItemTemplate = {
   stackable: boolean;
   description?: string;
   maxStack?: number;
-
+  minDamage?: number;
+  maxDamage?: number;
   equipInfo?: EquipInfo;
   resourceInfo?: ResourceInfo;
   bookInfo?: BookInfo;
@@ -599,7 +603,7 @@ export type CreatureTemplate = {
   maxHealth: number;
   currentMana: number;
   maxMana: number;
-
+  equipments: ItemInstance[];
   modifier: Modifier;
 };
 export type CreatureInstance = CreatureTemplate & {

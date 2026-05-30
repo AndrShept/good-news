@@ -39,6 +39,7 @@ interface CheckHitParams {
   attackerModifier: Modifier;
   defenderModifier: Modifier;
   damageType: DamageType;
+  equipments: ItemInstance[];
 }
 
 interface GetBattleLogParam {
@@ -224,6 +225,7 @@ export const battleService = {
       attackerModifier: firstParticipant.modifier,
       defenderModifier: secondParticipant.modifier,
       damageType: 'PHYSICAL',
+      equipments: firstParticipant.equipments,
     });
     const secondHitResult = this.checkHitResult({
       attackZone: secondAction.attackingZone,
@@ -231,6 +233,7 @@ export const battleService = {
       attackerModifier: secondParticipant.modifier,
       defenderModifier: firstParticipant.modifier,
       damageType: 'PHYSICAL',
+      equipments: secondParticipant.equipments,
     });
 
     const firstBattleLog = this.getBattleLog({
@@ -274,7 +277,7 @@ export const battleService = {
     socketService.sendToClientBattleUpdate(battle.id, { type: 'ACTIONS_REMOVE', payload: [firstAction.id, secondAction.id] });
   },
 
-  checkHitResult({ attackZone, defendZone, attackerModifier, defenderModifier, damageType }: CheckHitParams): HitResult {
+  checkHitResult({ attackZone, defendZone, attackerModifier, defenderModifier, damageType, equipments }: CheckHitParams): HitResult {
     const hitResult: HitResult = {
       LEFT_HAND: { hit: null, handResult: null, giveDamage: 0, isCriticalDamage: false },
       RIGHT_HAND: { hit: null, handResult: null, giveDamage: 0, isCriticalDamage: false },
@@ -300,7 +303,13 @@ export const battleService = {
 
       const isCritical = battleCalculateService.isCriticalHit(attackerModifier, defenderModifier, damageType);
       hitResult[hand].handResult = 'HIT';
-      hitResult[hand].giveDamage = battleCalculateService.calculatePhysicalDamage(attackerModifier, defenderModifier, isCritical);
+      hitResult[hand].giveDamage = battleCalculateService.calculatePhysicalDamage({
+        attackerModifier,
+        defenderModifier,
+        isCritical,
+        equipments,
+        hitHand: hand,
+      });
     }
 
     return hitResult;

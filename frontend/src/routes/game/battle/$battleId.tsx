@@ -37,28 +37,27 @@ function RouteComponent() {
   const setConsoleActiveTab = useGameUIStore((state) => state.setConsoleActiveTab);
 
   useEffect(() => {
-
     return () => {
       setConsoleActiveTab('CHAT');
     };
   }, []);
-  if (!selfParticipant || !targetParticipant || !battle) return;
+  if (!selfParticipant || !battle) return;
 
   return (
     <section className="mx-auto flex w-full max-w-5xl flex-col items-center p-2">
       <div className="flex w-full justify-between gap-1">
         <BattleParticipantCard {...selfParticipant} />
-        <div className="flex flex-col gap-1">
-          <ZoneSelector
-            isEquipLeftHandWeapon={isEquipLeftHandWeapon}
-            isEquipRightHandWeapon={isEquipRightHandWeapon}
-            isEquipShield={isEquipShield}
-            currentRound={battle.currentRound}
-            roundEndsAt={battle.roundEndsAt}
-            targetId={selfParticipant.targetId ?? ''}
-          />
-        </div>
-        <BattleParticipantCard {...targetParticipant} />
+
+        <ZoneSelector
+          isEquipLeftHandWeapon={isEquipLeftHandWeapon}
+          isEquipRightHandWeapon={isEquipRightHandWeapon}
+          isEquipShield={isEquipShield}
+          currentRound={battle.currentRound}
+          roundEndsAt={battle.roundEndsAt}
+          targetId={selfParticipant.targetId ?? ''}
+        />
+
+        {targetParticipant && <BattleParticipantCard {...targetParticipant} />}
       </div>
 
       <BattleParticipantList attackers={attackers} defenders={defenders} />

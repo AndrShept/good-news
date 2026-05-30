@@ -1,5 +1,6 @@
 import { resourceTemplateById } from '@/shared/templates/resource-template';
 import type { CoreResourceType, ItemInstance, ItemLocationType, ItemsInstanceDeltaEvent, Modifier, WeaponType } from '@/shared/types';
+import { sumAllModifier } from '@/shared/utils';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
@@ -11,7 +12,6 @@ import { heroService } from './hero-service';
 import { itemContainerService } from './item-container-service';
 import { itemTemplateService } from './item-template-service';
 import { queueCraftService } from './queue-craft-service';
-import { sumAllModifier } from '@/shared/utils';
 
 interface ICreateItem {
   itemTemplateId: string;
@@ -62,6 +62,8 @@ export const itemInstanceService = {
       itemTemplateId,
       ownerHeroId: heroId,
       marketPrice: null,
+      minDamage: craftItem.minDamage ?? null,
+      maxDamage: craftItem.maxDamage ?? null,
       modifier: finalModifier ?? (craftItem.modifier ? craftItem.modifier : null),
       coreResource,
       slot: null,

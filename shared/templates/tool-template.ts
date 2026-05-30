@@ -11,18 +11,14 @@ export const toolsTemplate = [
     image: imageConfig.equipments.tools['blacksmith-hammer'],
     type: 'TOOL',
     stackable: false,
-
+    minDamage: 5,
+    maxDamage: 9,
     equipInfo: {
       weaponHand: 'ONE_HANDED',
       weaponType: 'MACE',
     },
     toolInfo: {
       skillTemplateId: skillTemplateByKey.BLACKSMITHING.id,
-    },
-
-    modifier: {
-      minDamage: 5,
-      maxDamage: 9,
     },
   },
   {
@@ -32,18 +28,14 @@ export const toolsTemplate = [
     image: imageConfig.equipments.tools['fishing-rod'],
     type: 'TOOL',
     stackable: false,
-
+    minDamage: 5,
+    maxDamage: 9,
     equipInfo: {
       weaponHand: 'TWO_HANDED',
       weaponType: 'STAFF',
     },
     toolInfo: {
       skillTemplateId: skillTemplateByKey.FISHING.id,
-    },
-
-    modifier: {
-      minDamage: 5,
-      maxDamage: 9,
     },
   },
   {
@@ -53,18 +45,14 @@ export const toolsTemplate = [
     image: imageConfig.equipments.tools['lumber-axe'],
     type: 'TOOL',
     stackable: false,
-
+    minDamage: 5,
+    maxDamage: 7,
     equipInfo: {
       weaponHand: 'ONE_HANDED',
       weaponType: 'AXE',
     },
     toolInfo: {
       skillTemplateId: skillTemplateByKey.WOODCUTTING.id,
-    },
-
-    modifier: {
-      minDamage: 5,
-      maxDamage: 7,
     },
   },
   {
@@ -74,18 +62,14 @@ export const toolsTemplate = [
     image: imageConfig.equipments.tools['mining-pickaxe'],
     type: 'TOOL',
     stackable: false,
-
+    minDamage: 4,
+    maxDamage: 7,
     equipInfo: {
       weaponHand: 'ONE_HANDED',
       weaponType: 'SWORD',
     },
     toolInfo: {
       skillTemplateId: skillTemplateByKey.MINING.id,
-    },
-
-    modifier: {
-      minDamage: 4,
-      maxDamage: 7,
     },
   },
 ] as const satisfies ItemTemplate[];
