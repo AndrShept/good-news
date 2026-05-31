@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { imageConfig } from '@/shared/config/image-config';
 import { SelectedAttackingZone, SelectedDefenseZone } from '@/shared/types';
 import { getAttackingRandomZone, getDefenseRandomZone } from '@/shared/utils';
+import { useGameUIStore } from '@/store/useGameUIStore';
 import { useIsMutating } from '@tanstack/react-query';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 
@@ -21,7 +22,8 @@ export const AutoZoneSelectorButton = ({
   setSelectedAttackingZone,
   setSelectedDefenseZone,
 }: Props) => {
-  const [isChecked, setIsChecked] = useState(false);
+  const isAutoZoneChecked = useGameUIStore((state) => state.isAutoZoneChecked);
+  const setIsAutoZoneChecked = useGameUIStore((state) => state.setIsAutoZoneChecked);
   const disabled = !!useIsMutating();
   const onRandom = useCallback(() => {
     const attackingZone = getAttackingRandomZone({ isEquipLeftHandWeapon, isEquipRightHandWeapon });
@@ -31,13 +33,19 @@ export const AutoZoneSelectorButton = ({
   }, [isEquipLeftHandWeapon, isEquipRightHandWeapon, isEquipShield, setSelectedAttackingZone, setSelectedDefenseZone]);
 
   useEffect(() => {
-    if (isChecked) {
+    if (!disabled && isAutoZoneChecked) {
       onRandom();
     }
-  }, [disabled]);
+  }, [disabled, isAutoZoneChecked, onRandom]);
   return (
     <div className="flex items-center gap-1">
-      <Input checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)} className="size-4.5" type="checkbox" />
+      <Input
+        title="auto zone"
+        checked={isAutoZoneChecked}
+        onChange={(e) => setIsAutoZoneChecked(e.target.checked)}
+        className="size-4.5"
+        type="checkbox"
+      />
       <Button disabled={disabled} onClick={onRandom} variant="outline" size="icon">
         <GameIcon className="size-4" image={imageConfig.icon.ui.refresh} />
       </Button>

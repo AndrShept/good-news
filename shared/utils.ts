@@ -249,6 +249,12 @@ export const getAttackingRandomZone = ({
 }): SelectedAttackingZone => {
   const randomLeft = Math.floor(Math.random() * battleZoneValues.length);
   const randomRight = Math.floor(Math.random() * battleZoneValues.length);
+  if (!isEquipLeftHandWeapon && !isEquipRightHandWeapon) {
+    return {
+      LEFT_HAND: null,
+      RIGHT_HAND: battleZoneValues[randomRight],
+    };
+  }
   return {
     LEFT_HAND: isEquipLeftHandWeapon ? battleZoneValues[randomLeft] : null,
     RIGHT_HAND: isEquipRightHandWeapon ? battleZoneValues[randomRight] : null,

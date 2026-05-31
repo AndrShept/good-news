@@ -12,15 +12,16 @@ export const battleTick = (now: number) => {
           a.actionType === 'NORMAL',
       );
       if (findResolveActionOpponent) {
-      
         battleService.resolveActionPair(battle, action, findResolveActionOpponent);
       }
     }
+
     for (const participant of battle.participants) {
       if (participant.currentHealth <= 0) {
-        participant.isAlive = false;
-        const aliveAttackers = battle.participants.filter((p) => p.side === 'ATTACKER' && p.isAlive);
-        const aliveDefenders = battle.participants.filter((p) => p.side === 'DEFENDER' && p.isAlive);
+        battleService.onParticipantDead(participant, battle);
+
+        const aliveAttackers = battle.participants.filter((p) => p.side === 'ATTACKER' && !p.isDead);
+        const aliveDefenders = battle.participants.filter((p) => p.side === 'DEFENDER' && !p.isDead);
 
         if (!aliveAttackers.length || !aliveDefenders.length) {
           battle.status = 'FINISHED';

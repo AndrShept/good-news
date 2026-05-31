@@ -688,6 +688,8 @@ export type BattleLog = {
   defenderName: string;
   defendZone: SelectedDefenseZone;
   giveDamage: number;
+  defenderCurrentHealth: number;
+  defenderMaxHealth: number;
   attackingZone: BattleZoneType | null;
   hand: keyof HitResult;
   isMissed: boolean;
@@ -782,7 +784,7 @@ export type BattleParticipant = Pick<
   modifier: Modifier;
   type: BattleParticipantType;
   side: BattleSide;
-  isAlive: boolean;
+  isDead: boolean;
   targetId: string | null;
 };
 

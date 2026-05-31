@@ -17,7 +17,7 @@ import type {
   SelectedAttackingZone,
   SelectedDefenseZone,
 } from '@/shared/types';
-import { getAttackingRandomZone, getDefenseRandomZone } from '@/shared/utils';
+import { getAttackingRandomZone, getDefenseRandomZone, sumAllModifier } from '@/shared/utils';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
@@ -47,6 +47,8 @@ interface GetBattleLogParam {
   attacker: BattleParticipant;
   defender: BattleParticipant;
   defendZone: SelectedDefenseZone;
+  defenderCurrentHealth: number;
+  defenderMaxHealth: number;
 }
 
 export const battleService = {
@@ -63,7 +65,7 @@ export const battleService = {
   getRoundDuration() {
     return Date.now() + 90_000;
   },
-  getBattleLog({ attacker, defender, defendZone, hitResult }: GetBattleLogParam): BattleLog[] {
+  getBattleLog({ attacker, defender, defendZone, hitResult, defenderCurrentHealth, defenderMaxHealth }: GetBattleLogParam): BattleLog[] {
     const logs = (Object.keys(hitResult) as (keyof HitResult)[])
       .map((hand) => {
         const { hit, handResult, giveDamage, isCriticalDamage } = hitResult[hand];
@@ -75,6 +77,8 @@ export const battleService = {
           defenderId: defender.id,
           defenderName: defender.name,
           attackingZone: hit,
+          defenderCurrentHealth,
+          defenderMaxHealth,
           defendZone,
           hand,
           isBlocking: handResult === 'BLOCKED' ? true : false,
@@ -151,7 +155,7 @@ export const battleService = {
           stat: hero.stat,
           equipments: hero.equipments,
           buffs: hero.buffs,
-          isAlive: true,
+          isDead: false,
           targetId: null,
           side,
           type,
@@ -172,7 +176,7 @@ export const battleService = {
           modifier: creature.modifier,
           equipments: [],
           buffs: [],
-          isAlive: true,
+          isDead: false,
           targetId: null,
           side,
           type,
@@ -184,15 +188,16 @@ export const battleService = {
   setNextTargetParticipant(battle: Battle, participantId: string) {
     const participant = battle.participants.find((p) => p.id === participantId);
     if (!participant) return;
-    const enemies = battle.participants.filter((p) => p.side !== participant.side && p.isAlive);
+    const enemies = battle.participants.filter((p) => p.side !== participant.side && !p.isDead);
     const validTargets = enemies.filter((e) =>
       battle.pendingActions.some((a) => a.targetId !== e.id && a.participantId === participant.id),
     );
 
     const random = Math.floor(Math.random() * enemies.length);
-
+    if (!validTargets.length && !enemies.length) return;
     const targetId = validTargets.length ? validTargets[random].id : enemies[random].id;
     participant.targetId = targetId;
+    return participant;
   },
   createCreatureActionPending(battle: Battle, creatureParticipant: BattleParticipant, targetId: string) {
     const attackingZone = getAttackingRandomZone({ isEquipLeftHandWeapon: false, isEquipRightHandWeapon: true });
@@ -218,44 +223,50 @@ export const battleService = {
   resolveActionPair(battle: Battle, firstAction: BattleAction, secondAction: BattleAction) {
     const firstParticipant = this.getParticipant(battle, firstAction.participantId);
     const secondParticipant = this.getParticipant(battle, secondAction.participantId);
+    const firstSumModifier = sumAllModifier(firstParticipant.stat, firstParticipant.modifier);
+    const secondSumModifier = sumAllModifier(secondParticipant.stat, secondParticipant.modifier);
 
     const firstHitResult = this.checkHitResult({
       attackZone: firstAction.attackingZone,
       defendZone: secondAction.defenseZone,
-      attackerModifier: firstParticipant.modifier,
-      defenderModifier: secondParticipant.modifier,
+      attackerModifier: firstSumModifier,
+      defenderModifier: secondSumModifier,
       damageType: 'PHYSICAL',
       equipments: firstParticipant.equipments,
     });
     const secondHitResult = this.checkHitResult({
       attackZone: secondAction.attackingZone,
       defendZone: firstAction.defenseZone,
-      attackerModifier: secondParticipant.modifier,
-      defenderModifier: firstParticipant.modifier,
+      attackerModifier: secondSumModifier,
+      defenderModifier: firstSumModifier,
       damageType: 'PHYSICAL',
       equipments: secondParticipant.equipments,
     });
 
-    const firstBattleLog = this.getBattleLog({
-      attacker: firstParticipant,
-      defender: secondParticipant,
-      defendZone: secondAction.defenseZone,
-      hitResult: firstHitResult,
-    });
-    const secondBattleLog = this.getBattleLog({
-      attacker: secondParticipant,
-      defender: firstParticipant,
-      defendZone: firstAction.defenseZone,
-      hitResult: secondHitResult,
-    });
-
-    battle.logs.push(...[...firstBattleLog, ...secondBattleLog]);
     const firstCurrentHealth =
       firstParticipant.currentHealth - (secondHitResult.LEFT_HAND.giveDamage + secondHitResult.RIGHT_HAND.giveDamage);
     const secondCurrentHealth =
       secondParticipant.currentHealth - (firstHitResult.LEFT_HAND.giveDamage + firstHitResult.RIGHT_HAND.giveDamage);
     this.updateParticipant(firstParticipant, { currentHealth: firstCurrentHealth });
     this.updateParticipant(secondParticipant, { currentHealth: secondCurrentHealth });
+
+    const firstBattleLog = this.getBattleLog({
+      attacker: firstParticipant,
+      defender: secondParticipant,
+      defendZone: secondAction.defenseZone,
+      hitResult: firstHitResult,
+      defenderCurrentHealth: secondCurrentHealth,
+      defenderMaxHealth: secondParticipant.maxHealth,
+    });
+    const secondBattleLog = this.getBattleLog({
+      attacker: secondParticipant,
+      defender: firstParticipant,
+      defendZone: firstAction.defenseZone,
+      hitResult: secondHitResult,
+      defenderCurrentHealth: firstCurrentHealth,
+      defenderMaxHealth: firstParticipant.maxHealth,
+    });
+    battle.logs.push(...[...firstBattleLog, ...secondBattleLog]);
 
     socketService.sendToClientBattleUpdate(battle.id, {
       type: 'PARTICIPANT_UPDATE',
@@ -302,7 +313,9 @@ export const battleService = {
       }
 
       const isCritical = battleCalculateService.isCriticalHit(attackerModifier, defenderModifier, damageType);
+      console.log('isCritical', isCritical);
       hitResult[hand].handResult = 'HIT';
+      hitResult[hand].isCriticalDamage = isCritical;
       hitResult[hand].giveDamage = battleCalculateService.calculatePhysicalDamage({
         attackerModifier,
         defenderModifier,
@@ -316,5 +329,26 @@ export const battleService = {
   },
   updateParticipant(participant: BattleParticipant, updateData: Partial<BattleParticipant>) {
     Object.assign(participant, updateData);
+  },
+  onParticipantDead(deadParticipant: BattleParticipant, battle: Battle) {
+    deadParticipant.isDead = true;
+
+    const removeActionsId = battle.pendingActions.filter((a) => a.participantId === deadParticipant.id).map((a) => a.id);
+    battle.pendingActions = battle.pendingActions.filter((a) => a.participantId !== deadParticipant.id);
+
+    const participantsTargetingDead = battle.participants.filter((p) => p.targetId === deadParticipant.id);
+
+    for (const participant of participantsTargetingDead) {
+      this.setNextTargetParticipant(battle, participant.id);
+    }
+
+    socketService.sendToClientBattleUpdate(battle.id, {
+      type: 'ACTIONS_REMOVE',
+      payload: removeActionsId,
+    });
+    socketService.sendToClientBattleUpdate(battle.id, {
+      type: 'PARTICIPANT_UPDATE',
+      payload: [deadParticipant, ...participantsTargetingDead],
+    });
   },
 };

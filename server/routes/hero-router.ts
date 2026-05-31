@@ -1558,8 +1558,8 @@ export const heroRouter = new Hono<Context>()
       const targetParticipant = battleService.getParticipant(battle, targetId);
 
       if (battle.status !== 'IN_PROGRESS') throw new HTTPException(400, { message: 'Battle is already finished' });
-      if (!selfParticipant.isAlive) throw new HTTPException(400, { message: 'You are dead' });
-      if (!targetParticipant.isAlive) throw new HTTPException(400, { message: 'Target is already dead' });
+      if (selfParticipant.isDead) throw new HTTPException(400, { message: 'You are dead', cause: { canShow: true } });
+      if (targetParticipant.isDead) throw new HTTPException(400, { message: 'Target is already dead', cause: { canShow: true } });
 
       battle.pendingActions.push({
         id: generateRandomUuid(),

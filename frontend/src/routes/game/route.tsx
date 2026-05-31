@@ -41,6 +41,12 @@ export const Route = createFileRoute('/game')({
       hero,
     };
   },
+  onEnter: ({ context }) => {
+    const battleId = context.hero.battleId;
+    if (useGameUIStore.getState().consoleTab.active === 'LOG' && !battleId) {
+      useGameUIStore.getState().setConsoleTab({ active: useGameUIStore.getState().consoleTab.default });
+    }
+  },
 });
 
 function GameRouteComponent() {

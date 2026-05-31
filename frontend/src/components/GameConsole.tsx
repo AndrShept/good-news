@@ -11,7 +11,7 @@ import { useSelfMessage } from '@/features/hero/hooks/useSelfMessage';
 import { useMapListener } from '@/features/map/hooks/useMapListener';
 import { usePlaceListener } from '@/features/place/hooks/usePlaceListener';
 import { useQueueCraftListener } from '@/features/queue/hooks/useQueueCraftListener';
-import { ConsoleActiveTab, useGameUIStore } from '@/store/useGameUIStore';
+import { ConsoleActiveTab, ConsoleTabType, useGameUIStore } from '@/store/useGameUIStore';
 
 import { GameMessageList } from './GameMessageList';
 
@@ -26,14 +26,18 @@ export const GameConsole = () => {
   useQueueCraftListener();
   useBattleListener();
 
-  const { consoleActiveTab, setConsoleActiveTab } = useGameUIStore();
+  const { consoleTab, setConsoleTab } = useGameUIStore();
   const battleId = useHero((state) => state?.battleId ?? '');
   return (
     <Tabs
       onValueChange={(e) => {
-        setConsoleActiveTab(e as ConsoleActiveTab);
+        if (e === 'SYS' || e === 'CHAT') {
+          setConsoleTab({ active: e as ConsoleTabType, default: e });
+        } else {
+          setConsoleTab({ active: e as ConsoleTabType });
+        }
       }}
-      defaultValue={consoleActiveTab}
+      defaultValue={consoleTab.active}
       className="bg-background/80 backdrop-blur-xs h-[250px] gap-1"
     >
       <TabsList className="rounded-none">

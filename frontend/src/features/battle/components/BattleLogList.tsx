@@ -1,8 +1,8 @@
 import { GameIcon } from '@/components/GameIcon';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { getTimeFns } from '@/lib/utils';
+import { cn, getTimeFns } from '@/lib/utils';
 import { imageConfig } from '@/shared/config/image-config';
-import { BattleLog, HandResult } from '@/shared/types';
+import { BattleLog, BattleParticipantDto } from '@/shared/types';
 import { memo, useEffect, useRef } from 'react';
 
 import { useBattle } from '../hooks/useBattle';
@@ -24,11 +24,15 @@ export const BattleLogList = () => {
   );
 };
 
-const BattleLogCard = memo(({ log, heroId }: { log: BattleLog; heroId: string }) => {
+interface Props {
+  log: BattleLog;
+  heroId: string;
+}
+const BattleLogCard = memo(({ log, heroId }: Props) => {
   const defZone = Array.isArray(log.defendZone) ? log.defendZone.join('/') : log.defendZone;
   const hand = log.hand === 'LEFT_HAND' ? 'L' : 'R';
   const isHero = log.attackerId === heroId;
-
+  const isLowHealth = log.defenderCurrentHealth <= log.defenderCurrentHealth * 0.3;
   return (
     <li className="inline-flex flex-wrap items-center gap-1 leading-relaxed text-[#8b949e]">
       <span className="text-zinc-600">[{getTimeFns(log.createdAt)}] </span>
@@ -47,7 +51,19 @@ const BattleLogCard = memo(({ log, heroId }: { log: BattleLog; heroId: string })
           ) : (
             <BattleLogIcon className="text-green-500" image={imageConfig.icon.ui.battle.hit} label="HIT" />
           )}
-          <span className="ml-1 text-sm text-orange-100">-{log.giveDamage}</span>
+          <span
+            className={cn('ml-1 text-[15px] text-orange-300', {
+              'font-semibold text-red-500': log.isCriticalDamage,
+            })}
+          >
+            -{log.giveDamage}
+          </span>
+          <div className="ml-1 inline-flex items-center">
+            [<span className={cn(isLowHealth ? 'text-red-500' : 'text-foreground')}>{log.defenderCurrentHealth}</span>
+            <span>/</span>
+            <span className="text-muted-foreground">{log.defenderMaxHealth}</span>]
+            {log.defenderCurrentHealth <= 0 && <GameIcon className="ml-0.5 size-6" image={imageConfig.icon.ui.battle.dead} />}
+          </div>
         </>
       )}
     </li>

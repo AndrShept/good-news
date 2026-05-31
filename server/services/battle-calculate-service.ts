@@ -40,15 +40,16 @@ export const battleCalculateService = {
   },
   isCriticalHit(attackerModifier: Modifier, defenderModifier: Modifier, damageType: DamageType) {
     if (damageType === 'PHYSICAL') {
-      // strength * 0.15% + dexterity * 0.10% + physCritRating * 0.1%
+      // luck * 0.15% + strength * 0.5% + physCritRating * 0.1%
       const critChance = clamp(
-        5 + attackerModifier.strength * 0.15 + attackerModifier.dexterity * 0.1 + attackerModifier.physCritRating * 0.1,
+        5 + attackerModifier.luck * 0.15 + attackerModifier.strength * 0.05 + attackerModifier.physCritRating * 0.1,
         5,
         50,
       );
 
       // constitution захисника зменшує шанс крита
       const critReduction = clamp(defenderModifier.constitution * 0.1, 0, 20);
+      console.log('critChance', critChance);
 
       return Math.random() * 100 < critChance - critReduction;
     }
@@ -58,7 +59,6 @@ export const battleCalculateService = {
 
     // wisdom захисника зменшує шанс крита
     const critReduction = clamp(defenderModifier.wisdom * 0.1, 0, 20);
-
     return Math.random() * 100 < critChance - critReduction;
   },
   isZoneBlocked(attackZone: BattleZoneType, defendZone: SelectedDefenseZone) {
@@ -71,18 +71,17 @@ export const battleCalculateService = {
   calculatePhysicalDamage({ attackerModifier, defenderModifier, isCritical, equipments, hitHand }: CalculatePhysicalDamageParam) {
     let baseDamage = 0;
     const equipWeapon = equipments.find((e) => e.slot === hitHand);
-
     if (equipWeapon) {
       const weaponTemplate = itemTemplateService.getTemplateByItemTemplateId(equipWeapon.itemTemplateId);
       const weaponBase =
         (weaponTemplate.minDamage ?? 0) + Math.random() * ((weaponTemplate.maxDamage ?? 0) - (weaponTemplate.minDamage ?? 0));
-    
-      baseDamage = weaponBase + Math.floor(attackerModifier.strength * 0.15);
+
+      baseDamage = weaponBase + Math.floor(attackerModifier.strength * 0.1);
     }
 
     if (!equipWeapon) {
       // нема зброї — рукопашний бій
-      const wrestlingBase = 2 + Math.floor(attackerModifier.strength * 0.18);
+      const wrestlingBase = 2 + Math.floor(attackerModifier.strength * 0.12);
       baseDamage = wrestlingBase + Math.random() * wrestlingBase;
     }
 

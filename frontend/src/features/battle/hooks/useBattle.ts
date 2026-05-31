@@ -21,7 +21,7 @@ export const useBattle = () => {
       const template = itemsTemplateById[e.itemTemplateId];
       return e.slot === 'LEFT_HAND' && template.type === 'SHIELD';
     }) ?? false;
-
+    
   return {
     battle,
     isEquipLeftHandWeapon,
