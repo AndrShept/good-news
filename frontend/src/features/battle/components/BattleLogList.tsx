@@ -52,7 +52,7 @@ const BattleLogCard = memo(({ log, heroId }: Props) => {
             <BattleLogIcon className="text-green-500" image={imageConfig.icon.ui.battle.hit} label="HIT" />
           )}
           <span
-            className={cn('ml-1 text-[15px] text-orange-300', {
+            className={cn('ml-1 text-[15px] text-orange-200', {
               'font-semibold text-red-500': log.isCriticalDamage,
             })}
           >

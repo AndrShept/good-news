@@ -77,6 +77,7 @@ import { itemInstanceService } from '../services/item-instance-service';
 import { itemTemplateService } from '../services/item-template-service';
 import { mapService } from '../services/map-service';
 import { npcService } from '../services/npc-service';
+import { placeService } from '../services/place-service';
 import { queueCraftService } from '../services/queue-craft-service';
 import { refiningService } from '../services/refining-service';
 import { skillService } from '../services/skill-service';
@@ -918,12 +919,8 @@ export const heroRouter = new Hono<Context>()
       const heroPosY = hero.location.y;
 
       if (placeId) {
-        const place = placeTemplate.find((p) => p.id === placeId);
-        if (!place) {
-          throw new HTTPException(404, {
-            message: 'place not found',
-          });
-        }
+        const place = placeService.getPlace(placeId);
+
         if (place.mapId !== hero.location.mapId) {
           throw new HTTPException(404, {
             message: 'Hero is not located on this map ',
@@ -939,19 +936,10 @@ export const heroRouter = new Hono<Context>()
           await itemContainerService.createPlaceContainers(tx, place.id, hero.id);
         });
 
-        const socket = socketService.getSocket(hero.id);
-        const chunksIds = mapService.getAroundChunkIds({ x: hero.location.x, y: hero.location.y, mapId: hero.location.mapId });
-        for (const chunkId of chunksIds) {
-          socket.leave(chunkId);
-        }
-
-        hero.location.mapId = null;
-        hero.location.chunkId = null;
-        hero.location.placeId = place.id;
-
-        mapService.despawnMapEntitiesInChunk({ entityId: hero.id, type: 'HERO', mapId: place.mapId, x: place.x, y: place.y });
-        socketService.sendPlaceAddHero(hero.id, place.id);
-        socketService.sendToClientSysMessage(hero.id, { color: 'GREY', text: `You have entered ${place.name}.` });
+        placeService.onEnterToPlace({
+          hero,
+          place,
+        });
       }
 
       if (entranceId) {
@@ -1513,20 +1501,48 @@ export const heroRouter = new Hono<Context>()
       const hero = heroService.getHero(id);
       verifyHeroOwnership({ heroUserId: hero.userId, userId: user?.id });
 
+      switch (targetType) {
+        case 'HERO': {
+          const targetHero = heroService.getHero(targetId);
+          if (
+            targetHero.location.x !== hero.location.x ||
+            targetHero.location.y !== hero.location.y ||
+            targetHero.location.mapId !== hero.location.mapId
+          ) {
+            throw new HTTPException(400, { message: 'Target is not in your location' });
+          }
+          break;
+        }
+        case 'CREATURE': {
+          const targetCreature = creatureService.getCreature(targetId);
+          if (
+            targetCreature.x !== hero.location.x ||
+            targetCreature.y !== hero.location.y ||
+            targetCreature.mapId !== hero.location.mapId
+          ) {
+            throw new HTTPException(400, { message: 'Target is not in your location' });
+          }
+          break;
+        }
+      }
+
       if (id === targetId) throw new HTTPException(400, { message: 'You do not attacking yourself' });
 
-      battleService.startBattle([
-        {
-          participantId: id,
-          side: 'ATTACKER',
-          type: 'HERO',
-        },
-        {
-          participantId: targetId,
-          side: 'DEFENDER',
-          type: targetType,
-        },
-      ]);
+      battleService.startBattle(
+        [
+          {
+            participantId: id,
+            side: 'ATTACKER',
+            type: 'HERO',
+          },
+          {
+            participantId: targetId,
+            side: 'DEFENDER',
+            type: targetType,
+          },
+        ],
+        { mapId: hero.location.mapId!, x: hero.location.x, y: hero.location.y },
+      );
 
       const returnData = { state: hero.state, battleId: hero.battleId };
       return c.json<SuccessResponse<typeof returnData>>({

@@ -12,6 +12,7 @@ import { useMapListener } from '@/features/map/hooks/useMapListener';
 import { usePlaceListener } from '@/features/place/hooks/usePlaceListener';
 import { useQueueCraftListener } from '@/features/queue/hooks/useQueueCraftListener';
 import { ConsoleActiveTab, ConsoleTabType, useGameUIStore } from '@/store/useGameUIStore';
+import { useEffect } from 'react';
 
 import { GameMessageList } from './GameMessageList';
 
@@ -28,6 +29,7 @@ export const GameConsole = () => {
 
   const { consoleTab, setConsoleTab } = useGameUIStore();
   const battleId = useHero((state) => state?.battleId ?? '');
+
   return (
     <Tabs
       onValueChange={(e) => {
@@ -37,15 +39,13 @@ export const GameConsole = () => {
           setConsoleTab({ active: e as ConsoleTabType });
         }
       }}
-      defaultValue={consoleTab.active}
+      value={consoleTab.active}
       className="bg-background/80 backdrop-blur-xs h-[250px] gap-1"
     >
       <TabsList className="rounded-none">
         <TabsTrigger value="CHAT">chat</TabsTrigger>
         <TabsTrigger value="SYS">sys</TabsTrigger>
-        <TabsTrigger disabled={!battleId} value="LOG">
-          log
-        </TabsTrigger>
+        <TabsTrigger disabled={!battleId} value="LOG">log</TabsTrigger>
       </TabsList>
       <ScrollArea className="h-full min-h-0">
         <TabsContent value="CHAT">Make changes to your account here.</TabsContent>

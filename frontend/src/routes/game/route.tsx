@@ -12,7 +12,7 @@ import { useHero } from '@/features/hero/hooks/useHero';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { MovingPanel } from '@/features/map/components/MovingPanel';
 import { useCancelGatheringMutation } from '@/features/map/hooks/useCancelGatheringMutation';
-import { useGameUIStore } from '@/store/useGameUIStore';
+
 import { useMovementPathTileStore } from '@/store/useMovementPathTileStore';
 import { useNavigate } from '@tanstack/react-router';
 import { createFileRoute, redirect } from '@tanstack/react-router';
@@ -24,29 +24,22 @@ export const Route = createFileRoute('/game')({
 
   beforeLoad: async ({ context }) => {
     const [hero] = await Promise.all([
-      // context.queryClient.ensureQueryData(getUserQueryOptions()),
       context.queryClient.ensureQueryData(getHeroOptions()),
       context.queryClient.ensureQueryData(getGameDataOptions()),
     ]);
-    // if (!auth) {
-    //   throw redirect({ to: '/auth/sign-in' });
-    // }
+  
     if (!hero) {
       throw redirect({ to: '/create-hero' });
     }
     if (hero?.battleId && !location.pathname.includes('/battle/')) {
       throw redirect({ to: '/game/battle/$battleId', params: { battleId: hero.battleId } });
     }
+
     return {
       hero,
     };
   },
-  onEnter: ({ context }) => {
-    const battleId = context.hero.battleId;
-    if (useGameUIStore.getState().consoleTab.active === 'LOG' && !battleId) {
-      useGameUIStore.getState().setConsoleTab({ active: useGameUIStore.getState().consoleTab.default });
-    }
-  },
+
 });
 
 function GameRouteComponent() {
@@ -60,11 +53,13 @@ function GameRouteComponent() {
   }));
   const cancelGatheringMutation = useCancelGatheringMutation();
   const movementPathTiles = useMovementPathTileStore((state) => state.movementPathTiles);
+
   useEffect(() => {
     if (battleId) {
       navigate({ to: '/game/battle/$battleId', params: { battleId } });
     }
   }, [battleId]);
+
   return (
     <SocketProvider username={auth?.username} userId={auth?.id} heroId={heroId}>
       <DndInventoryProvider>

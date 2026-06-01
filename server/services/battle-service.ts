@@ -1,8 +1,10 @@
+import { imageConfig } from '@/shared/config/image-config';
 import type { BattleSocketEvent } from '@/shared/socket-data-types';
 import { socketEvents } from '@/shared/socket-events';
 import type {
   Battle,
   BattleAction,
+  BattleLocation,
   BattleLog,
   BattleParticipant,
   BattleParticipantType,
@@ -23,8 +25,11 @@ import { HTTPException } from 'hono/http-exception';
 import { serverState } from '../game/state/server-state';
 import { generateRandomUuid } from '../lib/utils';
 import { battleCalculateService } from './battle-calculate-service';
+import { corpseService } from './corpse-service';
 import { creatureService } from './creature-service';
 import { heroService } from './hero-service';
+import { mapService } from './map-service';
+import { placeService } from './place-service';
 import { socketService } from './socket-service';
 
 interface GetParticipantData {
@@ -93,13 +98,14 @@ export const battleService = {
 
     return logs;
   },
-  initBattle() {
+  initBattle(location: BattleLocation) {
     const id = generateRandomUuid();
     const newBattle: Battle = {
       id,
       roundEndsAt: this.getRoundDuration(),
       currentRound: 1,
       status: 'IN_PROGRESS',
+      location,
       logs: [],
       pendingActions: [],
       participants: [],
@@ -108,8 +114,8 @@ export const battleService = {
 
     return newBattle;
   },
-  startBattle(partData: GetParticipantData[]) {
-    const newBattle = battleService.initBattle();
+  startBattle(partData: GetParticipantData[], location: BattleLocation) {
+    const newBattle = battleService.initBattle(location);
     for (const participantInfo of partData) {
       const participant = battleService.getParticipantData({
         participantId: participantInfo.participantId,
@@ -342,13 +348,74 @@ export const battleService = {
       this.setNextTargetParticipant(battle, participant.id);
     }
 
-    socketService.sendToClientBattleUpdate(battle.id, {
-      type: 'ACTIONS_REMOVE',
-      payload: removeActionsId,
-    });
+    if (removeActionsId.length) {
+      socketService.sendToClientBattleUpdate(battle.id, {
+        type: 'ACTIONS_REMOVE',
+        payload: removeActionsId,
+      });
+    }
     socketService.sendToClientBattleUpdate(battle.id, {
       type: 'PARTICIPANT_UPDATE',
       payload: [deadParticipant, ...participantsTargetingDead],
     });
+  },
+  finishBattle(battle: Battle) {
+    if (!battle.location) throw new HTTPException(400, { message: 'battle location not found' });
+    for (const participant of battle.participants) {
+      switch (participant.type) {
+        case 'HERO': {
+          const hero = heroService.getHero(participant.id);
+          const socket = socketService.getSocket(hero.id);
+          socket.leave(battle.id);
+          hero.battleId = null;
+          hero.state = 'IDLE';
+          hero.currentHealth = participant.currentHealth;
+          hero.currentMana = participant.currentMana;
+          socketService.sendToClientUpdateSelfHeroData(hero.id, {
+            battleId: null,
+            currentHealth: participant.currentHealth,
+            currentMana: participant.currentMana,
+            state: 'IDLE',
+          });
+          if (hero.currentHealth <= 0) {
+            placeService.onTeleportNearTown(hero);
+          }
+          break;
+        }
+        case 'CREATURE': {
+          if (participant.currentHealth > 0) continue;
+          const creature = creatureService.getCreature(participant.id);
+          const newCorpse = corpseService.createCorpse({
+            id: generateRandomUuid(),
+            deadEntityId: participant.id,
+            expiredAt: Date.now() + 60_000 * 20, //20 min
+            name: `${creature.name} corpse`,
+            image: imageConfig.icon.ui.grave,
+            mapId: creature.mapId,
+            x: creature.x,
+            y: creature.y,
+          });
+          mapService.despawnMapEntitiesInChunk({
+            entityId: participant.id,
+            type: 'CREATURE',
+            mapId: creature.mapId,
+            x: creature.x,
+            y: creature.y,
+          });
+          mapService.spawnMapEntitiesInChunk({
+            entityId: newCorpse.id,
+            type: 'CORPSE',
+            mapId: newCorpse.mapId,
+            x: newCorpse.x,
+            y: newCorpse.y,
+          });
+
+          break;
+        }
+      }
+    }
+
+    battle.status = 'FINISHED';
+    serverState.battle.delete(battle.id);
   },
 };

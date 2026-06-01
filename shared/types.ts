@@ -284,6 +284,7 @@ export type GameMap = {
   places: TPlace[];
   entrances: Entrance[];
 };
+export type PlaceType = 'TOWN' | 'MINE' | 'DUNGEON';
 
 export type TPlace = {
   id: string;
@@ -293,6 +294,7 @@ export type TPlace = {
   y: number;
   mapId: string;
   buildingIds: string[];
+  type: PlaceType;
   npcIds: string[];
   entrances: Entrance[];
   itemContainers: { id: string; name: string; color: string | null; type: ItemContainerType }[];
@@ -735,11 +737,18 @@ export type BattleActionCategory =
   | 'ABILITY' // магія + фізичні абіліті + бафи на себе
   | 'ITEM' // використати предмет
   | 'FLEE';
+
+export type BattleLocation = {
+  mapId: string;
+  x: number;
+  y: number;
+};
 export type Battle = {
   id: string;
   status: BattleStatusType;
   currentRound: number;
   roundEndsAt: number;
+  location: BattleLocation;
   pendingActions: BattleAction[];
   logs: BattleLog[];
   participants: BattleParticipant[];

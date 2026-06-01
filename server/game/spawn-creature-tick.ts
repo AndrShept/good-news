@@ -64,7 +64,8 @@ export const spawnCreatureTick = (now: number) => {
     for (const heroId of heroes) {
       const hero = heroService.getHero(heroId);
       const { mapId, x, y } = hero.location;
-      const chunkAroundHero = mapService.getAroundChunkIds({ mapId: mapId!, x, y });
+      if (!mapId) continue;
+      const chunkAroundHero = mapService.getAroundChunkIds({ mapId, x, y });
       chunkAroundHero.forEach((c) => activeChunks.add(c));
     }
   }
@@ -72,7 +73,7 @@ export const spawnCreatureTick = (now: number) => {
   for (const chunkId of activeChunks) {
     let chunk = serverState.mapChunks.get(chunkId);
     if (!chunk) {
-      chunk = mapService.initChunk(chunkId)
+      chunk = mapService.initChunk(chunkId);
     }
     const { mapId } = mapService.parseChunkId(chunkId);
     const creaturesIds: string[] = [];

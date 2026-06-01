@@ -24,8 +24,7 @@ export const battleTick = (now: number) => {
         const aliveDefenders = battle.participants.filter((p) => p.side === 'DEFENDER' && !p.isDead);
 
         if (!aliveAttackers.length || !aliveDefenders.length) {
-          battle.status = 'FINISHED';
-          console.log("  battle.status = 'FINISHED'");
+          battleService.finishBattle(battle);
         }
       }
     }

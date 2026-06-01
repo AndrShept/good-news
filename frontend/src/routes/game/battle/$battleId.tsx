@@ -4,8 +4,11 @@ import { BattleParticipantCard } from '@/features/battle/components/BattlePartic
 import { BattleParticipantList } from '@/features/battle/components/BattleParticipantList';
 import { ZoneSelector } from '@/features/battle/components/ZoneSelector';
 import { useBattle } from '@/features/battle/hooks/useBattle';
+import { useHero } from '@/features/hero/hooks/useHero';
 import { useGameUIStore } from '@/store/useGameUIStore';
+import { useNavigate } from '@tanstack/react-router';
 import { createFileRoute, redirect } from '@tanstack/react-router';
+import { useEffect } from 'react';
 
 export const Route = createFileRoute('/game/battle/$battleId')({
   component: RouteComponent,
@@ -30,20 +33,32 @@ export const Route = createFileRoute('/game/battle/$battleId')({
     if (!data) throw redirect({ to: '/game' });
     return data;
   },
-  onEnter: () => {
-    useGameUIStore.getState().setConsoleTab({ active: 'LOG' });
-  },
-  onLeave: () => {
-    useGameUIStore.getState().setConsoleTab({ active: useGameUIStore.getState().consoleTab.default });
-  },
+
 });
 
 function RouteComponent() {
   const { battle, isEquipLeftHandWeapon, isEquipRightHandWeapon, isEquipShield, selfParticipant } = useBattle();
+  const navigate = useNavigate();
+  const battleId = useHero((data) => data?.battleId);
   const targetParticipant = battle?.participants.find((p) => p.id === selfParticipant?.targetId);
   const attackers = battle?.participants.filter((p) => p.side === 'ATTACKER');
   const defenders = battle?.participants.filter((p) => p.side === 'DEFENDER');
+  const setConsoleTab = useGameUIStore((state) => state.setConsoleTab);
+  const defaultTab = useGameUIStore((state) => state.consoleTab.default);
 
+  useEffect(() => {
+    if (!battleId) {
+      navigate({ to: '/game' });
+    }
+  }, [battleId]);
+
+  useEffect(() => {
+    setConsoleTab({ active: 'LOG' });
+    return () => {
+      setConsoleTab({ active: defaultTab });
+    };
+  }, []);
+  
   if (!selfParticipant || !battle) return;
 
   return (

@@ -32,7 +32,7 @@ export const BattleParticipantList = ({ attackers, defenders, selfParticipant }:
           );
         })}
       </ul>
-      <p className="text-red-500">vs</p>
+      <p className="text-foreground">vs</p>
       <ul className="text-muted-foreground">
         {defenders?.map((a) => {
           const isTarget = a.id === selfParticipant.targetId;
