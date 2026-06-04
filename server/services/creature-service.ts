@@ -1,8 +1,9 @@
-import { creatureTemplateById } from '@/shared/templates/creature-template';
-import type { CreatureInstance, MapCreature } from '@/shared/types';
+import { type CreatureKey, creatureTemplateById } from '@/shared/templates/creature-template';
+import type { CreatureInstance, MapCreature, SpawnCreatureTileType } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
+import { SPAWN_ZONE_CREATURE_TABLE } from '../lib/table/spawn-zone-creature-table';
 import { generateRandomUuid } from '../lib/utils';
 
 interface CreateCreature {
@@ -48,5 +49,10 @@ export const creatureService = {
     serverState.creature.set(newCreature.id, newCreature);
 
     return newCreature;
+  },
+  getSpawnZone(creatureKey: CreatureKey): SpawnCreatureTileType | undefined {
+    for (const [zone, { creatures }] of Object.entries(SPAWN_ZONE_CREATURE_TABLE)) {
+      if (creatures.includes(creatureKey)) return zone as SpawnCreatureTileType;
+    }
   },
 };

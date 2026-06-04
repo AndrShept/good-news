@@ -1586,9 +1586,7 @@ export const heroRouter = new Hono<Context>()
         attackingZone,
         defenseZone,
       });
-      if (targetParticipant.type === 'CREATURE') {
-        battleService.createCreatureActionPending(battle, targetParticipant, selfParticipant.id);
-      }
+
 
       const returnData = { state: hero.state, battleId: hero.battleId };
       return c.json<SuccessResponse<typeof returnData>>({

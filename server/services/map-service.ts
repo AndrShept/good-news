@@ -222,6 +222,7 @@ export const mapService = {
       case 'CREATURE':
         chunk?.creatures.delete(entityId);
         serverState.creature.delete(entityId);
+       
         break;
       case 'CORPSE':
         chunk?.corpses.delete(entityId);

@@ -85,6 +85,7 @@ export const spawnCreatureTick = (now: number) => {
         zoneData.indexes.length / SPAWN_ZONE_CREATURE_TABLE[spawnTileZone as SpawnCreatureTileType].density,
       );
       for (let i = zoneData.creatureAlive; i < maxSpawnQuantity; i++) {
+        if (zoneData.lastSpawnAt >= now) continue;
         const random = Math.floor(Math.random() * SPAWN_ZONE_CREATURE_TABLE[spawnTileZone as SpawnCreatureTileType].creatures.length);
 
         const template = creatureTemplateByKey[SPAWN_ZONE_CREATURE_TABLE[spawnTileZone as SpawnCreatureTileType].creatures[random]];

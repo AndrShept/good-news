@@ -682,23 +682,6 @@ export interface HitResult {
   LEFT_HAND: { hit: BattleZoneType | null; handResult: HandResult | null; giveDamage: number; isCriticalDamage: boolean };
   RIGHT_HAND: { hit: BattleZoneType | null; handResult: HandResult | null; giveDamage: number; isCriticalDamage: boolean };
 }
-export type BattleLog = {
-  id: string;
-  attackerId: string;
-  attackerName: string;
-  defenderId: string;
-  defenderName: string;
-  defendZone: SelectedDefenseZone;
-  giveDamage: number;
-  defenderCurrentHealth: number;
-  defenderMaxHealth: number;
-  attackingZone: BattleZoneType | null;
-  hand: keyof HitResult;
-  isMissed: boolean;
-  isCriticalDamage: boolean;
-  isBlocking: boolean;
-  createdAt: number;
-};
 
 export type OmitDeepHero = {
   location?: Partial<ApiGetHeroResponse['location']>;
@@ -761,6 +744,42 @@ export type BattleDto = {
   pendingActions: BattleAction[];
   logs: BattleLog[];
   participants: BattleParticipantDto[];
+};
+
+export type BattleLog = PhysicalAttackLog | AbilityLog;
+
+export type PhysicalAttackLog = {
+  id: string;
+  type: 'PHYSICAL_ATTACK';
+  attackerId: string;
+  attackerName: string;
+  defenderId: string;
+  defenderName: string;
+  defendZone: SelectedDefenseZone;
+  giveDamage: number;
+  defenderCurrentHealth: number;
+  defenderMaxHealth: number;
+  attackingZone: BattleZoneType | null;
+  hand: keyof HitResult;
+  isMissed: boolean;
+  isCriticalDamage: boolean;
+  isBlocking: boolean;
+  createdAt: number;
+};
+export type AbilityLog = {
+  id: string;
+  type: 'ABILITY';
+  casterId: string;
+  casterName: string;
+  targetId: string;
+  targetName: string;
+  abilityId: string;
+  abilityName: string;
+  isMissed: boolean;
+  isCriticalDamage: boolean;
+  giveDamage?: number;
+  healAmount?: number;
+  createdAt: number;
 };
 
 export type BattleAction = {

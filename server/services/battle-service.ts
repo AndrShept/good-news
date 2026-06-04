@@ -23,6 +23,7 @@ import { getAttackingRandomZone, getDefenseRandomZone, sumAllModifier } from '@/
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
+import { SPAWN_ZONE_CREATURE_TABLE } from '../lib/table/spawn-zone-creature-table';
 import { generateRandomUuid } from '../lib/utils';
 import { battleCalculateService } from './battle-calculate-service';
 import { corpseService } from './corpse-service';
@@ -86,6 +87,7 @@ export const battleService = {
           defenderMaxHealth,
           defendZone,
           hand,
+          type: 'PHYSICAL_ATTACK' as 'PHYSICAL_ATTACK',
           isBlocking: handResult === 'BLOCKED' ? true : false,
           isMissed: handResult === 'MISSED' ? true : false,
           isCriticalDamage,
@@ -137,10 +139,15 @@ export const battleService = {
       heroSocket.join(battleId);
       hero.state = 'BATTLE';
       hero.battleId = battleId;
+      if (hero.location.chunkId) {
+        socketService.sendMapUpdateEntity(participant.id, hero.location.chunkId, { type: 'HERO', payload: { state: 'BATTLE' } });
+      }
     }
     if (participant.type === 'CREATURE') {
       const creature = creatureService.getCreature(participant.id);
       creature.state = 'BATTLE';
+      const chunkId = mapService.getChunkId({ mapId: creature.mapId, x: creature.x, y: creature.y });
+      socketService.sendMapUpdateEntity(participant.id, chunkId, { type: 'CREATURE', payload: { state: 'BATTLE' } });
     }
   },
   getParticipantData({ participantId, side, type }: GetParticipantData) {
@@ -359,7 +366,7 @@ export const battleService = {
       payload: [deadParticipant, ...participantsTargetingDead],
     });
   },
-  finishBattle(battle: Battle) {
+  finishBattle(battle: Battle, now: number) {
     if (!battle.location) throw new HTTPException(400, { message: 'battle location not found' });
     for (const participant of battle.participants) {
       switch (participant.type) {
@@ -377,6 +384,8 @@ export const battleService = {
             currentMana: participant.currentMana,
             state: 'IDLE',
           });
+          if (!hero.location.chunkId) continue;
+          socketService.sendMapUpdateEntity(hero.id, hero.location.chunkId, { type: 'HERO', payload: { state: 'IDLE' } });
           if (hero.currentHealth <= 0) {
             placeService.onTeleportNearTown(hero);
           }
@@ -385,10 +394,20 @@ export const battleService = {
         case 'CREATURE': {
           if (participant.currentHealth > 0) continue;
           const creature = creatureService.getCreature(participant.id);
+          const chunkId = mapService.getChunkId({ mapId: creature.mapId, x: creature.x, y: creature.y });
+          const chunk = serverState.mapChunks.get(chunkId);
+          if (!chunk) continue;
+          const spawnZone = creatureService.getSpawnZone(creature.key);
+          if (!spawnZone) continue;
+          if (chunk.spawnZones[spawnZone].lastSpawnAt <= now) {
+            chunk.spawnZones[spawnZone].lastSpawnAt = now + SPAWN_ZONE_CREATURE_TABLE[spawnZone].respawnTime;
+          }
+          chunk.spawnZones[spawnZone].creatureAlive--;
+
           const newCorpse = corpseService.createCorpse({
             id: generateRandomUuid(),
             deadEntityId: participant.id,
-            expiredAt: Date.now() + 60_000 * 20, //20 min
+            expiredAt: now + 60_000 * 20, //20 min
             name: `${creature.name} corpse`,
             image: imageConfig.icon.ui.grave,
             mapId: creature.mapId,
@@ -409,7 +428,11 @@ export const battleService = {
             x: newCorpse.x,
             y: newCorpse.y,
           });
-
+          socketService.sendMapChunkSpawnEntities({
+            type: 'CORPSE',
+            chunkId,
+            entityIds: [newCorpse.id],
+          });
           break;
         }
       }

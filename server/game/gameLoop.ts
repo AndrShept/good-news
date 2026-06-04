@@ -2,6 +2,7 @@ import { performance } from 'node:perf_hooks';
 
 import { heroTickService } from '../services/hero-tick-service';
 import { battleTick } from './battleTick';
+import { despawnCorpseTick } from './despawn-corpse-tick';
 import { resourceRespawnTick } from './resource-respawn-tick';
 import { spawnCreatureTick } from './spawn-creature-tick';
 
@@ -20,15 +21,11 @@ export const gameLoop = () => {
   while (now - lastTick >= TICK_RATE && ticks < MAX_CATCHUP_TICKS) {
     tickId++;
 
-    // moveTick(lastTick);
-    // queueCraftTick(lastTick);
-    // gatherTick(lastTick);
-    // refineTick(lastTick);
-    // regenTick(lastTick, TICK_RATE)
     heroTickService.heroTick(lastTick, TICK_RATE);
-    // buffTick(lastTick);
+
     resourceRespawnTick(lastTick);
     spawnCreatureTick(lastTick);
+    despawnCorpseTick(lastTick);
     battleTick(lastTick);
 
     lastTick += TICK_RATE;

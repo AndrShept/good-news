@@ -1,9 +1,14 @@
 import { battleService } from '../services/battle-service';
+import { creatureService } from '../services/creature-service';
 import { serverState } from './state/server-state';
 
 export const battleTick = (now: number) => {
   for (const battle of serverState.battle.values()) {
     for (const action of battle.pendingActions) {
+      const targetParticipant = battleService.getParticipant(battle, action.targetId);
+      if (targetParticipant.type === 'CREATURE') {
+        battleService.createCreatureActionPending(battle, targetParticipant, action.participantId);
+      }
       const findResolveActionOpponent = battle.pendingActions.find(
         (a) =>
           a.participantId === action.targetId &&
@@ -24,7 +29,7 @@ export const battleTick = (now: number) => {
         const aliveDefenders = battle.participants.filter((p) => p.side === 'DEFENDER' && !p.isDead);
 
         if (!aliveAttackers.length || !aliveDefenders.length) {
-          battleService.finishBattle(battle);
+          battleService.finishBattle(battle, now);
         }
       }
     }
