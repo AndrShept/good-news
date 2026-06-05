@@ -77,7 +77,12 @@ const SelectPlaceNpc = ({ selectedNpc }: { selectedNpc: NPC }) => {
   }, [clearAllItems, npcActiveTab]);
 
   return (
-    <m.section variants={parentVariants} initial="hidden" animate="visible" className="mx-auto flex w-full max-w-2xl flex-col gap-1">
+    <m.section
+      variants={parentVariants}
+      initial="hidden"
+      animate="visible"
+      className="mx-auto flex h-full min-h-0 w-full max-w-2xl flex-col gap-1"
+    >
       {npcActiveTab && <ShopHeader />}
 
       {npcActiveTab === 'BUY' && <NpcBuy sellItems={shop?.sells ?? []} npc={selectedNpc} />}

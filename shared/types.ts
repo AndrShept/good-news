@@ -579,7 +579,7 @@ export type Corpse = {
   expiredAt: number;
 };
 
-export type MapCorpse = Pick<Corpse, 'image' | 'id' | 'name' | 'x' | 'y'>;
+export type MapCorpse = Pick<Corpse, 'image' | 'id' | 'name' | 'x' | 'y' | 'expiredAt'>;
 
 export type CreatureType =
   | 'ANIMAL' // farm, meadow — корова, кролик, олень

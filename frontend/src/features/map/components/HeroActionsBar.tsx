@@ -6,7 +6,6 @@ import { GameMap, StateType } from '@/shared/types';
 import { useIsMutating } from '@tanstack/react-query';
 import { BracketsIcon } from 'lucide-react';
 
-
 import { GatherSkillButton } from './GatherSkillButton';
 import { TravelButton } from './TravelButton';
 
@@ -19,7 +18,7 @@ interface Props {
   onCenter: () => void;
 }
 
-const gatherSkills: GatheringCategorySkillKey[] = ['FISHING', 'FORAGING', 'WOODCUTTING', 'MINING', 'SKINNING'];
+const gatherSkills: Exclude<GatheringCategorySkillKey, 'SKINNING'>[] = ['FISHING', 'FORAGING', 'WOODCUTTING', 'MINING'];
 
 export const HeroActionsBar = ({ heroPosX, heroPosY, map, state, gatheringFinishAt, onCenter }: Props) => {
   const mutationIsPending = !!useIsMutating();
@@ -32,7 +31,7 @@ export const HeroActionsBar = ({ heroPosX, heroPosY, map, state, gatheringFinish
   const placeId = placeTile?.id;
   const image = entranceTile ? entranceTile.image : placeTile?.image;
   return (
-    <div className="flex w-full select-none flex-row flex-wrap gap-1 sm:flex-col">
+    <div className="flex w-full select-none flex-wrap justify-center gap-1">
       <Button onClick={onCenter} variant="outline" size="icon">
         <BracketsIcon />
       </Button>
@@ -43,8 +42,6 @@ export const HeroActionsBar = ({ heroPosX, heroPosY, map, state, gatheringFinish
       {gatherSkills.map((gatherSkill) => (
         <GatherSkillButton key={gatherSkill} gatherSkill={gatherSkill} disabled={state !== 'IDLE' || mutationIsPending} />
       ))}
-
-      {(entranceTile || placeTile) && <Separator className="hidden sm:block" />}
     </div>
   );
-}
+};

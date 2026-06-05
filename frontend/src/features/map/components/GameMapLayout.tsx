@@ -63,51 +63,50 @@ export const GameMapLayout = () => {
   }, [hero.mapId]);
 
   return (
-    <section className="flex w-full flex-col gap-2 p-1 sm:flex-row">
-      <aside className="flex w-full gap-2 sm:max-w-[150px] sm:flex-col">
-        <HeroActionsBar
-          onCenter={() => onCenter({ behavior: 'smooth' })}
-          heroPosX={hero.x}
-          heroPosY={hero.y}
-          map={map.data}
-          gatheringFinishAt={hero.gatheringFinishAt}
-          state={hero.state}
-        />
-        <EntitySidebar
-          mode="MAP"
-          creatures={creaturesAtPosition}
-          corpses={corpsesAtPosition}
-          heroes={heroesAtPosition}
-          isLoading={isLoading}
-        />
-      </aside>
-
+    <section className="flex w-full gap-2 p-1">
       {map.isLoading ? (
         <LoadingMapSkeleton />
       ) : (
-        <GameMap
-          scale={scale}
-          containerRef={containerRef}
-          callbackRef={callbackRef}
-          width={map.data?.width ?? 0}
-          height={map.data?.height ?? 0}
-          tileWidth={map.data?.tileWidth ?? 0}
-          heroWorldX={heroWorldX}
-          heroWorldY={heroWorldY}
-          heroLocalX={heroLocalX}
-          heroLocalY={heroLocalY}
-          heroTargetX={hero.targetX}
-          heroTargetY={hero.targetY}
-          heroState={hero.state}
-          tileset={map.data?.tileset ?? []}
-          layers={map.data?.layers ?? []}
-          mapEntities={mapEntities}
-          places={map.data?.places ?? []}
-          entrances={map.data?.entrances ?? []}
-          offsetX={offsetX}
-          offsetY={offsetY}
-        />
+        <div className="flex w-full  flex-col gap-2">
+          <HeroActionsBar
+            onCenter={() => onCenter({ behavior: 'smooth' })}
+            heroPosX={hero.x}
+            heroPosY={hero.y}
+            map={map.data}
+            gatheringFinishAt={hero.gatheringFinishAt}
+            state={hero.state}
+          />
+          <GameMap
+            scale={scale}
+            containerRef={containerRef}
+            callbackRef={callbackRef}
+            width={map.data?.width ?? 0}
+            height={map.data?.height ?? 0}
+            tileWidth={map.data?.tileWidth ?? 0}
+            heroWorldX={heroWorldX}
+            heroWorldY={heroWorldY}
+            heroLocalX={heroLocalX}
+            heroLocalY={heroLocalY}
+            heroTargetX={hero.targetX}
+            heroTargetY={hero.targetY}
+            heroState={hero.state}
+            tileset={map.data?.tileset ?? []}
+            layers={map.data?.layers ?? []}
+            mapEntities={mapEntities}
+            places={map.data?.places ?? []}
+            entrances={map.data?.entrances ?? []}
+            offsetX={offsetX}
+            offsetY={offsetY}
+          />
+        </div>
       )}
+      <EntitySidebar
+        mode="MAP"
+        creatures={creaturesAtPosition}
+        corpses={corpsesAtPosition}
+        heroes={heroesAtPosition}
+        isLoading={isLoading}
+      />
     </section>
   );
 };

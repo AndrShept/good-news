@@ -1,5 +1,6 @@
 import { GameAvatar } from '@/components/GameAvatar';
 import { GameIcon } from '@/components/GameIcon';
+import { TimerText } from '@/components/TimerText';
 import { Button } from '@/components/ui/button';
 import { useAttackTarget } from '@/features/battle/hooks/useAttackTarget';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
@@ -15,9 +16,19 @@ interface Props {
   state?: StateType;
   mode: 'PLACE' | 'MAP';
   entityType: MapChunkEntitiesType;
+  expiredAt?: number;
 }
 
-export const EntitySidebarCard = memo(function EntitySidebarCard({ id, name, avatarImage, level, state, entityType, mode }: Props) {
+export const EntitySidebarCard = memo(function EntitySidebarCard({
+  id,
+  name,
+  avatarImage,
+  level,
+  state,
+  entityType,
+  mode,
+  expiredAt,
+}: Props) {
   const heroId = useHeroId();
   const isCanAttack = mode === 'MAP' && entityType !== 'CORPSE' && heroId !== id;
   const { mutate, isPending } = useAttackTarget();
@@ -26,7 +37,14 @@ export const EntitySidebarCard = memo(function EntitySidebarCard({ id, name, ava
       <GameAvatar size={'sm'} src={avatarImage} />
       <div className="text-sm">
         <div className="inline-flex items-center gap-1">
-          <span className="line-clamp-1 font-semibold">{name}</span>
+          {entityType === 'CORPSE' && (
+            <div className="flex flex-col">
+              <span className="line-clamp-1 font-semibold">{name}</span>
+              {expiredAt && <TimerText expiredAt={expiredAt} />}
+            </div>
+          )}
+          {entityType !== 'CORPSE' && <span className="line-clamp-1 font-semibold">{name}</span>}
+
           {state && <GameIcon className="size-4" image={imageConfig.icon.state[state]} />}
         </div>
         {level && <p className="text-muted-foreground">level: ({level})</p>}

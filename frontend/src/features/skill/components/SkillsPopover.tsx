@@ -11,7 +11,7 @@ export const SkillsPopover = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline"  size="icon-lg">
+        <Button title="Skills" variant="outline" size="icon-lg">
           <GameIcon image={imageConfig.icon.ui.skill} />
         </Button>
       </PopoverTrigger>

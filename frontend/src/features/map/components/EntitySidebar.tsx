@@ -1,6 +1,18 @@
 import { CounterBadge } from '@/components/CounterBadge';
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HeroSidebarItem, MapCorpse, MapCreature } from '@/shared/types';
+import { useSheetStore } from '@/store/useBackpackStore';
+import { useMediaQuery } from 'usehooks-ts';
 
 import { EntitySidebarCard } from './EntitySidebarCard';
 import { HeroSidebarListSkeleton } from './HeroSidebarListSkeleton';
@@ -15,82 +27,174 @@ interface Props {
 }
 
 export const EntitySidebar = ({ heroes, corpses, creatures, mode, isLoading }: Props) => {
+  const isMobile = useMediaQuery('(max-width: 640px)');
+  const isEntitySidebarOpen = useSheetStore((state) => state.isEntitySidebarOpen);
+  const onEntitySidebarToggle = useSheetStore((state) => state.onEntitySidebarToggle);
   if (isLoading) return <HeroSidebarListSkeleton />;
   return (
-    <aside className="hidden w-full max-w-[200px] select-text flex-col gap-1 p-1 sm:flex">
-      {mode === 'PLACE' ? (
-        heroes?.map((hero) => (
-          <EntitySidebarCard
-            entityType="HERO"
-            mode="PLACE"
-            key={hero.id}
-            avatarImage={hero.avatarImage}
-            id={hero.id}
-            name={hero.name}
-            state={hero.state}
-            level={hero.level}
-          />
-        ))
+    <>
+      {isMobile ? (
+        <Sheet modal={false} open={isEntitySidebarOpen} onOpenChange={onEntitySidebarToggle}>
+          {/* <SheetTrigger>Open</SheetTrigger> */}
+          <SheetContent className="w-full max-w-[200px] select-text gap-1 p-1">
+            {mode === 'PLACE' ? (
+              heroes?.map((hero) => (
+                <EntitySidebarCard
+                  entityType="HERO"
+                  mode="PLACE"
+                  key={hero.id}
+                  avatarImage={hero.avatarImage}
+                  id={hero.id}
+                  name={hero.name}
+                  state={hero.state}
+                  level={hero.level}
+                />
+              ))
+            ) : (
+              <Tabs defaultValue="hero" className="w-full">
+                <TabsList className="mb-2 w-full p-0">
+                  <TabsTrigger className="relative p-0 text-[13px]" value="hero">
+                    hero
+                    {!!heroes?.length && (
+                      <CounterBadge value={heroes.length} className="top-9.5 size-4.5 -translate-1/2 left-1/2 bg-teal-800" />
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger className="relative p-0 text-[13px]" value="creature">
+                    creature
+                    {!!creatures?.length && (
+                      <CounterBadge value={creatures.length} className="top-9.5 size-4.5 -translate-1/2 left-1/2 bg-teal-800" />
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger className="relative p-0 text-[13px]" value="corpse">
+                    corpse
+                    {!!corpses?.length && (
+                      <CounterBadge value={corpses.length} className="top-9.5 size-4.5 -translate-1/2 left-1/2 bg-teal-800" />
+                    )}
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="hero">
+                  {heroes?.map((hero) => (
+                    <EntitySidebarCard
+                      mode="MAP"
+                      entityType="HERO"
+                      key={hero.id}
+                      id={hero.id}
+                      avatarImage={hero.avatarImage}
+                      name={hero.name}
+                      state={hero.state}
+                      level={hero.level}
+                    />
+                  ))}
+                </TabsContent>
+                <TabsContent value="creature">
+                  {creatures?.map((creature) => (
+                    <EntitySidebarCard
+                      mode="MAP"
+                      entityType="CREATURE"
+                      key={creature.id}
+                      id={creature.id}
+                      avatarImage={creature.image}
+                      name={creature.name}
+                    />
+                  ))}
+                </TabsContent>
+                <TabsContent value="corpse">
+                  {corpses?.map((corpse) => (
+                    <EntitySidebarCard
+                      mode="MAP"
+                      entityType="CORPSE"
+                      key={corpse.id}
+                      id={corpse.id}
+                      avatarImage={corpse.image}
+                      name={corpse.name}
+                      expiredAt={corpse.expiredAt}
+                    />
+                  ))}
+                </TabsContent>
+              </Tabs>
+            )}
+          </SheetContent>
+        </Sheet>
       ) : (
-        <Tabs defaultValue="hero" className="w-full">
-          <TabsList className="w-full p-0">
-            <TabsTrigger className="relative p-0 text-[13px]" value="hero">
-              hero
-              {!!heroes?.length && <CounterBadge value={heroes.length} className="top-9.5 size-4.5 -translate-1/2 left-1/2 bg-teal-800" />}
-            </TabsTrigger>
-            <TabsTrigger className="relative p-0 text-[13px]" value="creature">
-              creature
-              {!!creatures?.length && (
-                <CounterBadge value={creatures.length} className="top-9.5 size-4.5 -translate-1/2 left-1/2 bg-teal-800" />
-              )}
-            </TabsTrigger>
-            <TabsTrigger className="relative p-0 text-[13px]" value="corpse">
-              corpse
-              {!!corpses?.length && (
-                <CounterBadge value={corpses.length} className="top-9.5 size-4.5 -translate-1/2 left-1/2 bg-teal-800" />
-              )}
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="hero">
-            {heroes?.map((hero) => (
+        <aside className="w-full max-w-[200px] select-text flex-col gap-1 p-1 sm:flex">
+          {mode === 'PLACE' ? (
+            heroes?.map((hero) => (
               <EntitySidebarCard
-                mode="MAP"
                 entityType="HERO"
+                mode="PLACE"
                 key={hero.id}
-                id={hero.id}
                 avatarImage={hero.avatarImage}
+                id={hero.id}
                 name={hero.name}
                 state={hero.state}
                 level={hero.level}
               />
-            ))}
-          </TabsContent>
-          <TabsContent value="creature">
-            {creatures?.map((creature) => (
-              <EntitySidebarCard
-                mode="MAP"
-                entityType="CREATURE"
-                key={creature.id}
-                id={creature.id}
-                avatarImage={creature.image}
-                name={creature.name}
-              />
-            ))}
-          </TabsContent>
-          <TabsContent value="corpse">
-            {corpses?.map((corpse) => (
-              <EntitySidebarCard
-                mode="MAP"
-                entityType="CORPSE"
-                key={corpse.id}
-                id={corpse.id}
-                avatarImage={corpse.image}
-                name={corpse.name}
-              />
-            ))}
-          </TabsContent>
-        </Tabs>
+            ))
+          ) : (
+            <Tabs defaultValue="hero" className="w-full">
+              <TabsList className="mb-2 w-full p-0">
+                <TabsTrigger className="relative p-0 text-[13px]" value="hero">
+                  hero
+                  {!!heroes?.length && (
+                    <CounterBadge value={heroes.length} className="top-9.5 size-4.5 -translate-1/2 left-1/2 bg-teal-800" />
+                  )}
+                </TabsTrigger>
+                <TabsTrigger className="relative p-0 text-[13px]" value="creature">
+                  creature
+                  {!!creatures?.length && (
+                    <CounterBadge value={creatures.length} className="top-9.5 size-4.5 -translate-1/2 left-1/2 bg-teal-800" />
+                  )}
+                </TabsTrigger>
+                <TabsTrigger className="relative p-0 text-[13px]" value="corpse">
+                  corpse
+                  {!!corpses?.length && (
+                    <CounterBadge value={corpses.length} className="top-9.5 size-4.5 -translate-1/2 left-1/2 bg-teal-800" />
+                  )}
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="hero">
+                {heroes?.map((hero) => (
+                  <EntitySidebarCard
+                    mode="MAP"
+                    entityType="HERO"
+                    key={hero.id}
+                    id={hero.id}
+                    avatarImage={hero.avatarImage}
+                    name={hero.name}
+                    state={hero.state}
+                    level={hero.level}
+                  />
+                ))}
+              </TabsContent>
+              <TabsContent value="creature">
+                {creatures?.map((creature) => (
+                  <EntitySidebarCard
+                    mode="MAP"
+                    entityType="CREATURE"
+                    key={creature.id}
+                    id={creature.id}
+                    avatarImage={creature.image}
+                    name={creature.name}
+                  />
+                ))}
+              </TabsContent>
+              <TabsContent value="corpse">
+                {corpses?.map((corpse) => (
+                  <EntitySidebarCard
+                    mode="MAP"
+                    entityType="CORPSE"
+                    key={corpse.id}
+                    id={corpse.id}
+                    avatarImage={corpse.image}
+                    name={corpse.name}
+                    expiredAt={corpse.expiredAt}
+                  />
+                ))}
+              </TabsContent>
+            </Tabs>
+          )}
+        </aside>
       )}
-    </aside>
+    </>
   );
 };

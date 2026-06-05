@@ -18,6 +18,7 @@ export const CharacterPaperdollButton = (props: Props) => {
   const state = useHero((data) => data?.state);
   return (
     <Button
+      title="Character status bar"
       onClick={() => {
         startTransition(() => {
           setHeaderUIType(props.type);

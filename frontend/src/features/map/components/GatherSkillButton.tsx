@@ -13,7 +13,7 @@ interface Props {
 export const GatherSkillButton = ({ disabled, gatherSkill }: Props) => {
   const { mutate, isPending } = useGatherResourceMutation();
   return (
-    <Button onClick={() => mutate({ gatherSkill })} variant={'secondary'} disabled={disabled || isPending || gatherSkill === 'SKINNING'}>
+    <Button onClick={() => mutate({ gatherSkill })} variant={'secondary'} disabled={disabled || isPending }>
       <GameIcon className="size-6" image={imageConfig.icon.skill[gatherSkill]} />
       <p className="truncate">{capitalize(gatherSkill)}</p>
     </Button>

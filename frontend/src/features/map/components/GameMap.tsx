@@ -123,7 +123,7 @@ export const GameMap = memo(function GameMap({
         callbackRef(el);
         containerRef.current = el;
       }}
-      className="relative mx-auto aspect-video w-full max-w-[700px] self-start overflow-hidden rounded border"
+      className="relative  aspect-video w-full mx-auto max-w-[700px] self-start overflow-hidden rounded border"
       style={{
         cursor: isDragging ? 'grabbing' : 'default',
         touchAction: 'none',

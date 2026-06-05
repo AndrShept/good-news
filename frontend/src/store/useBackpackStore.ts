@@ -1,16 +1,19 @@
 import { create } from 'zustand';
 
-interface BackpackStore {
-  isOpen: boolean;
-  onOpen: () => void;
-  onClose: () => void;
-
+interface UseSheetStore {
+  isBackpackOpen: boolean;
+  onBackpackToggle: () => void;
+  onBackpackClose: () => void;
+  isEntitySidebarOpen: boolean;
+  onEntitySidebarToggle: () => void;
+  onEntitySidebarClose: () => void;
 }
 
-export const useBackpackStore = create<BackpackStore>((set) => ({
-  isOpen: false,
-
-  onOpen: () => set(({isOpen}) => ({ isOpen: !isOpen })),
-  onClose: () => set({ isOpen: false }),
-
+export const useSheetStore = create<UseSheetStore>((set) => ({
+  isBackpackOpen: false,
+  onBackpackToggle: () => set(({ isBackpackOpen }) => ({ isBackpackOpen: !isBackpackOpen })),
+  onBackpackClose: () => set({ isBackpackOpen: false }),
+  isEntitySidebarOpen: false,
+  onEntitySidebarToggle: () => set(({ isEntitySidebarOpen }) => ({ isEntitySidebarOpen: !isEntitySidebarOpen })),
+  onEntitySidebarClose: () => set({ isEntitySidebarOpen: false }),
 }));

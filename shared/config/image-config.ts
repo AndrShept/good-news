@@ -10,9 +10,7 @@ export const imageConfig = {
       gold: '/sprites/icons/ui/gold.png',
       prem: '/sprites/icons/ui/prem.png',
       group: '/sprites/icons/ui/group.png',
-      logo: '/sprites/icons/ui/logo.png',
       map: '/sprites/icons/ui/map.png',
-      random: '/sprites/icons/ui/random.png',
       town: '/sprites/icons/ui/town.png',
       dungeon: '/sprites/icons/ui/dungeon.png',
       leave: '/sprites/icons/ui/leave.png',
@@ -46,6 +44,7 @@ export const imageConfig = {
       'ability-book': '/sprites/icons/ui/ability-book.png',
       libra: '/sprites/icons/ui/libra.png',
       library: '/sprites/icons/ui/library.png',
+      random: '/sprites/icons/ui/random.png',
       battle: {
         dead: '/sprites/icons/ui/battle/dead.png',
         phys_crit: '/sprites/icons/ui/battle/phys_crit.png',

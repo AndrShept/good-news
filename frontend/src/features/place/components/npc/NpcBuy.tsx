@@ -1,3 +1,4 @@
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { NPC, NPCSellItem } from '@/shared/types';
 import { useNpcStore } from '@/store/useNpcStore';
@@ -34,27 +35,28 @@ export const NpcBuy = ({ sellItems, npc }: Props) => {
     }
   }, [sellItems?.length]);
   return (
-    <section className="flex h-full gap-1">
-      <div className="flex flex-col gap-1.5 border-r px-2">
+    <section className="flex h-full  gap-1">
+      <div className="flex h-full  flex-col gap-1.5 border-r px-2">
         <ShopAvatar image={npc.image} name={npc.name} />
+        <ScrollArea className="h-[calc(100vh-428px)]">
+          <ul className="flex flex-col gap-1">
+            {sellItems?.map((i) => {
+              const template = itemsTemplateById[i.itemTemplateId];
 
-        <ul className="flex flex-1 flex-col gap-1">
-          {sellItems?.map((i) => {
-            const template = itemsTemplateById[i.itemTemplateId];
-
-            return (
-              <NpcBuyItemCard
-                key={template.id}
-                templateKey={template.key}
-                id={template.id}
-                image={template.image}
-                name={template.name}
-                price={i.price}
-                isSelect={!!itemsMap[template.id]}
-              />
-            );
-          })}
-        </ul>
+              return (
+                <NpcBuyItemCard
+                  key={template.id}
+                  templateKey={template.key}
+                  id={template.id}
+                  image={template.image}
+                  name={template.name}
+                  price={i.price}
+                  isSelect={!!itemsMap[template.id]}
+                />
+              );
+            })}
+          </ul>
+        </ScrollArea>
       </div>
 
       <ShopItemCart mode="BUY" />

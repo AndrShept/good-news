@@ -1,5 +1,6 @@
 import { GameIcon } from '@/components/GameIcon';
 import { LogOutButton } from '@/components/LogOutButton';
+import { Button } from '@/components/ui/button';
 import { GroupMenuButton } from '@/features/group/components/GroupMenuButton';
 import { useHero } from '@/features/hero/hooks/useHero';
 import { BackpackButton } from '@/features/item-container/components/BackpackButton';
@@ -7,7 +8,9 @@ import { ContainerCapacityInfo } from '@/features/item-container/components/Cont
 import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack';
 import { SkillsPopover } from '@/features/skill/components/SkillsPopover';
 import { imageConfig } from '@/shared/config/image-config';
+import { useSheetStore } from '@/store/useBackpackStore';
 import { Link, useLocation } from '@tanstack/react-router';
+import { ArrowLeftToLineIcon, ArrowRightToLineIcon } from 'lucide-react';
 import { memo } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 
@@ -22,18 +25,16 @@ export const GameHeader = memo(() => {
   const { backpack } = useHeroBackpack();
   const { pathname } = useLocation();
   const isMobile = useMediaQuery('(max-width: 640px)');
+  const isEntitySidebarOpen = useSheetStore((state) => state.isEntitySidebarOpen);
+  const onEntitySidebarToggle = useSheetStore((state) => state.onEntitySidebarToggle);
   return (
     <header className="bg-background/80 backdrop-blur-xs sticky top-0 z-50 mb-1 flex items-center justify-between border-b px-4 py-2">
       <section>
         <Link to="/">
-          <GameIcon image={imageConfig.icon.ui.logo} />
+          <GameIcon image="/game-logo.png" />
         </Link>
       </section>
       <section className="flex gap-0.5">
-        <Link to="/game/battle/$battleId" params={{ battleId: '2222' }}>
-          BATLE
-        </Link>
-        <Link to="/game">GAME</Link>
         <CharacterPaperdollButton type="CHARACTER" />
         <BackpackButton />
         <SkillsPopover />
@@ -41,6 +42,11 @@ export const GameHeader = memo(() => {
       </section>
       <section className="flex items-center gap-1 text-[15px]">
         {pathname === '/' && <LogOutButton />}
+        {isMobile && (
+          <Button title="Open entity sidebar" onClick={() => onEntitySidebarToggle()} variant="outline" size="icon">
+            {isEntitySidebarOpen ? <ArrowRightToLineIcon /> : <ArrowLeftToLineIcon />}
+          </Button>
+        )}
         <div className="flex items-center gap-0.5">
           <GameIcon image={imageConfig.icon.ui.gold} />
           <span>{goldCoins}</span>

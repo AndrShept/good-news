@@ -1,19 +1,19 @@
 import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { imageConfig } from '@/shared/config/image-config';
-import { useBackpackStore } from '@/store/useBackpackStore';
+import { useSheetStore } from '@/store/useBackpackStore';
 
 import { HeroBackpack } from './HeroBackpack';
 
 export const BackpackButton = () => {
-  const isOpen = useBackpackStore((state) => state.isOpen);
-  const onOpen = useBackpackStore((state) => state.onOpen);
+  const isBackpackOpen = useSheetStore((state) => state.isBackpackOpen);
+  const onBackpackToggle = useSheetStore((state) => state.onBackpackToggle);
   return (
     <>
-      <Sheet open={isOpen} onOpenChange={onOpen} modal={false}>
+      <Sheet open={isBackpackOpen} onOpenChange={onBackpackToggle} modal={false}>
         <SheetTrigger asChild>
-          <Button variant={isOpen ? 'secondary' : 'outline'}  size="icon-lg">
+          <Button variant={isBackpackOpen ? 'secondary' : 'outline'} size="icon-lg">
             <GameIcon className="size-6.5" image={imageConfig.icon.ui.backpack} />
           </Button>
         </SheetTrigger>

@@ -1,9 +1,7 @@
-
 import type { Corpse, MapCorpse } from '@/shared/types';
 import { HTTPException } from 'hono/http-exception';
 
 import { serverState } from '../game/state/server-state';
-
 
 interface CreateCorpse {
   mapId: string;
@@ -27,6 +25,7 @@ export const corpseService = {
       id: corpse.id,
       image: corpse.image,
       name: corpse.name,
+      expiredAt: corpse.expiredAt,
       x: corpse.x,
       y: corpse.y,
     };
