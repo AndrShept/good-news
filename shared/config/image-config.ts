@@ -28,7 +28,6 @@ export const imageConfig = {
       fire: '/sprites/icons/ui/fire.png',
       grave: '/sprites/icons/ui/grave.png',
       hammer: '/sprites/icons/ui/hammer.png',
-      pick: '/sprites/icons/ui/pick.png',
       skull: '/sprites/icons/ui/skull.png',
       walk: '/sprites/icons/ui/walk.png',
       refresh: '/sprites/icons/ui/refresh.png',
@@ -36,8 +35,7 @@ export const imageConfig = {
       skill: '/sprites/icons/ui/skill.png',
       gold2: '/sprites/icons/ui/gold2.png',
       'gold-bag': '/sprites/icons/ui/gold-bag.png',
-      bag2: '/sprites/icons/ui/bag2.png',
-      bag3: '/sprites/icons/ui/bag3.png',
+
       'shop-cart': '/sprites/icons/ui/shop-cart.png',
       buy: '/sprites/icons/ui/buy.png',
       sell: '/sprites/icons/ui/sell.png',
@@ -45,6 +43,9 @@ export const imageConfig = {
       refine: '/sprites/icons/ui/refine.png',
       clock: '/sprites/icons/ui/clock.png',
       info: '/sprites/icons/ui/info.png',
+      'ability-book': '/sprites/icons/ui/ability-book.png',
+      libra: '/sprites/icons/ui/libra.png',
+      library: '/sprites/icons/ui/library.png',
       battle: {
         dead: '/sprites/icons/ui/battle/dead.png',
         phys_crit: '/sprites/icons/ui/battle/phys_crit.png',

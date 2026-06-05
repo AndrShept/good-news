@@ -1,6 +1,6 @@
 {
-  "name": "magic-world",
-  "version": "0.2",
+  "name": "mist-land",
+  "version": "0.5",
   "scripts": {
     "dev": "bun run --hot server/index.ts",
     "start": "bun server/index.ts",
