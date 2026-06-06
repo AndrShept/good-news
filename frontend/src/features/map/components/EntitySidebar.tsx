@@ -35,8 +35,8 @@ export const EntitySidebar = ({ heroes, corpses, creatures, mode, isLoading }: P
     <>
       {isMobile ? (
         <Sheet modal={false} open={isEntitySidebarOpen} onOpenChange={onEntitySidebarToggle}>
-          {/* <SheetTrigger>Open</SheetTrigger> */}
           <SheetContent className="w-full max-w-[200px] select-text gap-1 p-1">
+            <SheetTitle></SheetTitle>
             {mode === 'PLACE' ? (
               heroes?.map((hero) => (
                 <EntitySidebarCard

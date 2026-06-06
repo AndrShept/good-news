@@ -60,6 +60,16 @@ export const EntitySidebarCard = memo(function EntitySidebarCard({
           <GameIcon className="size-4" image={imageConfig.icon.ui.attack} />
         </Button>
       )}
+      {entityType === 'CORPSE' && (
+        <div className="flex">
+          <Button title='Loot' size="icon-sm" variant="ghost">
+            <GameIcon className="size-5" image={imageConfig.icon.ui['loot-bag']} />
+          </Button>
+          <Button title='Skinning' size="icon-sm" variant="ghost">
+            <GameIcon className="size-5" image={imageConfig.icon.skill.SKINNING} />
+          </Button>
+        </div>
+      )}
     </li>
   );
 });

@@ -6,7 +6,7 @@ export const despawnCorpseTick = (now: number) => {
     if (corpse.expiredAt > now) continue;
     mapService.despawnMapEntitiesInChunk({
       entityId: corpse.id,
-      type: 'CREATURE',
+      type: 'CORPSE',
       mapId: corpse.mapId,
       x: corpse.x,
       y: corpse.y,

@@ -16,6 +16,7 @@ export const imageConfig = {
       leave: '/sprites/icons/ui/leave.png',
       backpack: '/sprites/icons/ui/backpack.png',
       bag: '/sprites/icons/ui/bag.png',
+      'loot-bag': '/sprites/icons/ui/loot-bag.png',
       chest: '/sprites/icons/ui/chest.png',
       chest2: '/sprites/icons/ui/chest2.png',
       chest3: '/sprites/icons/ui/chest3.png',

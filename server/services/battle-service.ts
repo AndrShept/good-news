@@ -44,6 +44,7 @@ interface CheckHitParams {
   defendZone: SelectedDefenseZone;
   attackerModifier: Modifier;
   defenderModifier: Modifier;
+  defenderParticipant: BattleParticipant;
   damageType: DamageType;
   equipments: ItemInstance[];
 }
@@ -53,8 +54,7 @@ interface GetBattleLogParam {
   attacker: BattleParticipant;
   defender: BattleParticipant;
   defendZone: SelectedDefenseZone;
-  defenderCurrentHealth: number;
-  defenderMaxHealth: number;
+  
 }
 
 export const battleService = {
@@ -71,7 +71,7 @@ export const battleService = {
   getRoundDuration() {
     return Date.now() + 90_000;
   },
-  getBattleLog({ attacker, defender, defendZone, hitResult, defenderCurrentHealth, defenderMaxHealth }: GetBattleLogParam): BattleLog[] {
+  getBattleLog({ attacker, defender, defendZone, hitResult }: GetBattleLogParam): BattleLog[] {
     const logs = (Object.keys(hitResult) as (keyof HitResult)[])
       .map((hand) => {
         const { hit, handResult, giveDamage, isCriticalDamage } = hitResult[hand];
@@ -83,8 +83,8 @@ export const battleService = {
           defenderId: defender.id,
           defenderName: defender.name,
           attackingZone: hit,
-          defenderCurrentHealth,
-          defenderMaxHealth,
+          defenderCurrentHealth: defender.currentHealth,
+          defenderMaxHealth: defender.maxHealth,
           defendZone,
           hand,
           type: 'PHYSICAL_ATTACK' as 'PHYSICAL_ATTACK',
@@ -244,6 +244,7 @@ export const battleService = {
       defendZone: secondAction.defenseZone,
       attackerModifier: firstSumModifier,
       defenderModifier: secondSumModifier,
+      defenderParticipant: secondParticipant,
       damageType: 'PHYSICAL',
       equipments: firstParticipant.equipments,
     });
@@ -252,32 +253,22 @@ export const battleService = {
       defendZone: firstAction.defenseZone,
       attackerModifier: secondSumModifier,
       defenderModifier: firstSumModifier,
+      defenderParticipant: firstParticipant,
       damageType: 'PHYSICAL',
       equipments: secondParticipant.equipments,
     });
-
-    const firstCurrentHealth =
-      firstParticipant.currentHealth - (secondHitResult.LEFT_HAND.giveDamage + secondHitResult.RIGHT_HAND.giveDamage);
-    const secondCurrentHealth =
-      secondParticipant.currentHealth - (firstHitResult.LEFT_HAND.giveDamage + firstHitResult.RIGHT_HAND.giveDamage);
-    this.updateParticipant(firstParticipant, { currentHealth: firstCurrentHealth });
-    this.updateParticipant(secondParticipant, { currentHealth: secondCurrentHealth });
 
     const firstBattleLog = this.getBattleLog({
       attacker: firstParticipant,
       defender: secondParticipant,
       defendZone: secondAction.defenseZone,
       hitResult: firstHitResult,
-      defenderCurrentHealth: secondCurrentHealth,
-      defenderMaxHealth: secondParticipant.maxHealth,
     });
     const secondBattleLog = this.getBattleLog({
       attacker: secondParticipant,
       defender: firstParticipant,
       defendZone: firstAction.defenseZone,
       hitResult: secondHitResult,
-      defenderCurrentHealth: firstCurrentHealth,
-      defenderMaxHealth: firstParticipant.maxHealth,
     });
     battle.logs.push(...[...firstBattleLog, ...secondBattleLog]);
 
@@ -286,11 +277,11 @@ export const battleService = {
       payload: [
         {
           id: firstParticipant.id,
-          currentHealth: firstCurrentHealth,
+          currentHealth: firstParticipant.currentHealth,
         },
         {
           id: secondParticipant.id,
-          currentHealth: secondCurrentHealth,
+          currentHealth: secondParticipant.currentHealth,
         },
       ],
     });
@@ -301,15 +292,24 @@ export const battleService = {
     socketService.sendToClientBattleUpdate(battle.id, { type: 'ACTIONS_REMOVE', payload: [firstAction.id, secondAction.id] });
   },
 
-  checkHitResult({ attackZone, defendZone, attackerModifier, defenderModifier, damageType, equipments }: CheckHitParams): HitResult {
+  checkHitResult({
+    attackZone,
+    defendZone,
+    attackerModifier,
+    defenderModifier,
+    defenderParticipant,
+    damageType,
+    equipments,
+  }: CheckHitParams): HitResult {
     const hitResult: HitResult = {
-      LEFT_HAND: { hit: null, handResult: null, giveDamage: 0, isCriticalDamage: false },
       RIGHT_HAND: { hit: null, handResult: null, giveDamage: 0, isCriticalDamage: false },
+      LEFT_HAND: { hit: null, handResult: null, giveDamage: 0, isCriticalDamage: false },
     };
 
     for (const hand of Object.keys(hitResult) as (keyof HitResult)[]) {
       const zone = attackZone[hand];
       if (!zone) continue;
+      if (defenderParticipant.currentHealth <= 0) continue;
 
       hitResult[hand].hit = zone;
 
@@ -326,7 +326,6 @@ export const battleService = {
       }
 
       const isCritical = battleCalculateService.isCriticalHit(attackerModifier, defenderModifier, damageType);
-      console.log('isCritical', isCritical);
       hitResult[hand].handResult = 'HIT';
       hitResult[hand].isCriticalDamage = isCritical;
       hitResult[hand].giveDamage = battleCalculateService.calculatePhysicalDamage({
@@ -336,6 +335,9 @@ export const battleService = {
         equipments,
         hitHand: hand,
       });
+      const newCurrentHealth = Math.max(defenderParticipant.currentHealth - hitResult[hand].giveDamage, 0);
+
+      this.updateParticipant(defenderParticipant, { currentHealth: newCurrentHealth });
     }
 
     return hitResult;

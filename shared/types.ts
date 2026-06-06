@@ -683,6 +683,8 @@ export interface HitResult {
   RIGHT_HAND: { hit: BattleZoneType | null; handResult: HandResult | null; giveDamage: number; isCriticalDamage: boolean };
 }
 
+export type WeaponAttackHand  = 'LEFT_HAND' | 'RIGHT_HAND'
+
 export type OmitDeepHero = {
   location?: Partial<ApiGetHeroResponse['location']>;
   group?: Partial<ApiGetHeroResponse['group']>;
