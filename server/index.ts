@@ -14,10 +14,6 @@ import { gameLoop } from './game/gameLoop';
 import { saveItemsDb } from './game/save-items-db';
 import { saveSkillsDb } from './game/save-skills-db';
 import { serverState } from './game/state/server-state';
-import { heroOffline } from './lib/heroOffline';
-import { inviteGroup } from './lib/inviteGroup';
-import { joinRoom } from './lib/joinRoom';
-import { leaveRoom } from './lib/leaveRoom';
 import { maintance } from './middleware/maintance';
 import { sessionHandler } from './middleware/sessionHandler';
 import { authRouter } from './routes/auth-router';
@@ -121,8 +117,9 @@ io.on('connection', async (socket) => {
   socket.join('global');
   const hero = serverState.hero.get(heroId);
   if (hero) {
-    if (hero.offlineTimer) {
-      hero.offlineTimer = undefined;
+    if (hero.lastOnlineAt) {
+      hero.lastOnlineAt = undefined;
+      hero.isOnline = true
     }
     if (hero.location.placeId) {
       socket.join(hero.location.placeId);
@@ -137,13 +134,13 @@ io.on('connection', async (socket) => {
       }
     }
   }
-
   console.info('connected ' + username);
+
   socket.on('disconnect', async () => {
     console.info('disconnect ' + username);
     const heroState = serverState.hero.get(heroId);
     if (heroState) {
-      heroState.offlineTimer = Date.now() + 10000;
+      heroState.lastOnlineAt = Date.now();
     }
   });
 });

@@ -471,9 +471,16 @@ export const heroTickService = {
     console.log('delta', delta);
   },
   heroOffline(hero: HeroRuntime, now: number) {
-    if (hero.offlineTimer && hero.offlineTimer <= now) {
-      heroOffline(hero.id, hero.userId);
-      console.log(` heroOffline ${hero.name}`);
+    if (hero.lastOnlineAt && hero.isOnline && hero.lastOnlineAt + 10_000 <= now) {
+      heroOffline(hero);
+      console.log(` DESPAWN HERO - ${hero.name}`);
+    }
+    if (hero.lastOnlineAt && !hero.isOnline && hero.lastOnlineAt + 30_000 <= now) {
+      serverState.hero.delete(hero.id);
+      serverState.skill.delete(hero.id);
+      serverState.socket.delete(hero.id);
+      serverState.user.delete(hero.id);
+      console.log(`HERO_OFFLINE ${hero.name}`);
     }
   },
   buffTick(hero: HeroRuntime, now: number) {

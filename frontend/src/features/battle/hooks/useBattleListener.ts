@@ -7,7 +7,8 @@ import { useBattleUpdate } from './useBattleUpdate';
 
 export const useBattleListener = () => {
   const { socket } = useSocket();
-  const { updateBattle, updateParticipant, addParticipant, addLog, addPendingAction, removePendingAction } = useBattleUpdate();
+  const { updateBattle, updateParticipant, addParticipant, addLog, addPendingAction, removePendingAction, addCombatStats } =
+    useBattleUpdate();
 
   useEffect(() => {
     const updateBattleListener = (data: BattleSocketEvent) => {
@@ -37,6 +38,9 @@ export const useBattleListener = () => {
             addLog(log);
           }
           break;
+        case 'COMBAT_STATS_ADD':
+          addCombatStats(data.payload.participantId, data.payload.combatStats);
+          break;
       }
     };
 
@@ -44,5 +48,5 @@ export const useBattleListener = () => {
     return () => {
       socket.off(socketEvents.battleUpdate(), updateBattleListener);
     };
-  }, [addLog, addParticipant, socket, updateBattle, updateParticipant]);
+  }, [addCombatStats, addLog, addParticipant, addPendingAction, removePendingAction, socket, updateBattle, updateParticipant]);
 };

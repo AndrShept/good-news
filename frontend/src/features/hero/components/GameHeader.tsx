@@ -9,6 +9,7 @@ import { useHeroBackpack } from '@/features/item-container/hooks/useHeroBackpack
 import { SkillsPopover } from '@/features/skill/components/SkillsPopover';
 import { imageConfig } from '@/shared/config/image-config';
 import { useSheetStore } from '@/store/useBackpackStore';
+import { useGameUIStore } from '@/store/useGameUIStore';
 import { Link, useLocation } from '@tanstack/react-router';
 import { ArrowLeftToLineIcon, ArrowRightToLineIcon } from 'lucide-react';
 import { memo } from 'react';
@@ -27,6 +28,7 @@ export const GameHeader = memo(() => {
   const isMobile = useMediaQuery('(max-width: 640px)');
   const isEntitySidebarOpen = useSheetStore((state) => state.isEntitySidebarOpen);
   const onEntitySidebarToggle = useSheetStore((state) => state.onEntitySidebarToggle);
+  const headerUIType = useGameUIStore((state) => state.headerUIType);
   return (
     <header className="bg-background/80 backdrop-blur-xs sticky top-0 z-50 mb-1 flex items-center justify-between border-b px-4 py-2">
       <section>
@@ -42,7 +44,7 @@ export const GameHeader = memo(() => {
       </section>
       <section className="flex items-center gap-1 text-[15px]">
         {pathname === '/' && <LogOutButton />}
-        {isMobile && (
+        {isMobile && !headerUIType  && (
           <Button title="Open entity sidebar" onClick={() => onEntitySidebarToggle()} variant="outline" size="icon">
             {isEntitySidebarOpen ? <ArrowRightToLineIcon /> : <ArrowLeftToLineIcon />}
           </Button>

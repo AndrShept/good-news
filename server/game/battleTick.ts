@@ -22,15 +22,13 @@ export const battleTick = (now: number) => {
     }
 
     for (const participant of battle.participants) {
-      if (participant.currentHealth <= 0) {
+      if (participant.currentHealth <= 0 && !participant.isDead) {
         battleService.onParticipantDead(participant, battle);
-
-        const aliveAttackers = battle.participants.filter((p) => p.side === 'ATTACKER' && !p.isDead);
-        const aliveDefenders = battle.participants.filter((p) => p.side === 'DEFENDER' && !p.isDead);
-
-        if (!aliveAttackers.length || !aliveDefenders.length) {
-          battleService.finishBattle(battle, now);
-        }
+      }
+      const aliveAttackers = battle.participants.filter((p) => p.side === 'ATTACKER' && !p.isDead);
+      const aliveDefenders = battle.participants.filter((p) => p.side === 'DEFENDER' && !p.isDead);
+      if (!aliveAttackers.length || !aliveDefenders.length) {
+        battleService.finishBattle(battle, now);
       }
     }
   }

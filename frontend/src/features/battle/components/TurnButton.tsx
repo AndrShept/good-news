@@ -3,6 +3,7 @@ import { useHeroId } from '@/features/hero/hooks/useHeroId';
 import { SelectedAttackingZone, SelectedDefenseZone } from '@/shared/types';
 import { useState } from 'react';
 
+import { useBattle } from '../hooks/useBattle';
 import { useParticipantTurnMutation } from '../hooks/useParticipantTurnMutation';
 
 interface Props {
@@ -15,6 +16,7 @@ export const TurnButton = ({ selectedAttackingZone, selectedDefenseZone, targetI
   const { mutate, isPending } = useParticipantTurnMutation();
   const [isDelay, setIsDelay] = useState(false);
   const heroId = useHeroId();
+  const { canMakeActionInTarget } = useBattle();
 
   const onCLick = () => {
     setIsDelay(true);
@@ -24,7 +26,7 @@ export const TurnButton = ({ selectedAttackingZone, selectedDefenseZone, targetI
     }, 500);
   };
   return (
-    <Button className="w-1/2" disabled={isPending || isDelay} onClick={onCLick}>
+    <Button className="w-1/2" disabled={isPending || isDelay || canMakeActionInTarget} onClick={onCLick}>
       Turn
     </Button>
   );

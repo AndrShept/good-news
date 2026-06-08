@@ -47,7 +47,7 @@ export const AutoZoneSelectorButton = ({
         type="checkbox"
       />
       <Button disabled={disabled} onClick={onRandom} variant="outline" size="icon">
-        <GameIcon className="size-4" image={imageConfig.icon.ui.refresh} />
+        <GameIcon className="size-5" image={imageConfig.icon.ui.random} />
       </Button>
     </div>
   );

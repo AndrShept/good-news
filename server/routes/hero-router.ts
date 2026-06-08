@@ -7,6 +7,8 @@ import { resourceTemplateById } from '@/shared/templates/resource-template';
 import { gatheringSkillKeysValues, skillsTemplate } from '@/shared/templates/skill-template';
 import { toolTemplateByKey } from '@/shared/templates/tool-template';
 import {
+  type BattleAction,
+  type BattleActionCategory,
   type BattleDto,
   type ErrorResponse,
   type Hero,
@@ -91,8 +93,9 @@ export const heroRouter = new Hono<Context>()
     async (c) => {
       const userId = c.get('user')?.id as string;
       let heroId = serverState.user.get(userId);
+      let stateHero = serverState.hero.get(heroId ?? '');
 
-      if (!heroId) {
+      if (!stateHero || !heroId) {
         const hero = await db.query.heroTable.findFirst({
           where: eq(heroTable.userId, userId),
           with: {
@@ -101,12 +104,14 @@ export const heroRouter = new Hono<Context>()
             itemContainers: { columns: { id: true, type: true, name: true }, where: eq(itemContainerTable.type, 'BACKPACK') },
           },
         });
+
         if (!hero) {
           throw new HTTPException(404, {
             message: 'hero not found',
           });
         }
         heroId = hero.id;
+
         console.log('FETCH HERO');
         const equipments = await db.query.itemInstanceTable.findMany({
           where: and(eq(itemInstanceTable.ownerHeroId, hero.id), eq(itemInstanceTable.location, 'EQUIPMENT')),
@@ -119,29 +124,32 @@ export const heroRouter = new Hono<Context>()
         });
         serverState.user.set(userId, hero.id);
         serverState.skill.set(hero.id, skills);
-
-        serverState.hero.set(hero.id, {
+        const heroRuntime = {
           ...hero,
           equipments: equipments ?? [],
           buffs,
           queueCraft: [],
           queueRefine: [],
           location: { ...hero.location, targetX: null, targetY: null },
+          isOnline: true,
           regen: {
             healthAcc: 0,
             healthTimeMs: 0,
             manaAcc: 0,
             manaTimeMs: 0,
           },
-        } as HeroRuntime);
+        } as HeroRuntime;
+        serverState.hero.set(hero.id, heroRuntime);
+        stateHero = heroRuntime;
         heroOnline(hero.id);
         heroService.updateModifier(heroId);
       }
 
-      const stateHero = heroService.getHero(heroId);
+      if (!stateHero.isOnline) {
+        heroOnline(stateHero.id);
+      }
       verifyHeroOwnership({ heroUserId: stateHero?.userId, userId });
-      stateHero.offlineTimer = undefined;
-      const { paths, offlineTimer, selectedGatherTile, ...returnData } = stateHero;
+      const { paths, lastOnlineAt, isOnline, selectedGatherTile, ...returnData } = stateHero;
 
       return c.json<SuccessResponse<typeof returnData>>({
         success: true,
@@ -1544,11 +1552,11 @@ export const heroRouter = new Hono<Context>()
         { mapId: hero.location.mapId!, x: hero.location.x, y: hero.location.y },
       );
 
-      const returnData = { state: hero.state, battleId: hero.battleId };
-      return c.json<SuccessResponse<typeof returnData>>({
+      // const returnData = { state: hero.state, battleId: hero.battleId };
+      return c.json<SuccessResponse>({
         message: 'You start the battle',
         success: true,
-        data: returnData,
+        // data: returnData,
       });
     },
   )
@@ -1574,10 +1582,15 @@ export const heroRouter = new Hono<Context>()
       const targetParticipant = battleService.getParticipant(battle, targetId);
 
       if (battle.status !== 'IN_PROGRESS') throw new HTTPException(400, { message: 'Battle is already finished' });
-      if (selfParticipant.isDead) throw new HTTPException(400, { message: 'You are dead', cause: { canShow: true } });
-      if (targetParticipant.isDead) throw new HTTPException(400, { message: 'Target is already dead', cause: { canShow: true } });
-
-      battle.pendingActions.push({
+      if (selfParticipant.isDead) throw new HTTPException(400, { message: 'You are dead', cause: { canShow: false } });
+      if (targetParticipant.isDead) throw new HTTPException(400, { message: 'Target is already dead', cause: { canShow: false } });
+      if (battle.pendingActions.some((a) => a.targetId === targetParticipant.id)) {
+        throw new HTTPException(400, {
+          message: 'You have already attacked this target. Wait for their response.',
+          cause: { canShow: false },
+        });
+      }
+      const newAction: BattleAction = {
         id: generateRandomUuid(),
         actionType: 'NORMAL',
         category: 'PHYSICAL_ATTACK',
@@ -1585,14 +1598,17 @@ export const heroRouter = new Hono<Context>()
         targetId: targetParticipant.id,
         attackingZone,
         defenseZone,
+      };
+      battle.pendingActions.push(newAction);
+
+      socketService.sendToClientBattleUpdate(battle.id, {
+        type: 'ACTIONS_ADD',
+        payload: newAction,
       });
 
-
-      const returnData = { state: hero.state, battleId: hero.battleId };
-      return c.json<SuccessResponse<typeof returnData>>({
-        message: 'You start the battle',
+      return c.json<SuccessResponse>({
+        message: 'Success end turn',
         success: true,
-        data: returnData,
       });
     },
   );

@@ -8,7 +8,8 @@ import { socketService } from '../services/socket-service';
 
 export const heroOnline = async (heroId: string) => {
   const hero = heroService.getHero(heroId);
-  hero.offlineTimer = undefined;
+  hero.lastOnlineAt = undefined;
+  hero.isOnline = true;
   const mapHeroData = heroService.getHeroMapData(heroId);
   const socketData: HeroOnlineEvent = {
     type: 'HERO_ONLINE',
@@ -16,8 +17,13 @@ export const heroOnline = async (heroId: string) => {
   };
 
   if (hero.location.chunkId && hero.location.mapId) {
-   
-    mapService.spawnMapEntitiesInChunk({ type: 'HERO', entityId: hero.id, x: hero.location.x, y: hero.location.y , mapId: hero.location.mapId });
+    mapService.spawnMapEntitiesInChunk({
+      type: 'HERO',
+      entityId: hero.id,
+      x: hero.location.x,
+      y: hero.location.y,
+      mapId: hero.location.mapId,
+    });
     socketService.sendMapChunkSpawnEntities({ chunkId: hero.location.chunkId, entityIds: [hero.id], type: 'HERO' });
   }
   if (hero.location.placeId) {

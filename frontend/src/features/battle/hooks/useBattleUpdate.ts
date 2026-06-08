@@ -1,5 +1,5 @@
 import { useHero } from '@/features/hero/hooks/useHero';
-import { Battle, BattleAction, BattleLog, BattleParticipant } from '@/shared/types';
+import { Battle, BattleAction, BattleLog, BattleParticipant, CombatStats } from '@/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { getBattleOptions } from '../api/get-battle';
@@ -44,6 +44,20 @@ export const useBattleUpdate = () => {
       return { ...oldData, pendingActions: oldData.pendingActions.filter((a) => a.id !== actionId) };
     });
   };
+  const addCombatStats = (participantId: string, newCombatStats: CombatStats[]) => {
+    queryClient.setQueryData(getBattleOptions(hero.id, hero.battleId).queryKey, (oldData) => {
+      if (!oldData) return;
+      return {
+        ...oldData,
+        participants: oldData.participants.map((p) => {
+          if (p.id === participantId) {
+            return { ...p, combatStats: [...p.combatStats, ...newCombatStats] };
+          }
+          return p;
+        }),
+      };
+    });
+  };
 
   return {
     updateBattle,
@@ -52,5 +66,6 @@ export const useBattleUpdate = () => {
     addLog,
     addPendingAction,
     removePendingAction,
+    addCombatStats
   };
 };

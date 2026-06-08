@@ -575,7 +575,8 @@ export type Corpse = {
   x: number;
   y: number;
   mapId: string;
-  deadEntityId: string;
+  parentEntityId: string;
+  type: BattleParticipantType;
   expiredAt: number;
 };
 
@@ -679,11 +680,23 @@ export interface GameSysMessage {
 }
 
 export interface HitResult {
-  LEFT_HAND: { hit: BattleZoneType | null; handResult: HandResult | null; giveDamage: number; isCriticalDamage: boolean };
-  RIGHT_HAND: { hit: BattleZoneType | null; handResult: HandResult | null; giveDamage: number; isCriticalDamage: boolean };
+  LEFT_HAND: {
+    hit: BattleZoneType | null;
+    handResult: HandResult | null;
+    giveDamage: number;
+    currentHealthAfterHit: number;
+    isCriticalDamage: boolean;
+  };
+  RIGHT_HAND: {
+    hit: BattleZoneType | null;
+    handResult: HandResult | null;
+    giveDamage: number;
+    currentHealthAfterHit: number;
+    isCriticalDamage: boolean;
+  };
 }
 
-export type WeaponAttackHand  = 'LEFT_HAND' | 'RIGHT_HAND'
+export type WeaponAttackHand = 'LEFT_HAND' | 'RIGHT_HAND';
 
 export type OmitDeepHero = {
   location?: Partial<ApiGetHeroResponse['location']>;
@@ -747,7 +760,38 @@ export type BattleDto = {
   logs: BattleLog[];
   participants: BattleParticipantDto[];
 };
+export type BattleParticipantDto = Omit<BattleParticipant, 'modifier'> & { modifier: Partial<Modifier> };
+export type BattleParticipant = Pick<
+  Hero,
+  | 'id'
+  | 'name'
+  | 'currentHealth'
+  | 'maxHealth'
+  | 'currentMana'
+  | 'maxMana'
+  | 'level'
+  | 'avatarImage'
+  | 'characterImage'
+  | 'equipments'
+  | 'buffs'
+> & {
+  scale?: number;
+  stat?: IHeroStat;
+  modifier: Modifier;
+  type: BattleParticipantType;
+  side: BattleSide;
+  isDead: boolean;
+  targetId: string | null;
+  combatStats: CombatStats[];
+};
 
+export type CombatStats = {
+  targetId: string;
+  value: number;
+  isCritical: boolean;
+  targetType: BattleParticipantType;
+  type: 'DAMAGE' | 'HEAL';
+};
 export type BattleLog = PhysicalAttackLog | AbilityLog;
 
 export type PhysicalAttackLog = {
@@ -793,29 +837,6 @@ export type BattleAction = {
   attackingZone: SelectedAttackingZone;
   defenseZone: SelectedDefenseZone;
   abilityId?: string;
-};
-export type BattleParticipantDto = Omit<BattleParticipant, 'modifier'> & { modifier: Partial<Modifier> };
-export type BattleParticipant = Pick<
-  Hero,
-  | 'id'
-  | 'name'
-  | 'currentHealth'
-  | 'maxHealth'
-  | 'currentMana'
-  | 'maxMana'
-  | 'level'
-  | 'avatarImage'
-  | 'characterImage'
-  | 'equipments'
-  | 'buffs'
-> & {
-  scale?: number;
-  stat?: IHeroStat;
-  modifier: Modifier;
-  type: BattleParticipantType;
-  side: BattleSide;
-  isDead: boolean;
-  targetId: string | null;
 };
 
 //API RESPONSE

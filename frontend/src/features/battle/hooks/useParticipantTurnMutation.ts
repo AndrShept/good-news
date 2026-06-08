@@ -10,7 +10,7 @@ export const useParticipantTurnMutation = () => {
   return useMutation({
     mutationFn: ({ attackingZone, defenseZone, targetId, heroId }: Parameters<typeof participantTurn>[0]) =>
       participantTurn({ attackingZone, defenseZone, heroId, targetId }),
-    onSuccess: ({ message, data }) => {
+    onSuccess: ({ message }) => {
       //   setGameMessage({
       //     color: 'YELLOW',
       //     text: message,

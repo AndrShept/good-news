@@ -13,8 +13,8 @@ export const useAttackTarget = () => {
   return useMutation({
     mutationFn: ({ targetId, targetType }: { targetId: string; targetType: Extract<MapChunkEntitiesType, 'HERO' | 'CREATURE'> }) =>
       attackTarget({ heroId, targetId, targetType }),
-    onSuccess: ({ message, data }) => {
-      updateHero({ ...data });
+    onSuccess: ({ message }) => {
+      // updateHero({ ...data });
       setGameMessage({
         color: 'YELLOW',
         text: message,

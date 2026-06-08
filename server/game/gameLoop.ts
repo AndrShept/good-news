@@ -2,9 +2,9 @@ import { performance } from 'node:perf_hooks';
 
 import { heroTickService } from '../services/hero-tick-service';
 import { battleTick } from './battleTick';
-import { despawnCorpseTick } from './despawn-corpse-tick';
 import { resourceRespawnTick } from './resource-respawn-tick';
 import { spawnCreatureTick } from './spawn-creature-tick';
+import { corpseTick } from './corpse-tick';
 
 const TICK_RATE = 500; // ms
 const MAX_CATCHUP_TICKS = 5;
@@ -25,7 +25,7 @@ export const gameLoop = () => {
 
     resourceRespawnTick(lastTick);
     spawnCreatureTick(lastTick);
-    despawnCorpseTick(lastTick);
+    corpseTick(lastTick);
     battleTick(lastTick);
 
     lastTick += TICK_RATE;

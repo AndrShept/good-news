@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { AutoZoneSelectorButton } from './AutoZoneSelectorButton';
 import { BattleTimer } from './BattleTimer';
 import { TurnButton } from './TurnButton';
+import { useBattle } from '../hooks/useBattle';
 
 interface Props {
   isEquipLeftHandWeapon: boolean;

@@ -4,6 +4,7 @@ import type {
   BattleLog,
   BattleParticipant,
   BuffInstance,
+  CombatStats,
   Corpse,
   EntityPayloadMap,
   GameSysMessageType,
@@ -171,9 +172,10 @@ export type BuffUpdateData = {
 };
 
 export type BattleSocketEvent =
-  | { type: 'PARTICIPANT_ADD'; payload: BattleParticipant}
+  | { type: 'PARTICIPANT_ADD'; payload: BattleParticipant }
   | { type: 'PARTICIPANT_UPDATE'; payload: Partial<BattleParticipant>[] }
   | { type: 'LOG_ADD'; payload: BattleLog[] }
   | { type: 'ACTIONS_ADD'; payload: BattleAction }
   | { type: 'ACTIONS_REMOVE'; payload: string[] }
-  | { type: 'BATTLE_UPDATE'; payload: Partial<Battle> };
+  | { type: 'BATTLE_UPDATE'; payload: Partial<Battle> }
+  | { type: 'COMBAT_STATS_ADD'; payload: { participantId: string; combatStats: CombatStats[] } };

@@ -61,12 +61,12 @@ export const EntitySidebarCard = memo(function EntitySidebarCard({
         </Button>
       )}
       {entityType === 'CORPSE' && (
-        <div className="flex">
-          <Button title='Loot' size="icon-sm" variant="ghost">
-            <GameIcon className="size-5" image={imageConfig.icon.ui['loot-bag']} />
-          </Button>
-          <Button title='Skinning' size="icon-sm" variant="ghost">
+        <div className="ml-auto flex">
+          <Button title="Skinning" size="icon-sm" variant="ghost">
             <GameIcon className="size-5" image={imageConfig.icon.skill.SKINNING} />
+          </Button>
+          <Button title="Loot" size="icon-sm" variant="ghost">
+            <GameIcon className="size-5" image={imageConfig.icon.ui['loot-bag']} />
           </Button>
         </div>
       )}

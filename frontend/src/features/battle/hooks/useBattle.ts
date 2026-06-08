@@ -21,12 +21,19 @@ export const useBattle = () => {
       const template = itemsTemplateById[e.itemTemplateId];
       return e.slot === 'LEFT_HAND' && template.type === 'SHIELD';
     }) ?? false;
-    
+
+  const canMakeActionInTarget  = battle?.participants.some((p) =>
+    battle.pendingActions.some(
+      (a) => p.id === a.participantId && p.id === hero.id && p.targetId === a.targetId && a.actionType === 'NORMAL',
+    ),
+  );
+
   return {
     battle,
     isEquipLeftHandWeapon,
     isEquipRightHandWeapon,
     isEquipShield,
     selfParticipant,
+    canMakeActionInTarget,
   };
 };

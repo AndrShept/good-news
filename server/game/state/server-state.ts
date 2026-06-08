@@ -26,11 +26,11 @@ export type HeroRuntime = Hero & {
   paths?: PathNode[];
   queueCraft: QueueCraft[];
   queueRefine: RefineOperation[];
-  offlineTimer?: number;
+  lastOnlineAt?: number;
   gatheringFinishAt?: number;
   refiningFinishAt?: number;
   regen: THeroRegen;
-
+  isOnline: boolean;
   selectedGatherTile?: {
     x: number;
     y: number;

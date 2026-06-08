@@ -26,11 +26,17 @@ export const placeService = {
       socket.leave(chunkId);
     }
 
+    mapService.despawnMapEntitiesInChunk({
+      entityId: hero.id,
+      type: 'HERO',
+      mapId: hero.location.mapId!,
+      x: hero.location.x,
+      y: hero.location.y,
+    });
     hero.location.mapId = null;
     hero.location.chunkId = null;
     hero.location.placeId = place.id;
 
-    mapService.despawnMapEntitiesInChunk({ entityId: hero.id, type: 'HERO', mapId: place.mapId, x: place.x, y: place.y });
     socketService.sendPlaceAddHero(hero.id, place.id);
     socketService.sendToClientSysMessage(hero.id, { color: 'GREY', text: `You have entered ${place.name}.` });
   },

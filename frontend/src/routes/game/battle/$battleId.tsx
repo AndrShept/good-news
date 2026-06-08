@@ -78,7 +78,7 @@ function RouteComponent() {
         {targetParticipant && <BattleParticipantCard {...targetParticipant} />}
       </div>
 
-      <BattleParticipantList selfParticipant={selfParticipant} attackers={attackers} defenders={defenders} />
+      <BattleParticipantList selfParticipant={selfParticipant} attackers={attackers} defenders={defenders} pendingActions={battle.pendingActions} />
     </section>
   );
 }

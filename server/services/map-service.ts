@@ -221,12 +221,12 @@ export const mapService = {
         break;
       case 'CREATURE':
         chunk?.creatures.delete(entityId);
-        serverState.creature.delete(entityId);
+        // serverState.creature.delete(entityId);
        
         break;
       case 'CORPSE':
         chunk?.corpses.delete(entityId);
-        serverState.corpse.delete(entityId);
+        // serverState.corpse.delete(entityId);
         break;
     }
 

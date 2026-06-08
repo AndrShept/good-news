@@ -10,6 +10,7 @@ import type {
   BattleParticipantType,
   BattleSide,
   BattleZoneType,
+  CombatStats,
   DamageType,
   EquipmentSlotType,
   HandResult,
@@ -18,6 +19,7 @@ import type {
   Modifier,
   SelectedAttackingZone,
   SelectedDefenseZone,
+  WeaponAttackHand,
 } from '@/shared/types';
 import { getAttackingRandomZone, getDefenseRandomZone, sumAllModifier } from '@/shared/utils';
 import { HTTPException } from 'hono/http-exception';
@@ -54,7 +56,12 @@ interface GetBattleLogParam {
   attacker: BattleParticipant;
   defender: BattleParticipant;
   defendZone: SelectedDefenseZone;
-  
+}
+
+interface AddCombatStatParam {
+  hitResult: HitResult;
+  attacker: BattleParticipant;
+  defender: BattleParticipant;
 }
 
 export const battleService = {
@@ -74,7 +81,7 @@ export const battleService = {
   getBattleLog({ attacker, defender, defendZone, hitResult }: GetBattleLogParam): BattleLog[] {
     const logs = (Object.keys(hitResult) as (keyof HitResult)[])
       .map((hand) => {
-        const { hit, handResult, giveDamage, isCriticalDamage } = hitResult[hand];
+        const { hit, handResult, giveDamage, isCriticalDamage, currentHealthAfterHit } = hitResult[hand];
         if (!hit) return;
         return {
           id: generateRandomUuid(),
@@ -83,7 +90,7 @@ export const battleService = {
           defenderId: defender.id,
           defenderName: defender.name,
           attackingZone: hit,
-          defenderCurrentHealth: defender.currentHealth,
+          defenderCurrentHealth: currentHealthAfterHit,
           defenderMaxHealth: defender.maxHealth,
           defendZone,
           hand,
@@ -139,6 +146,7 @@ export const battleService = {
       heroSocket.join(battleId);
       hero.state = 'BATTLE';
       hero.battleId = battleId;
+      socketService.sendToClientUpdateSelfHeroData(participant.id, { battleId, state: 'BATTLE' });
       if (hero.location.chunkId) {
         socketService.sendMapUpdateEntity(participant.id, hero.location.chunkId, { type: 'HERO', payload: { state: 'BATTLE' } });
       }
@@ -170,6 +178,7 @@ export const battleService = {
           buffs: hero.buffs,
           isDead: false,
           targetId: null,
+          combatStats: [],
           side,
           type,
         };
@@ -191,6 +200,7 @@ export const battleService = {
           buffs: [],
           isDead: false,
           targetId: null,
+          combatStats: [],
           side,
           type,
           scale: creature.scale,
@@ -270,7 +280,35 @@ export const battleService = {
       defendZone: firstAction.defenseZone,
       hitResult: secondHitResult,
     });
+
+    const firstCombatStats = this.getCombatStat({
+      attacker: firstParticipant,
+      defender: secondParticipant,
+      hitResult: firstHitResult,
+    });
+    const secondCombatStats = this.getCombatStat({
+      attacker: secondParticipant,
+      defender: firstParticipant,
+      hitResult: secondHitResult,
+    });
     battle.logs.push(...[...firstBattleLog, ...secondBattleLog]);
+    firstParticipant.combatStats.push(...firstCombatStats);
+    secondParticipant.combatStats.push(...secondCombatStats);
+
+    socketService.sendToClientBattleUpdate(battle.id, {
+      type: 'COMBAT_STATS_ADD',
+      payload: {
+        participantId: firstParticipant.id,
+        combatStats: firstCombatStats,
+      },
+    });
+    socketService.sendToClientBattleUpdate(battle.id, {
+      type: 'COMBAT_STATS_ADD',
+      payload: {
+        participantId: secondParticipant.id,
+        combatStats: secondCombatStats,
+      },
+    });
 
     socketService.sendToClientBattleUpdate(battle.id, {
       type: 'PARTICIPANT_UPDATE',
@@ -286,10 +324,20 @@ export const battleService = {
       ],
     });
     socketService.sendToClientBattleUpdate(battle.id, { type: 'LOG_ADD', payload: [...firstBattleLog, ...secondBattleLog] });
-    for (const action of [firstAction, secondAction]) {
+
+    const allInstanceActions = battle.pendingActions.filter(
+      (a) =>
+        (a.participantId === firstAction.participantId || a.participantId === secondAction.participantId) && a.actionType === 'INSTANT',
+    );
+    const allInstanceActionIds = allInstanceActions.map((a) => a.id);
+
+    for (const action of [...allInstanceActions, firstAction, secondAction]) {
       this.removeActionPending(battle.pendingActions, action.id);
     }
-    socketService.sendToClientBattleUpdate(battle.id, { type: 'ACTIONS_REMOVE', payload: [firstAction.id, secondAction.id] });
+    socketService.sendToClientBattleUpdate(battle.id, {
+      type: 'ACTIONS_REMOVE',
+      payload: [firstAction.id, secondAction.id, ...allInstanceActionIds],
+    });
   },
 
   checkHitResult({
@@ -302,8 +350,8 @@ export const battleService = {
     equipments,
   }: CheckHitParams): HitResult {
     const hitResult: HitResult = {
-      RIGHT_HAND: { hit: null, handResult: null, giveDamage: 0, isCriticalDamage: false },
-      LEFT_HAND: { hit: null, handResult: null, giveDamage: 0, isCriticalDamage: false },
+      RIGHT_HAND: { hit: null, handResult: null, giveDamage: 0, currentHealthAfterHit: 0, isCriticalDamage: false },
+      LEFT_HAND: { hit: null, handResult: null, giveDamage: 0, currentHealthAfterHit: 0, isCriticalDamage: false },
     };
 
     for (const hand of Object.keys(hitResult) as (keyof HitResult)[]) {
@@ -335,9 +383,10 @@ export const battleService = {
         equipments,
         hitHand: hand,
       });
-      const newCurrentHealth = Math.max(defenderParticipant.currentHealth - hitResult[hand].giveDamage, 0);
 
-      this.updateParticipant(defenderParticipant, { currentHealth: newCurrentHealth });
+      const currentHealthAfterHit = Math.max(defenderParticipant.currentHealth - hitResult[hand].giveDamage, 0);
+      hitResult[hand].currentHealthAfterHit = currentHealthAfterHit;
+      this.updateParticipant(defenderParticipant, { currentHealth: currentHealthAfterHit });
     }
 
     return hitResult;
@@ -388,53 +437,40 @@ export const battleService = {
           });
           if (!hero.location.chunkId) continue;
           socketService.sendMapUpdateEntity(hero.id, hero.location.chunkId, { type: 'HERO', payload: { state: 'IDLE' } });
-          if (hero.currentHealth <= 0) {
+          if (participant.isDead) {
+            corpseService.createHeroCorpse({
+              hero,
+              now,
+              chunkId: hero.location.chunkId,
+            });
             placeService.onTeleportNearTown(hero);
+            socketService.sendToClientSysMessage(hero.id, { color: 'RED', text: 'You died and were teleported to the nearest town' });
           }
           break;
         }
         case 'CREATURE': {
-          if (participant.currentHealth > 0) continue;
           const creature = creatureService.getCreature(participant.id);
+
           const chunkId = mapService.getChunkId({ mapId: creature.mapId, x: creature.x, y: creature.y });
           const chunk = serverState.mapChunks.get(chunkId);
           if (!chunk) continue;
-          const spawnZone = creatureService.getSpawnZone(creature.key);
-          if (!spawnZone) continue;
-          if (chunk.spawnZones[spawnZone].lastSpawnAt <= now) {
-            chunk.spawnZones[spawnZone].lastSpawnAt = now + SPAWN_ZONE_CREATURE_TABLE[spawnZone].respawnTime;
-          }
-          chunk.spawnZones[spawnZone].creatureAlive--;
+          creature.state = 'IDLE';
+          socketService.sendMapUpdateEntity(creature.id, chunkId, { type: 'CREATURE', payload: { state: 'IDLE' } });
+          if (participant.isDead) {
+            const spawnZone = creatureService.getSpawnZone(creature.key);
+            if (!spawnZone) continue;
+            if (chunk.spawnZones[spawnZone].lastSpawnAt <= now) {
+              chunk.spawnZones[spawnZone].lastSpawnAt = now + SPAWN_ZONE_CREATURE_TABLE[spawnZone].respawnTime;
+            }
+            chunk.spawnZones[spawnZone].creatureAlive--;
 
-          const newCorpse = corpseService.createCorpse({
-            id: generateRandomUuid(),
-            deadEntityId: participant.id,
-            expiredAt: now + 60_000 * 20, //20 min
-            name: `${creature.name} corpse`,
-            image: imageConfig.icon.ui.grave,
-            mapId: creature.mapId,
-            x: creature.x,
-            y: creature.y,
-          });
-          mapService.despawnMapEntitiesInChunk({
-            entityId: participant.id,
-            type: 'CREATURE',
-            mapId: creature.mapId,
-            x: creature.x,
-            y: creature.y,
-          });
-          mapService.spawnMapEntitiesInChunk({
-            entityId: newCorpse.id,
-            type: 'CORPSE',
-            mapId: newCorpse.mapId,
-            x: newCorpse.x,
-            y: newCorpse.y,
-          });
-          socketService.sendMapChunkSpawnEntities({
-            type: 'CORPSE',
-            chunkId,
-            entityIds: [newCorpse.id],
-          });
+            corpseService.createCreatureCorpse({
+              chunkId,
+              creature,
+              now,
+            });
+          }
+
           break;
         }
       }
@@ -442,5 +478,21 @@ export const battleService = {
 
     battle.status = 'FINISHED';
     serverState.battle.delete(battle.id);
+  },
+
+  getCombatStat({ attacker, defender, hitResult }: AddCombatStatParam) {
+    const combatStats: CombatStats[] = [];
+    for (const hand of Object.keys(hitResult) as WeaponAttackHand[]) {
+      const { giveDamage, isCriticalDamage, hit } = hitResult[hand];
+      if (!hit) continue;
+      combatStats.push({
+        targetId: defender.id,
+        type: 'DAMAGE',
+        targetType: defender.type,
+        isCritical: isCriticalDamage,
+        value: giveDamage,
+      });
+    }
+    return combatStats;
   },
 };
