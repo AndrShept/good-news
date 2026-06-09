@@ -801,7 +801,7 @@ export type PhysicalAttackLog = {
   attackerName: string;
   defenderId: string;
   defenderName: string;
-  defendZone: SelectedDefenseZone;
+  defendZone: SelectedDefenseZone | null
   giveDamage: number;
   defenderCurrentHealth: number;
   defenderMaxHealth: number;
@@ -835,7 +835,7 @@ export type BattleAction = {
   actionType: BattleActionType;
   targetId: string;
   attackingZone: SelectedAttackingZone;
-  defenseZone: SelectedDefenseZone;
+  defenseZone: SelectedDefenseZone | null;
   abilityId?: string;
 };
 

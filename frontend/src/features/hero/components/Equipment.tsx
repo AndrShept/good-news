@@ -4,7 +4,7 @@ import { BASE_EQUIPMENTS_IMAGE } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { EquipmentSlotType, ItemInstance } from '@/shared/types';
 import { useSelectItemInstanceStore } from '@/store/useSelectItemInstanceStore';
-import { useMemo } from 'react';
+import { memo } from 'react';
 
 import { useGameData } from '../hooks/useGameData';
 import { CharacterSprite } from './CharacterSprite';
@@ -15,19 +15,16 @@ interface Props {
   scale?: number;
 }
 
-export const Equipments = ({ equipments, characterImage, scale }: Props) => {
-  const equipmentBySlot = useMemo(
-    () =>
-      equipments.reduce(
-        (acc, equip) => {
-          if (!equip.slot) return acc;
-          acc[equip.slot] = equip;
-          return acc;
-        },
-        {} as Record<EquipmentSlotType, ItemInstance>,
-      ),
-    [equipments],
+export const Equipments = memo(({ equipments, characterImage, scale }: Props) => {
+  const equipmentBySlot = equipments.reduce(
+    (acc, equip) => {
+      if (!equip.slot) return acc;
+      acc[equip.slot] = equip;
+      return acc;
+    },
+    {} as Record<EquipmentSlotType, ItemInstance>,
   );
+
   const { itemsTemplateById } = useGameData();
   const { itemInstance, setItemInstance } = useSelectItemInstanceStore();
   return (
@@ -73,4 +70,4 @@ export const Equipments = ({ equipments, characterImage, scale }: Props) => {
       </ul>
     </div>
   );
-};
+});

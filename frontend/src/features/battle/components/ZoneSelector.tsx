@@ -4,10 +4,10 @@ import { imageConfig } from '@/shared/config/image-config';
 import { SelectedAttackingZone, SelectedDefenseZone, battleShieldZoneValues, battleZoneValues } from '@/shared/types';
 import { useState } from 'react';
 
+import { useBattle } from '../hooks/useBattle';
 import { AutoZoneSelectorButton } from './AutoZoneSelectorButton';
 import { BattleTimer } from './BattleTimer';
 import { TurnButton } from './TurnButton';
-import { useBattle } from '../hooks/useBattle';
 
 interface Props {
   isEquipLeftHandWeapon: boolean;
@@ -43,7 +43,7 @@ export const ZoneSelector = ({
     <section className="mx-auto flex h-full w-full flex-col items-center justify-between gap-2">
       <div className="flex flex-col gap-2 text-nowrap md:flex-row">
         <ul className="flex w-fit flex-col gap-1">
-          <p className="text-center text-yellow-400">ATTACK</p>
+          <p className="text-mist-500 text-center">Attack zone</p>
           {battleZoneValues.map((zone) => (
             <li key={zone} className="flex select-none items-center gap-1">
               {isEquipLeftHandWeapon && (
@@ -66,12 +66,12 @@ export const ZoneSelector = ({
                 />
               )}
 
-              <p className="text-sm lowercase">hit to the {zone}</p>
+              <p className="text-sm lowercase">hit {zone}</p>
             </li>
           ))}
         </ul>
         <ul className="flex w-fit flex-col gap-1">
-          <p className="text-center text-blue-500">DEFENSE</p>
+          <p className="text-center text-slate-500">Block zone</p>
           {defenseZoneValues.map((zone, idx) => (
             <li key={idx} className="flex select-none gap-1">
               <Input
@@ -90,10 +90,12 @@ export const ZoneSelector = ({
         </ul>
       </div>
       <div className="flex w-full flex-col items-center gap-1">
-        <p>Round: {currentRound}</p>
+        <p className="text-mauve-500">
+          Round: <span className="text-foreground">{currentRound}</span>
+        </p>
         <div className="flex gap-1">
           <GameIcon className="size-6" image={imageConfig.icon.ui.clock} />
-          <BattleTimer roundEndsAt={roundEndsAt} />
+          <BattleTimer roundEndsAt={roundEndsAt} lowTime={10} />
         </div>
         <div className="flex w-full justify-center gap-1">
           <AutoZoneSelectorButton

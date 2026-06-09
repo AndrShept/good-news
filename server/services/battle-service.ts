@@ -43,7 +43,7 @@ interface GetParticipantData {
 
 interface CheckHitParams {
   attackZone: SelectedAttackingZone;
-  defendZone: SelectedDefenseZone;
+  defendZone: SelectedDefenseZone | null;
   attackerModifier: Modifier;
   defenderModifier: Modifier;
   defenderParticipant: BattleParticipant;
@@ -55,7 +55,7 @@ interface GetBattleLogParam {
   hitResult: HitResult;
   attacker: BattleParticipant;
   defender: BattleParticipant;
-  defendZone: SelectedDefenseZone;
+  defendZone: SelectedDefenseZone | null;
 }
 
 interface AddCombatStatParam {
@@ -75,8 +75,8 @@ export const battleService = {
     if (!participant) throw new HTTPException(400, { message: 'participant not found' });
     return participant;
   },
-  getRoundDuration() {
-    return Date.now() + 90_000;
+  getRoundDuration(participantLength: number) {
+    return Date.now() + Math.min(participantLength * 10_000, 60_000);
   },
   getBattleLog({ attacker, defender, defendZone, hitResult }: GetBattleLogParam): BattleLog[] {
     const logs = (Object.keys(hitResult) as (keyof HitResult)[])
@@ -107,11 +107,11 @@ export const battleService = {
 
     return logs;
   },
-  initBattle(location: BattleLocation) {
+  initBattle(location: BattleLocation, participantLength: number) {
     const id = generateRandomUuid();
     const newBattle: Battle = {
       id,
-      roundEndsAt: this.getRoundDuration(),
+      roundEndsAt: this.getRoundDuration(participantLength),
       currentRound: 1,
       status: 'IN_PROGRESS',
       location,
@@ -124,7 +124,7 @@ export const battleService = {
     return newBattle;
   },
   startBattle(partData: GetParticipantData[], location: BattleLocation) {
-    const newBattle = battleService.initBattle(location);
+    const newBattle = battleService.initBattle(location, partData.length);
     for (const participantInfo of partData) {
       const participant = battleService.getParticipantData({
         participantId: participantInfo.participantId,

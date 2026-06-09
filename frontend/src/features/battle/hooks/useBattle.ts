@@ -1,6 +1,6 @@
 import { useGameData } from '@/features/hero/hooks/useGameData';
 import { useHero } from '@/features/hero/hooks/useHero';
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { getBattleOptions } from '../api/get-battle';
 

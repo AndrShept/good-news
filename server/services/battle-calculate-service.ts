@@ -61,8 +61,8 @@ export const battleCalculateService = {
     const critReduction = clamp(defenderModifier.wisdom * 0.1, 0, 20);
     return Math.random() * 100 < critChance - critReduction;
   },
-  isZoneBlocked(attackZone: BattleZoneType, defendZone: SelectedDefenseZone) {
-    if (!attackZone) return false;
+  isZoneBlocked(attackZone: BattleZoneType, defendZone: SelectedDefenseZone | null) {
+    if (!attackZone || !defendZone) return false;
     if (Array.isArray(defendZone)) {
       return (defendZone as BattleZoneType[]).includes(attackZone);
     }
