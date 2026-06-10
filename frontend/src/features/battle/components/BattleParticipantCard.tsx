@@ -27,7 +27,7 @@ export const BattleParticipantCard = memo((props: Props) => {
       />
       <Equipments scale={props.scale} characterImage={props.characterImage} equipments={props.equipments} />
       <p className="text-mauve-600">
-        Give Damage: <span className="text-foreground font-semibold">{giveDamage}</span>
+        Total Damage: <span className="text-foreground font-semibold">{giveDamage}</span>
       </p>
     </div>
   );
