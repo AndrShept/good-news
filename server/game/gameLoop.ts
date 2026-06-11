@@ -6,7 +6,7 @@ import { resourceRespawnTick } from './resource-respawn-tick';
 import { spawnCreatureTick } from './spawn-creature-tick';
 import { corpseTick } from './corpse-tick';
 
-const TICK_RATE = 500; // ms
+const TICK_RATE = 200; // ms
 const MAX_CATCHUP_TICKS = 5;
 
 let lastTick = Date.now();

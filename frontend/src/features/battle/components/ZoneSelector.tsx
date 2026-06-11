@@ -1,10 +1,9 @@
 import { GameIcon } from '@/components/GameIcon';
 import { Input } from '@/components/ui/input';
+import { SelectedAttackingZone, SelectedDefenseZone, battleShieldZoneValues, battleZoneValues } from '@/shared/battle-types';
 import { imageConfig } from '@/shared/config/image-config';
-import { SelectedAttackingZone, SelectedDefenseZone, battleShieldZoneValues, battleZoneValues } from '@/shared/types';
 import { useState } from 'react';
 
-import { useBattle } from '../hooks/useBattle';
 import { AutoZoneSelectorButton } from './AutoZoneSelectorButton';
 import { BattleTimer } from './BattleTimer';
 import { TurnButton } from './TurnButton';

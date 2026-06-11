@@ -1,26 +1,23 @@
-import { imageConfig } from '@/shared/config/image-config';
-import type { BattleSocketEvent } from '@/shared/socket-data-types';
-import { socketEvents } from '@/shared/socket-events';
 import type {
+  AbilityResult,
+  ActionResult,
   Battle,
   BattleAction,
+  BattleActionCategory,
   BattleLocation,
   BattleLog,
   BattleParticipant,
   BattleParticipantType,
   BattleSide,
-  BattleZoneType,
   CombatStats,
   DamageType,
-  EquipmentSlotType,
-  HandResult,
-  HitResult,
-  ItemInstance,
-  Modifier,
+  PhysicalAttackResult,
   SelectedAttackingZone,
   SelectedDefenseZone,
-  WeaponAttackHand,
-} from '@/shared/types';
+  SkipRoundLog,
+  SkipRoundResult,
+} from '@/shared/battle-types';
+import type { ItemInstance, Modifier, WeaponAttackHand } from '@/shared/types';
 import { getAttackingRandomZone, getDefenseRandomZone, sumAllModifier } from '@/shared/utils';
 import { HTTPException } from 'hono/http-exception';
 
@@ -41,27 +38,33 @@ interface GetParticipantData {
   side: BattleSide;
 }
 
-interface CheckHitParams {
-  attackZone: SelectedAttackingZone;
-  defendZone: SelectedDefenseZone | null;
-  attackerModifier: Modifier;
-  defenderModifier: Modifier;
-  defenderParticipant: BattleParticipant;
-  damageType: DamageType;
-  equipments: ItemInstance[];
+interface GetBattleLogParams {
+  actionResult: ActionResult;
+  attackerParticipant: BattleParticipant;
+  targetParticipant: BattleParticipant;
+  targetDefenseZone: SelectedDefenseZone | null;
 }
 
-interface GetBattleLogParam {
-  hitResult: HitResult;
-  attacker: BattleParticipant;
-  defender: BattleParticipant;
-  defendZone: SelectedDefenseZone | null;
+interface ResolveActionPairParam {
+  battle: Battle;
+  action: BattleAction;
+  attackerParticipant: BattleParticipant;
+  targetParticipant: BattleParticipant;
+  targetDefenseZone: SelectedDefenseZone | null;
 }
 
-interface AddCombatStatParam {
-  hitResult: HitResult;
-  attacker: BattleParticipant;
-  defender: BattleParticipant;
+interface GetCombatStatParam {
+  actionResult: ActionResult;
+  targetParticipant: BattleParticipant;
+}
+
+interface ActionResultParam {
+  action: BattleAction;
+  attackerParticipant: BattleParticipant;
+  targetParticipant: BattleParticipant;
+  attackerSumModifier: Modifier;
+  targetSumModifier: Modifier;
+  targetDefenseZone: SelectedDefenseZone | null;
 }
 
 export const battleService = {
@@ -78,35 +81,7 @@ export const battleService = {
   getRoundDuration(participantLength: number) {
     return Date.now() + Math.min(participantLength * 10_000, 60_000);
   },
-  getBattleLog({ attacker, defender, defendZone, hitResult }: GetBattleLogParam): BattleLog[] {
-    const logs = (Object.keys(hitResult) as (keyof HitResult)[])
-      .map((hand) => {
-        const { hit, handResult, giveDamage, isCriticalDamage, currentHealthAfterHit } = hitResult[hand];
-        if (!hit) return;
-        return {
-          id: generateRandomUuid(),
-          attackerId: attacker.id,
-          attackerName: attacker.name,
-          defenderId: defender.id,
-          defenderName: defender.name,
-          attackingZone: hit,
-          defenderCurrentHealth: currentHealthAfterHit,
-          defenderMaxHealth: defender.maxHealth,
-          defendZone,
-          hand,
-          type: 'PHYSICAL_ATTACK' as 'PHYSICAL_ATTACK',
-          isBlocking: handResult === 'BLOCKED' ? true : false,
-          isMissed: handResult === 'MISSED' ? true : false,
-          isCriticalDamage,
-          giveDamage,
 
-          createdAt: Date.now(),
-        };
-      })
-      .filter((l) => !!l);
-
-    return logs;
-  },
   initBattle(location: BattleLocation, participantLength: number) {
     const id = generateRandomUuid();
     const newBattle: Battle = {
@@ -213,7 +188,13 @@ export const battleService = {
     if (!participant) return;
     const enemies = battle.participants.filter((p) => p.side !== participant.side && !p.isDead);
     const validTargets = enemies.filter((e) =>
-      battle.pendingActions.some((a) => a.targetId !== e.id && a.participantId === participant.id),
+      battle.pendingActions.some(
+        (a) =>
+          (a.category === 'ABILITY' || a.category === 'PHYSICAL_ATTACK') &&
+          a.actionType === 'NORMAL' &&
+          a.targetId !== e.id &&
+          a.participantId === participant.id,
+      ),
     );
 
     const random = Math.floor(Math.random() * enemies.length);
@@ -225,7 +206,8 @@ export const battleService = {
   createCreatureActionPending(battle: Battle, creatureParticipant: BattleParticipant, targetId: string) {
     const attackingZone = getAttackingRandomZone({ isEquipLeftHandWeapon: false, isEquipRightHandWeapon: true });
     const defenseZone = getDefenseRandomZone(false);
-    battle.pendingActions.push({
+
+    const creatureAction: BattleAction = {
       id: generateRandomUuid(),
       attackingZone,
       defenseZone,
@@ -233,6 +215,12 @@ export const battleService = {
       participantId: creatureParticipant.id,
       targetId,
       category: 'PHYSICAL_ATTACK',
+    };
+    battle.pendingActions.push(creatureAction);
+
+    socketService.sendToClientBattleUpdate(battle.id, {
+      type: 'ACTIONS_ADD',
+      payload: creatureAction,
     });
   },
   removeActionPending(actionsPending: BattleAction[], actionId: string) {
@@ -243,154 +231,207 @@ export const battleService = {
     }
     actionsPending.splice(index, 1);
   },
-  resolveActionPair(battle: Battle, firstAction: BattleAction, secondAction: BattleAction) {
-    const firstParticipant = this.getParticipant(battle, firstAction.participantId);
-    const secondParticipant = this.getParticipant(battle, secondAction.participantId);
-    const firstSumModifier = sumAllModifier(firstParticipant.stat, firstParticipant.modifier);
-    const secondSumModifier = sumAllModifier(secondParticipant.stat, secondParticipant.modifier);
+  actionResult({
+    action,
+    attackerParticipant,
+    targetParticipant,
+    attackerSumModifier,
+    targetSumModifier,
+    targetDefenseZone,
+  }: ActionResultParam) {
+    let actionResult: ActionResult | null = null;
+    switch (action.category) {
+      case 'PHYSICAL_ATTACK': {
+        const hitResult: PhysicalAttackResult = {
+          RIGHT_HAND: { hit: null, handResult: null, giveDamage: 0, currentHealthAfterHit: 0, isCriticalDamage: false },
+          LEFT_HAND: { hit: null, handResult: null, giveDamage: 0, currentHealthAfterHit: 0, isCriticalDamage: false },
+        };
 
-    const firstHitResult = this.checkHitResult({
-      attackZone: firstAction.attackingZone,
-      defendZone: secondAction.defenseZone,
-      attackerModifier: firstSumModifier,
-      defenderModifier: secondSumModifier,
-      defenderParticipant: secondParticipant,
-      damageType: 'PHYSICAL',
-      equipments: firstParticipant.equipments,
-    });
-    const secondHitResult = this.checkHitResult({
-      attackZone: secondAction.attackingZone,
-      defendZone: firstAction.defenseZone,
-      attackerModifier: secondSumModifier,
-      defenderModifier: firstSumModifier,
-      defenderParticipant: firstParticipant,
-      damageType: 'PHYSICAL',
-      equipments: secondParticipant.equipments,
+        for (const hand of Object.keys(hitResult) as WeaponAttackHand[]) {
+          const zone = action.attackingZone[hand];
+          if (!zone) continue;
+          if (targetParticipant.currentHealth <= 0) continue;
+
+          hitResult[hand].hit = zone;
+
+          const isDodged = battleCalculateService.isDodged({
+            attackerModifier: attackerSumModifier,
+            targetModifier: targetSumModifier,
+            damageType: 'PHYSICAL',
+          });
+          if (isDodged) {
+            hitResult[hand].handResult = 'MISSED';
+            continue;
+          }
+
+          const isBlocked = battleCalculateService.isZoneBlocked(zone, targetDefenseZone);
+          if (isBlocked) {
+            hitResult[hand].handResult = 'BLOCKED';
+            continue;
+          }
+
+          const isCritical = battleCalculateService.isCriticalHit({
+            attackerModifier: attackerSumModifier,
+            targetModifier: targetSumModifier,
+            damageType: 'PHYSICAL',
+          });
+          hitResult[hand].handResult = 'HIT';
+          hitResult[hand].isCriticalDamage = isCritical;
+          hitResult[hand].giveDamage = battleCalculateService.calculatePhysicalDamage({
+            attackerModifier: attackerSumModifier,
+            targetModifier: targetSumModifier,
+            isCritical,
+            equipments: attackerParticipant.equipments,
+            hitHand: hand,
+          });
+
+          const currentHealthAfterHit = Math.max(targetParticipant.currentHealth - hitResult[hand].giveDamage, 0);
+          hitResult[hand].currentHealthAfterHit = currentHealthAfterHit;
+          this.updateParticipant(targetParticipant, { currentHealth: currentHealthAfterHit });
+        }
+        actionResult = {
+          category: action.category,
+          hitResult,
+        };
+        return actionResult;
+      }
+      case 'ABILITY': {
+        actionResult = {
+          category: action.category,
+          abilityResult: {},
+        };
+        return actionResult;
+      }
+      case 'SKIP_ROUND': {
+        actionResult = {
+          category: action.category,
+          skipRoundResult: {
+            message: `skipped their turn`,
+            participantId: attackerParticipant.id,
+            participantName: attackerParticipant.name,
+          },
+        };
+        return actionResult;
+      }
+    }
+  },
+  getBattleLog({ actionResult, attackerParticipant, targetParticipant, targetDefenseZone }: GetBattleLogParams) {
+    const battleLogs: BattleLog[] = [];
+
+    switch (actionResult.category) {
+      case 'PHYSICAL_ATTACK':
+        for (const hand of Object.keys(actionResult.hitResult) as WeaponAttackHand[]) {
+          const { hit, handResult, giveDamage, isCriticalDamage, currentHealthAfterHit } = actionResult.hitResult[hand];
+          if (!hit) continue;
+          battleLogs.push({
+            id: generateRandomUuid(),
+            attackerId: attackerParticipant.id,
+            attackerName: attackerParticipant.name,
+            targetId: targetParticipant.id,
+            targetName: targetParticipant.name,
+            targetHealthAfterHit: currentHealthAfterHit,
+            targetMaxHealth: targetParticipant.maxHealth,
+            attackingZone: hit,
+            defendZone: targetDefenseZone,
+            hand,
+            type: 'PHYSICAL_ATTACK',
+            isBlocking: handResult === 'BLOCKED' ? true : false,
+            isMissed: handResult === 'MISSED' ? true : false,
+            isCriticalDamage,
+            giveDamage,
+
+            createdAt: Date.now(),
+          });
+        }
+        break;
+      case 'ABILITY':
+        break;
+      case 'SKIP_ROUND':
+        battleLogs.push({
+          id: generateRandomUuid(),
+          type: 'SKIP_ROUND',
+          ...actionResult.skipRoundResult,
+        });
+        break;
+    }
+
+    return battleLogs;
+  },
+  resolveActionPair({ battle, action, attackerParticipant, targetParticipant, targetDefenseZone }: ResolveActionPairParam) {
+    const attackerSumModifier = sumAllModifier(attackerParticipant.stat, attackerParticipant.modifier);
+    const targetSumModifier = sumAllModifier(targetParticipant.stat, targetParticipant.modifier);
+
+    const actionResult = this.actionResult({
+      action,
+      attackerParticipant,
+      targetParticipant,
+      attackerSumModifier,
+      targetSumModifier,
+      targetDefenseZone,
     });
 
-    const firstBattleLog = this.getBattleLog({
-      attacker: firstParticipant,
-      defender: secondParticipant,
-      defendZone: secondAction.defenseZone,
-      hitResult: firstHitResult,
-    });
-    const secondBattleLog = this.getBattleLog({
-      attacker: secondParticipant,
-      defender: firstParticipant,
-      defendZone: firstAction.defenseZone,
-      hitResult: secondHitResult,
+    const battleLogs = this.getBattleLog({
+      attackerParticipant,
+      targetParticipant,
+      actionResult,
+      targetDefenseZone,
     });
 
-    const firstCombatStats = this.getCombatStat({
-      attacker: firstParticipant,
-      defender: secondParticipant,
-      hitResult: firstHitResult,
-    });
-    const secondCombatStats = this.getCombatStat({
-      attacker: secondParticipant,
-      defender: firstParticipant,
-      hitResult: secondHitResult,
-    });
-    battle.logs.push(...[...firstBattleLog, ...secondBattleLog]);
-    firstParticipant.combatStats.push(...firstCombatStats);
-    secondParticipant.combatStats.push(...secondCombatStats);
-
-    socketService.sendToClientBattleUpdate(battle.id, {
-      type: 'COMBAT_STATS_ADD',
-      payload: {
-        participantId: firstParticipant.id,
-        combatStats: firstCombatStats,
-      },
-    });
-    socketService.sendToClientBattleUpdate(battle.id, {
-      type: 'COMBAT_STATS_ADD',
-      payload: {
-        participantId: secondParticipant.id,
-        combatStats: secondCombatStats,
-      },
+    const combatStats = this.getCombatStat({
+      actionResult,
+      targetParticipant,
     });
 
-    socketService.sendToClientBattleUpdate(battle.id, {
-      type: 'PARTICIPANT_UPDATE',
-      payload: [
-        {
-          id: firstParticipant.id,
-          currentHealth: firstParticipant.currentHealth,
+    battle.logs.push(...battleLogs);
+    attackerParticipant.combatStats.push(...combatStats);
+
+    if (
+      battle.pendingActions.filter((a) => (a.category === 'ABILITY' || a.category === 'PHYSICAL_ATTACK') && a.actionType === 'NORMAL')
+        .length < 2
+    ) {
+      battle.currentRound++;
+      battle.roundEndsAt = battleService.getRoundDuration(battle.participants.length);
+      socketService.sendToClientBattleUpdate(battle.id, {
+        type: 'BATTLE_UPDATE',
+        payload: {
+          currentRound: battle.currentRound,
+          roundEndsAt: battle.roundEndsAt,
         },
-        {
-          id: secondParticipant.id,
-          currentHealth: secondParticipant.currentHealth,
-        },
-      ],
-    });
-    socketService.sendToClientBattleUpdate(battle.id, { type: 'LOG_ADD', payload: [...firstBattleLog, ...secondBattleLog] });
+      });
+    }
 
-    const allInstanceActions = battle.pendingActions.filter(
-      (a) =>
-        (a.participantId === firstAction.participantId || a.participantId === secondAction.participantId) && a.actionType === 'INSTANT',
-    );
+    const allInstanceActions = battle.pendingActions.filter((a) => a.participantId === action.participantId);
     const allInstanceActionIds = allInstanceActions.map((a) => a.id);
 
-    for (const action of [...allInstanceActions, firstAction, secondAction]) {
-      this.removeActionPending(battle.pendingActions, action.id);
-    }
-    socketService.sendToClientBattleUpdate(battle.id, {
-      type: 'ACTIONS_REMOVE',
-      payload: [firstAction.id, secondAction.id, ...allInstanceActionIds],
-    });
-  },
-
-  checkHitResult({
-    attackZone,
-    defendZone,
-    attackerModifier,
-    defenderModifier,
-    defenderParticipant,
-    damageType,
-    equipments,
-  }: CheckHitParams): HitResult {
-    const hitResult: HitResult = {
-      RIGHT_HAND: { hit: null, handResult: null, giveDamage: 0, currentHealthAfterHit: 0, isCriticalDamage: false },
-      LEFT_HAND: { hit: null, handResult: null, giveDamage: 0, currentHealthAfterHit: 0, isCriticalDamage: false },
-    };
-
-    for (const hand of Object.keys(hitResult) as (keyof HitResult)[]) {
-      const zone = attackZone[hand];
-      if (!zone) continue;
-      if (defenderParticipant.currentHealth <= 0) continue;
-
-      hitResult[hand].hit = zone;
-
-      const isDodged = battleCalculateService.isDodged({ attackerModifier, defenderModifier, damageType });
-      if (isDodged) {
-        hitResult[hand].handResult = 'MISSED';
-        continue;
-      }
-
-      const isBlocked = battleCalculateService.isZoneBlocked(zone, defendZone);
-      if (isBlocked) {
-        hitResult[hand].handResult = 'BLOCKED';
-        continue;
-      }
-
-      const isCritical = battleCalculateService.isCriticalHit(attackerModifier, defenderModifier, damageType);
-      hitResult[hand].handResult = 'HIT';
-      hitResult[hand].isCriticalDamage = isCritical;
-      hitResult[hand].giveDamage = battleCalculateService.calculatePhysicalDamage({
-        attackerModifier,
-        defenderModifier,
-        isCritical,
-        equipments,
-        hitHand: hand,
-      });
-
-      const currentHealthAfterHit = Math.max(defenderParticipant.currentHealth - hitResult[hand].giveDamage, 0);
-      hitResult[hand].currentHealthAfterHit = currentHealthAfterHit;
-      this.updateParticipant(defenderParticipant, { currentHealth: currentHealthAfterHit });
+    for (const a of [...allInstanceActions]) {
+      this.removeActionPending(battle.pendingActions, a.id);
     }
 
-    return hitResult;
+    socketService.sendToClientBattleUpdate(battle.id, [
+      { type: 'LOG_ADD', payload: battleLogs },
+      {
+        type: 'COMBAT_STATS_ADD',
+        payload: {
+          participantId: attackerParticipant.id,
+          combatStats,
+        },
+      },
+      {
+        type: 'PARTICIPANT_UPDATE',
+        payload: [
+          {
+            id: targetParticipant.id,
+            currentHealth: targetParticipant.currentHealth,
+          },
+        ],
+      },
+      {
+        type: 'ACTIONS_REMOVE',
+        payload: [...allInstanceActionIds],
+      },
+    ]);
   },
+
   updateParticipant(participant: BattleParticipant, updateData: Partial<BattleParticipant>) {
     Object.assign(participant, updateData);
   },
@@ -480,19 +521,34 @@ export const battleService = {
     serverState.battle.delete(battle.id);
   },
 
-  getCombatStat({ attacker, defender, hitResult }: AddCombatStatParam) {
+  getCombatStat({ actionResult, targetParticipant }: GetCombatStatParam) {
     const combatStats: CombatStats[] = [];
-    for (const hand of Object.keys(hitResult) as WeaponAttackHand[]) {
-      const { giveDamage, isCriticalDamage, hit } = hitResult[hand];
-      if (!hit) continue;
-      combatStats.push({
-        targetId: defender.id,
-        type: 'DAMAGE',
-        targetType: defender.type,
-        isCritical: isCriticalDamage,
-        value: giveDamage,
-      });
+
+    switch (actionResult.category) {
+      case 'PHYSICAL_ATTACK':
+        for (const hand of Object.keys(actionResult.hitResult) as WeaponAttackHand[]) {
+          const { giveDamage, isCriticalDamage, hit } = actionResult.hitResult[hand];
+          if (!hit) continue;
+          combatStats.push({
+            targetId: targetParticipant.id,
+            type: 'DAMAGE',
+            targetType: targetParticipant.type,
+            isCritical: isCriticalDamage,
+            value: giveDamage,
+          });
+        }
     }
+
     return combatStats;
+  },
+
+  findOpponentAction(battle: Battle, action: BattleAction) {
+    return battle.pendingActions.find((a) => {
+      if (a.participantId !== action.targetId) return false;
+      if (action.category !== 'SKIP_ROUND' && 'targetId' in a && a.targetId !== action.participantId) return false;
+
+      if (a.category === 'SKIP_ROUND') return true;
+      return (a.category === 'PHYSICAL_ATTACK' || a.category === 'ABILITY') && a.actionType === 'NORMAL';
+    });
   },
 };

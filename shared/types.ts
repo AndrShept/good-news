@@ -52,6 +52,7 @@ import type { skillInstanceTable } from '../server/db/schema/skill-instance-sche
 import type { Layer, Tileset } from './json-types';
 import type { CreatureKey } from './templates/creature-template';
 import type { SkillKey, skillCategoryValues } from './templates/skill-template';
+import type { BattleParticipantType } from './battle-types';
 
 export interface SuccessResponse<T = undefined> {
   success: true;
@@ -576,7 +577,7 @@ export type Corpse = {
   y: number;
   mapId: string;
   parentEntityId: string;
-  type: BattleParticipantType;
+  type: BattleParticipantType
   expiredAt: number;
 };
 
@@ -679,22 +680,7 @@ export interface GameSysMessage {
   createdAt?: number;
 }
 
-export interface HitResult {
-  LEFT_HAND: {
-    hit: BattleZoneType | null;
-    handResult: HandResult | null;
-    giveDamage: number;
-    currentHealthAfterHit: number;
-    isCriticalDamage: boolean;
-  };
-  RIGHT_HAND: {
-    hit: BattleZoneType | null;
-    handResult: HandResult | null;
-    giveDamage: number;
-    currentHealthAfterHit: number;
-    isCriticalDamage: boolean;
-  };
-}
+
 
 export type WeaponAttackHand = 'LEFT_HAND' | 'RIGHT_HAND';
 
@@ -704,140 +690,6 @@ export type OmitDeepHero = {
   regen?: Partial<ApiGetHeroResponse['regen']>;
 } & Omit<Partial<ApiGetHeroResponse>, 'location' | 'group' | 'regen'>;
 
-//BATTLE
-
-export const battleZoneValues = ['HEAD', 'CHEST', 'HANDS', 'FEET'] as const;
-export const battleShieldZoneValues = [
-  ['HEAD', 'CHEST'],
-  ['CHEST', 'HANDS'],
-  ['HANDS', 'FEET'],
-  ['FEET', 'HEAD'],
-] as const;
-
-export type SelectedAttackingZone = z.infer<typeof selectedAttackingZoneSchema>;
-export type SelectedDefenseZone = z.infer<typeof selectedDefenseZoneSchema>;
-
-export type BattleSide = 'ATTACKER' | 'DEFENDER';
-export type BattleParticipantType = 'HERO' | 'CREATURE';
-export type BattleStatusType = 'IN_PROGRESS' | 'FINISHED';
-export type DamageType = 'MAGIC' | 'PHYSICAL';
-
-export type BattleZoneType = (typeof battleZoneValues)[number];
-export type BattleShieldZoneType = (typeof battleShieldZoneValues)[number];
-
-// Тип дії
-export type BattleActionType = 'INSTANT' | 'NORMAL';
-export type HandResult = 'HIT' | 'BLOCKED' | 'MISSED' | null;
-
-// Категорія дії
-export type BattleActionCategory =
-  | 'PHYSICAL_ATTACK' // удар зброєю по зонах
-  | 'ABILITY' // магія + фізичні абіліті + бафи на себе
-  | 'ITEM' // використати предмет
-  | 'FLEE';
-
-export type BattleLocation = {
-  mapId: string;
-  x: number;
-  y: number;
-};
-export type Battle = {
-  id: string;
-  status: BattleStatusType;
-  currentRound: number;
-  roundEndsAt: number;
-  location: BattleLocation;
-  pendingActions: BattleAction[];
-  logs: BattleLog[];
-  participants: BattleParticipant[];
-};
-export type BattleDto = {
-  id: string;
-  status: BattleStatusType;
-  currentRound: number;
-  roundEndsAt: number;
-  pendingActions: BattleAction[];
-  logs: BattleLog[];
-  participants: BattleParticipantDto[];
-};
-export type BattleParticipantDto = Omit<BattleParticipant, 'modifier'> & { modifier: Partial<Modifier> };
-export type BattleParticipant = Pick<
-  Hero,
-  | 'id'
-  | 'name'
-  | 'currentHealth'
-  | 'maxHealth'
-  | 'currentMana'
-  | 'maxMana'
-  | 'level'
-  | 'avatarImage'
-  | 'characterImage'
-  | 'equipments'
-  | 'buffs'
-> & {
-  scale?: number;
-  stat?: IHeroStat;
-  modifier: Modifier;
-  type: BattleParticipantType;
-  side: BattleSide;
-  isDead: boolean;
-  targetId: string | null;
-  combatStats: CombatStats[];
-};
-
-export type CombatStats = {
-  targetId: string;
-  value: number;
-  isCritical: boolean;
-  targetType: BattleParticipantType;
-  type: 'DAMAGE' | 'HEAL';
-};
-export type BattleLog = PhysicalAttackLog | AbilityLog;
-
-export type PhysicalAttackLog = {
-  id: string;
-  type: 'PHYSICAL_ATTACK';
-  attackerId: string;
-  attackerName: string;
-  defenderId: string;
-  defenderName: string;
-  defendZone: SelectedDefenseZone | null
-  giveDamage: number;
-  defenderCurrentHealth: number;
-  defenderMaxHealth: number;
-  attackingZone: BattleZoneType | null;
-  hand: keyof HitResult;
-  isMissed: boolean;
-  isCriticalDamage: boolean;
-  isBlocking: boolean;
-  createdAt: number;
-};
-export type AbilityLog = {
-  id: string;
-  type: 'ABILITY';
-  casterId: string;
-  casterName: string;
-  targetId: string;
-  targetName: string;
-  abilityId: string;
-  abilityName: string;
-  isMissed: boolean;
-  isCriticalDamage: boolean;
-  giveDamage?: number;
-  healAmount?: number;
-  createdAt: number;
-};
-
-export type BattleAction = {
-  id: string;
-  participantId: string;
-  category: BattleActionCategory;
-  actionType: BattleActionType;
-  targetId: string;
-  attackingZone: SelectedAttackingZone;
-  defenseZone: SelectedDefenseZone | null;
-  abilityId?: string;
-};
 
 //API RESPONSE
 export type ApiGetHeroResponse = NonNullable<InferResponseType<(typeof client.hero)['$get']>['data']>;
@@ -916,24 +768,3 @@ export const buyItemsSchema = z.object({
   // .refine((items) => new Set(items.map((i) => i.id)).size === items.length, { message: 'Duplicate item id' }),
 });
 
-const battleZoneSchema = z.enum(battleZoneValues);
-
-const battleShieldZoneSchema = z.union([
-  z.tuple([z.literal('HEAD'), z.literal('CHEST')]),
-  z.tuple([z.literal('CHEST'), z.literal('HANDS')]),
-  z.tuple([z.literal('HANDS'), z.literal('FEET')]),
-  z.tuple([z.literal('FEET'), z.literal('HEAD')]),
-]);
-
-const selectedAttackingZoneSchema = z.object({
-  LEFT_HAND: battleZoneSchema.nullable(),
-  RIGHT_HAND: battleZoneSchema.nullable(),
-});
-
-const selectedDefenseZoneSchema = z.union([battleZoneSchema, battleShieldZoneSchema]);
-
-export const endTurnSchema = z.object({
-  attackingZone: selectedAttackingZoneSchema,
-  defenseZone: selectedDefenseZoneSchema,
-  targetId: z.string().uuid(),
-});

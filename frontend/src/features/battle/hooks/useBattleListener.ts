@@ -12,35 +12,70 @@ export const useBattleListener = () => {
 
   useEffect(() => {
     const updateBattleListener = (data: BattleSocketEvent) => {
-      switch (data.type) {
-        case 'BATTLE_UPDATE':
-          updateBattle(data.payload);
-          break;
-        case 'PARTICIPANT_UPDATE':
-          for (const participant of data.payload) {
-            if (!participant.id) continue;
-            updateParticipant(participant.id, participant);
+      if (Array.isArray(data)) {
+        for (const event of data) {
+          switch (event.type) {
+            case 'BATTLE_UPDATE':
+              updateBattle(event.payload);
+              break;
+            case 'PARTICIPANT_UPDATE':
+              for (const participant of event.payload) {
+                if (!participant.id) continue;
+                updateParticipant(participant.id, participant);
+              }
+              break;
+            case 'PARTICIPANT_ADD':
+              addParticipant(event.payload);
+              break;
+            case 'ACTIONS_ADD':
+              addPendingAction(event.payload);
+              break;
+            case 'ACTIONS_REMOVE':
+              for (const actionId of event.payload) {
+                removePendingAction(actionId);
+              }
+              break;
+            case 'LOG_ADD':
+              for (const log of event.payload) {
+                addLog(log);
+              }
+              break;
+            case 'COMBAT_STATS_ADD':
+              addCombatStats(event.payload.participantId, event.payload.combatStats);
+              break;
           }
-          break;
-        case 'PARTICIPANT_ADD':
-          addParticipant(data.payload);
-          break;
-        case 'ACTIONS_ADD':
-          addPendingAction(data.payload);
-          break;
-        case 'ACTIONS_REMOVE':
-          for (const actionId of data.payload) {
-            removePendingAction(actionId);
-          }
-          break;
-        case 'LOG_ADD':
-          for (const log of data.payload) {
-            addLog(log);
-          }
-          break;
-        case 'COMBAT_STATS_ADD':
-          addCombatStats(data.payload.participantId, data.payload.combatStats);
-          break;
+        }
+      } else {
+        switch (data.type) {
+          case 'BATTLE_UPDATE':
+            updateBattle(data.payload);
+            break;
+          case 'PARTICIPANT_UPDATE':
+            for (const participant of data.payload) {
+              if (!participant.id) continue;
+              updateParticipant(participant.id, participant);
+            }
+            break;
+          case 'PARTICIPANT_ADD':
+            addParticipant(data.payload);
+            break;
+          case 'ACTIONS_ADD':
+            addPendingAction(data.payload);
+            break;
+          case 'ACTIONS_REMOVE':
+            for (const actionId of data.payload) {
+              removePendingAction(actionId);
+            }
+            break;
+          case 'LOG_ADD':
+            for (const log of data.payload) {
+              addLog(log);
+            }
+            break;
+          case 'COMBAT_STATS_ADD':
+            addCombatStats(data.payload.participantId, data.payload.combatStats);
+            break;
+        }
       }
     };
 

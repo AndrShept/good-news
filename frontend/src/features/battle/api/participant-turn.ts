@@ -1,5 +1,6 @@
 import { client } from '@/lib/utils';
-import { ErrorResponse,  endTurnSchema } from '@/shared/types';
+import { endTurnSchema } from '@/shared/battle-types';
+import { ErrorResponse } from '@/shared/types';
 import { z } from 'zod';
 
 export const participantTurn = async ({

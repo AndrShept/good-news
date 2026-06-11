@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useBattle } from '../hooks/useBattle';
 import { AbilityLogCard } from './AbilityLogCard';
 import { PhysicalAttackLogCard } from './PhysicalAttackLogCard';
+import { SkipRoundLogCard } from './SkipRoundLogCard';
 
 export const BattleLogList = () => {
   const { battle } = useBattle();
@@ -19,6 +20,7 @@ export const BattleLogList = () => {
       {battle?.logs.map((log) => {
         if (log.type === 'PHYSICAL_ATTACK') return <PhysicalAttackLogCard key={log.id} log={log} heroId={heroId} />;
         if (log.type === 'ABILITY') return <AbilityLogCard key={log.id} log={log} />;
+        if (log.type === 'SKIP_ROUND') return <SkipRoundLogCard key={log.id} log={log} />;
       })}
     </ul>
   );

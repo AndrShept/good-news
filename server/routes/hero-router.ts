@@ -1,3 +1,4 @@
+import { type BattleAction, type BattleDto, endTurnSchema } from '@/shared/battle-types';
 import { BANK_CONTAINER_COST, BASE_STATS, MAX_QUEUE_CRAFT_ITEM, RESET_STATS_COST } from '@/shared/shared-constants';
 import type { HeroUpdateEvent, MapChunkUpdateEntitiesData } from '@/shared/socket-data-types';
 import { mapTemplate } from '@/shared/templates/map-template';
@@ -7,9 +8,6 @@ import { resourceTemplateById } from '@/shared/templates/resource-template';
 import { gatheringSkillKeysValues, skillsTemplate } from '@/shared/templates/skill-template';
 import { toolTemplateByKey } from '@/shared/templates/tool-template';
 import {
-  type BattleAction,
-  type BattleActionCategory,
-  type BattleDto,
   type ErrorResponse,
   type Hero,
   type ItemInstance,
@@ -24,7 +22,6 @@ import {
   buildingValues,
   buyItemsSchema,
   createHeroSchema,
-  endTurnSchema,
   refiningBuildingValues,
   statsSchema,
 } from '@/shared/types';
@@ -1584,7 +1581,14 @@ export const heroRouter = new Hono<Context>()
       if (battle.status !== 'IN_PROGRESS') throw new HTTPException(400, { message: 'Battle is already finished' });
       if (selfParticipant.isDead) throw new HTTPException(400, { message: 'You are dead', cause: { canShow: false } });
       if (targetParticipant.isDead) throw new HTTPException(400, { message: 'Target is already dead', cause: { canShow: false } });
-      if (battle.pendingActions.some((a) => a.targetId === targetParticipant.id)) {
+      if (
+        battle.pendingActions.some(
+          (a) =>
+            (a.category === 'ABILITY' || a.category === 'PHYSICAL_ATTACK') &&
+            a.actionType === 'NORMAL' &&
+            a.targetId === targetParticipant.id,
+        )
+      ) {
         throw new HTTPException(400, {
           message: 'You have already attacked this target. Wait for their response.',
           cause: { canShow: false },

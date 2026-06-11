@@ -22,9 +22,14 @@ export const useBattle = () => {
       return e.slot === 'LEFT_HAND' && template.type === 'SHIELD';
     }) ?? false;
 
-  const canMakeActionInTarget  = battle?.participants.some((p) =>
+  const canMakeActionInTarget = battle?.participants.some((p) =>
     battle.pendingActions.some(
-      (a) => p.id === a.participantId && p.id === hero.id && p.targetId === a.targetId && a.actionType === 'NORMAL',
+      (a) =>
+        (a.category === 'PHYSICAL_ATTACK' || a.category === 'ABILITY') &&
+        p.id === a.participantId &&
+        p.id === hero.id &&
+        p.targetId === a.targetId &&
+        a.actionType === 'NORMAL',
     ),
   );
 

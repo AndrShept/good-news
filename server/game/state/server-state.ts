@@ -1,6 +1,5 @@
 import type { GatheringCategorySkillKey } from '@/shared/templates/skill-template';
 import type {
-  Battle,
   BuffInstance,
   BuffTemplate,
   Corpse,
@@ -21,6 +20,7 @@ import type {
 import type { Socket } from 'socket.io';
 
 import type { itemInstanceTable, skillInstanceTable } from '../../db/schema';
+import type { Battle } from '@/shared/battle-types';
 
 export type HeroRuntime = Hero & {
   paths?: PathNode[];

@@ -1,5 +1,5 @@
 import { useHero } from '@/features/hero/hooks/useHero';
-import { Battle, BattleAction, BattleLog, BattleParticipant, CombatStats } from '@/shared/types';
+import { Battle, BattleAction, BattleLog, BattleParticipant, CombatStats } from '@/shared/battle-types';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { getBattleOptions } from '../api/get-battle';
@@ -66,6 +66,6 @@ export const useBattleUpdate = () => {
     addLog,
     addPendingAction,
     removePendingAction,
-    addCombatStats
+    addCombatStats,
   };
 };

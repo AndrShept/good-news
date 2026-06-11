@@ -1,6 +1,6 @@
 import { CharacterStatusBar } from '@/features/hero/components/CharacterStatusBar';
 import { Equipments } from '@/features/hero/components/Equipment';
-import { BattleParticipantDto } from '@/shared/types';
+import { BattleParticipantDto } from '@/shared/battle-types';
 import { sumAllModifier } from '@/shared/utils';
 import { memo } from 'react';
 

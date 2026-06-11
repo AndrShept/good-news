@@ -1,44 +1,41 @@
-import type {
-  BattleZoneType,
-  DamageType,
-  HandResult,
-  HitResult,
-  ItemInstance,
-  Modifier,
-  SelectedAttackingZone,
-  SelectedDefenseZone,
-} from '@/shared/types';
+import type { BattleZoneType, DamageType, SelectedDefenseZone } from '@/shared/battle-types';
+import type { ItemInstance, Modifier, WeaponAttackHand } from '@/shared/types';
 
 import { clamp } from '../lib/utils';
 import { itemTemplateService } from './item-template-service';
 
 interface IsDodgedParam {
   attackerModifier: Modifier;
-  defenderModifier: Modifier;
+  targetModifier: Modifier;
   damageType: DamageType;
 }
 
 interface CalculatePhysicalDamageParam {
   attackerModifier: Modifier;
-  defenderModifier: Modifier;
+  targetModifier: Modifier;
   isCritical: boolean;
   equipments: ItemInstance[];
-  hitHand: keyof HitResult;
+  hitHand: WeaponAttackHand;
+}
+interface IsCriticalHitParam {
+  attackerModifier: Modifier;
+  targetModifier: Modifier;
+  damageType: DamageType;
 }
 
 export const battleCalculateService = {
-  isDodged({ attackerModifier, defenderModifier, damageType }: IsDodgedParam) {
+  isDodged({ attackerModifier, targetModifier, damageType }: IsDodgedParam) {
     const hitRating = damageType === 'PHYSICAL' ? attackerModifier.physHitRating : attackerModifier.spellHitRating;
 
     const hitChance = clamp(75 + hitRating * 0.1 + attackerModifier.dexterity * 0.2, 75, 95);
 
-    const evasionChance = clamp(5 + defenderModifier.evasion * 0.15 + defenderModifier.dexterity * 0.3, 5, 40);
+    const evasionChance = clamp(5 + targetModifier.evasion * 0.15 + targetModifier.dexterity * 0.3, 5, 40);
 
     const missChance = clamp(evasionChance - (hitChance - 75), 0, 40);
 
     return Math.random() * 100 < missChance;
   },
-  isCriticalHit(attackerModifier: Modifier, defenderModifier: Modifier, damageType: DamageType) {
+  isCriticalHit({ attackerModifier, targetModifier, damageType }: IsCriticalHitParam) {
     if (damageType === 'PHYSICAL') {
       // luck * 0.15% + strength * 0.5% + physCritRating * 0.1%
       const critChance = clamp(
@@ -48,7 +45,7 @@ export const battleCalculateService = {
       );
 
       // constitution захисника зменшує шанс крита
-      const critReduction = clamp(defenderModifier.constitution * 0.1, 0, 20);
+      const critReduction = clamp(targetModifier.constitution * 0.1, 0, 20);
       console.log('critChance', critChance);
 
       return Math.random() * 100 < critChance - critReduction;
@@ -58,7 +55,7 @@ export const battleCalculateService = {
     const critChance = clamp(5 + attackerModifier.intelligence * 0.15 + attackerModifier.spellCritRating * 0.1, 5, 50);
 
     // wisdom захисника зменшує шанс крита
-    const critReduction = clamp(defenderModifier.wisdom * 0.1, 0, 20);
+    const critReduction = clamp(targetModifier.wisdom * 0.1, 0, 20);
     return Math.random() * 100 < critChance - critReduction;
   },
   isZoneBlocked(attackZone: BattleZoneType, defendZone: SelectedDefenseZone | null) {
@@ -68,7 +65,7 @@ export const battleCalculateService = {
     }
     return attackZone === defendZone;
   },
-  calculatePhysicalDamage({ attackerModifier, defenderModifier, isCritical, equipments, hitHand }: CalculatePhysicalDamageParam) {
+  calculatePhysicalDamage({ attackerModifier, targetModifier, isCritical, equipments, hitHand }: CalculatePhysicalDamageParam) {
     let baseDamage = 0;
     const equipWeapon = equipments.find((e) => e.slot === hitHand);
     if (equipWeapon) {
@@ -89,7 +86,7 @@ export const battleCalculateService = {
     const withPhysDamage = baseDamage * (1 + attackerModifier.physDamage / 100);
 
     // penetration зменшує ефективний armor
-    const effectiveArmor = Math.max(0, defenderModifier.armor - attackerModifier.physPenetration);
+    const effectiveArmor = Math.max(0, targetModifier.armor - attackerModifier.physPenetration);
 
     // armor редукція максимум 70%
     const reductionPercent = clamp(effectiveArmor * 0.1, 0, 70);

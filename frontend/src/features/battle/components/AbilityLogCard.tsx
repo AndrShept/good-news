@@ -1,4 +1,4 @@
-import { AbilityLog } from '@/shared/types';
+import { AbilityLog } from '@/shared/battle-types';
 import React from 'react';
 
 interface Props {

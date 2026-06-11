@@ -12,6 +12,7 @@ import {
   plankValues,
 } from '../server/db/schema';
 import { itemTemplateService } from '../server/services/item-template-service';
+import { battleShieldZoneValues, battleZoneValues, type SelectedAttackingZone, type SelectedDefenseZone } from './battle-types';
 import type { Layer } from './json-types';
 import { mapTemplate } from './templates/map-template';
 import type { GatheringCategorySkillKey } from './templates/skill-template';
@@ -25,11 +26,9 @@ import {
   type Modifier,
   type RefiningBuildingKey,
   type RefiningRecipe,
-  type SelectedAttackingZone,
-  type SelectedDefenseZone,
+
   type StateType,
-  battleShieldZoneValues,
-  battleZoneValues,
+
   gatheringTileTypeValues,
 } from './types';
 

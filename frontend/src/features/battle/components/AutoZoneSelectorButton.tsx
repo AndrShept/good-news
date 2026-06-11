@@ -1,8 +1,8 @@
 import { GameIcon } from '@/components/GameIcon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { SelectedAttackingZone, SelectedDefenseZone } from '@/shared/battle-types';
 import { imageConfig } from '@/shared/config/image-config';
-import { SelectedAttackingZone, SelectedDefenseZone } from '@/shared/types';
 import { getAttackingRandomZone, getDefenseRandomZone } from '@/shared/utils';
 import { useGameUIStore } from '@/store/useGameUIStore';
 import { useIsMutating } from '@tanstack/react-query';

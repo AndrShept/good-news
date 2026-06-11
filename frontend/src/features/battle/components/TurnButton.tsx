@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useHeroId } from '@/features/hero/hooks/useHeroId';
-import { SelectedAttackingZone, SelectedDefenseZone } from '@/shared/types';
+import { SelectedAttackingZone, SelectedDefenseZone } from '@/shared/battle-types';
 import { useState } from 'react';
 
 import { useBattle } from '../hooks/useBattle';
