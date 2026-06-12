@@ -21,7 +21,6 @@ export type DamageType = 'MAGIC' | 'PHYSICAL';
 export type BattleZoneType = (typeof battleZoneValues)[number];
 export type BattleShieldZoneType = (typeof battleShieldZoneValues)[number];
 
-export type BattleActionType = 'INSTANT' | 'NORMAL';
 export type HandResult = 'HIT' | 'BLOCKED' | 'MISSED' | null;
 
 export interface PhysicalAttackResult {
@@ -46,24 +45,21 @@ export interface SkipRoundResult {
   participantName: string;
   message: string;
 }
-export type ActionResult =
+export type PendingActionResult =
   | {
-      category: 'PHYSICAL_ATTACK';
+      type: 'PHYSICAL_ATTACK';
       hitResult: PhysicalAttackResult;
     }
   | {
-      category: 'ABILITY';
+      type: 'ABILITY';
       abilityResult: AbilityResult;
     }
   | {
-      category: 'SKIP_ROUND';
+      type: 'SKIP_ROUND';
       skipRoundResult: SkipRoundResult;
     };
 
-export type BattleActionCategory =
-  | 'PHYSICAL_ATTACK' // удар зброєю по зонах
-  | 'ABILITY' // магія + фізичні абіліті + бафи на себе
-  | 'SKIP_ROUND';
+export type BattleActionType = 'PHYSICAL_ATTACK' | 'ABILITY' | 'SKIP_ROUND';
 
 export type BattleLocation = {
   mapId: string;
@@ -76,7 +72,7 @@ export type Battle = {
   currentRound: number;
   roundEndsAt: number;
   location: BattleLocation;
-  pendingActions: BattleAction[];
+  pendingActions: BattlePendingAction[];
   logs: BattleLog[];
   participants: BattleParticipant[];
 };
@@ -85,7 +81,7 @@ export type BattleDto = {
   status: BattleStatusType;
   currentRound: number;
   roundEndsAt: number;
-  pendingActions: BattleAction[];
+  pendingActions: BattlePendingAction[];
   logs: BattleLog[];
   participants: BattleParticipantDto[];
 };
@@ -163,29 +159,16 @@ export type SkipRoundLog = SkipRoundResult & {
   type: 'SKIP_ROUND';
 };
 
-type BaseAction = {
+export type BattlePendingAction = {
   id: string;
   participantId: string;
   targetId: string;
+  type: BattleActionType;
   defenseZone: SelectedDefenseZone | null;
+  attackingZone: SelectedAttackingZone;
+  abilityId?: string;
+  isResolved: boolean;
 };
-
-export type BattleAction = BaseAction &
-  (
-    | {
-        category: 'PHYSICAL_ATTACK';
-        actionType: BattleActionType;
-        attackingZone: SelectedAttackingZone;
-      }
-    | {
-        category: 'ABILITY';
-        actionType: BattleActionType;
-        abilityId: string;
-      }
-    | {
-        category: 'SKIP_ROUND';
-      }
-  );
 
 const battleZoneSchema = z.enum(battleZoneValues);
 
