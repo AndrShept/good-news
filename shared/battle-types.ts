@@ -157,6 +157,7 @@ export type AbilityLog = {
 export type SkipRoundLog = SkipRoundResult & {
   id: string;
   type: 'SKIP_ROUND';
+  createdAt: number;
 };
 
 export type BattlePendingAction = {

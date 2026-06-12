@@ -25,11 +25,11 @@ export const useBattle = () => {
   const canMakeActionInTarget = battle?.participants.some((p) =>
     battle.pendingActions.some(
       (a) =>
-        (a.category === 'PHYSICAL_ATTACK' || a.category === 'ABILITY') &&
+        
         p.id === a.participantId &&
         p.id === hero.id &&
-        p.targetId === a.targetId &&
-        a.actionType === 'NORMAL',
+        p.targetId === a.targetId 
+       
     ),
   );
 

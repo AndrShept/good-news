@@ -343,6 +343,7 @@ export const battleService = {
         battleLogs.push({
           id: generateRandomUuid(),
           type: 'SKIP_ROUND',
+          createdAt: Date.now(),
           ...actionResult.skipRoundResult,
         });
         break;
@@ -514,14 +515,20 @@ export const battleService = {
     battle.currentRound++;
     const filterPendingActions = battle.pendingActions.filter((a) => !a.isResolved);
     battle.pendingActions = filterPendingActions;
-    
+
     battle.roundEndsAt = battleService.getRoundDuration(battle.participants.length);
-    socketService.sendToClientBattleUpdate(battle.id, {
-      type: 'BATTLE_UPDATE',
-      payload: {
-        currentRound: battle.currentRound,
-        roundEndsAt: battle.roundEndsAt,
+    socketService.sendToClientBattleUpdate(battle.id, [
+      {
+        type: 'BATTLE_UPDATE',
+        payload: {
+          currentRound: battle.currentRound,
+          roundEndsAt: battle.roundEndsAt,
+        },
       },
-    });
+      {
+        type: 'ACTIONS_SET',
+        payload: filterPendingActions,
+      },
+    ]);
   },
 };

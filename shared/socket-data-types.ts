@@ -1,4 +1,4 @@
-import type { Battle, BattleAction, BattleLog, BattleParticipant, CombatStats } from './battle-types';
+import type { Battle, BattleLog, BattleParticipant, BattlePendingAction, CombatStats } from './battle-types';
 import type {
   BuffInstance,
   Corpse,
@@ -171,16 +171,18 @@ export type BattleSocketEvent =
   | { type: 'PARTICIPANT_ADD'; payload: BattleParticipant }
   | { type: 'PARTICIPANT_UPDATE'; payload: Partial<BattleParticipant>[] }
   | { type: 'LOG_ADD'; payload: BattleLog[] }
-  | { type: 'ACTIONS_ADD'; payload: BattleAction }
+  | { type: 'ACTIONS_ADD'; payload: BattlePendingAction }
   | { type: 'ACTIONS_REMOVE'; payload: string[] }
+  | { type: 'ACTIONS_SET'; payload: BattlePendingAction[] }
   | { type: 'BATTLE_UPDATE'; payload: Partial<Battle> }
   | { type: 'COMBAT_STATS_ADD'; payload: { participantId: string; combatStats: CombatStats[] } }
   | (
       | { type: 'PARTICIPANT_ADD'; payload: BattleParticipant }
       | { type: 'PARTICIPANT_UPDATE'; payload: Partial<BattleParticipant>[] }
       | { type: 'LOG_ADD'; payload: BattleLog[] }
-      | { type: 'ACTIONS_ADD'; payload: BattleAction }
+      | { type: 'ACTIONS_ADD'; payload: BattlePendingAction }
       | { type: 'ACTIONS_REMOVE'; payload: string[] }
+      | { type: 'ACTIONS_SET'; payload: BattlePendingAction[] }
       | { type: 'BATTLE_UPDATE'; payload: Partial<Battle> }
       | { type: 'COMBAT_STATS_ADD'; payload: { participantId: string; combatStats: CombatStats[] } }
     )[];

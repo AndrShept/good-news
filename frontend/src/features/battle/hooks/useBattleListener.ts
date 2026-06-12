@@ -7,8 +7,16 @@ import { useBattleUpdate } from './useBattleUpdate';
 
 export const useBattleListener = () => {
   const { socket } = useSocket();
-  const { updateBattle, updateParticipant, addParticipant, addLog, addPendingAction, removePendingAction, addCombatStats } =
-    useBattleUpdate();
+  const {
+    updateBattle,
+    updateParticipant,
+    addParticipant,
+    addLog,
+    addPendingAction,
+    removePendingAction,
+    setPendingAction,
+    addCombatStats,
+  } = useBattleUpdate();
 
   useEffect(() => {
     const updateBattleListener = (data: BattleSocketEvent) => {
@@ -34,6 +42,10 @@ export const useBattleListener = () => {
               for (const actionId of event.payload) {
                 removePendingAction(actionId);
               }
+              break;
+            case 'ACTIONS_SET':
+              setPendingAction(event.payload);
+
               break;
             case 'LOG_ADD':
               for (const log of event.payload) {
@@ -67,6 +79,10 @@ export const useBattleListener = () => {
               removePendingAction(actionId);
             }
             break;
+          case 'ACTIONS_SET':
+            setPendingAction(data.payload);
+
+            break;
           case 'LOG_ADD':
             for (const log of data.payload) {
               addLog(log);
@@ -83,5 +99,5 @@ export const useBattleListener = () => {
     return () => {
       socket.off(socketEvents.battleUpdate(), updateBattleListener);
     };
-  }, [addCombatStats, addLog, addParticipant, addPendingAction, removePendingAction, socket, updateBattle, updateParticipant]);
+  }, [addCombatStats, addLog, addParticipant, addPendingAction, removePendingAction, setPendingAction, socket, updateBattle, updateParticipant]);
 };

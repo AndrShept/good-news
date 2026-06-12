@@ -1,13 +1,13 @@
 import { GameIcon } from '@/components/GameIcon';
 import { cn } from '@/lib/utils';
-import { BattleAction, BattleParticipantDto } from '@/shared/battle-types';
+import { BattleParticipantDto, BattlePendingAction } from '@/shared/battle-types';
 import { imageConfig } from '@/shared/config/image-config';
 
 interface Props {
   attackers: BattleParticipantDto[] | undefined;
   defenders: BattleParticipantDto[] | undefined;
   selfParticipant: BattleParticipantDto;
-  pendingActions: BattleAction[];
+  pendingActions: BattlePendingAction[];
 }
 
 export const BattleParticipantList = ({ attackers, defenders, selfParticipant, pendingActions }: Props) => {
@@ -17,13 +17,7 @@ export const BattleParticipantList = ({ attackers, defenders, selfParticipant, p
         {attackers?.map((p) => {
           const isTarget = p.id === selfParticipant.targetId;
           const isSelfParticipant = p.id === selfParticipant.id;
-          const hasAttackedMe = pendingActions.some(
-            (a) =>
-              (a.category === 'PHYSICAL_ATTACK' || a.category === 'ABILITY') &&
-              a.actionType === 'NORMAL' &&
-              a.participantId === p.id &&
-              a.targetId === selfParticipant.id,
-          );
+          const hasAttackedMe = pendingActions.some((a) => a.participantId === p.id && a.targetId === selfParticipant.id);
           return (
             <li
               key={p.id}
@@ -55,13 +49,7 @@ export const BattleParticipantList = ({ attackers, defenders, selfParticipant, p
         {defenders?.map((p) => {
           const isTarget = p.id === selfParticipant.targetId;
           const isSelfParticipant = p.id === selfParticipant.id;
-          const hasAttackedMe = pendingActions.some(
-            (a) =>
-              (a.category === 'PHYSICAL_ATTACK' || a.category === 'ABILITY') &&
-              a.actionType === 'NORMAL' &&
-              a.participantId === p.id &&
-              a.targetId === selfParticipant.id,
-          );
+          const hasAttackedMe = pendingActions.some((a) => a.participantId === p.id && a.targetId === selfParticipant.id);
           return (
             <li
               key={p.id}

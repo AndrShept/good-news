@@ -26,7 +26,6 @@ export const battleTick = (now: number) => {
         battle.pendingActions.push(newAction);
       }
 
-      // battleService.setNextRound(battle);
     }
 
     for (const action of battle.pendingActions) {
@@ -45,12 +44,9 @@ export const battleTick = (now: number) => {
         });
       }
     }
-
-    if (battle.participants.length <= battle.pendingActions.length) {
-      const resolvedActions = new Set(battle.pendingActions.filter((a) => a.isResolved));
-      if (resolvedActions.size === battle.participants.length) {
-        battleService.nextRound(battle);
-      }
+    if (battle.participants.every((p) => battle.pendingActions.some((a) => a.participantId === p.id))) {
+      battleService.nextRound(battle);
+      console.log('NEXT ROUND!!');
     }
 
     for (const participant of battle.participants) {
