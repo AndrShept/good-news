@@ -76,6 +76,8 @@ export type Battle = {
   logs: BattleLog[];
   participants: BattleParticipant[];
 };
+ 
+
 export type BattleDto = {
   id: string;
   status: BattleStatusType;
@@ -118,6 +120,8 @@ export type CombatStats = {
   type: 'DAMAGE' | 'HEAL';
 };
 export type BattleLog = PhysicalAttackLog | AbilityLog | SkipRoundLog;
+
+
 
 export type PhysicalAttackLog = {
   id: string;

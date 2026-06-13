@@ -11,8 +11,8 @@ export const toolsTemplate = [
     image: imageConfig.equipments.tools['blacksmith-hammer'],
     type: 'TOOL',
     stackable: false,
-    minDamage: 5,
-    maxDamage: 9,
+    minDamage: 2,
+    maxDamage: 5,
     equipInfo: {
       weaponHand: 'ONE_HANDED',
       weaponType: 'MACE',
@@ -28,8 +28,8 @@ export const toolsTemplate = [
     image: imageConfig.equipments.tools['fishing-rod'],
     type: 'TOOL',
     stackable: false,
-    minDamage: 5,
-    maxDamage: 9,
+    minDamage: 3,
+    maxDamage: 6,
     equipInfo: {
       weaponHand: 'TWO_HANDED',
       weaponType: 'STAFF',
@@ -45,8 +45,8 @@ export const toolsTemplate = [
     image: imageConfig.equipments.tools['lumber-axe'],
     type: 'TOOL',
     stackable: false,
-    minDamage: 5,
-    maxDamage: 7,
+    minDamage: 3,
+    maxDamage: 4,
     equipInfo: {
       weaponHand: 'ONE_HANDED',
       weaponType: 'AXE',
@@ -62,14 +62,31 @@ export const toolsTemplate = [
     image: imageConfig.equipments.tools['mining-pickaxe'],
     type: 'TOOL',
     stackable: false,
-    minDamage: 4,
-    maxDamage: 7,
+    minDamage: 2,
+    maxDamage: 5,
     equipInfo: {
       weaponHand: 'ONE_HANDED',
       weaponType: 'SWORD',
     },
     toolInfo: {
       skillTemplateId: skillTemplateByKey.MINING.id,
+    },
+  },
+  {
+    id: '019ec292-d83a-78a5-a521-d195a143b593',
+    name: 'skinning knife',
+    key: 'Skinning_Knife',
+    image: imageConfig.equipments.tools['skinning-knife'],
+    type: 'TOOL',
+    stackable: false,
+    minDamage: 2,
+    maxDamage: 3,
+    equipInfo: {
+      weaponHand: 'ONE_HANDED',
+      weaponType: 'DAGGER',
+    },
+    toolInfo: {
+      skillTemplateId: skillTemplateByKey.SKINNING.id,
     },
   },
 ] as const satisfies ItemTemplate[];

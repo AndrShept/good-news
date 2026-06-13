@@ -53,6 +53,13 @@ export const imageConfig = {
         miss: '/sprites/icons/ui/battle/hit.png',
         block: '/sprites/icons/ui/battle/block.png',
         hit: '/sprites/icons/ui/battle/hit.png',
+        'ability-resource': {
+          block: '/sprites/icons/ui/battle/ability-resource/block.png',
+          dodge: '/sprites/icons/ui/battle/ability-resource/dodge.png',
+          hit: '/sprites/icons/ui/battle/ability-resource/hit.png',
+          'magic-crit': '/sprites/icons/ui/battle/ability-resource/magic-crit.png',
+          'phys-crit': '/sprites/icons/ui/battle/ability-resource/phys-crit.png',
+        },
       },
     },
     action: {
@@ -283,6 +290,21 @@ export const imageConfig = {
       'fishing-rod': '/sprites/equipments/tools/fishing-rod.png',
       'lumber-axe': '/sprites/equipments/tools/lumber-axe.png',
       'mining-pickaxe': '/sprites/equipments/tools/mining-pickaxe.png',
+      'skinning-knife': '/sprites/equipments/tools/mining-pickaxe.png',
+    },
+  },
+  ability: {
+    fire_arrow: '/sprites/ability/fire-arrow.png',
+    fire_ball: '/sprites/ability/fire-ball.png',
+    ice_arrow: '/sprites/ability/ice-arrow.png',
+    ice_spike: '/sprites/ability/ice-spike.png',
+    effects: {
+      ignition: '/sprites/icons/ui/battle/effects/ignition.png',
+      paralyze: '/sprites/icons/ui/battle/effects/paralyze.png',
+      shock: '/sprites/icons/ui/battle/effects/shock.png',
+      static: '/sprites/icons/ui/battle/effects/static.png',
+      stun: '/sprites/icons/ui/battle/effects/stun.png',
+      wet: '/sprites/icons/ui/battle/effects/wet.png',
     },
   },
 } as const;
